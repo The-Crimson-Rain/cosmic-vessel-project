@@ -1945,9 +1945,11 @@ function renderTzTable() {
   if (!tbody) return;
   tbody.innerHTML = Object.values(liveData.members).map(m => {
     const depts = (m.depts||[]).map(d=>{const dc=DEPT_COLORS[d]||'#fff';return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${d}</span>`;}).join('');
-    const status = m.status || 'offline';
+    // Only show as active if status is explicitly set to an active state
+    const status = (m.status && m.status !== 'offline') ? m.status : 'offline';
+    const hasLoggedIn = !!m.status; // if no status field, they haven't logged in yet
     const statusColors = { online:'var(--green)', working:'var(--amber)', gaming:'var(--purple)', offline:'var(--grey-2)' };
-    const statusLabels = { online:'ONLINE', working:'WORKING', gaming:'GAMING', offline:'OFFLINE' };
+    const statusLabels = { online:'ONLINE', working:'WORKING', gaming:'GAMING', offline: hasLoggedIn ? 'OFFLINE' : 'NOT LOGGED IN' };
     const statusCls = status === 'offline' ? 'tz-sleep' : 'tz-awake';
     const statusColor = statusColors[status] || 'var(--grey-2)';
     return `<tr>
