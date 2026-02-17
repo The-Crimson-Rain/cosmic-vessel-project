@@ -2130,8 +2130,19 @@ function renderAdminRoster() {
 }
 
 async function updateMemberRole(uid, role) {
-  await db.collection('users').doc(uid).update({ role });
-  toast('Role updated','ok');
+  try {
+    // Use set with merge to avoid permission issues with update()
+    await db.collection('users').doc(uid).set({ role }, { merge: true });
+    toast('Role updated','ok');
+  } catch(e) {
+    console.error('Role update error:', e);
+    // If permission denied, it's likely a Firestore rules issue
+    if (e.code === 'permission-denied') {
+      toast('Permission denied — update Firestore rules (see guide)','err');
+    } else {
+      toast('Error updating role: ' + e.message,'err');
+    }
+  }
 }
 
 // ─── PROFILE ──────────────────────────────────────────────
