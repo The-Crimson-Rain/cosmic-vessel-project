@@ -1269,6 +1269,22 @@ document.getElementById('pwa-manifest').href = manifestUrl;
   </div>
 </div>
 
+
+<!-- Install App Modal -->
+<div class="modal-bg" id="m-install">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">▸ INSTALL CVP HUB AS APP</span>
+      <button class="modal-x" onclick="closeModal('m-install')">✕</button>
+    </div>
+    <div class="modal-body" id="install-modal-body">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m-install')">Close</button>
+      <button class="btn btn-primary" id="install-trigger-btn" style="display:none;" onclick="triggerInstall()">⬇ Install Now</button>
+    </div>
+  </div>
+</div>
 <div id="toasts"></div>
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -2362,6 +2378,101 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
   toast('CVP Hub installed to your device! 🚀', 'ok');
 });
+
+
+function openInstallModal() {
+  const body = document.getElementById('install-modal-body');
+  const triggerBtn = document.getElementById('install-trigger-btn');
+  const ua = navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isAndroid = /android/.test(ua);
+  const isOpera = /opr|opera/.test(ua);
+  const isEdge = /edg/.test(ua);
+  const isChrome = /chrome/.test(ua) && !isEdge && !isOpera;
+  const isFirefox = /firefox/.test(ua);
+  const isSafari = /safari/.test(ua) && !isChrome && !isEdge;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  if (isStandalone) {
+    body.innerHTML = \`
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:48px;margin-bottom:16px;">✅</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:14px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">ALREADY INSTALLED</div>
+        <div style="font-size:13px;color:var(--grey);">CVP Hub is already running as an installed app on this device!</div>
+      </div>\`;
+    triggerBtn.style.display = 'none';
+    openModal('m-install');
+    return;
+  }
+
+  let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+
+  if (deferredPrompt) {
+    // Chrome/Edge — can do it automatically
+    html += \`<div style="background:rgba(46,204,138,.08);border:1px solid rgba(46,204,138,.3);border-radius:6px;padding:14px 16px;">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--green);font-weight:700;margin-bottom:6px;">✓ ONE-CLICK INSTALL AVAILABLE</div>
+      <div style="font-size:13px;color:var(--white);">Your browser supports automatic install. Click the button below!</div>
+    </div>\`;
+    triggerBtn.style.display = 'flex';
+  } else {
+    triggerBtn.style.display = 'none';
+  }
+
+  if (isIOS) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">SAFARI ON IPHONE / IPAD</div>
+      <div style="font-size:13px;color:var(--white);">1. Tap the <strong style="color:var(--gold)">Share button</strong> (box with arrow pointing up) at the bottom of Safari<br>2. Scroll down and tap <strong style="color:var(--gold)">"Add to Home Screen"</strong><br>3. Tap <strong style="color:var(--gold)">Add</strong> — the hub icon will appear on your home screen!</div>
+    </div>\`;
+  }
+
+  if (isChrome && !isIOS) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">GOOGLE CHROME</div>
+      <div style="font-size:13px;color:var(--white);">Look for a <strong style="color:var(--gold)">computer/phone with ⊕ icon</strong> in the address bar and click it.<br><br>Or: Click the <strong style="color:var(--gold)">three dots ⋮</strong> menu → <strong style="color:var(--gold)">"Install Cosmic Vessel Project"</strong></div>
+    </div>\`;
+  }
+
+  if (isEdge) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">MICROSOFT EDGE</div>
+      <div style="font-size:13px;color:var(--white);">Click the <strong style="color:var(--gold)">three dots ···</strong> menu (top right)<br>→ <strong style="color:var(--gold)">Apps</strong> → <strong style="color:var(--gold)">"Install this site as an app"</strong></div>
+    </div>\`;
+  }
+
+  if (isOpera) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">OPERA</div>
+      <div style="font-size:13px;color:var(--white);">Look for the <strong style="color:var(--gold)">install icon</strong> in the address bar (monitor with down arrow).<br><br>Or: Click the <strong style="color:var(--gold)">Opera menu (O logo)</strong> → <strong style="color:var(--gold)">"Install Cosmic Vessel Project as app"</strong><br><br>If not available, Opera GX users can try: Easy Setup → Progressive Web Apps</div>
+    </div>\`;
+  }
+
+  if (isFirefox) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">FIREFOX</div>
+      <div style="font-size:13px;color:var(--white);">Firefox has limited PWA support on desktop. For the best experience we recommend using <strong style="color:var(--gold)">Chrome or Edge</strong> to install the app.<br><br>On <strong style="color:var(--gold)">Android Firefox</strong>: tap the three dots menu → "Install"</div>
+    </div>\`;
+  }
+
+  if (isAndroid && !isChrome && !isOpera && !isEdge && !isFirefox) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">ANDROID</div>
+      <div style="font-size:13px;color:var(--white);">Tap the <strong style="color:var(--gold)">three dots menu</strong> in your browser → <strong style="color:var(--gold)">"Add to Home Screen"</strong> or <strong style="color:var(--gold)">"Install App"</strong></div>
+    </div>\`;
+  }
+
+  if (!isIOS && !isChrome && !isEdge && !isOpera && !isFirefox && !isAndroid) {
+    html += \`<div class="setup-step">
+      <div class="setup-step-num">OTHER BROWSERS</div>
+      <div style="font-size:13px;color:var(--white);">Look for an <strong style="color:var(--gold)">install icon</strong> in the address bar, or check your browser's menu for <strong style="color:var(--gold)">"Install as App"</strong> or <strong style="color:var(--gold)">"Add to Home Screen"</strong>.<br><br>For best results use <strong style="color:var(--gold)">Chrome or Edge</strong>.</div>
+    </div>\`;
+  }
+
+  html += \`<div style="font-size:11px;color:var(--grey-2);letter-spacing:.5px;padding:4px 0;">Once installed, CVP Hub will appear on your desktop or home screen and open in its own window without a browser bar.</div>\`;
+  html += '</div>';
+
+  body.innerHTML = html;
+  openModal('m-install');
+}
 
 function showInstallBtn() {
   let btn = document.getElementById('pwa-install-btn');
