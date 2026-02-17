@@ -1944,18 +1944,24 @@ function renderTzTable() {
   const tbody = document.getElementById('tz-tbody');
   if (!tbody) return;
   tbody.innerHTML = Object.values(liveData.members).map(m => {
-    const hour = getLocalHour(m.tz||'UTC');
-    const awake = hour>=7 && hour<23;
     const depts = (m.depts||[]).map(d=>{const dc=DEPT_COLORS[d]||'#fff';return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${d}</span>`;}).join('');
+    const status = m.status || 'offline';
+    const statusColors = { online:'var(--green)', working:'var(--amber)', gaming:'var(--purple)', offline:'var(--grey-2)' };
+    const statusLabels = { online:'ONLINE', working:'WORKING', gaming:'GAMING', offline:'OFFLINE' };
+    const statusCls = status === 'offline' ? 'tz-sleep' : 'tz-awake';
+    const statusColor = statusColors[status] || 'var(--grey-2)';
     return `<tr>
       <td><div class="tz-member-cell">
-        <div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;color:var(--white);">${initials(m.name)}</div>
+        <div style="position:relative;">
+          <div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;color:var(--white);">${initials(m.name)}</div>
+          <div class="status-dot ${STATUS_CLASS[status]||'s-offline'}" style="position:absolute;bottom:0;right:0;width:9px;height:9px;border:2px solid var(--void);"></div>
+        </div>
         <div><div class="tz-name">${esc(m.name)}</div><div class="tz-loc">${esc(m.email||'')}</div></div>
       </div></td>
       <td class="tz-time-cell">${getLocalTime(m.tz||'UTC')}</td>
       <td class="tz-offset-cell">${getTzOffset(m.tz||'UTC')}</td>
       <td>${depts}</td>
-      <td class="${awake?'tz-awake':'tz-sleep'}">${awake?'AWAKE':'SLEEP'}</td>
+      <td class="${statusCls}" style="color:${statusColor};">${statusLabels[status]||'OFFLINE'}</td>
     </tr>`;
   }).join('');
   document.getElementById('dash-tz-time').textContent = 'Updated ' + new Date().toLocaleTimeString();
