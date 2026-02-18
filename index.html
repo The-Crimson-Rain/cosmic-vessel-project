@@ -1849,8 +1849,13 @@ function navTo(view) {
   if (el) {
     el.classList.add('active');
     if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
-    if (view === 'profile') renderProfile();
-    if (view === 'admin') renderAdminRoster();
+    if (view === 'profile')    renderProfile();
+    if (view === 'admin')      renderAdminRoster();
+    if (view === 'my-tasks')   renderMyTasks();
+    if (view === 'crew')       renderCrew();
+    if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
+    if (view === 'scheduler')  { renderMeetings(); renderTzTable(); }
+    if (view === 'transcripts') renderTranscripts();
   }
 }
 
@@ -1981,12 +1986,15 @@ function openNewTask(dept) {
 }
 
 function populateAssignSelect(dept) {
-  const sel = document.getElementById('t-assign');
+  var sel = document.getElementById('t-assign');
   sel.innerHTML = '<option value="">Unassigned</option>';
-  Object.values(liveData.members).forEach(m => {
-    if (!dept || (m.depts && m.depts.includes(dept))) {
-      const o = document.createElement('option');
-      o.value = m.uid; o.textContent = m.name;
+  var role = currentProfile ? currentProfile.role : '';
+  var canAssignAll = role === 'admin' || role === 'lead';
+  Object.values(liveData.members).forEach(function(m) {
+    // Admin/lead can assign anyone; otherwise restrict to dept members
+    if (canAssignAll || !dept || (m.depts && m.depts.includes(dept))) {
+      var o = document.createElement('option');
+      o.value = m.uid; o.textContent = m.name + (m.role === 'admin' ? ' (admin)' : m.role === 'lead' ? ' (lead)' : '');
       sel.appendChild(o);
     }
   });
@@ -2341,7 +2349,10 @@ function renderDeptBoard(dept) {
   var canCreate = currentProfile.role === 'admin' || currentProfile.role === 'lead';
 
   // Get dept members
-  const deptMembers = Object.values(liveData.members).filter(m => m.depts && m.depts.includes(dept));
+  const deptMembers = Object.values(liveData.members).filter(m => {
+    if (m.role === 'admin') return true; // admin appears on all boards
+    return m.depts && m.depts.includes(dept);
+  });
 
   container.innerHTML = `
     <div class="page-hdr">
@@ -2844,7 +2855,19 @@ function renderOrphanTasks() {
   var el = document.getElementById('admin-orphan-tasks');
   if (!el) return;
   var allTasks = Object.values(liveData.tasks);
-  var orphans = allTasks.filter(function(t) { return !t.dept || !t.name; });
+  var orphans = allTasks.filter(function(t) {
+    // No name or no dept = definitely orphaned
+    if (!t.name && !t.title) return true;
+    if (!t.dept) return true;
+    // Has dept but assignee is not a member of that dept (and not admin/lead) = invisible on board
+    if (t.assignee) {
+      var member = liveData.members[t.assignee];
+      if (member && member.role !== 'admin' && member.role !== 'lead') {
+        if (!member.depts || !member.depts.includes(t.dept)) return true;
+      }
+    }
+    return false;
+  });
   if (orphans.length === 0) {
     el.innerHTML = '<div style="font-size:12px;color:var(--grey-2);padding:10px;">No orphaned tasks. All clean!</div>';
     return;
