@@ -1633,6 +1633,16 @@ async function onAuthChange(user) {
       };
       await db.collection('users').doc(user.uid).set(currentProfile);
     }
+    // Admin always has all depts
+    if (currentProfile.role === 'admin') {
+      var allDepts = ['Programming', '2D Art', '3D Art', 'Marketing', 'Sound Design', 'Visual Effects', 'Narrative'];
+      var needsUpdate = !currentProfile.depts || allDepts.some(function(d){ return !(currentProfile.depts||[]).includes(d); });
+      if (needsUpdate) {
+        currentProfile.depts = allDepts;
+        db.collection('users').doc(user.uid).update({ depts: allDepts }).catch(function(){});
+        db.collection('members').doc(user.uid).update({ depts: allDepts }).catch(function(){});
+      }
+    }
     showApp();
   } else {
     currentUser = null; currentProfile = null;
@@ -1762,6 +1772,8 @@ function startListeners() {
     liveData.tasks = {}; snap.docs.forEach(d => { liveData.tasks[d.id] = {id:d.id,...d.data()}; });
     document.getElementById('s-tasks').textContent = Object.values(liveData.tasks).filter(t=>t.state!=='completed').length;
     renderDashTasks(); renderAllDeptBoards();
+    if (document.getElementById('view-my-tasks') && document.getElementById('view-my-tasks').classList.contains('active')) renderMyTasks();
+    updateNotifications();
   });
 
   // Meetings
@@ -2854,37 +2866,71 @@ async function removeMember(uid) {
 function renderOrphanTasks() {
   var el = document.getElementById('admin-orphan-tasks');
   if (!el) return;
+  var uid = currentUser ? currentUser.uid : null;
   var allTasks = Object.values(liveData.tasks);
-  var orphans = allTasks.filter(function(t) {
-    // No name or no dept = definitely orphaned
+
+  // Section 1: truly broken tasks
+  var broken = allTasks.filter(function(t) {
     if (!t.name && !t.title) return true;
     if (!t.dept) return true;
-    // Has dept but assignee is not a member of that dept (and not admin/lead) = invisible on board
+    if (t.assignee && !liveData.members[t.assignee]) return true;
     if (t.assignee) {
-      var member = liveData.members[t.assignee];
-      if (member && member.role !== 'admin' && member.role !== 'lead') {
-        if (!member.depts || !member.depts.includes(t.dept)) return true;
+      var m = liveData.members[t.assignee];
+      if (m && m.role !== 'admin' && m.role !== 'lead') {
+        if (!m.depts || !m.depts.includes(t.dept)) return true;
       }
     }
     return false;
   });
-  if (orphans.length === 0) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--grey-2);padding:10px;">No orphaned tasks. All clean!</div>';
+
+  // Section 2: tasks assigned to me (so admin can always find their own tasks)
+  var myTasks = uid ? allTasks.filter(function(t) { return t.assignee === uid; }) : [];
+
+  if (broken.length === 0 && myTasks.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--grey-2);padding:10px;">No issues found.</div>';
     return;
   }
+
   var html = '';
-  orphans.forEach(function(t) {
-    var taskName = t.name || t.title || '(no name)';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);">';
-    html += '<div>';
-    html += '<div style="font-size:13px;color:var(--white);">' + esc(taskName) + '</div>';
-    html += '<div style="font-size:10px;color:var(--grey-2);">dept: ' + (t.dept||'NONE') + ' · state: ' + (t.state||'?') + ' · id: ' + t.id + '</div>';
-    html += '</div>';
-    html += '<button class="btn btn-danger btn-xs" onclick="deleteTask(\'' + t.id + '\');">Delete</button>';
-    html += '</div>';
-  });
+
+  if (myTasks.length > 0) {
+    html += '<div style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;border-bottom:1px solid var(--border);">Tasks Assigned to You</div>';
+    myTasks.forEach(function(t) {
+      var taskName = t.name || t.title || '(no name)';
+      var stateLabel = {'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'}[t.state] || t.state;
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);">';
+      html += '<div>';
+      html += '<div style="font-size:13px;color:var(--white);">' + esc(taskName) + '</div>';
+      html += '<div style="font-size:10px;color:var(--grey-2);">dept: ' + (t.dept||'none') + ' · ' + stateLabel + '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;gap:6px;">';
+      html += '<button class="btn btn-gold btn-xs" onclick="openTaskDetail(\'' + t.id + '\')">View</button>';
+      if (t.state === 'pending-accept') html += '<button class="btn btn-ghost btn-xs" onclick="acceptTask(\'' + t.id + '\')">Accept</button>';
+      html += '<button class="btn btn-danger btn-xs" onclick="deleteTask(\'' + t.id + '\')">Delete</button>';
+      html += '</div></div>';
+    });
+  }
+
+  if (broken.length > 0) {
+    html += '<div style="padding:8px 14px;font-size:10px;letter-spacing:2px;color:var(--crimson-hi);text-transform:uppercase;border-bottom:1px solid var(--border);">Broken Tasks (no name or dept)</div>';
+    broken.forEach(function(t) {
+      var taskName = t.name || t.title || '(no name)';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);">';
+      html += '<div>';
+      html += '<div style="font-size:13px;color:var(--white);">' + esc(taskName) + '</div>';
+      html += '<div style="font-size:10px;color:var(--grey-2);">dept: ' + (t.dept||'NONE') + ' · state: ' + (t.state||'?') + ' · id: ' + t.id + '</div>';
+      html += '</div>';
+      html += '<button class="btn btn-danger btn-xs" onclick="deleteTask(\'' + t.id + '\')">Delete</button>';
+      html += '</div>';
+    });
+  }
+
   el.innerHTML = html;
 }
+
+// REMOVED old function - replaced above
+
+
 function renderAdminRoster() {
   const el = document.getElementById('admin-roster');
   if (!el) return;
