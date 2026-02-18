@@ -626,6 +626,8 @@ textarea.inp { resize:vertical; }
 .roster-card:hover { border-color:var(--border-2); }
 
 /* ── TRANSCRIPT CARDS ────────────────────── */
+.tr-title-link { color: var(--white); text-decoration: none; transition: color .15s; }
+.tr-title-link:hover { color: var(--crimson-hi); }
 .tc-card {
   background:rgba(8,10,18,.7); border:1px solid var(--border);
   border-radius:6px; padding:14px 16px; margin-bottom:10px;
@@ -1363,14 +1365,18 @@ textarea.inp { resize:vertical; }
   <div class="modal">
     <div class="modal-hdr"><span class="modal-title">▸ ADD MISSION LOG</span><button class="modal-x" onclick="closeModal('m-transcript')">✕</button></div>
     <div class="modal-body">
-      <div class="field"><span class="field-label">Meeting Title</span><input class="inp" id="tr-title" placeholder="e.g. Crew Sync · Nov 12"></div>
+      <div class="field">
+        <span class="field-label">NoteCat Link <span style="color:var(--crimson-hi)">*</span></span>
+        <input class="inp" id="tr-link" placeholder="Paste NoteCat link here..." oninput="onTranscriptLinkPaste(this.value)">
+        <div style="font-size:10px;color:var(--grey-2);margin-top:4px;letter-spacing:.5px;">Paste the link first — title and date will auto-fill if detectable</div>
+      </div>
+      <div class="field"><span class="field-label">Meeting Title <span style="color:var(--crimson-hi)">*</span></span><input class="inp" id="tr-title" placeholder="e.g. Crew Sync · Nov 12"></div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Date</span><input class="inp" id="tr-date" type="date"></div>
         <div class="field"><span class="field-label">Duration</span><input class="inp" id="tr-dur" placeholder="e.g. 45 min"></div>
       </div>
-      <div class="field"><span class="field-label">NoteCat Link</span><input class="inp" id="tr-link" placeholder="https://notecat.app/..."></div>
-      <div class="field"><span class="field-label">Summary</span><textarea class="inp" id="tr-summary" rows="3" placeholder="Key decisions, action items..."></textarea></div>
-      <div class="field"><span class="field-label">Tags (comma separated)</span><input class="inp" id="tr-tags" placeholder="planning, dev, art"></div>
+      <div class="field"><span class="field-label">Notes / Summary <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional)</span></span><textarea class="inp" id="tr-summary" rows="2" placeholder="Key decisions, action items..."></textarea></div>
+      <div class="field"><span class="field-label">Tags <span style="font-size:10px;color:var(--grey-2);font-weight:400;">comma separated — optional</span></span><input class="inp" id="tr-tags" placeholder="planning, dev, art"></div>
     </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-transcript')">Cancel</button><button class="btn btn-primary" onclick="submitTranscript()">Save Log</button></div>
   </div>
@@ -1786,9 +1792,10 @@ function startListeners() {
 
   // Transcripts
   const u4 = db.collection('transcripts').orderBy('createdAt','desc').onSnapshot(snap => {
-    liveData.transcripts = snap.docs.map(d=>({id:d.id,...d.data()}));
+    liveData.transcripts = snap.docs.map(function(d){ return {id:d.id,...d.data()}; });
     document.getElementById('s-logs').textContent = liveData.transcripts.length;
-    renderTranscripts();
+    var trView = document.getElementById('view-transcripts');
+    if (trView && trView.classList.contains('active')) renderTranscripts();
   });
 
   listeners = [u1,u2,u3,u4];
@@ -2825,21 +2832,44 @@ function renderDashTasks() {
 // ─── TRANSCRIPTS ──────────────────────────────────────────
 function filterLogs(val) { logSearch = val.toLowerCase(); renderTranscripts(); }
 
+
+function onTranscriptLinkPaste(val) {
+  // Auto-set date to today if not already set
+  var dateEl = document.getElementById('tr-date');
+  if (dateEl && !dateEl.value) {
+    dateEl.value = new Date().toISOString().slice(0,10);
+  }
+  // Try to extract a date from the URL (e.g. 2024-11-12 or nov-12-2024 patterns)
+  var dateMatch = val.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
+  if (dateMatch && dateEl) {
+    dateEl.value = dateMatch[1].replace(/_/g,'-');
+  }
+  // Focus title field so user can type it quickly
+  var titleEl = document.getElementById('tr-title');
+  if (titleEl && !titleEl.value) {
+    setTimeout(function(){ titleEl.focus(); }, 50);
+  }
+}
+
 async function submitTranscript() {
-  const title = document.getElementById('tr-title').value.trim();
-  if (!title) { toast('Enter a title','err'); return; }
-  const tr = {
-    title, date: document.getElementById('tr-date').value,
+  var title = document.getElementById('tr-title').value.trim();
+  var link  = document.getElementById('tr-link').value.trim();
+  if (!title) { toast('Enter a meeting title','err'); document.getElementById('tr-title').focus(); return; }
+  if (!link)  { toast('Paste the NoteCat link','err'); document.getElementById('tr-link').focus(); return; }
+  var tr = {
+    title: title,
+    date:  document.getElementById('tr-date').value || new Date().toISOString().slice(0,10),
     duration: document.getElementById('tr-dur').value.trim(),
-    link: document.getElementById('tr-link').value.trim(),
+    link:  link,
     summary: document.getElementById('tr-summary').value.trim(),
-    tags: document.getElementById('tr-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    addedBy: currentUser.uid, addedByName: currentProfile.name,
+    tags: document.getElementById('tr-tags').value.split(',').map(function(t){ return t.trim(); }).filter(Boolean),
+    addedBy: currentUser.uid,
+    addedByName: currentProfile.name,
     createdAt: new Date().toISOString()
   };
   await db.collection('transcripts').add(tr);
   closeModal('m-transcript');
-  ['tr-title','tr-date','tr-dur','tr-link','tr-summary','tr-tags'].forEach(id=>document.getElementById(id).value='');
+  ['tr-title','tr-date','tr-dur','tr-link','tr-summary','tr-tags'].forEach(function(id){ document.getElementById(id).value = ''; });
   toast('Mission log saved!','ok');
 }
 
@@ -2851,29 +2881,58 @@ async function deleteTranscript(id) {
 }
 
 function renderTranscripts() {
-  const el = document.getElementById('transcript-list');
+  var el = document.getElementById('transcript-list');
   if (!el) return;
-  let items = liveData.transcripts;
-  if (logSearch) items = items.filter(t=>t.title.toLowerCase().includes(logSearch)||t.summary?.toLowerCase().includes(logSearch)||(t.tags||[]).some(tag=>tag.toLowerCase().includes(logSearch)));
-  if (!items.length) { el.innerHTML='<div class="no-data">No transcripts yet</div>'; return; }
-  el.innerHTML = items.map(t=>`
-    <div class="tc-card">
-      <div class="tc-icon">📋</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${esc(t.title)}</div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          ${t.date?`<span class="text-mono" style="font-size:11px;color:var(--gold);">${t.date}</span>`:''}
-          ${t.duration?`<span style="font-size:11px;color:var(--grey);">${esc(t.duration)}</span>`:''}
-          ${t.link?`<a href="${esc(t.link)}" target="_blank" style="font-size:11px;color:var(--crimson-hi);font-family:'Share Tech Mono',monospace;">↗ NoteCat</a>`:''}
-        </div>
-        ${t.summary?`<div style="font-size:12px;color:var(--grey);margin-top:4px;">${esc(t.summary)}</div>`:''}
-        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-          ${t.link?'<span class="dept-tag" style="color:var(--crimson-hi);border-color:rgba(200,16,46,.4);background:rgba(200,16,46,.08);">NoteCat</span>':''}
-          ${(t.tags||[]).map(tag=>`<span class="dept-tag" style="color:var(--grey);border-color:var(--border);">${esc(tag)}</span>`).join('')}
-        </div>
-      </div>
-      ${currentProfile.role==='admin'?`<button class="icon-btn danger" onclick="deleteTranscript('${t.id}')">✕</button>`:''}
-    </div>`).join('');
+  var items = liveData.transcripts.slice(); // copy, already sorted newest first by Firestore
+  if (logSearch) {
+    var q = logSearch.toLowerCase();
+    items = items.filter(function(t){
+      return (t.title||'').toLowerCase().includes(q) ||
+             (t.summary||'').toLowerCase().includes(q) ||
+             (t.tags||[]).some(function(tag){ return tag.toLowerCase().includes(q); });
+    });
+  }
+  if (!items.length) {
+    el.innerHTML = '<div class="no-data">' + (logSearch ? 'No results for "'+esc(logSearch)+'"' : 'No mission logs yet. Add the first one!') + '</div>';
+    return;
+  }
+  var adminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+  el.innerHTML = items.map(function(t) {
+    var dateStr = t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '';
+    var html = '<div class="tc-card" style="border-left:2px solid rgba(200,16,46,.4);gap:12px;">';
+    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;width:32px;">';
+    html += '<span style="font-size:18px;">📋</span>';
+    html += '</div>';
+    html += '<div style="flex:1;min-width:0;">';
+    // Title row with link
+    html += '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px;flex-wrap:wrap;">';
+    if (t.link) {
+      html += '<a href="' + esc(t.link) + '" target="_blank" style="font-size:14px;font-weight:700;color:var(--white);text-decoration:none;letter-spacing:.3px;" class="tr-title-link">' + esc(t.title) + ' <span style="font-size:11px;color:var(--crimson-hi);">↗</span></a>';
+    } else {
+      html += '<span style="font-size:14px;font-weight:700;">' + esc(t.title) + '</span>';
+    }
+    html += '</div>';
+    // Meta row
+    html += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">';
+    if (dateStr) html += '<span style="font-family:Share Tech Mono,monospace;font-size:11px;color:var(--gold);">' + dateStr + '</span>';
+    if (t.duration) html += '<span style="font-size:11px;color:var(--grey);">⏱ ' + esc(t.duration) + '</span>';
+    if (t.addedByName) html += '<span style="font-size:10px;color:var(--grey-2);">by ' + esc(t.addedByName) + '</span>';
+    html += '</div>';
+    // Summary
+    if (t.summary) html += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:5px;">' + esc(t.summary) + '</div>';
+    // Tags
+    var tags = (t.tags||[]);
+    if (tags.length) {
+      html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+      tags.forEach(function(tag){ html += '<span class="dept-tag" style="color:var(--grey);border-color:var(--border);">' + esc(tag) + '</span>'; });
+      html += '</div>';
+    }
+    html += '</div>';
+    // Delete button
+    if (adminLead) html += '<button class="icon-btn danger" title="Delete" onclick="deleteTranscript(\'' + t.id + '\')">✕</button>';
+    html += '</div>';
+    return html;
+  }).join('');
 }
 
 // ─── ADMIN ────────────────────────────────────────────────
