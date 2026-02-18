@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cosmic Vessel Project — Mission Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1291,8 +1294,14 @@ textarea.inp { resize:vertical; }
             <div style="margin-top:10px;font-size:11px;color:var(--grey-2);">Share this code privately with new members.</div>
           </div>
         </div>
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Orphaned Tasks</span>
+            <button class="btn btn-ghost btn-xs" onclick="renderOrphanTasks()">Scan Now</button>
+          </div>
+          <div id="admin-orphan-tasks" style="font-size:12px;color:var(--grey-2);padding:14px;">Click "Scan Now" to find tasks that can't be accessed elsewhere.</div>
+        </div>
       </div>
-    </div>
 
   </main>
 </div>
@@ -2110,14 +2119,24 @@ function renderMyTasks() {
   if (!el) return;
   const uid = currentUser?.uid;
   const myTasks = Object.values(liveData.tasks).filter(t => t.assignee === uid);
+  // Fix legacy tasks assigned but stuck in 'unassigned' state - auto-correct to pending-accept
+  myTasks.forEach(function(t) {
+    if (t.state === 'unassigned' && t.assignee) {
+      db.collection('tasks').doc(t.id).update({ state: 'pending-accept' });
+    }
+  });
   const now = new Date(); now.setHours(0,0,0,0);
   const cols = [
-    { id:'pending-accept', label:'Pending Accept',   color:'#ff6b35',     icon:'?' },
-    { id:'accepted',       label:'Accepted',         color:'var(--gold)', icon:'✓' },
+    { id:'pending-accept', label:'Pending Accept',   color:'#ff6b35',      icon:'?' },
+    { id:'accepted',       label:'Accepted',         color:'var(--gold)',  icon:'✓' },
     { id:'in-progress',    label:'In Progress',      color:'var(--amber)', icon:'▶' },
-    { id:'review',         label:'Ready for Review', color:'var(--blue)', icon:'◎' },
+    { id:'review',         label:'Ready for Review', color:'var(--blue)',  icon:'◎' },
     { id:'completed',      label:'Completed',        color:'var(--green)', icon:'✓✓' }
   ];
+  // Auto-fix legacy tasks assigned to me but stuck in 'unassigned' state
+  myTasks.filter(function(t){ return t.state === 'unassigned'; }).forEach(function(t){
+    db.collection('tasks').doc(t.id).update({ state: 'pending-accept' });
+  });
   let html = '';
   cols.forEach(function(col) {
     const tasks = myTasks.filter(function(t){ return t.state === col.id; });
@@ -2299,7 +2318,7 @@ function updateNotifications() {
   if (!uid) return;
   
   // Task notifications - pending accept tasks assigned to me
-  const myPending = Object.values(liveData.tasks).filter(t => t.assignee === uid && t.state === 'pending-accept');
+  const myPending = Object.values(liveData.tasks).filter(t => t.assignee === uid && (t.state === 'pending-accept' || t.state === 'unassigned'));
   const taskNotif = document.getElementById('notif-tasks');
   if (taskNotif) taskNotif.classList.toggle('show', myPending.length > 0);
   
@@ -2706,7 +2725,7 @@ function renderDashTasks() {
     var taskName = t.name || t.title || 'Unnamed';
     var barColor = t.priority==='high' ? 'var(--crimson-hi)' : t.priority==='medium' ? 'var(--amber)' : 'var(--green)';
     var stateLabel = {'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'}[t.state] || t.state;
-    return '<div style="padding:10px 16px;border-bottom:1px solid rgba(30,33,56,.4);display:flex;align-items:center;gap:10px;">' +
+    return '<div style="padding:10px 16px;border-bottom:1px solid rgba(30,33,56,.4);display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openTaskDetail(\'' + t.id + '\')">' +
       '<div style="width:3px;height:36px;border-radius:2px;background:' + barColor + ';flex-shrink:0;"></div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="font-size:13px;font-weight:600;">' + esc(taskName) + '</div>' +
