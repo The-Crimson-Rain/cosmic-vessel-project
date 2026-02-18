@@ -1674,7 +1674,7 @@ function clearTaskForm() {
 }
 
 async function setTaskState(taskId, newState) {
-  if (!canSetState(newState)) { toast('You don\'t have permission to set that state','err'); return; }
+  if (!canSetState(newState)) { toast('You don't have permission to set that state','err'); return; }
   await db.collection('tasks').doc(taskId).update({ state: newState, updatedAt: new Date().toISOString() });
 }
 
@@ -1951,7 +1951,7 @@ function renderCrew() {
   if (!el) return;
   const actionsEl = document.getElementById('crew-actions');
   if (actionsEl && currentProfile.role==='admin') {
-    actionsEl.innerHTML = '<button class="btn btn-gold" onclick="openModal(\'m-add-member\');populateDeptChecks()">+ Add Member</button>';
+    actionsEl.innerHTML = '<button class="btn btn-gold" onclick="openModal('m-add-member');populateDeptChecks()">+ Add Member</button>';
   }
   let members = Object.values(liveData.members);
   if (crewFilter) members = members.filter(m=>m.name.toLowerCase().includes(crewFilter)||m.email?.toLowerCase().includes(crewFilter));
