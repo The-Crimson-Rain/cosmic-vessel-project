@@ -735,6 +735,126 @@ textarea.inp { resize:vertical; }
 }
 .upload-zone:hover { border-color:rgba(200,16,46,.4); background:var(--crimson-trace); }
 
+
+/* ── TASK STATES v2 ──────────────────────────── */
+.task-card[data-state="pending-accept"]  { --lc: #ff6b35; }
+.task-card[data-state="accepted"]        { --lc: #c9a84c; }
+.task-card[data-state="in-progress"]     { --lc: var(--amber); }
+.task-card[data-state="review"]          { --lc: var(--blue); }
+.task-card[data-state="completed"]       { --lc: var(--green); opacity:.7; }
+
+.chip-pending-accept { color:#ff6b35; border-color:rgba(255,107,53,.4); background:rgba(255,107,53,.08); }
+.chip-accepted       { color:var(--gold); border-color:rgba(201,168,76,.4); background:rgba(201,168,76,.08); }
+
+/* ── NOTIFICATION DOT ────────────────────────── */
+.nav-notif {
+  margin-left:auto; width:8px; height:8px; border-radius:50%;
+  background:var(--crimson-hi); box-shadow:0 0 8px var(--crimson-hi);
+  flex-shrink:0; display:none;
+}
+.nav-notif.show { display:block; }
+
+/* ── MY TASKS BOARD ──────────────────────────── */
+.my-tasks-board {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:14px; align-items:flex-start;
+}
+.my-task-col {
+  background:rgba(12,14,26,.7); border:1px solid var(--border);
+  border-radius:8px; overflow:hidden; min-height:200px;
+}
+.my-task-col-hdr {
+  padding:10px 14px; border-bottom:1px solid var(--border);
+  background:rgba(8,10,18,.6);
+  display:flex; align-items:center; justify-content:space-between;
+}
+
+/* ── OVERDUE ─────────────────────────────────── */
+.task-card.overdue {
+  border-color: rgba(200,16,46,.5) !important;
+  animation: overdueFlash 3s ease-in-out infinite;
+}
+@keyframes overdueFlash {
+  0%,100% { box-shadow: none; }
+  50%      { box-shadow: 0 0 12px rgba(200,16,46,.3); }
+}
+.overdue-badge {
+  font-size:9px; letter-spacing:1px; padding:2px 6px; border-radius:3px;
+  background:rgba(200,16,46,.15); color:var(--crimson-hi);
+  border:1px solid rgba(200,16,46,.3); font-weight:700; text-transform:uppercase;
+}
+
+/* ── ACCEPT BUTTON ───────────────────────────── */
+.accept-btn {
+  font-family:'Rajdhani',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  padding:4px 10px; border-radius:3px; cursor:pointer;
+  background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.4);
+  color:var(--gold); transition:all .15s;
+}
+.accept-btn:hover { background:rgba(201,168,76,.25); box-shadow:0 0 10px rgba(201,168,76,.2); }
+
+/* ── COMMENTS ────────────────────────────────── */
+.comment-section { padding:12px 14px; border-top:1px solid var(--border); }
+.comment-item {
+  display:flex; gap:8px; margin-bottom:10px;
+}
+.comment-av {
+  width:24px; height:24px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--crimson-dim),#1a0508);
+  border:1px solid rgba(200,16,46,.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700;
+}
+.comment-body { flex:1; }
+.comment-author { font-size:11px; font-weight:700; color:var(--gold); }
+.comment-time   { font-size:10px; color:var(--grey-2); margin-left:6px; font-family:'Share Tech Mono',monospace; }
+.comment-text   { font-size:12px; color:var(--white); margin-top:3px; line-height:1.5; }
+.comment-input-row { display:flex; gap:8px; margin-top:8px; }
+
+/* ── MILESTONES ──────────────────────────────── */
+.milestone-timeline { padding:16px; }
+.milestone-item {
+  display:flex; gap:16px; margin-bottom:20px; position:relative;
+}
+.milestone-item::before {
+  content:''; position:absolute; left:15px; top:32px;
+  width:2px; height:calc(100% + 4px);
+  background:linear-gradient(180deg, var(--border), transparent);
+}
+.milestone-item:last-child::before { display:none; }
+.milestone-dot {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; border:2px solid;
+  position:relative; z-index:1;
+}
+.milestone-dot.ms-done    { background:rgba(46,204,138,.15); border-color:var(--green); }
+.milestone-dot.ms-active  { background:rgba(201,168,76,.15); border-color:var(--gold); box-shadow:0 0 12px rgba(201,168,76,.3); }
+.milestone-dot.ms-upcoming{ background:rgba(30,33,56,.5);    border-color:var(--border-2); }
+.milestone-dot.ms-overdue { background:rgba(200,16,46,.15);  border-color:var(--crimson-hi); }
+.milestone-content { flex:1; padding-top:4px; }
+.milestone-title  { font-size:15px; font-weight:700; margin-bottom:3px; }
+.milestone-date   { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--gold); margin-bottom:4px; }
+.milestone-desc   { font-size:12px; color:var(--grey); line-height:1.5; }
+.ms-progress-bar  {
+  height:4px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden;
+}
+.ms-progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--crimson),var(--gold)); transition:width .5s; }
+
+/* ── DEPT OVERVIEW ───────────────────────────── */
+.dept-overview-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:14px; }
+.dept-ov-card {
+  background:rgba(8,10,18,.7); border:1px solid var(--border);
+  border-radius:6px; padding:12px; transition:border-color .15s;
+}
+.dept-ov-card:hover { border-color:var(--border-2); }
+.dept-ov-name { font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+.dept-ov-bar  { height:4px; background:var(--border); border-radius:2px; margin-bottom:6px; overflow:hidden; }
+.dept-ov-fill { height:100%; border-radius:2px; transition:width .5s; }
+.dept-ov-stats{ display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--grey); }
+
 /* ── MISC UTIL ───────────────────────────── */
 .flex { display:flex; }
 .flex-col { flex-direction:column; }
@@ -887,8 +1007,10 @@ textarea.inp { resize:vertical; }
   <nav id="sidebar">
     <div class="nav-section-label">Mission</div>
     <div class="nav-item active" data-view="dashboard" onclick="nav(this)"><span class="ni-icon">⬡</span> Dashboard</div>
+    <div class="nav-item" data-view="my-tasks" onclick="nav(this)"><span class="ni-icon">◈</span> My Tasks<div class="nav-notif" id="notif-tasks"></div></div>
     <div class="nav-item" data-view="crew" onclick="nav(this)"><span class="ni-icon">◉</span> Crew<span class="ni-badge" id="nb-crew">0</span></div>
-    <div class="nav-item" data-view="scheduler" onclick="nav(this)"><span class="ni-icon">◎</span> Scheduler</div>
+    <div class="nav-item" data-view="scheduler" onclick="nav(this)"><span class="ni-icon">◎</span> Scheduler<div class="nav-notif" id="notif-meetings"></div></div>
+    <div class="nav-item" data-view="milestones" onclick="nav(this)"><span class="ni-icon">◎</span> Milestones</div>
     <div class="nav-item" data-view="transcripts" onclick="nav(this)"><span class="ni-icon">◈</span> Mission Logs</div>
     <div class="sidebar-divider"></div>
     <div class="nav-section-label">Departments</div>
@@ -915,7 +1037,11 @@ textarea.inp { resize:vertical; }
           <div class="ph-sub">Overview · All systems status</div>
         </div>
 
-      </div><div class="stats-row">
+      </div>
+      <div style="text-align:right;margin-bottom:12px;">
+        <button class="btn btn-gold" onclick="openInstallModal()">&#x2B07; Install as App</button>
+      </div>
+      <div class="stats-row">
         <div class="stat-card c-red"><div class="stat-icon">⬡</div><div><div class="stat-val" id="s-tasks">0</div><div class="stat-lbl">Active Tasks</div></div></div>
         <div class="stat-card c-gold"><div class="stat-icon">◎</div><div><div class="stat-val" id="s-meetings">0</div><div class="stat-lbl">Meetings</div></div></div>
         <div class="stat-card c-green"><div class="stat-icon">◈</div><div><div class="stat-val" id="s-logs">0</div><div class="stat-lbl">Mission Logs</div></div></div>
@@ -934,6 +1060,34 @@ textarea.inp { resize:vertical; }
       <div class="panel mt-12">
         <div class="panel-hdr"><span class="panel-title">Crew Status · Live</span><span class="text-mono text-small text-grey" id="dash-tz-time"></span></div>
         <div id="dash-crew-strip" style="display:flex;flex-wrap:wrap;gap:8px;padding:14px;"></div>
+      </div>
+    </div>
+
+    <!-- ── MY TASKS ── -->
+    <div class="view" id="view-my-tasks">
+      <div class="page-hdr">
+        <div class="page-hdr-left"><div class="ph-title">MY TASKS</div><div class="ph-sub">Your assigned tasks · drag to update status</div></div>
+      </div>
+      <div class="my-tasks-board" id="my-tasks-board"></div>
+    </div>
+
+    <!-- ── MILESTONES ── -->
+    <div class="view" id="view-milestones">
+      <div class="page-hdr">
+        <div class="page-hdr-left"><div class="ph-title">PROJECT MILESTONES</div><div class="ph-sub">Roadmap · project goals</div></div>
+        <div class="ph-actions" id="milestone-actions"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;">
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">Timeline</span></div>
+          <div class="milestone-timeline" id="milestone-list"></div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-hdr"><span class="panel-title">Department Progress</span></div>
+            <div class="dept-overview-grid" id="dept-overview"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1255,6 +1409,70 @@ textarea.inp { resize:vertical; }
     </div>
   </div>
 </div>
+
+<!-- Milestone Modal -->
+<div class="modal-bg" id="m-milestone">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">&#9658; NEW MILESTONE</span><button class="modal-x" onclick="closeModal('m-milestone')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="field"><span class="field-label">Milestone Title</span><input class="inp" id="ms-title" placeholder="e.g. Alpha Build Complete"></div>
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Target Date</span><input class="inp" id="ms-date" type="date"></div>
+        <div class="field"><span class="field-label">Status</span>
+          <select class="inp" id="ms-status">
+            <option value="upcoming">Upcoming</option>
+            <option value="active">In Progress</option>
+            <option value="done">Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><span class="field-label">Description</span><textarea class="inp" id="ms-desc" rows="3" placeholder="What needs to be achieved..."></textarea></div>
+      <input type="hidden" id="ms-edit-id">
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-milestone')">Cancel</button><button class="btn btn-gold" onclick="submitMilestone()">Save Milestone</button></div>
+  </div>
+</div>
+
+<!-- Task Detail / Comments Modal -->
+<div class="modal-bg" id="m-task-detail">
+  <div class="modal" style="width:600px;">
+    <div class="modal-hdr"><span class="modal-title" id="td-title">&#9658; TASK DETAIL</span><button class="modal-x" onclick="closeModal('m-task-detail')">&#x2715;</button></div>
+    <div style="padding:18px;display:flex;flex-direction:column;gap:12px;" id="td-body"></div>
+    <div class="comment-section">
+      <div style="font-family:'Share Tech Mono',sans-serif;font-size:9px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:10px;">Comments</div>
+      <div id="td-comments"></div>
+      <div class="comment-input-row">
+        <input class="inp" id="td-comment-input" placeholder="Add a comment..." style="flex:1;" onkeydown="if(event.key==='Enter')submitComment()">
+        <button class="btn btn-gold btn-sm" onclick="submitComment()">Post</button>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-task-detail')">Close</button></div>
+  </div>
+</div>
+
+<!-- Overdue Prompt Modal -->
+<div class="modal-bg" id="m-overdue">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" style="color:var(--crimson-hi);">&#9658; TASK OVERDUE</span><button class="modal-x" onclick="closeModal('m-overdue')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--grey);" id="overdue-task-name"></div>
+      <div style="font-size:12px;color:var(--grey-2);margin-top:6px;">This task is past its due date. Let your lead know how much more time you need:</div>
+      <div class="field"><span class="field-label">I need approximately</span>
+        <select class="inp" id="overdue-time-select">
+          <option value="1 more day">1 more day</option>
+          <option value="2-3 more days">2-3 more days</option>
+          <option value="1 more week">1 more week</option>
+          <option value="2 more weeks">2 more weeks</option>
+          <option value="more than 2 weeks">More than 2 weeks</option>
+        </select>
+      </div>
+      <div class="field"><span class="field-label">Additional notes (optional)</span><textarea class="inp" id="overdue-notes" rows="2" placeholder="Any blockers or context..."></textarea></div>
+      <input type="hidden" id="overdue-task-id">
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-overdue')">Later</button><button class="btn btn-primary" onclick="submitOverdueReport()">Notify Lead</button></div>
+  </div>
+</div>
+
 <div id="toasts"></div>
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -1600,11 +1818,15 @@ function updateStatusDot(s) {
 }
 
 // ─── TASKS ────────────────────────────────────────────────
-function canSetState(state) {
+function canSetState(state, task) {
   const role = currentProfile?.role;
+  const uid  = currentUser?.uid;
   if (role === 'admin' || role === 'lead') return true;
-  // crew can only set in-progress or review
-  return state === 'in-progress' || state === 'review';
+  // Crew: can accept their own pending task
+  if (state === 'accepted' && task?.assignee === uid) return true;
+  // Crew: can set in-progress or review on their own task
+  if ((state === 'in-progress' || state === 'review') && task?.assignee === uid) return true;
+  return false;
 }
 
 async function submitTask() {
@@ -1685,6 +1907,323 @@ function renderAllDeptBoards() {
   });
 }
 
+
+// ─── ACCEPT TASK ──────────────────────────────────────────
+async function acceptTask(id) {
+  await db.collection('tasks').doc(id).update({ state: 'accepted' });
+  toast('Task accepted!', 'ok');
+}
+
+// ─── TASK DETAIL / COMMENTS ───────────────────────────────
+let currentTaskId = null;
+
+function openTaskDetail(id) {
+  currentTaskId = id;
+  const t = Object.values(liveData.tasks).find(t => t.id === id);
+  if (!t) return;
+  
+  document.getElementById('td-title').textContent = '▸ ' + (t.name || 'Task Detail');
+  
+  const assigneeName = t.assignee ? (liveData.members[t.assignee]?.name || 'Unknown') : 'Unassigned';
+  const due = t.dueDate ? new Date(t.dueDate).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}) : 'No due date';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const isOverdue = t.dueDate && new Date(t.dueDate) < now && t.state !== 'completed';
+  
+  document.getElementById('td-body').innerHTML = 
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Assigned To</div>' +
+        '<div style="font-size:13px;color:var(--white);">' + esc(assigneeName) + '</div></div>' +
+      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Due Date</div>' +
+        '<div style="font-size:13px;color:' + (isOverdue?'var(--crimson-hi)':'var(--white)') + ';">' + due + (isOverdue?' (OVERDUE)':'') + '</div></div>' +
+      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Status</div>' +
+        '<div style="font-size:13px;color:var(--white);">' + ({'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted ✓','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'}[t.state]||t.state) + '</div></div>' +
+      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Priority</div>' +
+        '<div style="font-size:13px;color:var(--white);">' + (t.priority||'medium').charAt(0).toUpperCase()+(t.priority||'medium').slice(1) + '</div></div>' +
+    '</div>' +
+    (t.description ? '<div style="padding:12px;background:rgba(8,10,18,.5);border-radius:4px;border:1px solid var(--border);font-size:12px;color:var(--grey);line-height:1.6;">' + esc(t.description) + '</div>' : '');
+
+  renderComments(t.comments || []);
+  
+  // Show overdue prompt button if applicable
+  if (isOverdue && t.assignee === currentUser?.uid && t.state !== 'completed') {
+    const obtn = document.createElement('button');
+    obtn.className = 'btn btn-danger btn-sm';
+    obtn.textContent = 'Report Timeline to Lead';
+    obtn.onclick = function() { openOverduePrompt(id, t.name||''); };
+    document.getElementById('td-body').appendChild(obtn);
+  }
+  openModal('m-task-detail');
+}
+
+function renderComments(comments) {
+  const el = document.getElementById('td-comments');
+  if (!comments || comments.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--grey-2);margin-bottom:8px;">No comments yet.</div>';
+    return;
+  }
+  el.innerHTML = comments.map(c => {
+    const member = liveData.members[c.uid];
+    const name = member?.name || 'Unknown';
+    const time = c.ts ? new Date(c.ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    return '<div class="comment-item">' +
+      '<div class="comment-av">' + initials(name) + '</div>' +
+      '<div class="comment-body">' +
+        '<div><span class="comment-author">' + esc(name) + '</span><span class="comment-time">' + time + '</span></div>' +
+        '<div class="comment-text">' + esc(c.text) + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+async function submitComment() {
+  const input = document.getElementById('td-comment-input');
+  const text = input.value.trim();
+  if (!text || !currentTaskId) return;
+  
+  const t = Object.values(liveData.tasks).find(t => t.id === currentTaskId);
+  if (!t) return;
+  
+  const comments = t.comments || [];
+  comments.push({ uid: currentUser.uid, text, ts: Date.now() });
+  
+  await db.collection('tasks').doc(currentTaskId).update({ comments });
+  input.value = '';
+  renderComments(comments);
+  toast('Comment posted', 'ok');
+}
+
+// ─── OVERDUE PROMPT ───────────────────────────────────────
+function openOverduePrompt(id, name) {
+  document.getElementById('overdue-task-id').value = id;
+  document.getElementById('overdue-task-name').textContent = 'Task: ' + name;
+  closeModal('m-task-detail');
+  openModal('m-overdue');
+}
+
+async function submitOverdueReport() {
+  const id    = document.getElementById('overdue-task-id').value;
+  const time  = document.getElementById('overdue-time-select').value;
+  const notes = document.getElementById('overdue-notes').value.trim();
+  const t     = Object.values(liveData.tasks).find(t => t.id === id);
+  if (!t) return;
+  
+  const msg = currentProfile.name + ' reports needing ' + time + ' more for task "' + (t.name||'') + '".' + (notes ? ' Notes: ' + notes : '');
+  const comments = t.comments || [];
+  comments.push({ uid: currentUser.uid, text: msg, ts: Date.now(), system: true });
+  await db.collection('tasks').doc(id).update({ comments });
+  
+  closeModal('m-overdue');
+  toast('Lead notified via task comments', 'ok');
+}
+
+// ─── MY TASKS ─────────────────────────────────────────────
+function renderMyTasks() {
+  const el = document.getElementById('my-tasks-board');
+  if (!el) return;
+  const uid = currentUser?.uid;
+  const myTasks = Object.values(liveData.tasks).filter(t => t.assignee === uid);
+  const now = new Date(); now.setHours(0,0,0,0);
+  const cols = [
+    { id:'pending-accept', label:'Pending Accept', color:'#ff6b35', icon:'?' },
+    { id:'accepted',       label:'Accepted',       color:'var(--gold)', icon:'\u2713' },
+    { id:'in-progress',    label:'In Progress',    color:'var(--amber)', icon:'\u25b6' },
+    { id:'review',         label:'Ready for Review', color:'var(--blue)', icon:'\u25ce' }
+  ];
+  let html = '';
+  cols.forEach(function(col) {
+    const tasks = myTasks.filter(function(t){ return t.state === col.id; });
+    let colHtml = '<div class="my-task-col" ondragover="event.preventDefault()" ondrop="dropMyTask(event,\'' + col.id + '\')">';
+    colHtml += '<div class="my-task-col-hdr">';
+    colHtml += '<span style="font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:' + col.color + ';text-transform:uppercase;">' + col.icon + ' ' + col.label + '</span>';
+    colHtml += '<span style="font-size:11px;color:var(--grey-2);">' + tasks.length + '</span>';
+    colHtml += '</div>';
+    colHtml += '<div style="padding:10px;display:flex;flex-direction:column;gap:8px;" id="my-col-' + col.id + '">';
+    if (tasks.length === 0) {
+      colHtml += '<div style="font-size:11px;color:var(--grey-2);text-align:center;padding:20px 0;">No tasks</div>';
+    } else {
+      tasks.forEach(function(t) {
+        const due = t.dueDate ? new Date(t.dueDate) : null;
+        const isOverdue = due && due < now;
+        const dueStr = due ? due.toLocaleDateString(undefined,{month:'short',day:'numeric'}) : '';
+        const commentCount = (t.comments||[]).length;
+        let cardHtml = '<div class="task-card' + (isOverdue ? ' overdue' : '') + '" data-id="' + t.id + '" draggable="true" ondragstart="dragMyTask(event)" onclick="openTaskDetail(\'' + t.id + '\')" style="cursor:pointer;">';
+        cardHtml += '<div class="tc-title">' + esc(t.name||'') + '</div>';
+        if (t.description) cardHtml += '<div style="font-size:11px;color:var(--grey-2);margin-top:3px;line-height:1.4;">' + esc(t.description.substring(0,60)) + (t.description.length>60?'...':'') + '</div>';
+        cardHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">';
+        if (dueStr) cardHtml += '<span style="font-size:10px;font-family:Share Tech Mono,monospace;color:' + (isOverdue?'var(--crimson-hi)':'var(--grey-2)') + ';">' + (isOverdue?'OVERDUE ':'Due ') + dueStr + '</span>';
+        else cardHtml += '<span></span>';
+        if (col.id === 'pending-accept') cardHtml += '<button class="accept-btn" onclick="acceptTask(\'' + t.id + '\');event.stopPropagation()">Accept</button>';
+        if (commentCount > 0) cardHtml += '<span style="font-size:10px;color:var(--grey-2);">\u{1f4ac} ' + commentCount + '</span>';
+        cardHtml += '</div></div>';
+        colHtml += cardHtml;
+      });
+    }
+    colHtml += '</div></div>';
+    html += colHtml;
+  });
+  el.innerHTML = html;
+}
+
+let dragMyTaskId = null;
+
+function dragMyTask(e) {
+  dragMyTaskId = e.currentTarget.dataset.id;
+}
+
+async function dropMyTask(e, newState) {
+  e.preventDefault();
+  if (!dragMyTaskId) return;
+  const allowed = ['accepted','in-progress','review'];
+  if (!allowed.includes(newState)) { toast('Cannot move to that column','err'); return; }
+  // pending-accept -> accepted is only allowed by assignee
+  if (newState === 'accepted') {
+    const t = Object.values(liveData.tasks).find(t => t.id === dragMyTaskId);
+    if (t?.assignee !== currentUser?.uid) { toast('Only the assigned crew member can accept','err'); return; }
+  }
+  await db.collection('tasks').doc(dragMyTaskId).update({ state: newState });
+  dragMyTaskId = null;
+  toast('Task updated', 'ok');
+}
+
+// ─── MILESTONES ───────────────────────────────────────────
+async function submitMilestone() {
+  const title  = document.getElementById('ms-title').value.trim();
+  const date   = document.getElementById('ms-date').value;
+  const status = document.getElementById('ms-status').value;
+  const desc   = document.getElementById('ms-desc').value.trim();
+  const editId = document.getElementById('ms-edit-id').value;
+  
+  if (!title) { toast('Milestone title required','err'); return; }
+  
+  const data = { title, date, status, desc, updatedBy: currentUser.uid, updatedAt: Date.now() };
+  
+  if (editId) {
+    await db.collection('milestones').doc(editId).update(data);
+    toast('Milestone updated','ok');
+  } else {
+    data.createdBy = currentUser.uid;
+    data.createdAt = Date.now();
+    await db.collection('milestones').add(data);
+    toast('Milestone created','ok');
+  }
+  closeModal('m-milestone');
+  clearMilestoneForm();
+}
+
+function clearMilestoneForm() {
+  ['ms-title','ms-date','ms-desc','ms-edit-id'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const sel = document.getElementById('ms-status');
+  if (sel) sel.value = 'upcoming';
+}
+
+async function deleteMilestone(id) {
+  if (!confirm('Delete this milestone?')) return;
+  await db.collection('milestones').doc(id).delete();
+  toast('Milestone deleted','inf');
+}
+
+function openEditMilestone(id) {
+  const ms = liveData.milestones?.find(m => m.id === id);
+  if (!ms) return;
+  document.getElementById('ms-title').value  = ms.title||'';
+  document.getElementById('ms-date').value   = ms.date||'';
+  document.getElementById('ms-status').value = ms.status||'upcoming';
+  document.getElementById('ms-desc').value   = ms.desc||'';
+  document.getElementById('ms-edit-id').value = id;
+  openModal('m-milestone');
+}
+
+function renderMilestones() {
+  const el = document.getElementById('milestone-list');
+  const actEl = document.getElementById('milestone-actions');
+  if (!el) return;
+  
+  const canEdit = currentProfile?.role === 'admin' || currentProfile?.role === 'lead';
+  if (actEl) {
+    actEl.innerHTML = canEdit ? '<button class="btn btn-gold" onclick="openModal(\'m-milestone\');clearMilestoneForm()">+ Add Milestone</button>' : '';
+  }
+  
+  const milestones = (liveData.milestones || []).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  
+  if (milestones.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--grey-2);font-size:13px;">No milestones yet.' + (canEdit ? ' Add the first one!' : '') + '</div>';
+    return;
+  }
+  
+  const today = new Date().toISOString().split('T')[0];
+  
+  el.innerHTML = milestones.map(ms => {
+    const dotClass = ms.status === 'done' ? 'ms-done' : ms.status === 'active' ? 'ms-active' : ms.date && ms.date < today ? 'ms-overdue' : 'ms-upcoming';
+    const icon = ms.status === 'done' ? '✓' : ms.status === 'active' ? '▶' : ms.date && ms.date < today ? '!' : '◎';
+    const dateStr = ms.date ? new Date(ms.date+'T00:00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}) : 'No date set';
+    const titleColor = ms.status === 'done' ? 'var(--green)' : ms.status === 'active' ? 'var(--gold)' : dotClass === 'ms-overdue' ? 'var(--crimson-hi)' : 'var(--white)';
+    
+    return '<div class="milestone-item">' +
+      '<div class="milestone-dot ' + dotClass + '">' + icon + '</div>' +
+      '<div class="milestone-content">' +
+        '<div class="milestone-title" style="color:' + titleColor + ';">' + esc(ms.title||'') + '</div>' +
+        '<div class="milestone-date">' + dateStr + '</div>' +
+        (ms.desc ? '<div class="milestone-desc">' + esc(ms.desc) + '</div>' : '') +
+        (canEdit ? '<div style="margin-top:8px;display:flex;gap:6px;">' +
+          '<button class="btn btn-ghost btn-xs" onclick="openEditMilestone(\'' + ms.id + '\')">' + 'Edit</button>' +
+          '<button class="btn btn-danger btn-xs" onclick="deleteMilestone(\'' + ms.id + '\')">' + 'Delete</button>' +
+        '</div>' : '') +
+      '</div></div>';
+  }).join('');
+  
+  renderDeptOverview();
+}
+
+function renderDeptOverview() {
+  const el = document.getElementById('dept-overview');
+  if (!el) return;
+  
+  const depts = ['Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative'];
+  const allTasks = Object.values(liveData.tasks);
+  
+  el.innerHTML = depts.map(dept => {
+    const dTasks = allTasks.filter(t => t.dept === dept);
+    const total = dTasks.length;
+    const done  = dTasks.filter(t => t.state === 'completed').length;
+    const inProg = dTasks.filter(t => t.state === 'in-progress').length;
+    const pct = total > 0 ? Math.round((done/total)*100) : 0;
+    const deptColor = DEPT_COLORS[dept] || 'var(--grey)';
+    
+    return '<div class="dept-ov-card">' +
+      '<div class="dept-ov-name" style="color:' + deptColor + ';">' + dept + '</div>' +
+      '<div class="dept-ov-bar"><div class="dept-ov-fill" style="width:' + pct + '%;background:' + deptColor + ';"></div></div>' +
+      '<div class="dept-ov-stats">' +
+        '<span>' + pct + '% done</span>' +
+        '<span>' + done + '/' + total + '</span>' +
+      '</div>' +
+      (inProg > 0 ? '<div style="font-size:10px;color:var(--amber);margin-top:4px;">' + inProg + ' in progress</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────
+function updateNotifications() {
+  const uid = currentUser?.uid;
+  if (!uid) return;
+  
+  // Task notifications - pending accept tasks assigned to me
+  const myPending = Object.values(liveData.tasks).filter(t => t.assignee === uid && t.state === 'pending-accept');
+  const taskNotif = document.getElementById('notif-tasks');
+  if (taskNotif) taskNotif.classList.toggle('show', myPending.length > 0);
+  
+  // Meeting notifications - upcoming meetings in next 24hrs
+  const now = Date.now();
+  const soon = now + 24*60*60*1000;
+  const upcomingMeetings = (liveData.meetings||[]).filter(m => {
+    const mt = new Date(m.dateUtc).getTime();
+    return mt > now && mt < soon && (m.attendees||[]).includes(uid);
+  });
+  const meetNotif = document.getElementById('notif-meetings');
+  if (meetNotif) meetNotif.classList.toggle('show', upcomingMeetings.length > 0);
+}
+
 function renderDeptBoard(dept) {
   const container = document.querySelector(`.dept-board-container[data-dept="${dept}"]`);
   if (!container) return;
@@ -1739,27 +2278,46 @@ function renderDeptBoard(dept) {
 }
 
 function taskCardHTML(t) {
-  const canDrag = currentProfile.role==='admin' || currentProfile.role==='lead';
-  const stateOptions = ['unassigned','in-progress','review','completed'];
-  const assigneeName = t.assignee ? (liveData.members[t.assignee]?.name || 'Unknown') : '';
-
-  return `<div class="task-card" data-state="${t.state}" data-id="${t.id}"
-    draggable="${canDrag}"
-    ondragstart="onDragStart(event,'${t.id}')"
-    ondragend="onDragEnd(event)">
-    <div class="tc-title">${esc(t.title)}</div>
-    <div class="tc-meta">
-      <span class="tc-tag p-${t.priority}">${t.priority}</span>
-      ${t.due ? `<span class="tc-due">${t.due}</span>` : ''}
-    </div>
-    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
-      <select class="state-chip chip-${t.state}" onchange="setTaskState('${t.id}',this.value)" style="background:transparent;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:3px;appearance:none;outline:none;">
-        ${stateOptions.map(s=>`<option value="${s}" ${s===t.state?'selected':''} style="background:#111320;color:#efefef;">${s.replace('-',' ')}</option>`).join('')}
-      </select>
-      ${(currentProfile.role==='admin'||t.createdBy===currentUser.uid)?`<button class="icon-btn danger" onclick="deleteTask('${t.id}')" style="font-size:11px;padding:2px 5px;">✕</button>`:''}
-    </div>
-    ${assigneeName ? `<div class="tc-assignee" style="margin-top:4px;">→ ${esc(assigneeName)}</div>` : ''}
-  </div>`;
+  var role = currentProfile ? currentProfile.role : '';
+  var uid  = currentUser ? currentUser.uid : '';
+  var canAdminLead = role === 'admin' || role === 'lead';
+  var isAssignee   = t.assignee === uid;
+  var assigneeName = t.assignee ? ((liveData.members[t.assignee] ? liveData.members[t.assignee].name : '') || 'Unknown') : '';
+  var chipClass = {'unassigned':'chip-unassigned','pending-accept':'chip-pending-accept','accepted':'chip-accepted','in-progress':'chip-progress','review':'chip-review','completed':'chip-done'}[t.state] || 'chip-unassigned';
+  var stateLabel = {'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted ✓','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'}[t.state] || 'Unassigned';
+  var now = new Date(); now.setHours(0,0,0,0);
+  var due = t.dueDate ? new Date(t.dueDate) : null;
+  var isOverdue = due && due < now && t.state !== 'completed';
+  var dueDateStr = due ? due.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '';
+  var priorityColor = {high:'var(--crimson-hi)',medium:'var(--amber)',low:'var(--grey)'}[t.priority||'medium'];
+  var commentCount = (t.comments || []).length;
+  var html = '';
+  html += '<div class="task-card' + (isOverdue?' overdue':'') + '" data-state="' + (t.state||'unassigned') + '" data-id="' + t.id + '" draggable="' + (canAdminLead?'true':'false') + '" ondragstart="dragStart(event)" onclick="openTaskDetail(\'' + t.id + '\')" style="cursor:pointer;">';
+  html += '<div class="tc-top">';
+  html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
+  html += '<span class="chip ' + chipClass + '">' + stateLabel + '</span>';
+  if (isOverdue) html += '<span class="overdue-badge">OVERDUE</span>';
+  html += '<span class="chip" style="color:' + priorityColor + ';border-color:' + priorityColor + '44;background:' + priorityColor + '11;">' + (t.priority||'medium').toUpperCase() + '</span>';
+  html += '</div>';
+  if (canAdminLead) {
+    html += '<div class="tc-actions" onclick="event.stopPropagation()">';
+    html += '<button class="tc-btn" onclick="openEditTask(\'' + t.id + '\');event.stopPropagation()">Edit</button>';
+    html += '<button class="tc-btn tc-del" onclick="deleteTask(\'' + t.id + '\');event.stopPropagation()">Del</button>';
+    if (t.state==='review') html += '<button class="tc-btn" style="color:var(--green);" onclick="setTaskState(\'' + t.id + '\',\'completed\',this);event.stopPropagation()">Approve</button>';
+    if (t.state==='completed') html += '<button class="tc-btn" style="color:var(--amber);" onclick="setTaskState(\'' + t.id + '\',\'in-progress\',this);event.stopPropagation()">Reinstate</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="tc-title">' + esc(t.name||'') + '</div>';
+  if (assigneeName) html += '<div class="tc-assign">' + esc(assigneeName) + '</div>';
+  if (dueDateStr) html += '<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:' + (isOverdue?'var(--crimson-hi)':'var(--grey-2)') + ';margin-top:4px;">' + (isOverdue?'OVERDUE: ':'Due: ') + dueDateStr + '</div>';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">';
+  if (t.state==='pending-accept' && isAssignee) html += '<button class="accept-btn" onclick="acceptTask(\'' + t.id + '\');event.stopPropagation()">Accept Task</button>';
+  else html += '<span></span>';
+  if (commentCount > 0) html += '<span style="font-size:10px;color:var(--grey-2);">&#128172; ' + commentCount + '</span>';
+  html += '</div>';
+  html += '</div>';
+  return html;
 }
 
 // ─── DRAG & DROP ──────────────────────────────────────────
