@@ -963,6 +963,39 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Email</span><input class="inp" id="reg-email" type="email" placeholder="your@email.com"></div>
       <div class="field"><span class="field-label">Password</span><input class="inp" id="reg-pass" type="password" placeholder="Min 6 characters"></div>
       <div class="field"><span class="field-label">Invite Code</span><input class="inp" id="reg-code" type="text" placeholder="Get this from your admin"></div>
+      <div style="margin-top:4px;">
+        <div style="font-size:10px;color:var(--grey);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Your Department(s)</div>
+        <div id="reg-dept-checks" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Programming"> Programming</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="2D Art"> 2D Art</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="3D Art"> 3D Art</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Marketing"> Marketing</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Sound Design"> Sound Design</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Visual Effects"> Visual Effects</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Narrative"> Narrative</label>
+        </div>
+      </div>
+      <div class="field" style="margin-top:4px;">
+        <span class="field-label">Your Timezone</span>
+        <select class="inp" id="reg-tz">
+          <option value="UTC">UTC</option>
+          <option value="Europe/London">Europe/London (GMT/BST)</option>
+          <option value="Europe/Paris">Europe/Paris (CET)</option>
+          <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+          <option value="Europe/Moscow">Europe/Moscow (MSK)</option>
+          <option value="America/New_York">America/New_York (ET)</option>
+          <option value="America/Chicago">America/Chicago (CT)</option>
+          <option value="America/Denver">America/Denver (MT)</option>
+          <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
+          <option value="America/Sao_Paulo">America/Sao_Paulo (BRT)</option>
+          <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+          <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+          <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+          <option value="Asia/Shanghai">Asia/Shanghai (CST)</option>
+          <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+          <option value="Pacific/Auckland">Pacific/Auckland (NZST)</option>
+        </select>
+      </div>
       <button class="btn btn-primary fw" onclick="doRegister()">▸ JOIN CREW</button>
       <div id="reg-err" class="login-error"></div>
     </div>
@@ -1728,10 +1761,12 @@ async function doRegister() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({ displayName: name });
+    var regDepts = Array.from(document.querySelectorAll('#reg-dept-checks input:checked')).map(function(c){ return c.value; });
+    var regTz = document.getElementById('reg-tz') ? document.getElementById('reg-tz').value : 'UTC';
     const profile = {
-      uid:cred.user.uid, email, name,
-      role:'crew', depts:[], tz:'Europe/London',
-      status:'online', createdAt: new Date().toISOString()
+      uid: cred.user.uid, email: email, name: name,
+      role: 'crew', depts: regDepts, tz: regTz,
+      status: 'offline', createdAt: new Date().toISOString()
     };
     await db.collection('users').doc(cred.user.uid).set(profile);
   } catch(e) {
@@ -1778,6 +1813,7 @@ async function showApp() {
   // set status online
   await db.collection('users').doc(currentUser.uid).update({ status:'online' }).catch(()=>{});
   currentProfile.status = 'online';
+  setupPresenceHandlers();
 
   updateHeaderUI();
   startListeners();
@@ -2743,7 +2779,7 @@ async function submitEditMember() {
   var tz   = document.getElementById('em-tz').value;
   var depts = Array.from(document.querySelectorAll('#em-dept-checks input:checked')).map(function(c){ return c.value; });
   try {
-    await db.collection('members').doc(uid).update({ name, role, tz, depts });
+    await db.collection('users').doc(uid).update({ name: name, role: role, tz: tz, depts: depts });
     toast('Member updated!','ok');
     closeModal('m-edit-member');
   } catch(e) {
@@ -3265,8 +3301,8 @@ async function saveProfile() {
   const tz   = document.getElementById('edit-tz').value;
   const pass = document.getElementById('edit-pass').value;
   if (!name) { toast('Name required','err'); return; }
-  const updates = { name, tz };
-  await db.collection('users').doc(currentUser.uid).update(updates);
+  const updates = { name: name, tz: tz };
+  await db.collection('users').doc(currentUser.uid).set(updates, { merge: true });
   currentProfile = { ...currentProfile, ...updates };
   if (pass) {
     try { await currentUser.updatePassword(pass); toast('Password updated','ok'); }
@@ -3278,6 +3314,42 @@ async function saveProfile() {
 }
 
 // ─── CLOCK ────────────────────────────────────────────────
+// ─── PRESENCE: set offline when tab closes/hides ─────────
+function setupPresenceHandlers() {
+  function goOffline() {
+    if (currentUser && db) {
+      // Use sendBeacon-style sync update - navigator.sendBeacon can't hit Firestore
+      // Best we can do: synchronous XHR is deprecated, so use the REST API via fetch keepalive
+      var url = 'https://firestore.googleapis.com/v1/projects/' +
+        db.app.options.projectId +
+        '/databases/(default)/documents/users/' + currentUser.uid +
+        '?updateMask.fieldPaths=status';
+      fetch(url, {
+        method: 'PATCH',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { status: { stringValue: 'offline' } } })
+      }).catch(function(){});
+      // Also try the normal SDK way in case page isn't fully closing
+      db.collection('users').doc(currentUser.uid).update({ status: 'offline' }).catch(function(){});
+    }
+  }
+
+  // Tab hidden (minimized, switched, phone screen off)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      goOffline();
+    } else if (document.visibilityState === 'visible' && currentUser && db) {
+      // Coming back - set online
+      db.collection('users').doc(currentUser.uid).update({ status: currentProfile.status !== 'offline' ? (currentProfile.status || 'online') : 'online' }).catch(function(){});
+    }
+  });
+
+  // Page/tab closing
+  window.addEventListener('pagehide', function() { goOffline(); });
+  window.addEventListener('beforeunload', function() { goOffline(); });
+}
+
 function startClock() {
   function tick() {
     const now = new Date();
