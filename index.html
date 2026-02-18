@@ -1772,7 +1772,8 @@ function startListeners() {
     liveData.tasks = {}; snap.docs.forEach(d => { liveData.tasks[d.id] = {id:d.id,...d.data()}; });
     document.getElementById('s-tasks').textContent = Object.values(liveData.tasks).filter(t=>t.state!=='completed').length;
     renderDashTasks(); renderAllDeptBoards();
-    if (document.getElementById('view-my-tasks') && document.getElementById('view-my-tasks').classList.contains('active')) renderMyTasks();
+    var myTasksView = document.getElementById('view-my-tasks');
+    if (myTasksView && myTasksView.classList.contains('active')) renderMyTasks();
     updateNotifications();
   });
 
@@ -2134,6 +2135,33 @@ async function submitOverdueReport() {
 }
 
 // ─── MY TASKS ─────────────────────────────────────────────
+
+
+async function clearDeptCompleted(dept) {
+  var role = currentProfile ? currentProfile.role : '';
+  if (role !== 'admin' && role !== 'lead') { toast('No permission','err'); return; }
+  var completed = Object.values(liveData.tasks).filter(function(t){ return t.state === 'completed' && t.dept === dept; });
+  if (!completed.length) { toast('No completed tasks in this dept','inf'); return; }
+  if (!confirm('Delete ' + completed.length + ' completed task(s) from this board? Cannot be undone.')) return;
+  var batch = db.batch();
+  completed.forEach(function(t){ batch.delete(db.collection('tasks').doc(t.id)); });
+  await batch.commit();
+  toast('Cleared ' + completed.length + ' task(s)','ok');
+}
+
+async function clearCompleted() {
+  var uid = currentUser ? currentUser.uid : '';
+  var role = currentProfile ? currentProfile.role : '';
+  if (role !== 'admin' && role !== 'lead') { toast('No permission','err'); return; }
+  var completed = Object.values(liveData.tasks).filter(function(t){ return t.state === 'completed' && t.assignee === uid; });
+  if (!completed.length) { toast('No completed tasks to clear','inf'); return; }
+  if (!confirm('Delete ' + completed.length + ' completed task(s)? This cannot be undone.')) return;
+  var batch = db.batch();
+  completed.forEach(function(t){ batch.delete(db.collection('tasks').doc(t.id)); });
+  await batch.commit();
+  toast('Cleared ' + completed.length + ' completed task(s)','ok');
+}
+
 function renderMyTasks() {
   const el = document.getElementById('my-tasks-board');
   if (!el) return;
@@ -2163,7 +2191,12 @@ function renderMyTasks() {
     let colHtml = '<div class="my-task-col" ondragover="event.preventDefault()" ondrop="dropMyTask(event,\'' + col.id + '\')">';
     colHtml += '<div class="my-task-col-hdr">';
     colHtml += '<span style="font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:' + col.color + ';text-transform:uppercase;">' + col.icon + ' ' + col.label + '</span>';
-    colHtml += '<span style="font-size:11px;color:var(--grey-2);">' + tasks.length + '</span>';
+    var hdrRight = '<span style="font-size:11px;color:var(--grey-2);">' + tasks.length + '</span>';
+    var adminLead2 = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+    if (col.id === 'completed' && tasks.length > 0 && adminLead2) {
+      hdrRight += '<button class="tc-btn" style="margin-left:6px;font-size:9px;" onclick="clearCompleted()">Clear All</button>';
+    }
+    colHtml += hdrRight;
     colHtml += '</div>';
     colHtml += '<div style="padding:10px;display:flex;flex-direction:column;gap:8px;" id="my-col-' + col.id + '">';
     if (tasks.length === 0) {
@@ -2201,16 +2234,24 @@ function dragMyTask(e) {
 async function dropMyTask(e, newState) {
   e.preventDefault();
   if (!dragMyTaskId) return;
-  const allowed = ['accepted','in-progress','review'];
-  if (!allowed.includes(newState)) { toast('Cannot move to that column','err'); return; }
-  // pending-accept -> accepted is only allowed by assignee
-  if (newState === 'accepted') {
-    const t = Object.values(liveData.tasks).find(t => t.id === dragMyTaskId);
-    if (t?.assignee !== currentUser?.uid) { toast('Only the assigned member can accept','err'); return; }
+  var role = currentProfile ? currentProfile.role : '';
+  var uid  = currentUser ? currentUser.uid : '';
+  var task = liveData.tasks[dragMyTaskId] || Object.values(liveData.tasks).find(function(t){ return t.id === dragMyTaskId; });
+
+  // Admin/lead can move to any state including completed
+  var adminLead = role === 'admin' || role === 'lead';
+
+  // Members can only move their own tasks between accepted/in-progress/review
+  if (!adminLead) {
+    var memberAllowed = ['accepted','in-progress','review'];
+    if (!memberAllowed.includes(newState)) { toast('Only leads and admins can move tasks here','err'); dragMyTaskId = null; return; }
+    if (task && task.assignee !== uid) { toast('You can only move your own tasks','err'); dragMyTaskId = null; return; }
   }
-  await db.collection('tasks').doc(dragMyTaskId).update({ state: newState });
+
+  await db.collection('tasks').doc(dragMyTaskId).update({ state: newState, updatedAt: new Date().toISOString() });
   dragMyTaskId = null;
-  toast('Task updated', 'ok');
+  toast('Task moved to ' + newState.replace('-',' '),'ok');
+  renderMyTasks(); // re-render immediately without waiting for snapshot
 }
 
 // ─── MILESTONES ───────────────────────────────────────────
@@ -2406,12 +2447,16 @@ function renderDeptBoard(dept) {
         }).join('')}
         <!-- Completed column (admin/lead only) -->
         ${canCreate ? `
-        <div class="board-col" style="opacity:.8;">
-          <div class="board-col-hdr">
-            <span class="col-name" style="color:var(--green)">Completed</span>
-            <span class="col-count">${deptTasks.filter(t=>t.state==='completed').length}</span>
+        <div class="board-col" style="opacity:.85;">
+          <div class="board-col-hdr" style="justify-content:space-between;">
+            <span class="col-name" style="color:var(--green)">✓✓ Completed</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="col-count">${deptTasks.filter(t=>t.state==='completed').length}</span>
+              ${deptTasks.filter(t=>t.state==='completed').length > 0 ? `<button class="tc-btn" style="font-size:9px;" onclick="clearDeptCompleted('${dept}')">Clear</button>` : ''}
+            </div>
           </div>
-          <div class="task-drop-zone" style="min-height:60px;">
+          <div class="task-drop-zone" style="min-height:60px;"
+            ondragover="onDragOver(event)" ondrop="onDrop(event,'${dept}','__completed__')">
             ${deptTasks.filter(t=>t.state==='completed').map(t=>taskCardHTML(t)).join('')}
           </div>
         </div>` : ''}
@@ -2475,12 +2520,30 @@ async function onDrop(e, dept, memberId) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if (!dragTask) return;
-  const task = Object.values(liveData.tasks).find(t=>t.id===dragTask);
+  var task = liveData.tasks[dragTask] || Object.values(liveData.tasks).find(function(t){ return t.id === dragTask; });
   if (!task) return;
-  const update = { assignee: memberId, updatedAt: new Date().toISOString() };
-  if (memberId && task.state === 'unassigned') update.state = 'in-progress';
-  if (!memberId) update.state = 'unassigned';
+  var role = currentProfile ? currentProfile.role : '';
+  var adminLead = role === 'admin' || role === 'lead';
+
+  // Dropping onto the completed column
+  if (memberId === '__completed__') {
+    if (!adminLead) { toast('Only admin/lead can mark complete','err'); dragTask = null; return; }
+    await db.collection('tasks').doc(dragTask).update({ state: 'completed', updatedAt: new Date().toISOString() });
+    dragTask = null;
+    toast('Task marked complete','ok');
+    return;
+  }
+
+  var update = { updatedAt: new Date().toISOString() };
+  if (memberId) {
+    update.assignee = memberId;
+    if (task.state === 'unassigned' || task.state === 'pending-accept') update.state = 'in-progress';
+  } else {
+    update.assignee = '';
+    update.state = 'unassigned';
+  }
   await db.collection('tasks').doc(dragTask).update(update);
+  dragTask = null;
 }
 
 // ─── MEETINGS ─────────────────────────────────────────────
