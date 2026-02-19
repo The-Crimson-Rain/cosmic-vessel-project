@@ -966,13 +966,13 @@ textarea.inp { resize:vertical; }
       <div style="margin-top:4px;">
         <div style="font-size:10px;color:var(--grey);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Your Department(s)</div>
         <div id="reg-dept-checks" style="display:flex;flex-wrap:wrap;gap:6px;">
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Programming"> Programming</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="2D Art"> 2D Art</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="3D Art"> 3D Art</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Marketing"> Marketing</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Sound Design"> Sound Design</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Visual Effects"> Visual Effects</label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);"><input type="checkbox" value="Narrative"> Narrative</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #4a90d944;color:#4a90d9;"><input type="checkbox" value="programming" style="accent-color:#4a90d9;"> Programming</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #e8439344;color:#e84393;"><input type="checkbox" value="2d-art" style="accent-color:#e84393;"> 2D Art</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #9b6cf044;color:#9b6cf0;"><input type="checkbox" value="3d-art" style="accent-color:#9b6cf0;"> 3D Art</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #e8a02044;color:#e8a020;"><input type="checkbox" value="marketing" style="accent-color:#e8a020;"> Marketing</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #2ecc8a44;color:#2ecc8a;"><input type="checkbox" value="sound" style="accent-color:#2ecc8a;"> Sound Design</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #00d4ff44;color:#00d4ff;"><input type="checkbox" value="vfx" style="accent-color:#00d4ff;"> Visual Effects</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid #ff6b3544;color:#ff6b35;"><input type="checkbox" value="narrative" style="accent-color:#ff6b35;"> Narrative</label>
         </div>
       </div>
       <div class="field" style="margin-top:4px;">
@@ -1708,7 +1708,7 @@ async function onAuthChange(user) {
     }
     // Admin always has all depts
     if (currentProfile.role === 'admin') {
-      var allDepts = ['Programming', '2D Art', '3D Art', 'Marketing', 'Sound Design', 'Visual Effects', 'Narrative'];
+      var allDepts = ['programming', '2d-art', '3d-art', 'marketing', 'sound', 'vfx', 'narrative'];
       var needsUpdate = !currentProfile.depts || allDepts.some(function(d){ return !(currentProfile.depts||[]).includes(d); });
       if (needsUpdate) {
         currentProfile.depts = allDepts;
@@ -2481,7 +2481,8 @@ function renderDeptBoard(dept) {
   // Get dept members
   const deptMembers = Object.values(liveData.members).filter(m => {
     if (m.role === 'admin') return true; // admin appears on all boards
-    return m.depts && m.depts.includes(dept);
+    var nd = normaliseDepts(m.depts);
+    return nd.includes(dept);
   });
 
   container.innerHTML = `
@@ -2761,12 +2762,24 @@ function openEditMember(uid) {
   document.getElementById('em-name').value = member.name || '';
   document.getElementById('em-role').value = member.role || 'crew';
   document.getElementById('em-tz').value   = member.tz || 'UTC';
-  var depts = ['Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative'];
+  var depts = [
+    {id:'programming', label:'Programming'},
+    {id:'2d-art',      label:'2D Art'},
+    {id:'3d-art',      label:'3D Art'},
+    {id:'marketing',   label:'Marketing'},
+    {id:'sound',       label:'Sound Design'},
+    {id:'vfx',         label:'Visual Effects'},
+    {id:'narrative',   label:'Narrative'}
+  ];
   var memberDepts = member.depts || [];
+  // normalise any legacy full-name depts to short IDs for comparison
+  var legacyMap = {'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art','Marketing':'marketing','Sound Design':'sound','Visual Effects':'vfx','Narrative':'narrative'};
+  var normDepts = memberDepts.map(function(d){ return legacyMap[d] || d; });
   document.getElementById('em-dept-checks').innerHTML = depts.map(function(d) {
-    var checked = memberDepts.includes(d) ? 'checked' : '';
-    return '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;">' +
-      '<input type="checkbox" value="' + d + '" ' + checked + '> ' + d + '</label>';
+    var checked = normDepts.includes(d.id) ? 'checked' : '';
+    var color = {'programming':'#4a90d9','2d-art':'#e84393','3d-art':'#9b6cf0','marketing':'#e8a020','sound':'#2ecc8a','vfx':'#00d4ff','narrative':'#ff6b35'}[d.id] || '#fff';
+    return '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid ' + color + '44;color:' + color + ';">' +
+      '<input type="checkbox" value="' + d.id + '" ' + checked + ' style="accent-color:' + color + ';"> ' + d.label + '</label>';
   }).join('');
   openModal('m-edit-member');
 }
@@ -2787,6 +2800,17 @@ async function submitEditMember() {
   }
 }
 
+
+// Normalise legacy full-name dept values to short IDs
+function normaliseDepts(depts) {
+  var map = {
+    'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art',
+    'Marketing':'marketing','Sound Design':'sound','Sound':'sound',
+    'Visual Effects':'vfx','VFX':'vfx','Narrative':'narrative'
+  };
+  return (depts||[]).map(function(d){ return map[d] || d; });
+}
+
 function renderCrew() {
   const el = document.getElementById('crew-roster');
   if (!el) return;
@@ -2802,7 +2826,7 @@ function renderCrew() {
   el.innerHTML = members.map(m => {
     const statusCls = STATUS_CLASS[m.status||'offline'];
     const localTime = getLocalTime(m.tz||'UTC');
-    const depts = (m.depts||[]).map(d=>{const dc=DEPT_COLORS[d]||'#fff'; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${d}</span>`;}).join('');
+    const normD = normaliseDepts(m.depts); const depts = normD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
     return `<div class="roster-card">
       <div style="position:relative;">
         <div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;">${initials(m.name)}</div>
@@ -2832,7 +2856,7 @@ function renderTzTable() {
   const tbody = document.getElementById('tz-tbody');
   if (!tbody) return;
   tbody.innerHTML = Object.values(liveData.members).map(m => {
-    const depts = (m.depts||[]).map(d=>{const dc=DEPT_COLORS[d]||'#fff';return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${d}</span>`;}).join('');
+    const normD2 = normaliseDepts(m.depts); const depts = normD2.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
     // Only show as active if status is explicitly set to an active state
     const status = (m.status && m.status !== 'offline') ? m.status : 'offline';
     const hasLoggedIn = !!m.status; // if no status field, they haven't logged in yet
@@ -3293,7 +3317,7 @@ function renderProfile() {
   document.getElementById('edit-name').value = currentProfile.name;
   document.getElementById('edit-tz').value = currentProfile.tz || 'Europe/London';
   const deptsEl = document.getElementById('prof-depts');
-  deptsEl.innerHTML = (currentProfile.depts||[]).map(d=>{const dc=DEPT_COLORS[d]||'#fff';return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${d}</span>`;}).join('');
+  var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
 }
 
 async function saveProfile() {
