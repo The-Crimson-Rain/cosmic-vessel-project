@@ -1144,7 +1144,7 @@ textarea.inp { resize:vertical; }
           <option value="Pacific/Auckland">Pacific/Auckland (NZST)</option>
         </select>
       </div>
-      <button class="btn btn-primary fw" onclick="doRegister()">▸ JOIN CREW</button>
+      <button class="btn btn-primary fw" onclick="doRegister()">▸ JOIN TEAM</button>
       <div id="reg-err" class="login-error"></div>
     </div>
   </div>
@@ -1243,7 +1243,7 @@ textarea.inp { resize:vertical; }
         <div class="stat-card c-red"><div class="stat-icon">⬡</div><div><div class="stat-val" id="s-tasks">0</div><div class="stat-lbl">Active Tasks</div></div></div>
         <div class="stat-card c-gold"><div class="stat-icon">◎</div><div><div class="stat-val" id="s-meetings">0</div><div class="stat-lbl">Meetings</div></div></div>
         <div class="stat-card c-green"><div class="stat-icon">◈</div><div><div class="stat-val" id="s-logs">0</div><div class="stat-lbl">Mission Logs</div></div></div>
-        <div class="stat-card c-blue"><div class="stat-icon">◉</div><div><div class="stat-val" id="s-crew">0</div><div class="stat-lbl">Crew Online</div></div></div>
+        <div class="stat-card c-blue"><div class="stat-icon">◉</div><div><div class="stat-val" id="s-crew">0</div><div class="stat-lbl">Members Online</div></div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="panel">
@@ -1256,7 +1256,7 @@ textarea.inp { resize:vertical; }
         </div>
       </div>
       <div class="panel mt-12">
-        <div class="panel-hdr"><span class="panel-title">Crew Status · Live</span><span class="text-mono text-small text-grey" id="dash-tz-time"></span></div>
+        <div class="panel-hdr"><span class="panel-title">Member Status · Live</span><span class="text-mono text-small text-grey" id="dash-tz-time"></span></div>
         <div id="dash-crew-strip" style="display:flex;flex-wrap:wrap;gap:8px;padding:14px;"></div>
       </div>
     </div>
@@ -1296,7 +1296,7 @@ textarea.inp { resize:vertical; }
         <div class="ph-actions" id="crew-actions"></div>
       </div>
       <div class="panel">
-        <div class="panel-hdr"><span class="panel-title">Active Crew</span><input class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search crew..." oninput="filterCrew(this.value)"></div>
+        <div class="panel-hdr"><span class="panel-title">Active Members</span><input class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search crew..." oninput="filterCrew(this.value)"></div>
         <div class="roster-grid" id="crew-roster" style="max-height:calc(100vh - 280px);overflow-y:auto;"></div>
       </div>
     </div>
@@ -1310,7 +1310,7 @@ textarea.inp { resize:vertical; }
       <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
         <div>
           <div class="panel">
-            <div class="panel-hdr"><span class="panel-title">Crew Timezones · Live</span></div>
+            <div class="panel-hdr"><span class="panel-title">Member Timezones · Live</span></div>
             <div style="overflow-x:auto;">
               <table class="tz-table" id="tz-table"><thead><tr><th>Member</th><th>Local Time</th><th>UTC Offset</th><th>Departments</th><th>Status</th></tr></thead><tbody id="tz-tbody"></tbody></table>
             </div>
@@ -1329,7 +1329,7 @@ textarea.inp { resize:vertical; }
       <!-- ── AVAILABILITY HEAT MAP ──────────────────── -->
       <div class="panel" style="margin-top:16px;" id="avail-section">
         <div class="panel-hdr" style="flex-wrap:wrap;gap:8px;">
-          <span class="panel-title">◈ Crew Availability</span>
+          <span class="panel-title">◈ Member Availability</span>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div class="avail-week-toggle" id="avail-mode-toggle">
               <button class="avail-week-btn active" data-mode="weekly" onclick="setAvailMode('weekly',this)">WEEKLY</button>
@@ -1486,12 +1486,12 @@ textarea.inp { resize:vertical; }
     <!-- ── ADMIN ── -->
     <div class="view" id="view-admin">
       <div class="page-hdr">
-        <div class="page-hdr-left"><div class="ph-title">ADMIN CONTROL</div><div class="ph-sub">Crew management · system config</div></div>
+        <div class="page-hdr-left"><div class="ph-title">ADMIN CONTROL</div><div class="ph-sub">Member management · system config</div></div>
         <div class="ph-actions"><button class="btn btn-gold" onclick="openModal(\'m-add-member\')">+ Add Team Member</button></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="panel" style="grid-column:1/-1;">
-          <div class="panel-hdr"><span class="panel-title">Crew Management</span></div>
+          <div class="panel-hdr"><span class="panel-title">Member Management</span></div>
           <div id="admin-roster" style="max-height:400px;overflow-y:auto;"></div>
         </div>
         <div class="panel">
@@ -1504,7 +1504,7 @@ textarea.inp { resize:vertical; }
           </div>
         </div>
         <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Crew Invite Code</span></div>
+          <div class="panel-hdr"><span class="panel-title">Member Invite Code</span></div>
           <div style="padding:18px;">
             <div style="font-size:13px;color:var(--grey);margin-bottom:12px;letter-spacing:.5px;">Members use this code when registering. Change it anytime to invalidate old invites.</div>
             <div style="display:flex;gap:8px;align-items:center;">
@@ -1587,6 +1587,42 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Notes / Agenda</span><textarea class="inp" id="mt-notes" rows="2"></textarea></div>
     </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-meeting')">Cancel</button><button class="btn btn-primary" onclick="submitMeeting()">Schedule</button></div>
+  </div>
+</div>
+
+
+<!-- Edit Meeting Modal -->
+<div class="modal-bg" id="m-edit-meeting">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">▸ EDIT MEETING</span><button class="modal-x" onclick="closeModal('m-edit-meeting')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-mt-id">
+      <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="edit-mt-name" placeholder="e.g. Weekly Sync"></div>
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Date</span><input class="inp" id="edit-mt-date" type="date"></div>
+        <div class="field"><span class="field-label">Time (UTC)</span><input class="inp" id="edit-mt-time" type="time"></div>
+        <div class="field"><span class="field-label">Duration</span>
+          <select class="inp" id="edit-mt-duration">
+            <option value="30">30 minutes</option>
+            <option value="60" selected>1 hour</option>
+            <option value="90">1.5 hours</option>
+            <option value="120">2 hours</option>
+            <option value="180">3 hours</option>
+            <option value="240">4 hours</option>
+            <option value="300">5 hours</option>
+            <option value="360">6 hours</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><span class="field-label">Attendees</span>
+        <div id="edit-attendee-checks" style="background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:4px;padding:10px;max-height:130px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+      <div class="field"><span class="field-label">Notes / Agenda</span><textarea class="inp" id="edit-mt-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m-edit-meeting')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditMeeting()">Save Changes</button>
+    </div>
   </div>
 </div>
 
@@ -1707,7 +1743,7 @@ textarea.inp { resize:vertical; }
         This creates an account. The member will then log in with their email &amp; the invite code, and set their own password on first register.
       </div>
       <div class="field"><span class="field-label">Display Name</span><input class="inp" id="am-name" placeholder="Full name"></div>
-      <div class="field"><span class="field-label">Email</span><input class="inp" id="am-email" type="email" placeholder="crew@email.com"></div>
+      <div class="field"><span class="field-label">Email</span><input class="inp" id="am-email" type="email" placeholder="member@email.com"></div>
       <div class="field"><span class="field-label">Temporary Password</span><input class="inp" id="am-pass" type="password" placeholder="Min 6 characters — share with them"></div>
       <div class="field"><span class="field-label">Role</span>
         <select class="inp" id="am-role"><option value="crew">Member</option><option value="lead">Department Lead</option><option value="admin">Admin</option></select>
@@ -2105,8 +2141,19 @@ function startListeners() {
   // Meetings
   const u3 = db.collection('meetings').orderBy('dateUtc','asc').onSnapshot(snap => {
     liveData.meetings = snap.docs.map(d=>({id:d.id,...d.data()}));
-    document.getElementById('s-meetings').textContent = liveData.meetings.length;
-    renderMeetings(); renderDashMeetings();
+    var activeMtgs = liveData.meetings.filter(function(m){ return !m.cancelled; });
+    document.getElementById('s-meetings').textContent = activeMtgs.length;
+    renderMeetings(); renderDashMeetings(); updateNotifications();
+    // Auto-delete cancelled meetings older than 24h
+    var now = Date.now();
+    liveData.meetings.forEach(function(m) {
+      if (m.cancelled && m.cancelledAt) {
+        var age = now - new Date(m.cancelledAt).getTime();
+        if (age > 24 * 60 * 60 * 1000) {
+          db.collection('meetings').doc(m.id).delete().catch(function(){});
+        }
+      }
+    });
   });
 
   // Transcripts
@@ -2907,11 +2954,16 @@ async function submitMeeting() {
   const timeStr = document.getElementById('mt-time').value || '00:00';
   const dateUtc = dateStr ? new Date(dateStr+'T'+timeStr+':00Z').toISOString() : '';
   const durVal = document.getElementById('mt-duration') ? document.getElementById('mt-duration').value : '60';
+  var attendeeList = [...checks].map(c=>c.value);
+  // Auto-include creator in attendees and auto-accept their RSVP
+  if (!attendeeList.includes(currentUser.uid)) attendeeList.push(currentUser.uid);
+  var initRsvp = {};
+  initRsvp[currentUser.uid] = 'accepted';
   const meeting = {
     name, dateUtc, notes: document.getElementById('mt-notes').value.trim(),
     duration: parseInt(durVal) || 60,
-    attendees: [...checks].map(c=>c.value),
-    rsvp: {},
+    attendees: attendeeList,
+    rsvp: initRsvp,
     createdBy: currentUser.uid, createdAt: new Date().toISOString()
   };
   await db.collection('meetings').add(meeting);
@@ -2935,6 +2987,64 @@ async function rsvpMeeting(meetingId, response) {
   update['rsvp.' + uid] = response; // 'accepted' | 'declined'
   await db.collection('meetings').doc(meetingId).update(update);
   toast(response === 'accepted' ? 'Meeting accepted ✓' : 'Meeting declined', response === 'accepted' ? 'ok' : 'inf');
+}
+
+
+async function removeMeeting(id) {
+  if (!confirm('Remove this meeting permanently?')) return;
+  await db.collection('meetings').doc(id).delete();
+  toast('Meeting removed','inf');
+}
+
+
+// ─── EDIT MEETING ─────────────────────────────────────────
+
+function openEditMeeting(id) {
+  var m = liveData.meetings.find(function(x){ return x.id === id; });
+  if (!m) return;
+  document.getElementById('edit-mt-id').value = id;
+  document.getElementById('edit-mt-name').value = m.name || '';
+  document.getElementById('edit-mt-notes').value = m.notes || '';
+  // Parse dateUtc back to date/time inputs
+  if (m.dateUtc) {
+    var d = new Date(m.dateUtc);
+    var ds = d.toISOString().split('T')[0];
+    var ts = d.toISOString().split('T')[1].slice(0,5);
+    document.getElementById('edit-mt-date').value = ds;
+    document.getElementById('edit-mt-time').value = ts;
+  }
+  var durSel = document.getElementById('edit-mt-duration');
+  if (durSel) durSel.value = String(m.duration || 60);
+  // Populate attendees
+  var box = document.getElementById('edit-attendee-checks');
+  var currentAttendees = m.attendees || [];
+  box.innerHTML = Object.values(liveData.members).map(function(mb) {
+    var checked = currentAttendees.includes(mb.uid) ? 'checked' : '';
+    return '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:rgba(255,255,255,.04);padding:4px 9px;border-radius:4px;border:1px solid var(--border);">' +
+      '<input type="checkbox" value="' + mb.uid + '" ' + checked + ' style="accent-color:var(--crimson-hi);">' +
+      esc(mb.name) + '</label>';
+  }).join('');
+  openModal('m-edit-meeting');
+}
+
+async function saveEditMeeting() {
+  var id       = document.getElementById('edit-mt-id').value;
+  var name     = document.getElementById('edit-mt-name').value.trim();
+  var dateStr  = document.getElementById('edit-mt-date').value;
+  var timeStr  = document.getElementById('edit-mt-time').value || '00:00';
+  var durVal   = document.getElementById('edit-mt-duration').value;
+  var notes    = document.getElementById('edit-mt-notes').value.trim();
+  var checks   = document.querySelectorAll('#edit-attendee-checks input:checked');
+  if (!name) { toast('Meeting name required','err'); return; }
+  var dateUtc = dateStr ? new Date(dateStr+'T'+timeStr+':00Z').toISOString() : '';
+  var attendeeList = [...checks].map(function(c){ return c.value; });
+  if (!attendeeList.includes(currentUser.uid)) attendeeList.push(currentUser.uid);
+  await db.collection('meetings').doc(id).update({
+    name: name, dateUtc: dateUtc, duration: parseInt(durVal)||60,
+    notes: notes, attendees: attendeeList
+  });
+  closeModal('m-edit-meeting');
+  toast('Meeting updated!','ok');
 }
 
 async function cancelMeeting(meetingId) {
@@ -2986,9 +3096,24 @@ function renderMeetings() {
   if (!list) return;
   var uid = currentUser ? currentUser.uid : '';
   var userTz = (currentProfile && currentProfile.tz) || 'UTC';
-  if (!liveData.meetings.length) { list.innerHTML = '<div class="no-data">No meetings scheduled</div>'; return; }
+  var now = Date.now();
 
-  list.innerHTML = liveData.meetings.map(function(m) {
+  // Separate active (future + recent past 2h grace) from cancelled
+  var activeMeetings = liveData.meetings.filter(function(m) {
+    if (m.cancelled) return false;
+    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    return mt > now - 2 * 60 * 60 * 1000; // show until 2h after start
+  });
+  var cancelledMeetings = liveData.meetings.filter(function(m) { return m.cancelled; });
+
+  if (!activeMeetings.length && !cancelledMeetings.length) {
+    list.innerHTML = '<div class="no-data">No meetings scheduled</div>';
+    return;
+  }
+
+  var allToShow = activeMeetings.concat(cancelledMeetings);
+  list.innerHTML = (activeMeetings.length === 0 ? '<div style="padding:8px 0;font-size:11px;color:var(--grey-2);">No upcoming meetings</div>' : '') +
+    allToShow.map(function(m) {
     var dateUtc  = m.dateUtc ? new Date(m.dateUtc) : null;
     var localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'TBD';
     var utcStr   = dateUtc ? dateUtc.toUTCString().slice(0,22) : '';
@@ -3014,7 +3139,12 @@ function renderMeetings() {
       myRsvp === 'declined' ? 'rgba(200,16,46,.3)' : 'var(--border)';
 
     var h = '<div class="meeting-card" style="border-color:' + borderColor + ';' + (isCancelled?'opacity:.5;':'') + '">';
-    if (isCancelled) h += '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--grey-2);margin-bottom:6px;">✗ CANCELLED</div>';
+    if (isCancelled) {
+      h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+      h += '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--grey-2);">✗ CANCELLED</div>';
+      h += '<button class="btn btn-ghost btn-xs" style="font-size:10px;" data-mid="' + m.id + '" onclick="removeMeeting(this.dataset.mid)">Remove</button>';
+      h += '</div>';
+    }
     h += '<div class="mc-time">' + utcStr + ' · ' + durStr + '</div>';
     h += '<div class="mc-name">' + esc(m.name) + '</div>';
     h += '<div class="mc-local">Your time: ' + localStr + '</div>';
@@ -3043,9 +3173,15 @@ function renderMeetings() {
         h += '<span></span>';
       }
 
-      h += '<div style="display:flex;gap:6px;">';
+      h += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
       h += '<a href="' + makeGCalUrl(m) + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid rgba(66,133,244,.4);border-radius:4px;background:rgba(66,133,244,.08);color:#4285f4;font-size:10px;font-weight:700;letter-spacing:1px;text-decoration:none;">+ GCal</a>';
-      if (canCancel) h += '<button class="btn btn-danger btn-xs" data-mid="' + m.id + '" onclick="cancelMeeting(this.dataset.mid)">Cancel</button>';
+      if (canCancel && !isCancelled) {
+        h += '<button class="btn btn-ghost btn-xs" data-mid="' + m.id + '" onclick="openEditMeeting(this.dataset.mid)">Edit</button>';
+        h += '<button class="btn btn-danger btn-xs" data-mid="' + m.id + '" onclick="cancelMeeting(this.dataset.mid)">Cancel</button>';
+      }
+      if (canCancel) {
+        h += '<button class="btn btn-ghost btn-xs" style="font-size:10px;color:var(--grey-2);" data-mid="' + m.id + '" onclick="removeMeeting(this.dataset.mid)">Delete</button>';
+      }
       h += '</div>';
       h += '</div>';
     }
@@ -3059,16 +3195,30 @@ function renderDashMeetings() {
   const el = document.getElementById('dash-meetings');
   if (!el) return;
   const userTz = currentProfile?.tz || 'UTC';
-  const upcoming = liveData.meetings.slice(0,4);
-  if (!upcoming.length) { el.innerHTML='<div class="no-data">No meetings scheduled</div>'; return; }
-  el.innerHTML = upcoming.map(m => {
-    const dateUtc = m.dateUtc ? new Date(m.dateUtc) : null;
-    const localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,hour:'2-digit',minute:'2-digit'}) : '';
-    const dateDisp = dateUtc ? dateUtc.toLocaleDateString('en-GB',{timeZone:userTz,day:'2-digit',month:'short'}) : 'TBD';
-    return `<div class="meeting-card" style="border-radius:0;border-left:none;border-right:none;border-top:none;margin:0;">
-      <div class="mc-time">${dateDisp}${localStr?' · '+localStr+' local':''}</div>
-      <div class="mc-name" style="font-size:13px;">${esc(m.name)}</div>
-    </div>`;
+  var uid2 = currentUser ? currentUser.uid : '';
+  var now3 = Date.now();
+  // Show: active future meetings I'm attending, plus recently cancelled ones I was in
+  var dashMtgs = liveData.meetings.filter(function(m) {
+    var isAttendee = (m.attendees||[]).includes(uid2) || m.createdBy === uid2;
+    if (!isAttendee) return false;
+    if (m.cancelled) {
+      // Show cancelled for 24h so people know to remove from GCal
+      var age = m.cancelledAt ? (now3 - new Date(m.cancelledAt).getTime()) : Infinity;
+      return age < 24 * 60 * 60 * 1000;
+    }
+    return true;
+  }).slice(0, 4);
+  if (!dashMtgs.length) { el.innerHTML='<div class="no-data">No upcoming meetings</div>'; return; }
+  el.innerHTML = dashMtgs.map(function(m) {
+    var dateUtc = m.dateUtc ? new Date(m.dateUtc) : null;
+    var localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,hour:'2-digit',minute:'2-digit'}) : '';
+    var dateDisp = dateUtc ? dateUtc.toLocaleDateString('en-GB',{timeZone:userTz,day:'2-digit',month:'short'}) : 'TBD';
+    var isCancelled = m.cancelled;
+    return '<div class="meeting-card" style="border-radius:0;border-left:none;border-right:none;border-top:none;margin:0;' + (isCancelled?'opacity:.5;border-left:2px solid var(--crimson-hi);':'') + '">' +
+      (isCancelled ? '<div style="font-size:9px;color:var(--crimson-hi);letter-spacing:2px;font-weight:700;">CANCELLED</div>' : '') +
+      '<div class="mc-time">' + dateDisp + (localStr?' · '+localStr+' local':'') + '</div>' +
+      '<div class="mc-name" style="font-size:13px;' + (isCancelled?'text-decoration:line-through;':'') + '">' + esc(m.name) + '</div>' +
+      '</div>';
   }).join('');
 }
 
@@ -3610,7 +3760,7 @@ async function submitAddMember() {
     await db.collection('users').doc(uid).set(profile);
     closeModal('m-add-member');
     ['am-name','am-email','am-pass'].forEach(id=>document.getElementById(id).value='');
-    toast(name + ' added to crew!','ok');
+    toast(name + ' added to team!','ok');
   } catch(e) {
     toast('Error: ' + friendlyAuthError(e),'err');
   }
@@ -4329,6 +4479,7 @@ function openAvailEditor() {
   if (tzLabel) tzLabel.textContent = tz;
 
   renderEditorGrid();
+  initEditorDrag();
   openModal('m-avail-editor');
 }
 
@@ -4406,14 +4557,16 @@ function renderEditorGrid() {
     columns.forEach(function(col) {
       var isSelected = editorSlots[col.key] && editorSlots[col.key].has(hour);
       html += '<div class="avail-editor-cell' + (isSelected?' selected':'') + '" ' +
-        'data-col="' + col.key + '" data-hour="' + hour + '" ' +
-        'onclick="toggleEditorCell(this)"></div>';
+        'data-col="' + col.key + '" data-hour="' + hour + '"></div>';
     });
   });
 
   html += '</div>';
   grid.innerHTML = html;
 }
+
+var _dragPainting = false;
+var _dragPaintMode = null; // 'add' or 'remove'
 
 function toggleEditorCell(cell) {
   var col  = cell.dataset.col;
@@ -4427,6 +4580,70 @@ function toggleEditorCell(cell) {
     cell.classList.add('selected');
   }
 }
+
+function editorCellPaint(cell) {
+  if (!_dragPainting || !cell) return;
+  var col  = cell.dataset.col;
+  var hour = cell.dataset.hour;
+  if (!col || !hour) return;
+  if (!editorSlots[col]) editorSlots[col] = new Set();
+  if (_dragPaintMode === 'add') {
+    editorSlots[col].add(hour);
+    cell.classList.add('selected');
+  } else {
+    editorSlots[col].delete(hour);
+    cell.classList.remove('selected');
+  }
+}
+
+function initEditorDrag() {
+  var wrap = document.getElementById('editor-grid-wrap');
+  if (!wrap || wrap._dragInit) return;
+  wrap._dragInit = true;
+
+  wrap.addEventListener('mousedown', function(e) {
+    var cell = e.target.closest('.avail-editor-cell');
+    if (!cell) return;
+    e.preventDefault();
+    _dragPainting = true;
+    var col  = cell.dataset.col;
+    var hour = cell.dataset.hour;
+    if (!editorSlots[col]) editorSlots[col] = new Set();
+    // Decide paint mode based on first cell state
+    _dragPaintMode = editorSlots[col].has(hour) ? 'remove' : 'add';
+    editorCellPaint(cell);
+  });
+
+  wrap.addEventListener('mousemove', function(e) {
+    if (!_dragPainting) return;
+    var cell = document.elementFromPoint(e.clientX, e.clientY);
+    if (cell && cell.classList.contains('avail-editor-cell')) editorCellPaint(cell);
+  });
+
+  // Touch support
+  wrap.addEventListener('touchstart', function(e) {
+    var cell = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    if (!cell || !cell.classList.contains('avail-editor-cell')) return;
+    e.preventDefault();
+    _dragPainting = true;
+    var col = cell.dataset.col;
+    var hour = cell.dataset.hour;
+    if (!editorSlots[col]) editorSlots[col] = new Set();
+    _dragPaintMode = editorSlots[col].has(hour) ? 'remove' : 'add';
+    editorCellPaint(cell);
+  }, { passive: false });
+
+  wrap.addEventListener('touchmove', function(e) {
+    if (!_dragPainting) return;
+    e.preventDefault();
+    var cell = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    if (cell && cell.classList.contains('avail-editor-cell')) editorCellPaint(cell);
+  }, { passive: false });
+}
+
+document.addEventListener('mouseup',   function(){ _dragPainting = false; });
+document.addEventListener('touchend',  function(){ _dragPainting = false; });
+
 
 function clearAvailEditor() {
   if (!confirm('Clear all slots in the current view?')) return;
