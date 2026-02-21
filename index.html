@@ -1383,6 +1383,18 @@ textarea.inp { resize:vertical; }
       <div class="grid-2">
         <div class="field"><span class="field-label">Date</span><input class="inp" id="mt-date" type="date"></div>
         <div class="field"><span class="field-label">Time (UTC)</span><input class="inp" id="mt-time" type="time"></div>
+      <div class="field"><span class="field-label">Duration</span>
+        <select class="inp" id="mt-duration">
+          <option value="30">30 minutes</option>
+          <option value="60" selected>1 hour</option>
+          <option value="90">1.5 hours</option>
+          <option value="120">2 hours</option>
+          <option value="180">3 hours</option>
+          <option value="240">4 hours</option>
+          <option value="300">5 hours</option>
+          <option value="360">6 hours</option>
+        </select>
+      </div>
       </div>
       <div class="field"><span class="field-label">Attendees</span>
         <div id="attendee-checks" style="background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:4px;padding:10px;max-height:130px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;"></div>
@@ -1417,6 +1429,18 @@ textarea.inp { resize:vertical; }
       </div>
     </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-transcript')">Cancel</button><button class="btn btn-primary" onclick="submitTranscript()">Save Log</button></div>
+  </div>
+</div>
+
+
+<!-- Member Profile View -->
+<div class="modal-bg" id="m-member-profile">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-hdr">
+      <span class="modal-title" id="mp-title">▸ MEMBER PROFILE</span>
+      <button class="modal-x" onclick="closeModal('m-member-profile')">✕</button>
+    </div>
+    <div class="modal-body" id="mp-body" style="padding:0;"></div>
   </div>
 </div>
 
@@ -2460,15 +2484,24 @@ function updateNotifications() {
   const taskNotif = document.getElementById('notif-tasks');
   if (taskNotif) taskNotif.classList.toggle('show', myPending.length > 0);
   
-  // Meeting notifications - upcoming meetings in next 24hrs
-  const now = Date.now();
-  const soon = now + 24*60*60*1000;
-  const upcomingMeetings = (liveData.meetings||[]).filter(m => {
-    const mt = new Date(m.dateUtc).getTime();
-    return mt > now && mt < soon && (m.attendees||[]).includes(uid);
+  // Meeting notifications - pending RSVP invitations + upcoming in 24hrs
+  var now2 = Date.now();
+  var soon2 = now2 + 24*60*60*1000;
+  var pendingRsvp = (liveData.meetings||[]).filter(function(m) {
+    if (m.cancelled) return false;
+    var isAttendee = (m.attendees||[]).includes(uid);
+    var notResponded = !m.rsvp || m.rsvp[uid] === undefined;
+    var isCreator = m.createdBy === uid;
+    return isAttendee && notResponded && !isCreator;
   });
-  const meetNotif = document.getElementById('notif-meetings');
-  if (meetNotif) meetNotif.classList.toggle('show', upcomingMeetings.length > 0);
+  var upcomingMeetings = (liveData.meetings||[]).filter(function(m) {
+    if (m.cancelled) return false;
+    var mt = new Date(m.dateUtc).getTime();
+    return mt > now2 && mt < soon2 && (m.attendees||[]).includes(uid);
+  });
+  var meetNotif = document.getElementById('notif-meetings');
+  var meetCount = pendingRsvp.length + upcomingMeetings.length;
+  if (meetNotif) meetNotif.classList.toggle('show', meetCount > 0);
 }
 
 function renderDeptBoard(dept) {
@@ -2632,9 +2665,12 @@ async function submitMeeting() {
   const dateStr = document.getElementById('mt-date').value;
   const timeStr = document.getElementById('mt-time').value || '00:00';
   const dateUtc = dateStr ? new Date(dateStr+'T'+timeStr+':00Z').toISOString() : '';
+  const durVal = document.getElementById('mt-duration') ? document.getElementById('mt-duration').value : '60';
   const meeting = {
     name, dateUtc, notes: document.getElementById('mt-notes').value.trim(),
+    duration: parseInt(durVal) || 60,
     attendees: [...checks].map(c=>c.value),
+    rsvp: {},
     createdBy: currentUser.uid, createdAt: new Date().toISOString()
   };
   await db.collection('meetings').add(meeting);
@@ -2647,6 +2683,32 @@ async function submitMeeting() {
   closeModal('m-meeting');
   ['mt-name','mt-notes'].forEach(id=>document.getElementById(id).value='');
   toast('Meeting scheduled!','ok');
+}
+
+
+// ─── MEETING RSVP ─────────────────────────────────────────
+
+async function rsvpMeeting(meetingId, response) {
+  var uid = currentUser.uid;
+  var update = {};
+  update['rsvp.' + uid] = response; // 'accepted' | 'declined'
+  await db.collection('meetings').doc(meetingId).update(update);
+  toast(response === 'accepted' ? 'Meeting accepted ✓' : 'Meeting declined', response === 'accepted' ? 'ok' : 'inf');
+}
+
+async function cancelMeeting(meetingId) {
+  var meeting = liveData.meetings.find(function(m){ return m.id === meetingId; });
+  if (!meeting) return;
+  var isCreator = meeting.createdBy === currentUser.uid;
+  var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  if (!isCreator && !isAdminLead) { toast('No permission to cancel this meeting','err'); return; }
+  if (!confirm('Cancel this meeting? All attendees will be notified.')) return;
+  await db.collection('meetings').doc(meetingId).update({
+    cancelled: true,
+    cancelledBy: currentUser.uid,
+    cancelledAt: new Date().toISOString()
+  });
+  toast('Meeting cancelled','inf');
 }
 
 async function deleteMeeting(id) {
@@ -2679,31 +2741,78 @@ function makeGCalUrl(m) {
 }
 
 function renderMeetings() {
-  const list = document.getElementById('meetings-list');
+  var list = document.getElementById('meetings-list');
   if (!list) return;
+  var uid = currentUser ? currentUser.uid : '';
+  var userTz = (currentProfile && currentProfile.tz) || 'UTC';
   if (!liveData.meetings.length) { list.innerHTML = '<div class="no-data">No meetings scheduled</div>'; return; }
 
-  const userTz = currentProfile?.tz || 'UTC';
-  list.innerHTML = liveData.meetings.map(m => {
-    const dateUtc = m.dateUtc ? new Date(m.dateUtc) : null;
-    const localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'TBD';
-    const utcStr   = dateUtc ? dateUtc.toUTCString().slice(0,22) : '';
-    return `<div class="meeting-card">
-      <div class="mc-time">${utcStr}</div>
-      <div class="mc-name">${esc(m.name)}</div>
-      <div class="mc-local">Your time: ${localStr}</div>
-      ${m.notes ? `<div style="font-size:12px;color:var(--grey);margin-bottom:6px;">${esc(m.notes)}</div>` : ''}
-      <div class="mc-attendees">${m.attendees.map(uid=>{const mb=liveData.members[uid];return`<span class="ac-chip">${mb?esc(mb.name):uid}</span>`;}).join('')}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;">
-        <a href="${makeGCalUrl(m)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid rgba(66,133,244,.4);border-radius:4px;background:rgba(66,133,244,.08);color:#4285f4;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-          + Google Calendar
-        </a>
-        ${(currentProfile.role==='admin'||currentProfile.role==='lead'||m.createdBy===currentUser.uid)?`<button class="btn btn-danger btn-xs" onclick="deleteMeeting('${m.id}')">Delete</button>`:''}
-      </div>
-    </div>`;
+  list.innerHTML = liveData.meetings.map(function(m) {
+    var dateUtc  = m.dateUtc ? new Date(m.dateUtc) : null;
+    var localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'TBD';
+    var utcStr   = dateUtc ? dateUtc.toUTCString().slice(0,22) : '';
+    var durMins  = m.duration || 60;
+    var durStr   = durMins >= 60 ? Math.floor(durMins/60) + 'hr' + (durMins%60 ? ' ' + (durMins%60) + 'min' : '') : durMins + 'min';
+    var isAttendee  = (m.attendees||[]).includes(uid);
+    var isCreator   = m.createdBy === uid;
+    var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+    var canCancel   = isCreator || isAdminLead;
+    var myRsvp      = m.rsvp ? m.rsvp[uid] : undefined;
+    var isCancelled = !!m.cancelled;
+
+    var attendeeChips = (m.attendees||[]).map(function(auid) {
+      var mb = liveData.members[auid];
+      var ar = m.rsvp ? m.rsvp[auid] : undefined;
+      var rc = ar === 'accepted' ? 'var(--green)' : ar === 'declined' ? 'var(--crimson-hi)' : 'var(--grey)';
+      var ri = ar === 'accepted' ? ' ✓' : ar === 'declined' ? ' ✗' : '';
+      return '<span class="ac-chip" style="border-color:'+rc+'44;color:'+rc+';">' + esc(mb ? mb.name : auid) + ri + '</span>';
+    }).join('');
+
+    var borderColor = isCancelled ? 'rgba(100,100,100,.3)' :
+      myRsvp === 'accepted' ? 'rgba(46,204,138,.4)' :
+      myRsvp === 'declined' ? 'rgba(200,16,46,.3)' : 'var(--border)';
+
+    var h = '<div class="meeting-card" style="border-color:' + borderColor + ';' + (isCancelled?'opacity:.5;':'') + '">';
+    if (isCancelled) h += '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--grey-2);margin-bottom:6px;">✗ CANCELLED</div>';
+    h += '<div class="mc-time">' + utcStr + ' · ' + durStr + '</div>';
+    h += '<div class="mc-name">' + esc(m.name) + '</div>';
+    h += '<div class="mc-local">Your time: ' + localStr + '</div>';
+    if (m.notes) h += '<div style="font-size:12px;color:var(--grey);margin-bottom:6px;">' + esc(m.notes) + '</div>';
+    h += '<div class="mc-attendees">' + attendeeChips + '</div>';
+
+    if (!isCancelled) {
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px;flex-wrap:wrap;">';
+
+      if (isAttendee && !isCreator) {
+        if (myRsvp === undefined) {
+          h += '<div style="display:flex;gap:6px;">';
+          h += '<button class="btn btn-gold btn-xs" data-mid="' + m.id + '" data-rsp="accepted" onclick="rsvpMeeting(this.dataset.mid,this.dataset.rsp)">✓ Accept</button>';
+          h += '<button class="btn btn-ghost btn-xs" data-mid="' + m.id + '" data-rsp="declined" onclick="rsvpMeeting(this.dataset.mid,this.dataset.rsp)">✗ Decline</button>';
+          h += '</div>';
+        } else {
+          var opp = myRsvp === 'accepted' ? 'declined' : 'accepted';
+          h += '<div style="display:flex;align-items:center;gap:8px;">';
+          h += '<span style="font-size:11px;color:' + (myRsvp==='accepted'?'var(--green)':'var(--grey)') + ';font-family:Share Tech Mono,monospace;">' + (myRsvp==='accepted'?'✓ Accepted':'✗ Declined') + '</span>';
+          h += '<button class="btn btn-ghost btn-xs" style="font-size:9px;" data-mid="' + m.id + '" data-rsp="' + opp + '" onclick="rsvpMeeting(this.dataset.mid,this.dataset.rsp)">Change</button>';
+          h += '</div>';
+        }
+      } else if (isCreator) {
+        h += '<div style="font-size:10px;color:var(--grey-2);font-family:Share Tech Mono,monospace;">You organised this</div>';
+      } else {
+        h += '<span></span>';
+      }
+
+      h += '<div style="display:flex;gap:6px;">';
+      h += '<a href="' + makeGCalUrl(m) + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid rgba(66,133,244,.4);border-radius:4px;background:rgba(66,133,244,.08);color:#4285f4;font-size:10px;font-weight:700;letter-spacing:1px;text-decoration:none;">+ GCal</a>';
+      if (canCancel) h += '<button class="btn btn-danger btn-xs" data-mid="' + m.id + '" onclick="cancelMeeting(this.dataset.mid)">Cancel</button>';
+      h += '</div>';
+      h += '</div>';
+    }
+    h += '</div>';
+    return h;
   }).join('');
 }
+
 
 function renderDashMeetings() {
   const el = document.getElementById('dash-meetings');
@@ -2802,6 +2911,94 @@ async function submitEditMember() {
 
 
 // Normalise legacy full-name dept values to short IDs
+
+function openMemberProfile(uid) {
+  var m = liveData.members[uid];
+  if (!m) { toast('Member not found','err'); return; }
+  var role = currentProfile ? currentProfile.role : '';
+  var canSeeOverrides = role === 'admin' || role === 'lead' || uid === (currentUser && currentUser.uid);
+
+  var statusCls = STATUS_CLASS[m.status||'offline'];
+  var statusLabel = STATUS_LABEL[m.status||'offline'];
+  var localTime = getLocalTime(m.tz||'UTC');
+  var normD = normaliseDepts(m.depts);
+  var LABEL_MAP = {programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'};
+  var deptTags = normD.map(function(d){
+    var dc = DEPT_COLORS[d]||'#888';
+    return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+(LABEL_MAP[d]||d)+'</span>';
+  }).join('');
+
+  // Regular availability display (text list)
+  var weeklyAvail = m.weeklyAvail || {};
+  var DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+  var DAY_LABELS = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
+  var availRows = DAYS.filter(function(d){ return weeklyAvail[d] && weeklyAvail[d].length; }).map(function(d) {
+    var slots = weeklyAvail[d].slice().sort();
+    // Condense consecutive hours into ranges
+    var ranges = [];
+    var start = slots[0], prev = slots[0];
+    for (var i = 1; i <= slots.length; i++) {
+      var cur = slots[i];
+      var prevHour = parseInt(prev.split(':')[0]);
+      var curHour  = cur ? parseInt(cur.split(':')[0]) : -1;
+      if (curHour !== prevHour + 1) {
+        var endHour = (prevHour + 1) % 24;
+        ranges.push(start + '–' + String(endHour).padStart(2,'0') + ':00');
+        start = cur; prev = cur;
+      } else { prev = cur; }
+    }
+    return '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;">' +
+      '<span style="color:var(--gold);font-family:Share Tech Mono,monospace;width:80px;flex-shrink:0;">' + DAY_LABELS[d] + '</span>' +
+      '<span style="color:var(--grey);">' + ranges.join(', ') + ' (' + (m.tz||'UTC') + ')</span>' +
+      '</div>';
+  }).join('');
+
+  var html = '<div style="padding:20px;">';
+  // Header
+  html += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">';
+  html += '<div style="position:relative;">';
+  html += '<div class="tz-av" style="width:52px;height:52px;font-size:18px;background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);">' + initials(m.name) + '</div>';
+  html += '<div class="status-dot '+statusCls+'" style="position:absolute;bottom:0;right:0;width:12px;height:12px;border:2px solid var(--panel);"></div>';
+  html += '</div>';
+  html += '<div>';
+  html += '<div style="font-size:18px;font-weight:700;letter-spacing:.5px;">' + esc(m.name) + '</div>';
+  html += '<div style="font-size:11px;color:var(--grey);margin-top:2px;">' + esc(m.email||'') + '</div>';
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-top:4px;">';
+  html += '<span style="font-size:10px;font-weight:700;letter-spacing:2px;padding:2px 8px;border-radius:3px;background:rgba(200,16,46,.12);border:1px solid rgba(200,16,46,.3);color:var(--crimson-hi);">' + (m.role||'member').toUpperCase() + '</span>';
+  html += '<span style="font-size:11px;color:var(--grey-2);">' + statusLabel + '</span>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Details
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">';
+  html += '<div style="background:rgba(255,255,255,.03);padding:10px;border-radius:6px;border:1px solid var(--border);">';
+  html += '<div style="font-size:9px;color:var(--grey-2);letter-spacing:2px;margin-bottom:4px;">LOCAL TIME</div>';
+  html += '<div style="font-size:16px;font-family:Share Tech Mono,monospace;color:var(--gold);">' + localTime + '</div>';
+  html += '<div style="font-size:10px;color:var(--grey-2);">' + (m.tz||'UTC') + '</div>';
+  html += '</div>';
+  html += '<div style="background:rgba(255,255,255,.03);padding:10px;border-radius:6px;border:1px solid var(--border);">';
+  html += '<div style="font-size:9px;color:var(--grey-2);letter-spacing:2px;margin-bottom:6px;">DEPARTMENTS</div>';
+  html += deptTags || '<span style="font-size:11px;color:var(--grey-2);">None assigned</span>';
+  html += '</div>';
+  html += '</div>';
+
+  // Regular availability
+  html += '<div style="margin-bottom:4px;">';
+  html += '<div style="font-size:9px;color:var(--grey-2);letter-spacing:2px;margin-bottom:8px;">REGULAR AVAILABILITY</div>';
+  if (availRows) {
+    html += availRows;
+  } else {
+    html += '<div style="font-size:12px;color:var(--grey-2);">No regular hours set yet.</div>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  document.getElementById('mp-title').textContent = '▸ ' + m.name.toUpperCase();
+  document.getElementById('mp-body').innerHTML = html;
+  openModal('m-member-profile');
+}
+
 function normaliseDepts(depts) {
   var map = {
     'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art',
@@ -2833,7 +3030,7 @@ function renderCrew() {
         <div class="status-dot ${statusCls}" style="position:absolute;bottom:0;right:0;width:10px;height:10px;border:2px solid var(--panel);"></div>
       </div>
       <div>
-        <div style="font-size:14px;font-weight:600;">${esc(m.name)}</div>
+        <div style="font-size:14px;font-weight:600;cursor:pointer;color:var(--white);" onclick="openMemberProfile('${m.uid}')" title="View profile">${esc(m.name)} <span style="font-size:10px;color:var(--grey-2);">↗</span></div>
         <div style="font-size:11px;color:var(--grey);font-family:'Share Tech Mono',monospace;">${esc(m.email||'')}</div>
         <div style="margin-top:4px;">${depts}</div>
       </div>
@@ -2959,7 +3156,7 @@ function renderTagFilters() {
   var allTags = tags.concat(customTags);
   el.innerHTML = allTags.map(function(tag) {
     var active = (tag === 'All' && !logTagFilter) || logTagFilter === tag;
-    return '<button onclick="setTagFilter(' + JSON.stringify(tag) + ')" style="text-align:left;padding:6px 10px;border-radius:4px;border:1px solid ' + (active?'var(--crimson-hi)':'var(--border)') + ';background:' + (active?'rgba(200,16,46,.12)':'transparent') + ';color:' + (active?'var(--white)':'var(--grey)') + ';font-size:11px;font-family:Share Tech Mono,monospace;letter-spacing:1px;cursor:pointer;transition:all .15s;">' + (active?'▸ ':'') + tag.toUpperCase() + '</button>';
+    return '<button data-tag="' + esc(tag) + '" onclick="setTagFilter(this.dataset.tag)" style="text-align:left;padding:6px 10px;border-radius:4px;border:1px solid ' + (active?'var(--crimson-hi)':'var(--border)') + ';background:' + (active?'rgba(200,16,46,.12)':'transparent') + ';color:' + (active?'var(--white)':'var(--grey)') + ';font-size:11px;font-family:Share Tech Mono,monospace;letter-spacing:1px;cursor:pointer;transition:all .15s;">' + (active?'▸ ':'') + tag.toUpperCase() + '</button>';
   }).join('');
   // Show/hide upload panel based on role
   var adminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
@@ -3340,38 +3537,80 @@ async function saveProfile() {
 // ─── CLOCK ────────────────────────────────────────────────
 // ─── PRESENCE: set offline when tab closes/hides ─────────
 function setupPresenceHandlers() {
-  function goOffline() {
-    if (currentUser && db) {
-      // Use sendBeacon-style sync update - navigator.sendBeacon can't hit Firestore
-      // Best we can do: synchronous XHR is deprecated, so use the REST API via fetch keepalive
-      var url = 'https://firestore.googleapis.com/v1/projects/' +
-        db.app.options.projectId +
-        '/databases/(default)/documents/users/' + currentUser.uid +
-        '?updateMask.fieldPaths=status';
-      fetch(url, {
-        method: 'PATCH',
-        keepalive: true,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields: { status: { stringValue: 'offline' } } })
-      }).catch(function(){});
-      // Also try the normal SDK way in case page isn't fully closing
-      db.collection('users').doc(currentUser.uid).update({ status: 'offline' }).catch(function(){});
-    }
+  var heartbeatInterval = null;
+  var HEARTBEAT_MS = 45000; // ping every 45s
+  var OFFLINE_THRESHOLD_MS = 120000; // 2min without heartbeat = offline
+
+  function writeHeartbeat() {
+    if (!currentUser || !db) return;
+    db.collection('users').doc(currentUser.uid).update({
+      lastSeen: new Date().toISOString(),
+      status: currentProfile.status || 'online'
+    }).catch(function(){});
   }
 
-  // Tab hidden (minimized, switched, phone screen off)
+  function goOffline() {
+    if (!currentUser || !db) return;
+    // Use fetch with keepalive so it survives page unload
+    var projId = db.app.options.projectId;
+    var url = 'https://firestore.googleapis.com/v1/projects/' + projId +
+      '/databases/(default)/documents/users/' + currentUser.uid +
+      '?updateMask.fieldPaths=status&updateMask.fieldPaths=lastSeen';
+    var now = new Date().toISOString();
+    fetch(url, {
+      method: 'PATCH', keepalive: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: {
+        status:   { stringValue: 'offline' },
+        lastSeen: { stringValue: now }
+      }})
+    }).catch(function(){});
+    db.collection('users').doc(currentUser.uid).update({ status:'offline', lastSeen: now }).catch(function(){});
+  }
+
+  // Start heartbeat
+  writeHeartbeat();
+  heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
+
+  // Page/tab actually closing - go offline immediately
+  window.addEventListener('pagehide', function() {
+    clearInterval(heartbeatInterval);
+    goOffline();
+  });
+  window.addEventListener('beforeunload', function() {
+    clearInterval(heartbeatInterval);
+    goOffline();
+  });
+
+  // Visibility change: pause heartbeat when hidden, resume + re-ping when visible
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'hidden') {
-      goOffline();
-    } else if (document.visibilityState === 'visible' && currentUser && db) {
-      // Coming back - set online
-      db.collection('users').doc(currentUser.uid).update({ status: currentProfile.status !== 'offline' ? (currentProfile.status || 'online') : 'online' }).catch(function(){});
+      clearInterval(heartbeatInterval);
+      // Set a delayed offline - if they don't come back in 2min, go offline
+      // We can't set a 2min timeout here reliably, but the heartbeat stopping
+      // means lastSeen won't update. The Firestore snapshot will catch stale users.
+    } else {
+      // Back on tab - restart heartbeat and set online
+      writeHeartbeat();
+      heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
     }
   });
 
-  // Page/tab closing
-  window.addEventListener('pagehide', function() { goOffline(); });
-  window.addEventListener('beforeunload', function() { goOffline(); });
+  // Stale user cleanup: every 3 min check if any members have stale lastSeen
+  // and auto-mark them offline in the local view (not writing to Firestore)
+  setInterval(function() {
+    var threshold = Date.now() - OFFLINE_THRESHOLD_MS;
+    Object.values(liveData.members).forEach(function(m) {
+      if (m.status !== 'offline' && m.lastSeen) {
+        var ls = new Date(m.lastSeen).getTime();
+        if (ls < threshold) {
+          // Their heartbeat is stale - show as offline locally
+          liveData.members[m.uid] = Object.assign({}, m, { status: 'offline' });
+        }
+      }
+    });
+    renderDashCrewStrip();
+  }, 60000);
 }
 
 function startClock() {
