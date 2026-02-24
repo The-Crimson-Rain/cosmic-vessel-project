@@ -296,12 +296,20 @@ body::after {
 /* ── VIEWS ───────────────────────────────── */
 .view { display:none; }
 .view.active { display:block; }
+/* Mission Logs needs flex layout to fill height */
+#view-transcripts.active {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px); /* subtract hub top bar */
+  overflow: hidden;
+}
 
 /* ── PAGE HEADER ─────────────────────────── */
 .page-hdr {
   display:flex; align-items:flex-start; justify-content:space-between;
   margin-bottom:20px; position:relative; z-index:5;
 }
+#view-transcripts .page-hdr { margin-bottom: 8px; }
 .page-hdr-left .ph-title {
   font-family:'Orbitron',sans-serif; font-size:16px; font-weight:700;
   letter-spacing:3px; color:var(--white);
@@ -1045,9 +1053,10 @@ textarea.inp { resize:vertical; }
 /* ─── COSMIC MEETINGS ARCHIVE ─────────────────────────────── */
 .arc-wrap {
   display: flex;
-  height: calc(100vh - 52px); /* fill below the hub header */
+  flex: 1;
   overflow: hidden;
   gap: 0;
+  min-height: 0; /* critical: allow flex children to shrink below content size */
 }
 
 /* Sidebar — sessions list */
@@ -5363,25 +5372,30 @@ async function arcSubmitAdd() {
   var audioUrl = audioRaw ? (arcDriveToStream(audioRaw) || audioRaw) : null;
 
   var rec = {
-    title:    title,
-    date:     date,
-    dept:     document.getElementById('arc-add-dept').value || 'general',
-    duration: document.getElementById('arc-add-dur').value.trim(),
-    summary:  document.getElementById('arc-add-summary').value.trim() || (arcPendingMd.parsed.summary || ''),
-    audioUrl: audioUrl,
-    speakers: arcPendingMd.parsed.speakerCount || '',
-    lines:    arcPendingMd.parsed.lines,   // full transcript stored in Firestore
-    addedBy:  currentUser.uid,
-    addedByName: currentProfile.name,
-    createdAt: new Date().toISOString()
+    title:        title,
+    date:         date,
+    dept:         document.getElementById('arc-add-dept').value || 'general',
+    duration:     document.getElementById('arc-add-dur').value.trim(),
+    summary:      document.getElementById('arc-add-summary').value.trim() || (arcPendingMd.parsed.summary || ''),
+    audioUrl:     audioUrl,
+    speakers:     arcPendingMd.parsed.speakerCount || '',
+    markdownText: arcPendingMd.text,  // store raw md — parsed client-side on load (avoids Firestore 1MB limit)
+    addedBy:      currentUser.uid,
+    addedByName:  currentProfile.name,
+    createdAt:    new Date().toISOString()
   };
 
   try {
     var docRef = await db.collection('archive_meetings').add(rec);
     closeModal('m-arc-add');
     toast('Meeting added to archive!', 'ok');
-    // Select it immediately
-    setTimeout(function() { arcSelectMeeting(docRef.id); }, 500);
+    // Select it using the data we already have — don't wait for Firestore snapshot
+    var newMeeting = Object.assign({ id: docRef.id }, rec);
+    // Pre-populate liveData so arcSelectMeeting can find it immediately
+    if (!liveData.archiveMeetings) liveData.archiveMeetings = [];
+    liveData.archiveMeetings.unshift(newMeeting);
+    arcApplyFilters();
+    arcSelectMeeting(docRef.id);
   } catch(e) {
     toast('Error saving: ' + e.message, 'err');
   }
@@ -5453,7 +5467,8 @@ async function arcConfirmDelete(id) {
 
 // ── Render ALL (sidebar + filters) ────────────────────────────────
 function arcRenderAll() {
-  var isAdminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+  if (!currentProfile) return; // not logged in yet
+  var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
 
   // Show/hide admin buttons
   var adminBtnWrap = document.getElementById('arc-admin-btn-wrap');
@@ -5544,9 +5559,16 @@ function arcSelectMeeting(id) {
   var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
   if (!m) return;
 
-  arcCurrentId  = id;
-  arcLines      = m.lines || [];
-  arcActiveIdx  = -1;
+  arcCurrentId = id;
+  // Parse transcript on demand — stored as raw markdown to stay under Firestore 1MB limit
+  if (m.markdownText) {
+    arcLines = arcParseMarkdown(m.markdownText).lines;
+  } else if (m.lines && m.lines.length) {
+    arcLines = m.lines; // legacy: old records stored parsed lines directly
+  } else {
+    arcLines = [];
+  }
+  arcActiveIdx = -1;
   arcSearchQuery = '';
   arcAutoScroll  = true;
 
