@@ -1375,6 +1375,61 @@ textarea.inp { resize:vertical; }
 .arc-drive-input:focus { border-color:var(--crimson-hi); }
 .arc-drive-input::placeholder { color:var(--grey-2); }
 
+
+/* ─── ARC PLAYER EXTRAS ─── */
+.arc-stop-btn {
+  width: 28px; height: 28px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--grey);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .2s;
+  font-size: 10px;
+}
+.arc-stop-btn:hover { border-color: var(--crimson-hi); color: var(--crimson-hi); }
+.arc-stop-btn:disabled { opacity: .3; cursor: default; }
+
+.arc-progress-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--crimson-hi);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.arc-progress-wrap:hover .arc-progress-thumb { opacity: 1; }
+.arc-progress-wrap { cursor: pointer; user-select: none; }
+.arc-progress-wrap.dragging { cursor: grabbing; }
+.arc-progress-wrap.dragging .arc-progress-thumb { opacity: 1; }
+
+/* selection-jump highlight */
+.arc-line.arc-sel-preview {
+  background: rgba(95,207,207,.08);
+  border-color: rgba(95,207,207,.25);
+}
+.arc-line.arc-sel-preview .arc-ts { color: #5fcfcf; }
+
+/* dept tag in info bar */
+.arc-dept-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  opacity: .85;
+}
+
 </style>
 </head>
 <body>
@@ -1722,14 +1777,35 @@ textarea.inp { resize:vertical; }
 
     <!-- ── TRANSCRIPTS ── -->
     <div class="view" id="view-transcripts">
-      <div class="page-hdr" style="flex-shrink:0;">
+      <div class="page-hdr" style="flex-shrink:0;padding-bottom:8px;">
         <div class="page-hdr-left">
           <div class="ph-title">MISSION LOGS</div>
-          <div class="ph-sub">Meeting archive · transcripts · audio playback</div>
+          <div class="ph-sub">Meeting recordings · transcripts · audio playback</div>
         </div>
-        <div class="ph-actions">
-          <button class="btn btn-primary btn-xs" onclick="arcOpenUpload()">+ Add Meeting</button>
+        <div class="ph-actions" id="arc-admin-btn-wrap">
+          <!-- admin/lead only button injected by JS -->
         </div>
+      </div>
+
+      <!-- Filters bar -->
+      <div id="arc-filters" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 0 10px 0;flex-shrink:0;">
+        <input id="arc-global-search" class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search archive…" oninput="arcApplyFilters()">
+        <select id="arc-dept-filter" class="inp" style="width:150px;padding:5px 10px;font-size:12px;" onchange="arcApplyFilters()">
+          <option value="">All Departments</option>
+          <option value="general">General</option>
+          <option value="programming">Programming</option>
+          <option value="2d-art">2D Art</option>
+          <option value="3d-art">3D Art</option>
+          <option value="marketing">Marketing</option>
+          <option value="sound">Sound Design</option>
+          <option value="vfx">VFX</option>
+          <option value="narrative">Narrative</option>
+        </select>
+        <select id="arc-sort" class="inp" style="width:130px;padding:5px 10px;font-size:12px;" onchange="arcApplyFilters()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+        <span id="arc-result-count" style="font-family:var(--mono);font-size:10px;color:var(--grey-2);margin-left:4px;"></span>
       </div>
 
       <!-- Archive UI -->
@@ -1742,8 +1818,8 @@ textarea.inp { resize:vertical; }
             <span class="arc-count" id="arcCount">0 recorded</span>
           </div>
           <div class="arc-session-list" id="arcSessionList"></div>
-          <div class="arc-sidebar-foot">
-            <button class="btn btn-ghost fw" style="font-size:10px;" onclick="arcOpenUpload()">+ Add Meeting</button>
+          <div class="arc-sidebar-foot" id="arc-sidebar-foot-btn">
+            <!-- admin/lead add button injected -->
           </div>
         </aside>
 
@@ -1754,34 +1830,48 @@ textarea.inp { resize:vertical; }
           <div class="arc-empty" id="arcEmpty">
             <div class="arc-empty-icon">🌌</div>
             <div class="arc-empty-title">No session selected</div>
-            <div class="arc-empty-sub">Add a meeting recording<br>or select one from the archive</div>
+            <div class="arc-empty-sub">Select a meeting from the archive<br>or add a new recording</div>
           </div>
 
           <!-- Meeting view (hidden until session loaded) -->
           <div id="arcView" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
 
-            <!-- Player -->
+            <!-- Player bar -->
             <div class="arc-player">
-              <button class="arc-play-btn" id="arcPlayBtn" onclick="arcTogglePlay()" disabled>▶</button>
+              <!-- Play/Pause -->
+              <button class="arc-play-btn" id="arcPlayBtn" onclick="arcTogglePlay()" disabled title="Play / Pause (Space)">▶</button>
+              <!-- Stop -->
+              <button class="arc-stop-btn" id="arcStopBtn" onclick="arcStop()" disabled title="Stop">⏹</button>
+              <!-- Time -->
               <div class="arc-time" id="arcTime">0:00 / 0:00</div>
-              <div class="arc-progress-wrap" id="arcProgressWrap" onclick="arcSeek(event)">
+              <!-- Progress -->
+              <div class="arc-progress-wrap" id="arcProgressWrap"
+                   onmousedown="arcProgressDragStart(event)"
+                   onclick="arcSeek(event)">
                 <div class="arc-progress-fill" id="arcProgressFill" style="width:0%"></div>
+                <div class="arc-progress-thumb" id="arcProgressThumb" style="left:0%"></div>
               </div>
-              <button class="arc-speed-btn" id="arcSpeedBtn" onclick="arcCycleSpeed()">1×</button>
+              <!-- Speed -->
+              <button class="arc-speed-btn" id="arcSpeedBtn" onclick="arcCycleSpeed()" title="Playback speed">1×</button>
+              <!-- No audio indicator -->
+              <span id="arcNoAudio" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);display:none;">NO AUDIO</span>
             </div>
 
-            <!-- Search -->
+            <!-- Transcript search -->
             <div class="arc-search">
               <span style="color:var(--grey-2);font-size:12px;">⌕</span>
-              <input id="arcSearch" placeholder="Search transcript…" oninput="arcOnSearch(this.value)" style="flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:11px;color:var(--white);">
+              <input id="arcSearch" placeholder="Search transcript… (select text to jump)" oninput="arcOnSearch(this.value)">
               <span class="arc-search-count" id="arcSearchCount"></span>
+              <span id="arcSelHint" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);display:none;padding-left:8px;">↑ selection jump ready</span>
             </div>
 
             <!-- Info bar -->
             <div class="arc-info" id="arcInfoBar"></div>
 
-            <!-- Transcript scroll area -->
-            <div class="arc-transcript" id="arcTranscript">
+            <!-- Transcript -->
+            <div class="arc-transcript" id="arcTranscript"
+                 onmouseup="arcHandleTextSelection()"
+                 ontouchend="arcHandleTextSelection()">
               <div id="arcSummary"></div>
               <div id="arcLines"></div>
             </div>
@@ -2306,7 +2396,7 @@ const STATUS_LABEL = { online:'Online', working:'Working', gaming:'Gaming', offl
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{} };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{} };
 let crewSearch = '', logSearch = '', logTagFilter = '';
 let dragTask = null;
 
@@ -2532,12 +2622,12 @@ function startListeners() {
     });
   });
 
-  // Transcripts
-  const u4 = db.collection('transcripts').orderBy('createdAt','desc').onSnapshot(snap => {
-    liveData.transcripts = snap.docs.map(function(d){ return {id:d.id,...d.data()}; });
-    document.getElementById('s-logs').textContent = liveData.transcripts.length;
+  // Archive meetings (stored in Firestore 'archive_meetings' collection)
+  const u4 = db.collection('archive_meetings').orderBy('date','desc').onSnapshot(function(snap) {
+    liveData.archiveMeetings = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    document.getElementById('s-logs').textContent = liveData.archiveMeetings.length;
     var trView = document.getElementById('view-transcripts');
-    if (trView && trView.classList.contains('active')) { renderTranscripts(); renderTagFilters(); }
+    if (trView && trView.classList.contains('active')) { arcRenderAll(); }
   });
 
   // Weekly availability
@@ -2633,7 +2723,7 @@ function navTo(view) {
     if (view === 'crew')       renderCrew();
     if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
     if (view === 'scheduler')  { renderMeetings(); renderTzTable(); renderAvailHeatmap(); checkAvailPrompt(); }
-    if (view === 'transcripts') { renderTranscripts(); renderTagFilters(); }
+    if (view === 'transcripts') { arcRenderAll(); }
   }
 }
 
@@ -5068,81 +5158,73 @@ async function saveAvailability() {
 // (already reads m.weeklyAvail from the user doc via the users snapshot)
 
 
-// ═══════════════════════════════════════════════════════
-//  COSMIC MEETINGS ARCHIVE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+//  COSMIC MEETINGS ARCHIVE — v3 (Firestore-backed)
+// ═══════════════════════════════════════════════════════════════════
 
-var arcMeetings = [];
-var arcCurrentId = null;
-var arcLines = [];
-var arcActiveIdx = -1;
-var arcSearchQuery = '';
-var arcSpeeds = [0.75, 1, 1.25, 1.5, 2];
-var arcSpeedIdx = 1;
-var arcAutoScroll = true;
-var arcPendingMd = null;
-var arcPendingAudio = null;
-var arcPendingDriveUrl = null;
+// ── State ──────────────────────────────────────────────────────────
+var arcCurrentId     = null;
+var arcLines         = [];
+var arcActiveIdx     = -1;
+var arcSearchQuery   = '';
+var arcSpeeds        = [0.5, 0.75, 1, 1.25, 1.5, 2];
+var arcSpeedIdx      = 2; // default 1×
+var arcAutoScroll    = true;
+var arcIsDragging    = false;
+var arcFilterDept    = '';
+var arcFilterSearch  = '';
+var arcSortOrder     = 'newest';
+var arcPendingMd     = null; // { name, text, parsed }
 
 var arcAudio = document.getElementById('arcAudio');
 
-// ─── STORAGE ──────────────────────────────────────────
+// ── DEPT colours ───────────────────────────────────────────────────
+var ARC_DEPT_COLORS = {
+  'general':     '#8899aa',
+  'programming': '#4a90d9',
+  '2d-art':      '#e84393',
+  '3d-art':      '#9b6cf0',
+  'marketing':   '#e8a020',
+  'sound':       '#2ecc8a',
+  'vfx':         '#00d4ff',
+  'narrative':   '#ff6b35'
+};
+var ARC_DEPT_LABELS = {
+  'general':'General','programming':'Programming','2d-art':'2D Art',
+  '3d-art':'3D Art','marketing':'Marketing','sound':'Sound Design',
+  'vfx':'VFX','narrative':'Narrative'
+};
 
-function arcSave() {
-  try {
-    var meta = arcMeetings.map(function(m) {
-      return { id: m.id, title: m.title, date: m.date,
-               duration: m.duration, speakers: m.speakers,
-               summary: m.summary, lines: m.lines,
-               driveAudioUrl: m.driveAudioUrl || null };
-    });
-    localStorage.setItem('cvp_arc_meetings', JSON.stringify(meta));
-  } catch(e) {}
-}
-
-function arcLoad() {
-  try {
-    var raw = localStorage.getItem('cvp_arc_meetings');
-    if (!raw) return;
-    arcMeetings = JSON.parse(raw).map(function(m) {
-      return Object.assign({}, m, { localAudioUrl: null });
-    });
-  } catch(e) {}
-}
-
-// ─── GOOGLE DRIVE URL CONVERSION ──────────────────────
-// Converts share URL to direct streamable link
-
+// ── Google Drive URL → streamable URL ──────────────────────────────
 function arcDriveToStream(url) {
-  if (!url) return null;
-  // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-  var m = url.match(/\/file\/d\/([^/]+)/);
-  if (m) return 'https://drive.google.com/uc?export=download&id=' + m[1];
-  // Format: https://drive.google.com/open?id=FILE_ID
-  var m2 = url.match(/[?&]id=([^&]+)/);
+  if (!url || !url.trim()) return null;
+  url = url.trim();
+  // Format 1: /file/d/FILE_ID/
+  var m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return 'https://drive.google.com/uc?export=download&id=' + m1[1];
+  // Format 2: ?id=FILE_ID
+  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (m2) return 'https://drive.google.com/uc?export=download&id=' + m2[1];
-  return url; // return as-is if unrecognised
+  // Already a direct URL or something else — return as-is
+  if (url.startsWith('http')) return url;
+  return null;
 }
 
-function arcHandleDriveUrl(val) {
-  val = val.trim();
-  var statusEl = document.getElementById('arcDriveStatus');
-  if (!val) { arcPendingDriveUrl = null; statusEl.textContent = ''; return; }
+function arcDriveUrlStatus(inputId, statusId) {
+  var val = document.getElementById(inputId).value.trim();
+  var statusEl = document.getElementById(statusId);
+  if (!val) { statusEl.textContent = ''; return; }
   var streamUrl = arcDriveToStream(val);
   if (streamUrl) {
-    arcPendingDriveUrl = streamUrl;
-    statusEl.textContent = '✓ Drive link detected — will stream from Google Drive';
+    statusEl.textContent = '✓ Drive link detected';
     statusEl.style.color = 'var(--green)';
-    // Clear local file if drive URL is set
-    arcPendingAudio = null;
-    var nameEl = document.getElementById('arcAudioName');
-    nameEl.textContent = 'No local file selected';
-    nameEl.classList.remove('ok');
+  } else {
+    statusEl.textContent = '⚠ Unrecognised URL format';
+    statusEl.style.color = 'var(--crimson-hi)';
   }
 }
 
-// ─── PARSE MARKDOWN ───────────────────────────────────
-
+// ── Parse Notecat Markdown ─────────────────────────────────────────
 function arcParseMarkdown(text) {
   var rawLines = text.split('\n');
   var title = 'Meeting', date = '', duration = '', speakerCount = '', summary = '';
@@ -5151,7 +5233,7 @@ function arcParseMarkdown(text) {
   for (var i = 0; i < rawLines.length; i++) {
     var l = rawLines[i].trim();
     if (l.startsWith('# ')) title = l.slice(2).trim();
-    if (l.startsWith('- **Date**:')) date = l.replace('- **Date**:', '').trim();
+    if (l.startsWith('- **Date**:'))     date = l.replace('- **Date**:', '').trim();
     if (l.startsWith('- **Duration**:')) duration = l.replace('- **Duration**:', '').trim();
     if (l.startsWith('- **Speakers**:')) speakerCount = l.replace('- **Speakers**:', '').trim();
     if (l === '## Summary') {
@@ -5162,7 +5244,7 @@ function arcParseMarkdown(text) {
   }
 
   var speakerRe = /^\*\*(.+?)\*\*\s*-\s*(\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM))\s*$/i;
-  var eventRe = /^\*(.+?)\*$/;
+  var eventRe   = /^\*(.+?)\*$/;
   var speakerColors = {}, colorIdx = 0, startSeconds = null;
 
   function timeToSec(ts) {
@@ -5174,7 +5256,6 @@ function arcParseMarkdown(text) {
     if (!pm && h === 12) h = 0;
     return h * 3600 + mn * 60 + s;
   }
-
   function timeToOffset(ts) {
     var abs = timeToSec(ts);
     if (abs === null) return null;
@@ -5184,25 +5265,23 @@ function arcParseMarkdown(text) {
     return Math.max(0, diff);
   }
 
-  // Find start time first pass
+  // First pass: find start time
   for (var k = 0; k < rawLines.length; k++) {
     var sm0 = rawLines[k].match(speakerRe);
     if (sm0 && startSeconds === null) { startSeconds = timeToSec(sm0[2]); break; }
   }
 
-  // Second pass
-  var inTranscript = false, idx2 = 0;
-  while (idx2 < rawLines.length) {
-    var ll = rawLines[idx2].trim();
-    if (ll === '## Transcript') { inTranscript = true; idx2++; continue; }
-    if (!inTranscript) { idx2++; continue; }
-
+  // Second pass: build lines
+  var inTranscript = false, ii = 0;
+  while (ii < rawLines.length) {
+    var ll = rawLines[ii].trim();
+    if (ll === '## Transcript') { inTranscript = true; ii++; continue; }
+    if (!inTranscript) { ii++; continue; }
     var sm = ll.match(speakerRe);
     if (sm) {
-      var spk = sm[1], tstr = sm[2];
-      var off = timeToOffset(tstr);
+      var spk = sm[1], tstr = sm[2], off = timeToOffset(tstr);
       if (!(spk in speakerColors)) speakerColors[spk] = colorIdx++ % 6;
-      var txt = '', jj = idx2 + 1;
+      var txt = '', jj = ii + 1;
       while (jj < rawLines.length) {
         var nxt = rawLines[jj].trim();
         if (nxt === '') { jj++; break; }
@@ -5210,153 +5289,308 @@ function arcParseMarkdown(text) {
         txt += (txt ? ' ' : '') + nxt;
         jj++;
       }
-      parsed.push({ type: 'speech', speaker: spk, colorIdx: speakerColors[spk], timeStr: tstr, offset: off, text: txt || '…' });
-      idx2 = jj;
-      continue;
+      parsed.push({ type:'speech', speaker:spk, colorIdx:speakerColors[spk], timeStr:tstr, offset:off, text:txt || '…' });
+      ii = jj; continue;
     }
-
     var em = ll.match(eventRe);
-    if (em) { parsed.push({ type: 'event', text: em[1] }); idx2++; continue; }
-    idx2++;
+    if (em) { parsed.push({ type:'event', text:em[1] }); ii++; continue; }
+    ii++;
   }
-
-  return { title, date, duration, speakerCount, summary, lines: parsed };
+  return { title, date, duration, speakerCount, summary, lines:parsed };
 }
 
-// ─── UPLOAD HANDLERS ──────────────────────────────────
-
-function arcOpenUpload() {
+// ── Add meeting handlers ───────────────────────────────────────────
+function arcOpenAdd() {
   arcPendingMd = null;
-  arcPendingAudio = null;
-  arcPendingDriveUrl = null;
-  document.getElementById('arcMdName').textContent = 'No file selected';
-  document.getElementById('arcMdName').classList.remove('ok');
-  document.getElementById('arcAudioName').textContent = 'No local file selected';
-  document.getElementById('arcAudioName').classList.remove('ok');
-  document.getElementById('arcDriveUrl').value = '';
-  document.getElementById('arcDriveStatus').textContent = '';
-  openModal('m-arc-upload');
+  document.getElementById('arc-add-title').value    = '';
+  document.getElementById('arc-add-date').value     = '';
+  document.getElementById('arc-add-dur').value      = '';
+  document.getElementById('arc-add-summary').value  = '';
+  document.getElementById('arc-add-audio-url').value = '';
+  document.getElementById('arc-add-audio-status').textContent = '';
+  var mdNameEl = document.getElementById('arc-add-md-name');
+  mdNameEl.textContent = 'No file selected';
+  mdNameEl.style.color = 'var(--grey-2)';
+  document.getElementById('arc-add-dept').value = 'general';
+  // set default date = today
+  document.getElementById('arc-add-date').value = new Date().toISOString().slice(0,10);
+  openModal('m-arc-add');
 }
 
-function arcHandleMd(input) {
+function arcHandleAddMd(input) {
   var file = input.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    arcPendingMd = { name: file.name, text: e.target.result };
-    var el = document.getElementById('arcMdName');
-    el.textContent = file.name;
-    el.classList.add('ok');
+    var text = e.target.result;
+    var parsed = arcParseMarkdown(text);
+    arcPendingMd = { name:file.name, text:text, parsed:parsed };
+    var mdNameEl = document.getElementById('arc-add-md-name');
+    mdNameEl.textContent = '✓ ' + file.name;
+    mdNameEl.style.color = 'var(--green)';
+    // Auto-fill fields from transcript if blank
+    if (!document.getElementById('arc-add-title').value && parsed.title && parsed.title !== 'Meeting') {
+      document.getElementById('arc-add-title').value = parsed.title;
+    }
+    if (!document.getElementById('arc-add-dur').value && parsed.duration) {
+      document.getElementById('arc-add-dur').value = parsed.duration;
+    }
+    if (!document.getElementById('arc-add-summary').value && parsed.summary) {
+      document.getElementById('arc-add-summary').value = parsed.summary;
+    }
+    // Try to parse date from transcript
+    if (!document.getElementById('arc-add-date').value || document.getElementById('arc-add-date').value === new Date().toISOString().slice(0,10)) {
+      if (parsed.date) {
+        // Try to parse various date formats
+        var tryDate = new Date(parsed.date);
+        if (!isNaN(tryDate)) {
+          document.getElementById('arc-add-date').value = tryDate.toISOString().slice(0,10);
+        }
+      }
+    }
   };
   reader.readAsText(file);
 }
 
-function arcHandleAudio(input) {
-  var file = input.files[0];
-  if (!file) return;
-  arcPendingAudio = { name: file.name, url: URL.createObjectURL(file) };
-  arcPendingDriveUrl = null;
-  document.getElementById('arcDriveUrl').value = '';
-  document.getElementById('arcDriveStatus').textContent = '';
-  var el = document.getElementById('arcAudioName');
-  el.textContent = file.name;
-  el.classList.add('ok');
-}
+async function arcSubmitAdd() {
+  var title = document.getElementById('arc-add-title').value.trim();
+  var date  = document.getElementById('arc-add-date').value;
+  if (!title) { toast('Enter a meeting title', 'err'); return; }
+  if (!date)  { toast('Enter a date', 'err'); return; }
+  if (!arcPendingMd) { toast('Select a transcript .md file', 'err'); return; }
 
-function arcAddMeeting() {
-  if (!arcPendingMd) { toast('Please select a markdown transcript file.', 'err'); return; }
-  var parsed = arcParseMarkdown(arcPendingMd.text);
-  var id = 'arc_' + Date.now();
-  var audioUrl = null;
-  if (arcPendingAudio) {
-    audioUrl = arcPendingAudio.url;
-  } else if (arcPendingDriveUrl) {
-    audioUrl = arcPendingDriveUrl;
+  var audioRaw = document.getElementById('arc-add-audio-url').value.trim();
+  var audioUrl = audioRaw ? (arcDriveToStream(audioRaw) || audioRaw) : null;
+
+  var rec = {
+    title:    title,
+    date:     date,
+    dept:     document.getElementById('arc-add-dept').value || 'general',
+    duration: document.getElementById('arc-add-dur').value.trim(),
+    summary:  document.getElementById('arc-add-summary').value.trim() || (arcPendingMd.parsed.summary || ''),
+    audioUrl: audioUrl,
+    speakers: arcPendingMd.parsed.speakerCount || '',
+    lines:    arcPendingMd.parsed.lines,   // full transcript stored in Firestore
+    addedBy:  currentUser.uid,
+    addedByName: currentProfile.name,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    var docRef = await db.collection('archive_meetings').add(rec);
+    closeModal('m-arc-add');
+    toast('Meeting added to archive!', 'ok');
+    // Select it immediately
+    setTimeout(function() { arcSelectMeeting(docRef.id); }, 500);
+  } catch(e) {
+    toast('Error saving: ' + e.message, 'err');
   }
-  arcMeetings.unshift({
-    id, title: parsed.title, date: parsed.date, duration: parsed.duration,
-    speakers: parsed.speakerCount, summary: parsed.summary, lines: parsed.lines,
-    driveAudioUrl: arcPendingDriveUrl || null,
-    localAudioUrl: arcPendingAudio ? arcPendingAudio.url : null,
-    audioUrl: audioUrl
-  });
-  arcSave();
-  closeModal('m-arc-upload');
-  arcRenderSidebar();
-  arcSelectMeeting(id);
-  toast('Meeting added to archive!', 'ok');
 }
 
-// ─── RENDER SIDEBAR ───────────────────────────────────
+// ── Edit handlers ──────────────────────────────────────────────────
+function arcOpenEdit(id) {
+  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
+  if (!m) { toast('Meeting not found', 'err'); return; }
+  document.getElementById('arc-edit-id').value       = id;
+  document.getElementById('arc-edit-title').value    = m.title || '';
+  document.getElementById('arc-edit-date').value     = m.date  || '';
+  document.getElementById('arc-edit-dept').value     = m.dept  || 'general';
+  document.getElementById('arc-edit-dur').value      = m.duration || '';
+  document.getElementById('arc-edit-summary').value  = m.summary || '';
+  document.getElementById('arc-edit-audio-url').value = m.audioUrl || '';
+  document.getElementById('arc-edit-audio-status').textContent = '';
+  openModal('m-arc-edit');
+}
 
-function arcRenderSidebar() {
+async function arcSubmitEdit() {
+  var id    = document.getElementById('arc-edit-id').value;
+  var title = document.getElementById('arc-edit-title').value.trim();
+  var date  = document.getElementById('arc-edit-date').value;
+  if (!title) { toast('Title required', 'err'); return; }
+
+  var audioRaw = document.getElementById('arc-edit-audio-url').value.trim();
+  var audioUrl = audioRaw ? (arcDriveToStream(audioRaw) || audioRaw) : null;
+
+  try {
+    await db.collection('archive_meetings').doc(id).update({
+      title:    title,
+      date:     date,
+      dept:     document.getElementById('arc-edit-dept').value || 'general',
+      duration: document.getElementById('arc-edit-dur').value.trim(),
+      summary:  document.getElementById('arc-edit-summary').value.trim(),
+      audioUrl: audioUrl
+    });
+    closeModal('m-arc-edit');
+    toast('Meeting updated!', 'ok');
+    // If currently viewing, refresh info bar
+    if (arcCurrentId === id) arcRefreshInfoBar(id);
+  } catch(e) {
+    toast('Error: ' + e.message, 'err');
+  }
+}
+
+async function arcConfirmDelete(id) {
+  if (!id) return;
+  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
+  var name = m ? m.title : 'this meeting';
+  if (!confirm('Delete "' + name + '" from the archive? This cannot be undone.')) return;
+  try {
+    await db.collection('archive_meetings').doc(id).delete();
+    closeModal('m-arc-edit');
+    toast('Meeting deleted', 'inf');
+    if (arcCurrentId === id) {
+      arcCurrentId = null;
+      arcAudio.pause();
+      arcAudio.src = '';
+      document.getElementById('arcEmpty').style.display = '';
+      var view = document.getElementById('arcView');
+      if (view) view.style.display = 'none';
+    }
+  } catch(e) {
+    toast('Error deleting: ' + e.message, 'err');
+  }
+}
+
+// ── Render ALL (sidebar + filters) ────────────────────────────────
+function arcRenderAll() {
+  var isAdminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+
+  // Show/hide admin buttons
+  var adminBtnWrap = document.getElementById('arc-admin-btn-wrap');
+  if (adminBtnWrap) {
+    adminBtnWrap.innerHTML = isAdminLead
+      ? '<button class="btn btn-primary btn-xs" onclick="arcOpenAdd()">+ Add Meeting</button>'
+      : '';
+  }
+  var sidebarFoot = document.getElementById('arc-sidebar-foot-btn');
+  if (sidebarFoot) {
+    sidebarFoot.innerHTML = isAdminLead
+      ? '<button class="btn btn-ghost fw" style="font-size:10px;" onclick="arcOpenAdd()">+ Add Meeting</button>'
+      : '';
+  }
+
+  arcApplyFilters();
+}
+
+function arcApplyFilters() {
+  arcFilterSearch = (document.getElementById('arc-global-search') || {}).value || '';
+  arcFilterDept   = (document.getElementById('arc-dept-filter') || {}).value || '';
+  arcSortOrder    = (document.getElementById('arc-sort') || {}).value || 'newest';
+
+  var items = (liveData.archiveMeetings || []).slice();
+
+  // Filter
+  var q = arcFilterSearch.toLowerCase();
+  if (q) {
+    items = items.filter(function(m) {
+      return (m.title || '').toLowerCase().includes(q) ||
+             (m.summary || '').toLowerCase().includes(q) ||
+             (m.dept || '').toLowerCase().includes(q) ||
+             ((m.lines || []).some(function(l) {
+               return l.type === 'speech' && (l.text || '').toLowerCase().includes(q);
+             }));
+    });
+  }
+  if (arcFilterDept) {
+    items = items.filter(function(m) { return (m.dept || 'general') === arcFilterDept; });
+  }
+
+  // Sort
+  items.sort(function(a, b) {
+    var da = a.date || '', db2 = b.date || '';
+    return arcSortOrder === 'oldest' ? da.localeCompare(db2) : db2.localeCompare(da);
+  });
+
+  // Count
+  var countEl = document.getElementById('arc-result-count');
+  if (countEl) countEl.textContent = items.length + ' session' + (items.length !== 1 ? 's' : '');
+
+  arcRenderSidebar(items);
+}
+
+function arcRenderSidebar(items) {
   var list = document.getElementById('arcSessionList');
-  if (!list) return;
   var countEl = document.getElementById('arcCount');
-  if (countEl) countEl.textContent = arcMeetings.length + ' recorded';
+  if (!list) return;
 
-  if (!arcMeetings.length) {
-    list.innerHTML = '<div style="padding:16px 10px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--grey-2);letter-spacing:.1em;line-height:2;">NO MEETINGS YET<br>ADD YOUR FIRST RECORDING</div>';
+  var total = (liveData.archiveMeetings || []).length;
+  if (countEl) countEl.textContent = total + ' recorded';
+
+  if (!items || !items.length) {
+    list.innerHTML = '<div style="padding:16px 10px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--grey-2);letter-spacing:.1em;line-height:2;">' +
+      ((liveData.archiveMeetings || []).length === 0 ? 'NO MEETINGS YET<br>ADD YOUR FIRST RECORDING' : 'NO RESULTS') + '</div>';
     return;
   }
 
-  list.innerHTML = arcMeetings.map(function(m) {
-    return '<div class="arc-session-item' + (m.id === arcCurrentId ? ' active' : '') + '" data-mid="' + m.id + '" onclick="arcSelectMeeting(this.dataset.mid)">' +
+  list.innerHTML = items.map(function(m) {
+    var isActive = m.id === arcCurrentId;
+    var deptColor = ARC_DEPT_COLORS[m.dept || 'general'] || '#8899aa';
+    var deptLabel = ARC_DEPT_LABELS[m.dept || 'general'] || 'General';
+    var dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) : '';
+    var hasAudio = !!m.audioUrl;
+    return '<div class="arc-session-item' + (isActive ? ' active' : '') + '" data-mid="' + m.id + '" onclick="arcSelectMeeting(this.dataset.mid)">' +
       '<div class="arc-session-title">' + esc(m.title) + '</div>' +
-      '<div class="arc-session-meta">' + esc((m.date||'').slice(0,30)) + '</div>' +
-      '<div class="arc-session-meta">' + esc(m.duration||'') + (m.speakers ? ' · ' + esc(m.speakers) + ' speakers' : '') + '</div>' +
+      '<div class="arc-session-meta">' + dateStr + (m.duration ? ' · ' + esc(m.duration) : '') + '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">' +
+        '<span style="font-family:var(--mono);font-size:8px;font-weight:700;color:' + deptColor + ';letter-spacing:.08em;">' + deptLabel + '</span>' +
+        (hasAudio ? '<span style="font-family:var(--mono);font-size:8px;color:var(--grey-2);">♪</span>' : '') +
+      '</div>' +
       '</div>';
   }).join('');
 }
 
-// ─── SELECT MEETING ───────────────────────────────────
-
+// ── Select + load meeting ──────────────────────────────────────────
 function arcSelectMeeting(id) {
-  var m = arcMeetings.find(function(x) { return x.id === id; });
+  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
   if (!m) return;
-  arcCurrentId = id;
-  arcLines = m.lines || [];
-  arcActiveIdx = -1;
+
+  arcCurrentId  = id;
+  arcLines      = m.lines || [];
+  arcActiveIdx  = -1;
   arcSearchQuery = '';
+  arcAutoScroll  = true;
+
   var searchEl = document.getElementById('arcSearch');
   if (searchEl) { searchEl.value = ''; }
   var countEl = document.getElementById('arcSearchCount');
   if (countEl) countEl.textContent = '';
 
-  // Info bar
-  var info = document.getElementById('arcInfoBar');
-  if (info) {
-    info.innerHTML = '<div class="arc-chip">Date: <strong>' + esc(m.date||'') + '</strong></div>' +
-      '<div class="arc-chip">Duration: <strong>' + esc(m.duration||'') + '</strong></div>' +
-      '<div class="arc-chip">Speakers: <strong>' + esc(m.speakers||'') + '</strong></div>' +
-      '<div class="arc-chip">Lines: <strong>' + arcLines.filter(function(l){ return l.type==='speech'; }).length + '</strong></div>' +
-      '<div style="flex:1"></div>' +
-      '<button class="btn btn-ghost btn-xs" data-mid="' + id + '" onclick="arcDeleteMeeting(this.dataset.mid)">🗑 Remove</button>';
-  }
+  arcRefreshInfoBar(id);
+  arcRenderSidebar(arcGetFilteredItems()); // re-render to highlight active
 
   // Summary
   var sumEl = document.getElementById('arcSummary');
   if (sumEl) {
-    sumEl.innerHTML = m.summary ?
-      '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">' + esc(m.summary) + '</div></div>' : '';
+    sumEl.innerHTML = m.summary
+      ? '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">' + esc(m.summary) + '</div></div>'
+      : '';
   }
 
   arcRenderTranscript();
 
   // Audio
   var playBtn = document.getElementById('arcPlayBtn');
-  var audioUrl = m.localAudioUrl || m.driveAudioUrl || m.audioUrl;
-  if (audioUrl) {
-    arcAudio.src = audioUrl;
+  var stopBtn = document.getElementById('arcStopBtn');
+  var noAudio = document.getElementById('arcNoAudio');
+
+  arcAudio.pause();
+  if (m.audioUrl) {
+    arcAudio.src = m.audioUrl;
     arcAudio.load();
-    if (playBtn) playBtn.disabled = false;
+    if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶'; }
+    if (stopBtn) stopBtn.disabled = false;
+    if (noAudio) noAudio.style.display = 'none';
   } else {
     arcAudio.src = '';
-    if (playBtn) playBtn.disabled = true;
+    if (playBtn) { playBtn.disabled = true; playBtn.textContent = '▶'; }
+    if (stopBtn) stopBtn.disabled = true;
+    if (noAudio) noAudio.style.display = 'inline';
   }
-  if (playBtn) playBtn.textContent = '▶';
+
   var fillEl = document.getElementById('arcProgressFill');
+  var thumbEl = document.getElementById('arcProgressThumb');
   if (fillEl) fillEl.style.width = '0%';
+  if (thumbEl) thumbEl.style.left = '0%';
   var timeEl = document.getElementById('arcTime');
   if (timeEl) timeEl.textContent = '0:00 / 0:00';
 
@@ -5367,17 +5601,48 @@ function arcSelectMeeting(id) {
   view.style.flexDirection = 'column';
   view.style.flex = '1';
   view.style.overflow = 'hidden';
-
-  arcRenderSidebar();
 }
 
-// ─── RENDER TRANSCRIPT ────────────────────────────────
+function arcGetFilteredItems() {
+  var items = (liveData.archiveMeetings || []).slice();
+  var q = arcFilterSearch.toLowerCase();
+  if (q) items = items.filter(function(m) { return (m.title||'').toLowerCase().includes(q) || (m.summary||'').toLowerCase().includes(q); });
+  if (arcFilterDept) items = items.filter(function(m) { return (m.dept||'general') === arcFilterDept; });
+  items.sort(function(a, b) {
+    var da = a.date||'', db2 = b.date||'';
+    return arcSortOrder === 'oldest' ? da.localeCompare(db2) : db2.localeCompare(da);
+  });
+  return items;
+}
 
+function arcRefreshInfoBar(id) {
+  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
+  if (!m) return;
+  var isAdminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+  var info = document.getElementById('arcInfoBar');
+  if (!info) return;
+  var deptColor = ARC_DEPT_COLORS[m.dept || 'general'] || '#8899aa';
+  var deptLabel = ARC_DEPT_LABELS[m.dept || 'general'] || 'General';
+  var dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'}) : '';
+  info.innerHTML =
+    '<span class="arc-dept-tag" style="color:' + deptColor + ';border-color:' + deptColor + ';">' + esc(deptLabel) + '</span>' +
+    (dateStr ? '<div class="arc-chip">Date: <strong>' + dateStr + '</strong></div>' : '') +
+    (m.duration ? '<div class="arc-chip">Duration: <strong>' + esc(m.duration) + '</strong></div>' : '') +
+    (m.speakers ? '<div class="arc-chip">Speakers: <strong>' + esc(m.speakers) + '</strong></div>' : '') +
+    '<div class="arc-chip">Lines: <strong>' + arcLines.filter(function(l){ return l.type==='speech'; }).length + '</strong></div>' +
+    '<div style="flex:1"></div>' +
+    (isAdminLead
+      ? '<button class="btn btn-ghost btn-xs" data-mid="' + id + '" onclick="arcOpenEdit(this.dataset.mid)">✎ Edit</button>'
+      : '');
+}
+
+// ── Render transcript ──────────────────────────────────────────────
 function arcRenderTranscript() {
   var container = document.getElementById('arcLines');
   if (!container) return;
   var ql = arcSearchQuery.toLowerCase();
   var matchCount = 0;
+  var escRe = function(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
 
   container.innerHTML = arcLines.map(function(line, idx) {
     if (line.type === 'event') {
@@ -5389,13 +5654,9 @@ function arcRenderTranscript() {
     if (ql && (line.text.toLowerCase().includes(ql) || line.speaker.toLowerCase().includes(ql))) {
       isMatch = true;
       matchCount++;
-      var re = new RegExp('(' + ql.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-      textHtml = esc(line.text).replace(
-        new RegExp('(' + ql.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'),
-        '<mark>$1</mark>'
-      );
+      textHtml = esc(line.text).replace(new RegExp('(' + escRe(ql) + ')', 'gi'), '<mark>$1</mark>');
     }
-    var offsetStr = line.offset !== null ? arcFmtSec(line.offset) : '—';
+    var offsetStr = (line.offset !== null && line.offset !== undefined) ? arcFmtSec(line.offset) : '—';
     return '<div class="arc-line' + (isActive ? ' arc-active' : '') + (isMatch ? ' arc-match' : '') + '"' +
       ' id="arcl-' + idx + '" onclick="arcSeekToLine(' + idx + ')">' +
       '<div class="arc-ts">' + offsetStr + '</div>' +
@@ -5405,191 +5666,394 @@ function arcRenderTranscript() {
   }).join('');
 
   var sc = document.getElementById('arcSearchCount');
-  if (sc) sc.textContent = ql ? matchCount + ' match' + (matchCount !== 1 ? 'es' : '') : '';
+  if (sc) sc.textContent = ql ? (matchCount + ' match' + (matchCount !== 1 ? 'es' : '')) : '';
 }
 
-// ─── AUDIO CONTROLS ───────────────────────────────────
-
+// ── Audio controls ─────────────────────────────────────────────────
 arcAudio.addEventListener('timeupdate', function() {
   var dur = arcAudio.duration || 0;
   var cur = arcAudio.currentTime;
-  var pct = dur ? (cur / dur * 100) : 0;
-  var fill = document.getElementById('arcProgressFill');
-  if (fill) fill.style.width = pct + '%';
+  if (!arcIsDragging) {
+    var pct = dur ? (cur / dur * 100) : 0;
+    var fillEl = document.getElementById('arcProgressFill');
+    var thumbEl = document.getElementById('arcProgressThumb');
+    if (fillEl)  fillEl.style.width = pct + '%';
+    if (thumbEl) thumbEl.style.left = pct + '%';
+  }
   var tm = document.getElementById('arcTime');
   if (tm) tm.textContent = arcFmtSec(cur) + ' / ' + arcFmtSec(dur);
   arcUpdateActiveLine(cur);
 });
 
 arcAudio.addEventListener('play', function() {
-  var b = document.getElementById('arcPlayBtn'); if (b) b.textContent = '⏸';
+  var b = document.getElementById('arcPlayBtn');
+  if (b) b.textContent = '⏸';
 });
 arcAudio.addEventListener('pause', function() {
-  var b = document.getElementById('arcPlayBtn'); if (b) b.textContent = '▶';
+  var b = document.getElementById('arcPlayBtn');
+  if (b) b.textContent = '▶';
 });
 arcAudio.addEventListener('ended', function() {
-  var b = document.getElementById('arcPlayBtn'); if (b) b.textContent = '▶';
+  var b = document.getElementById('arcPlayBtn');
+  if (b) b.textContent = '▶';
+  arcActiveIdx = -1;
 });
 
 function arcTogglePlay() {
+  if (!arcAudio.src || arcAudio.readyState === 0) return;
   if (arcAudio.paused) arcAudio.play().catch(function(){});
   else arcAudio.pause();
 }
 
-function arcSeek(event) {
+function arcStop() {
+  arcAudio.pause();
+  arcAudio.currentTime = 0;
+  arcActiveIdx = -1;
+  var fillEl = document.getElementById('arcProgressFill');
+  var thumbEl = document.getElementById('arcProgressThumb');
+  if (fillEl)  fillEl.style.width = '0%';
+  if (thumbEl) thumbEl.style.left = '0%';
+  var tm = document.getElementById('arcTime');
+  if (tm && arcAudio.duration) tm.textContent = '0:00 / ' + arcFmtSec(arcAudio.duration);
+  arcRenderTranscript();
+}
+
+// Draggable progress bar
+function arcProgressDragStart(e) {
   if (!arcAudio.duration) return;
-  var rect = document.getElementById('arcProgressWrap').getBoundingClientRect();
-  var pct = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  arcIsDragging = true;
+  var wrap = document.getElementById('arcProgressWrap');
+  if (wrap) wrap.classList.add('dragging');
+  arcProgressDragMove(e);
+}
+
+function arcProgressDragMove(e) {
+  if (!arcIsDragging || !arcAudio.duration) return;
+  var wrap = document.getElementById('arcProgressWrap');
+  if (!wrap) return;
+  var rect = wrap.getBoundingClientRect();
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  var fillEl = document.getElementById('arcProgressFill');
+  var thumbEl = document.getElementById('arcProgressThumb');
+  if (fillEl)  fillEl.style.width = (pct * 100) + '%';
+  if (thumbEl) thumbEl.style.left = (pct * 100) + '%';
+}
+
+function arcProgressDragEnd(e) {
+  if (!arcIsDragging) return;
+  arcIsDragging = false;
+  var wrap = document.getElementById('arcProgressWrap');
+  if (wrap) wrap.classList.remove('dragging');
+  if (!arcAudio.duration) return;
+  var rect = wrap.getBoundingClientRect();
+  var clientX = e.touches ? e.changedTouches[0].clientX : e.clientX;
+  var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  arcAudio.currentTime = pct * arcAudio.duration;
+}
+
+document.addEventListener('mousemove', arcProgressDragMove);
+document.addEventListener('mouseup',   arcProgressDragEnd);
+document.addEventListener('touchmove', arcProgressDragMove, { passive: true });
+document.addEventListener('touchend',  arcProgressDragEnd);
+
+function arcSeek(e) {
+  if (!arcAudio.duration || arcIsDragging) return;
+  var wrap = document.getElementById('arcProgressWrap');
+  if (!wrap) return;
+  var rect = wrap.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   arcAudio.currentTime = pct * arcAudio.duration;
 }
 
 function arcSeekToLine(idx) {
   var line = arcLines[idx];
-  if (!line || line.offset === null) return;
-  if (arcAudio.src && arcAudio.duration) {
-    arcAudio.currentTime = line.offset;
-    if (arcAudio.paused) arcAudio.play().catch(function(){});
-    arcAutoScroll = true;
+  if (!line || line.offset === null || line.offset === undefined) return;
+  if (arcAudio.src) {
+    var trySeek = function() {
+      arcAudio.currentTime = line.offset;
+      if (arcAudio.paused) arcAudio.play().catch(function(){});
+      arcAutoScroll = true;
+    };
+    if (arcAudio.readyState >= 1) {
+      trySeek();
+    } else {
+      arcAudio.addEventListener('loadedmetadata', function onMeta() {
+        arcAudio.removeEventListener('loadedmetadata', onMeta);
+        trySeek();
+      });
+      arcAudio.load();
+    }
   }
 }
 
 function arcCycleSpeed() {
   arcSpeedIdx = (arcSpeedIdx + 1) % arcSpeeds.length;
   arcAudio.playbackRate = arcSpeeds[arcSpeedIdx];
-  var b = document.getElementById('arcSpeedBtn'); if (b) b.textContent = arcSpeeds[arcSpeedIdx] + '×';
+  var b = document.getElementById('arcSpeedBtn');
+  if (b) b.textContent = arcSpeeds[arcSpeedIdx] + '\u00d7';
 }
 
 function arcUpdateActiveLine(currentTime) {
   if (!arcLines.length) return;
-  var speechLines = arcLines.map(function(l, i) { return Object.assign({}, l, { idx: i }); })
-    .filter(function(l) { return l.type === 'speech' && l.offset !== null; });
+  var speechLines = arcLines
+    .map(function(l, i) { return Object.assign({}, l, { idx:i }); })
+    .filter(function(l) { return l.type === 'speech' && l.offset !== null && l.offset !== undefined; });
+
   var newActive = -1;
   for (var i = speechLines.length - 1; i >= 0; i--) {
     if (currentTime >= speechLines[i].offset - 0.3) { newActive = speechLines[i].idx; break; }
   }
   if (newActive !== arcActiveIdx) {
     if (arcActiveIdx >= 0) {
-      var old = document.getElementById('arcl-' + arcActiveIdx);
-      if (old) old.classList.remove('arc-active');
+      var oldEl = document.getElementById('arcl-' + arcActiveIdx);
+      if (oldEl) oldEl.classList.remove('arc-active');
     }
     arcActiveIdx = newActive;
     if (newActive >= 0) {
       var el = document.getElementById('arcl-' + newActive);
       if (el) {
         el.classList.add('arc-active');
-        if (arcAutoScroll) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (arcAutoScroll) el.scrollIntoView({ block:'center', behavior:'smooth' });
       }
     }
   }
 }
 
-// ─── SEARCH ───────────────────────────────────────────
-
+// ── Transcript search ──────────────────────────────────────────────
 function arcOnSearch(val) {
   arcSearchQuery = val;
   arcRenderTranscript();
   if (val) {
     var first = document.querySelector('.arc-line.arc-match');
-    if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (first) first.scrollIntoView({ block:'center', behavior:'smooth' });
   }
 }
 
-// ─── DELETE ───────────────────────────────────────────
+// ── Text selection → seek ──────────────────────────────────────────
+function arcHandleTextSelection() {
+  var sel = window.getSelection();
+  if (!sel || sel.isCollapsed) { arcClearSelPreview(); return; }
+  var selText = sel.toString().trim().toLowerCase();
+  if (selText.length < 3) { arcClearSelPreview(); return; }
 
-function arcDeleteMeeting(id) {
-  if (!confirm('Remove this meeting from the archive?')) return;
-  var idx = arcMeetings.findIndex(function(x) { return x.id === id; });
-  if (idx >= 0) {
-    if (arcMeetings[idx].localAudioUrl) URL.revokeObjectURL(arcMeetings[idx].localAudioUrl);
-    arcMeetings.splice(idx, 1);
+  // Find best matching speech line
+  var bestIdx = -1, bestScore = 0;
+  for (var i = 0; i < arcLines.length; i++) {
+    var line = arcLines[i];
+    if (line.type !== 'speech' || line.offset === null || line.offset === undefined) continue;
+    var lineText = (line.text || '').toLowerCase();
+    if (lineText.includes(selText)) {
+      // Exact substring match — prefer first occurrence
+      if (bestIdx === -1) bestIdx = i;
+      break; // take first exact match
+    }
+    // Partial word match: count overlapping words
+    var selWords = selText.split(/\s+/);
+    var score = selWords.filter(function(w) { return w.length > 2 && lineText.includes(w); }).length;
+    if (score > bestScore) { bestScore = score; bestIdx = i; }
   }
-  arcSave();
-  if (arcCurrentId === id) {
-    arcCurrentId = null;
-    arcAudio.src = '';
-    document.getElementById('arcEmpty').style.display = '';
-    var view = document.getElementById('arcView');
-    if (view) view.style.display = 'none';
+
+  if (bestIdx >= 0) {
+    // Show preview highlight
+    arcClearSelPreview();
+    var el = document.getElementById('arcl-' + bestIdx);
+    if (el) {
+      el.classList.add('arc-sel-preview');
+      el.scrollIntoView({ block:'center', behavior:'smooth' });
+    }
+    // Show hint
+    var hint = document.getElementById('arcSelHint');
+    if (hint) hint.style.display = 'inline';
+    // Auto-seek to the line
+    arcSeekToLine(bestIdx);
+  } else {
+    arcClearSelPreview();
   }
-  arcRenderSidebar();
-  toast('Meeting removed from archive.', 'inf');
 }
 
-// ─── UTILS ────────────────────────────────────────────
+function arcClearSelPreview() {
+  document.querySelectorAll('.arc-sel-preview').forEach(function(el) { el.classList.remove('arc-sel-preview'); });
+  var hint = document.getElementById('arcSelHint');
+  if (hint) hint.style.display = 'none';
+}
 
+// ── Keyboard shortcuts ─────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  var logsActive = document.getElementById('view-transcripts') &&
+                   document.getElementById('view-transcripts').classList.contains('active');
+  if (!logsActive) return;
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    arcTogglePlay();
+  }
+  // Left/right arrow: skip 5s
+  if (e.code === 'ArrowLeft')  { e.preventDefault(); if (arcAudio.src) arcAudio.currentTime = Math.max(0, arcAudio.currentTime - 5); }
+  if (e.code === 'ArrowRight') { e.preventDefault(); if (arcAudio.src) arcAudio.currentTime = Math.min(arcAudio.duration || 0, arcAudio.currentTime + 5); }
+  // A key: re-enable auto-scroll
+  if (e.code === 'KeyA') arcAutoScroll = true;
+});
+
+// Disable auto-scroll on manual transcript scroll
+document.addEventListener('DOMContentLoaded', function() {
+  var t = document.getElementById('arcTranscript');
+  if (t) t.addEventListener('wheel', function() { arcAutoScroll = false; });
+});
+
+// ── Utils ──────────────────────────────────────────────────────────
 function arcFmtSec(s) {
   if (!isFinite(s)) return '0:00';
   s = Math.floor(s);
   var h = Math.floor(s / 3600);
   var m = Math.floor((s % 3600) / 60);
   var sec = s % 60;
-  var p = function(n) { return n < 10 ? '0' + n : n; };
+  var p = function(n) { return n < 10 ? '0' + n : '' + n; };
   if (h > 0) return h + ':' + p(m) + ':' + p(sec);
   return m + ':' + p(sec);
 }
 
-// Disable auto-scroll on manual scroll within transcript
-document.addEventListener('DOMContentLoaded', function() {
-  var t = document.getElementById('arcTranscript');
-  if (t) t.addEventListener('wheel', function() { arcAutoScroll = false; });
-});
-
-// Spacebar to play/pause when on Mission Logs view
-document.addEventListener('keydown', function(e) {
-  if (e.target && e.target.tagName === 'INPUT') return;
-  var logsActive = document.getElementById('view-transcripts') && 
-                   document.getElementById('view-transcripts').classList.contains('active');
-  if (logsActive && e.code === 'Space') { e.preventDefault(); arcTogglePlay(); }
-});
-
-// ─── INIT ─────────────────────────────────────────────
-arcLoad();
-arcRenderSidebar();
+// ── Init (called after auth) ───────────────────────────────────────
+// arcRenderAll() is called from the Firestore snapshot when view is active
+// and also from navTo('transcripts')
 
 </script>
 
 <!-- ─── COSMIC ARCHIVE AUDIO ─── -->
 <audio id="arcAudio" preload="auto" style="display:none;"></audio>
 
-<!-- ─── ARCHIVE UPLOAD MODAL ─── -->
-<div class="modal-bg" id="m-arc-upload">
-  <div class="modal">
+<!-- ─── ARCHIVE: ADD MEETING MODAL ─── -->
+<div class="modal-bg" id="m-arc-add">
+  <div class="modal" style="max-width:520px;">
     <div class="modal-hdr">
       <span class="modal-title">▸ ADD MEETING RECORDING</span>
-      <button class="modal-x" onclick="closeModal('m-arc-upload')">✕</button>
+      <button class="modal-x" onclick="closeModal('m-arc-add')">✕</button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px;">
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
 
-      <div class="arc-modal">
-        <!-- Transcript file -->
-        <div class="arc-modal-row" style="margin-bottom:4px;">
-          <div class="arc-lbl">Transcript (.md)</div>
-          <div class="arc-inp-row">
-            <div class="arc-file-name" id="arcMdName">No file selected</div>
-            <label class="arc-browse">Browse<input type="file" accept=".md,.txt" onchange="arcHandleMd(this)"></label>
-          </div>
+      <!-- Title + Date -->
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Meeting Title <span style="color:var(--crimson-hi)">*</span></span>
+          <input class="inp" id="arc-add-title" placeholder="e.g. Weekly Sync · Jan 14">
         </div>
+        <div class="field"><span class="field-label">Date <span style="color:var(--crimson-hi)">*</span></span>
+          <input class="inp" id="arc-add-date" type="date">
+        </div>
+      </div>
 
-        <!-- Audio: local OR Google Drive URL -->
-        <div class="arc-modal-row">
-          <div class="arc-lbl">Audio — choose one option</div>
-          <div class="arc-inp-row" style="margin-bottom:8px;">
-            <div class="arc-file-name" id="arcAudioName">No local file selected</div>
-            <label class="arc-browse">Browse<input type="file" accept=".ogg,.mp3,.wav,.m4a,.opus,.webm" onchange="arcHandleAudio(this)"></label>
-          </div>
-          <div class="arc-hint">— or paste a Google Drive share link (recommended for storage) —</div>
-          <input class="arc-drive-input" id="arcDriveUrl" placeholder="https://drive.google.com/file/d/…/view?usp=sharing" oninput="arcHandleDriveUrl(this.value)">
-          <div class="arc-hint" id="arcDriveStatus"></div>
+      <!-- Dept + Duration -->
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Department</span>
+          <select class="inp" id="arc-add-dept">
+            <option value="general">General</option>
+            <option value="programming">Programming</option>
+            <option value="2d-art">2D Art</option>
+            <option value="3d-art">3D Art</option>
+            <option value="marketing">Marketing</option>
+            <option value="sound">Sound Design</option>
+            <option value="vfx">VFX</option>
+            <option value="narrative">Narrative</option>
+          </select>
         </div>
+        <div class="field"><span class="field-label">Duration (optional)</span>
+          <input class="inp" id="arc-add-dur" placeholder="e.g. 45 min">
+        </div>
+      </div>
+
+      <!-- Transcript .md file -->
+      <div class="field">
+        <span class="field-label">Transcript (.md file) <span style="color:var(--crimson-hi)">*</span></span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="inp" id="arc-add-md-name" style="flex:1;font-family:var(--mono);font-size:10px;color:var(--grey-2);">No file selected</div>
+          <label class="btn btn-ghost btn-xs" style="cursor:pointer;position:relative;white-space:nowrap;">
+            Browse
+            <input type="file" accept=".md,.txt" style="position:absolute;width:0;height:0;opacity:0;" onchange="arcHandleAddMd(this)">
+          </label>
+        </div>
+        <div style="font-size:10px;color:var(--grey-2);margin-top:3px;">The transcript is parsed and stored — you only need to upload it once</div>
+      </div>
+
+      <!-- Audio: Drive URL -->
+      <div class="field">
+        <span class="field-label">Audio — Google Drive share link (optional)</span>
+        <input class="inp" id="arc-add-audio-url" placeholder="https://drive.google.com/file/d/…/view?usp=sharing" oninput="arcDriveUrlStatus('arc-add-audio-url','arc-add-audio-status')">
+        <div style="font-size:10px;color:var(--grey-2);margin-top:3px;">Share the .ogg file with "Anyone with the link", paste that URL here. Audio will stream directly from your Drive.</div>
+        <div id="arc-add-audio-status" style="font-size:10px;margin-top:3px;"></div>
+      </div>
+
+      <!-- Summary -->
+      <div class="field">
+        <span class="field-label">Notes / Summary <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional — auto-filled from transcript)</span></span>
+        <textarea class="inp" id="arc-add-summary" rows="2" placeholder="Key decisions, action items…"></textarea>
       </div>
 
     </div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('m-arc-upload')">Cancel</button>
-      <button class="btn btn-primary" onclick="arcAddMeeting()">Add to Archive</button>
+      <button class="btn btn-ghost" onclick="closeModal('m-arc-add')">Cancel</button>
+      <button class="btn btn-primary" onclick="arcSubmitAdd()">Add to Archive</button>
     </div>
   </div>
 </div>
+
+<!-- ─── ARCHIVE: EDIT MEETING MODAL ─── -->
+<div class="modal-bg" id="m-arc-edit">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-hdr">
+      <span class="modal-title">▸ EDIT MEETING RECORD</span>
+      <button class="modal-x" onclick="closeModal('m-arc-edit')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+      <input type="hidden" id="arc-edit-id">
+
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Meeting Title</span>
+          <input class="inp" id="arc-edit-title" placeholder="Meeting title">
+        </div>
+        <div class="field"><span class="field-label">Date</span>
+          <input class="inp" id="arc-edit-date" type="date">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Department</span>
+          <select class="inp" id="arc-edit-dept">
+            <option value="general">General</option>
+            <option value="programming">Programming</option>
+            <option value="2d-art">2D Art</option>
+            <option value="3d-art">3D Art</option>
+            <option value="marketing">Marketing</option>
+            <option value="sound">Sound Design</option>
+            <option value="vfx">VFX</option>
+            <option value="narrative">Narrative</option>
+          </select>
+        </div>
+        <div class="field"><span class="field-label">Duration</span>
+          <input class="inp" id="arc-edit-dur" placeholder="e.g. 1h 30min">
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Audio Drive URL</span>
+        <input class="inp" id="arc-edit-audio-url" placeholder="Google Drive share link for .ogg" oninput="arcDriveUrlStatus('arc-edit-audio-url','arc-edit-audio-status')">
+        <div id="arc-edit-audio-status" style="font-size:10px;margin-top:3px;"></div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Notes / Summary</span>
+        <textarea class="inp" id="arc-edit-summary" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between;">
+      <button class="btn btn-ghost btn-xs" style="color:var(--crimson-hi);border-color:rgba(200,16,46,.3);" onclick="arcConfirmDelete(document.getElementById('arc-edit-id').value)">🗑 Delete</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('m-arc-edit')">Cancel</button>
+        <button class="btn btn-primary" onclick="arcSubmitEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>
