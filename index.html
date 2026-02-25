@@ -4796,6 +4796,8 @@ async function saveAvailability() {
 // ── State ──────────────────────────────────────────────────
 var arc = {
   currentId:   null,
+  pendingSelect: null,
+  transcriptCache: {}, // id -> lines[], persists for session
   lines:       [],
   activeIdx:   -1,
   query:       '',
@@ -4834,6 +4836,19 @@ function arcDriveUrl(url) {
   if (m2) return 'https://drive.google.com/uc?export=download&id=' + m2[1];
   if (url.startsWith('http')) return url;
   return null;
+}
+
+// For audio streaming - export=view works better than download for large .ogg files
+function arcDriveAudioUrl(url) {
+  if (!url) return null;
+  url = url.trim();
+  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return 'https://drive.google.com/uc?export=view&id=' + m2[1];
+  // Already a direct URL - use as-is
+  if (url.includes('uc?export=download')) return url.replace('export=download','export=view');
+  return url;
 }
 
 function arcDriveId(url) {
@@ -5025,7 +5040,7 @@ function arcSelect(id) {
   var stopBtn = document.getElementById('arcStopBtn');
   var noAudio = document.getElementById('arcNoAudio');
   if (m.audioUrl) {
-    arcAudio.src = m.audioUrl;
+    arcAudio.src = arcDriveAudioUrl(m.audioUrl) || m.audioUrl;
     arcAudio.load();
     if (playBtn) { playBtn.disabled=false; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=false;
@@ -5038,8 +5053,13 @@ function arcSelect(id) {
   }
   arcResetProg();
 
-  // Fetch + parse transcript from Drive
-  arcLoadTranscript(m);
+  // Check session cache first (populated by paste or successful fetch)
+  if (arc.transcriptCache[id] && arc.transcriptCache[id].length) {
+    arc.lines = arc.transcriptCache[id];
+    arcShowLines(arc.lines);
+  } else {
+    arcLoadTranscript(m);
+  }
 }
 
 // ── Load transcript from Drive (or fallback) ───────────────
@@ -5059,6 +5079,7 @@ function arcLoadTranscript(m) {
     .then(function(text){
       var parsed = arcParse(text);
       arc.lines = parsed.lines;
+      arc.transcriptCache[m.id] = arc.lines; // cache for session
       arcShowLines(arc.lines);
     })
     .catch(function(err){
@@ -5082,12 +5103,34 @@ function arcLoadTranscript(m) {
     });
 }
 
-function arcLoadPasted() {
+async function arcLoadPasted() {
   var el = document.getElementById('arcMdPaste');
-  if (!el || !el.value.trim()) return;
-  var parsed = arcParse(el.value);
+  if (!el || !el.value.trim()) { toast('Paste the transcript text first','err'); return; }
+  var text = el.value.trim();
+  var parsed = arcParse(text);
   arc.lines = parsed.lines;
+  if (arc.currentId) arc.transcriptCache[arc.currentId] = arc.lines; // cache for session
   arcShowLines(arc.lines);
+
+  // Also update summary from parsed data if not already set
+  var m = (liveData.archiveMeetings||[]).find(function(x){ return x.id===arc.currentId; });
+  if (m && arc.currentId) {
+    var update = {};
+    // Save auto-parsed summary if the record has none
+    if (!m.summary && parsed.summary) update.summary = parsed.summary;
+    // Save duration if missing
+    if (!m.duration && parsed.duration) update.duration = parsed.duration;
+    // Always save a note that transcript was manually loaded
+    update.transcriptLoaded = true;
+    try {
+      await db.collection('archive_meetings').doc(arc.currentId).update(update);
+      if (parsed.summary && !m.summary) {
+        var sumEl = document.getElementById('arcTSummary');
+        if (sumEl) sumEl.innerHTML = '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">'+esc(parsed.summary)+'</div></div>';
+      }
+      toast('Transcript loaded for this session', 'ok');
+    } catch(e) { /* non-critical, ignore */ }
+  }
 }
 
 function arcShowLines(lines) {
@@ -5226,12 +5269,25 @@ function arcProgClick(e) {
 }
 
 function arcSeekLine(idx) {
-  var line=arc.lines[idx];
-  if (!line||line.offset==null) return;
-  if (!arcAudio.src) return;
-  var doSeek=function(){ arcAudio.currentTime=line.offset; if(arcAudio.paused) arcAudio.play().catch(function(){}); arc.autoScroll=true; };
-  if (arcAudio.readyState>=1) doSeek();
-  else { arcAudio.addEventListener('loadedmetadata',function onM(){ arcAudio.removeEventListener('loadedmetadata',onM); doSeek(); }); arcAudio.load(); }
+  // Always highlight the clicked line, regardless of audio state
+  var oldEl = document.getElementById('arcl'+arc.activeIdx);
+  if (oldEl) oldEl.classList.remove('arc-on');
+  arc.activeIdx = idx;
+  var newEl = document.getElementById('arcl'+idx);
+  if (newEl) { newEl.classList.add('arc-on'); newEl.scrollIntoView({block:'center',behavior:'smooth'}); }
+
+  // Only seek audio if it has a valid src and is ready
+  var line = arc.lines[idx];
+  if (!line || line.offset == null) return;
+  if (!arcAudio.src || arcAudio.src === window.location.href) return;
+  try {
+    if (arcAudio.readyState >= 1) {
+      arcAudio.currentTime = line.offset;
+      if (arcAudio.paused) arcAudio.play().catch(function(){});
+    } else {
+      arcAudio.currentTime = line.offset;
+    }
+  } catch(e) { /* audio not ready, ignore */ }
 }
 
 function arcSpeedCycle() {
@@ -5406,11 +5462,8 @@ async function arcSubmitAdd() {
     var docRef = await db.collection('archive_meetings').add(rec);
     closeModal('m-arc-add');
     toast('Meeting added!','ok');
-    // Pre-populate immediately so arcSelect can find it
-    if (!liveData.archiveMeetings) liveData.archiveMeetings=[];
-    liveData.archiveMeetings.unshift(Object.assign({id:docRef.id},rec));
-    arcFilter();
-    arcSelect(docRef.id);
+    // Let Firestore snapshot drive the update — store pending ID to auto-select on arrival
+    arc.pendingSelect = docRef.id;
   } catch(e) {
     toast('Error: '+e.message,'err');
   }
