@@ -1871,6 +1871,14 @@ textarea.inp { resize:vertical; }
           </div>
           <div id="admin-orphan-tasks" style="font-size:12px;color:var(--grey-2);padding:14px;">Click "Scan Now" to find tasks that can't be accessed elsewhere.</div>
         </div>
+
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Mission Logs Archive</span>
+            <button class="btn btn-ghost btn-xs" style="color:var(--crimson-hi);" onclick="arcAdminClearAll()">Clear All Entries</button>
+          </div>
+          <div id="admin-arc-info" style="font-size:12px;color:var(--grey-2);padding:14px;">Delete all archive_meetings from Firestore (useful for removing broken test entries).</div>
+        </div>
       </div>
 
   </main>
@@ -5484,6 +5492,22 @@ function arcFmt(s) {
 }
 
 
+
+// ── Admin utility: clear all archive entries ──────────────
+async function arcAdminClearAll() {
+  var count = (liveData.archiveMeetings||[]).length;
+  if (!count) { toast('No archive entries to clear','inf'); return; }
+  if (!confirm('Delete ALL '+count+' archive entries from Firestore? This cannot be undone.')) return;
+  try {
+    var batch = db.batch();
+    (liveData.archiveMeetings||[]).forEach(function(m){
+      batch.delete(db.collection('archive_meetings').doc(m.id));
+    });
+    await batch.commit();
+    toast('Cleared '+count+' entries','ok');
+    document.getElementById('admin-arc-info').textContent = 'Archive cleared. '+count+' entries deleted.';
+  } catch(e) { toast('Error: '+e.message,'err'); }
+}
 </script>
 
 
