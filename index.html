@@ -296,20 +296,12 @@ body::after {
 /* ── VIEWS ───────────────────────────────── */
 .view { display:none; }
 .view.active { display:block; }
-/* Mission Logs needs flex layout to fill height */
-#view-transcripts.active {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 52px); /* subtract hub top bar */
-  overflow: hidden;
-}
 
 /* ── PAGE HEADER ─────────────────────────── */
 .page-hdr {
   display:flex; align-items:flex-start; justify-content:space-between;
   margin-bottom:20px; position:relative; z-index:5;
 }
-#view-transcripts .page-hdr { margin-bottom: 8px; }
 .page-hdr-left .ph-title {
   font-family:'Orbitron',sans-serif; font-size:16px; font-weight:700;
   letter-spacing:3px; color:var(--white);
@@ -1050,394 +1042,292 @@ textarea.inp { resize:vertical; }
   color: var(--crimson-hi);
 }
 
-/* ─── COSMIC MEETINGS ARCHIVE ─────────────────────────────── */
-.arc-wrap {
+
+
+
+
+/* === MISSION LOGS === */
+/* ═══════════════════════════════════════════════════════
+   MISSION LOGS ARCHIVE — clean build
+═══════════════════════════════════════════════════════ */
+
+/* Layout */
+.arc-layout {
   display: flex;
-  flex: 1;
+  height: calc(100vh - 104px); /* hub topbar ~52px + page-hdr ~52px */
   overflow: hidden;
   gap: 0;
-  min-height: 0; /* critical: allow flex children to shrink below content size */
 }
 
-/* Sidebar — sessions list */
-.arc-sidebar {
-  width: 230px;
+/* Sidebar */
+.arc-sb {
+  width: 220px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--bg-2);
   border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
-.arc-sidebar-hdr {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
+.arc-sb-top { flex-shrink: 0; border-bottom: 1px solid var(--border); }
+.arc-sb-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px 6px;
 }
-.arc-sidebar-lbl {
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--grey);
-  font-family: var(--mono);
+.arc-sb-lbl {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+  color: var(--grey); text-transform: uppercase;
 }
-.arc-count {
-  font-size: 9px;
-  color: var(--grey-2);
-  font-family: var(--mono);
+.arc-sb-count {
+  font-family: var(--mono); font-size: 9px; color: var(--grey-2);
+  background: var(--bg-3); border-radius: 8px; padding: 1px 6px;
 }
-.arc-session-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px;
+.arc-sb-filters {
+  padding: 6px 8px 10px;
+  display: flex; flex-direction: column; gap: 6px;
 }
-.arc-session-list::-webkit-scrollbar { width: 3px; }
-.arc-session-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.arc-search-inp, .arc-dept-sel {
+  width: 100%; padding: 5px 8px !important;
+  font-size: 11px !important;
+}
+.arc-sort-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .05em;
+  padding: 3px 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--grey-2); border-radius: 3px;
+  cursor: pointer; transition: all .15s;
+}
+.arc-sort-btn.active, .arc-sort-btn:hover {
+  border-color: var(--crimson-hi); color: var(--white);
+  background: rgba(200,16,46,.08);
+}
+.arc-sb-list { flex: 1; overflow-y: auto; padding: 6px; }
+.arc-sb-list::-webkit-scrollbar { width: 3px; }
+.arc-sb-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.arc-sb-foot { flex-shrink: 0; padding: 8px; border-top: 1px solid var(--border); }
 
-.arc-session-item {
-  padding: 9px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  margin-bottom: 3px;
-  transition: background .15s, border-color .15s;
+/* Session items */
+.arc-item {
+  padding: 9px 10px; border-radius: 4px; cursor: pointer;
+  border: 1px solid transparent; margin-bottom: 3px;
+  transition: background .12s, border-color .12s;
 }
-.arc-session-item:hover { background: var(--bg-3); border-color: var(--border); }
-.arc-session-item.active { background: rgba(200,16,46,.08); border-color: rgba(200,16,46,.3); }
-.arc-session-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 3px;
-  line-height: 1.3;
+.arc-item:hover { background: var(--bg-3); border-color: var(--border); }
+.arc-item.active {
+  background: rgba(200,16,46,.08);
+  border-color: rgba(200,16,46,.3);
 }
-.arc-session-item.active .arc-session-title { color: var(--crimson-hi); }
-.arc-session-meta {
-  font-size: 9px;
-  color: var(--grey-2);
-  font-family: var(--mono);
+.arc-item-title {
+  font-size: 12px; font-weight: 700; color: var(--white);
+  line-height: 1.3; margin-bottom: 3px;
+}
+.arc-item.active .arc-item-title { color: var(--crimson-hi); }
+.arc-item-meta {
+  font-family: var(--mono); font-size: 9px; color: var(--grey-2);
   letter-spacing: .05em;
 }
-.arc-sidebar-foot {
-  padding: 8px;
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
+.arc-item-tags {
+  display: flex; align-items: center; gap: 5px; margin-top: 4px;
 }
 
-/* Main pane */
-.arc-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
+/* Main viewer */
+.arc-viewer {
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-width: 0; min-height: 0;
+}
+.arc-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
 }
 
-/* Player */
-.arc-player {
-  background: var(--bg-3);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+/* Player bar */
+.arc-player-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; background: var(--bg-3);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
-.arc-play-btn {
-  width: 30px; height: 30px;
-  border-radius: 50%;
+.arc-btn-play {
+  width: 32px; height: 32px; border-radius: 50%;
   border: 1px solid var(--crimson-hi);
-  background: rgba(200,16,46,.1);
-  color: var(--crimson-hi);
-  cursor: pointer;
+  background: rgba(200,16,46,.1); color: var(--crimson-hi);
+  cursor: pointer; font-size: 12px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: background .2s;
-  font-size: 11px;
+  flex-shrink: 0; transition: background .15s;
 }
-.arc-play-btn:hover { background: rgba(200,16,46,.18); }
-.arc-play-btn:disabled { opacity: .3; cursor: default; border-color: var(--grey-2); color: var(--grey-2); }
-.arc-time {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--grey);
-  white-space: nowrap;
-  min-width: 90px;
-  flex-shrink: 0;
+.arc-btn-play:hover { background: rgba(200,16,46,.2); }
+.arc-btn-play:disabled { opacity: .3; cursor: default; }
+.arc-btn-stop {
+  width: 26px; height: 26px; border-radius: 3px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--grey); cursor: pointer; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s;
 }
-.arc-progress-wrap {
-  flex: 1;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  cursor: pointer;
-  position: relative;
+.arc-btn-stop:hover { border-color: var(--crimson-hi); color: var(--crimson-hi); }
+.arc-btn-stop:disabled { opacity: .3; cursor: default; }
+.arc-time-disp {
+  font-family: var(--mono); font-size: 10px; color: var(--grey);
+  white-space: nowrap; min-width: 90px; flex-shrink: 0;
 }
-.arc-progress-wrap::after {
+.arc-prog-wrap {
+  flex: 1; height: 4px; background: var(--border);
+  border-radius: 2px; cursor: pointer;
+  position: relative; user-select: none;
+}
+.arc-prog-wrap::before {
   content: ''; position: absolute;
-  top: -6px; left: 0; right: 0; bottom: -6px;
+  top: -8px; bottom: -8px; left: 0; right: 0;
 }
-.arc-progress-fill {
-  height: 100%;
-  background: var(--crimson-hi);
-  border-radius: 2px;
-  pointer-events: none;
+.arc-prog-fill {
+  height: 100%; background: var(--crimson-hi);
+  border-radius: 2px; pointer-events: none;
   transition: width .1s linear;
 }
-.arc-speed-btn {
-  font-family: var(--mono);
-  font-size: 9px;
-  padding: 3px 7px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--grey);
-  cursor: pointer;
-  border-radius: 3px;
-  transition: all .2s;
-  white-space: nowrap;
-  flex-shrink: 0;
+.arc-prog-thumb {
+  position: absolute; top: 50%; left: 0;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--crimson-hi); pointer-events: none;
+  opacity: 0; transition: opacity .15s;
 }
-.arc-speed-btn:hover { border-color: var(--crimson-hi); color: var(--white); }
-
-/* Search bar */
-.arc-search {
-  padding: 6px 16px;
-  background: var(--bg-2);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+.arc-prog-wrap:hover .arc-prog-thumb,
+.arc-prog-wrap.dragging .arc-prog-thumb { opacity: 1; }
+.arc-prog-wrap.dragging .arc-prog-fill { transition: none; }
+.arc-btn-speed {
+  font-family: var(--mono); font-size: 9px; padding: 3px 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--grey); border-radius: 3px; cursor: pointer;
+  flex-shrink: 0; transition: all .15s; white-space: nowrap;
 }
-.arc-search input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--white);
-  letter-spacing: .05em;
-}
-.arc-search input::placeholder { color: var(--grey-2); }
-.arc-search-count {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--grey-2);
-  white-space: nowrap;
+.arc-btn-speed:hover { border-color: var(--white); color: var(--white); }
+.arc-no-audio {
+  font-family: var(--mono); font-size: 9px; color: var(--grey-2);
+  letter-spacing: .1em; flex-shrink: 0;
 }
 
 /* Info bar */
-.arc-info {
-  padding: 6px 16px;
-  background: var(--bg-3);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-shrink: 0;
-  flex-wrap: wrap;
+.arc-info-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 6px 16px; background: var(--bg-2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
 .arc-chip {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  color: var(--grey);
-  text-transform: uppercase;
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: .08em; color: var(--grey); text-transform: uppercase;
 }
 .arc-chip strong { color: var(--white); }
-
-/* Transcript */
-.arc-transcript {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 20px 32px;
+.arc-dept-pill {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 3px; border: 1px solid currentColor;
 }
-.arc-transcript::-webkit-scrollbar { width: 4px; }
-.arc-transcript::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+/* Transcript search bar */
+.arc-tsearch {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 16px; background: var(--bg-2);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.arc-tsearch input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-family: var(--mono); font-size: 11px; color: var(--white);
+}
+.arc-tsearch input::placeholder { color: var(--grey-2); }
+
+/* Transcript body */
+.arc-tbody {
+  flex: 1; overflow-y: auto; padding: 14px 20px 32px;
+  min-height: 0;
+}
+.arc-tbody::-webkit-scrollbar { width: 4px; }
+.arc-tbody::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Summary block */
 .arc-summary {
-  background: var(--bg-3);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 4px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-left: 3px solid var(--gold); border-radius: 4px;
+  padding: 12px 16px; margin-bottom: 16px;
 }
 .arc-summary-lbl {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 6px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
 }
 .arc-summary-txt {
-  font-size: 13px;
-  font-style: italic;
-  color: var(--grey);
-  line-height: 1.65;
+  font-size: 13px; font-style: italic; color: var(--grey); line-height: 1.65;
 }
 
+/* Transcript lines */
 .arc-line {
-  display: flex;
-  gap: 12px;
-  padding: 4px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: background .12s, border-color .12s;
-  margin-bottom: 1px;
-  align-items: flex-start;
+  display: flex; gap: 10px; padding: 3px 8px; border-radius: 3px;
+  cursor: pointer; border: 1px solid transparent;
+  transition: background .1s; margin-bottom: 1px; align-items: flex-start;
 }
 .arc-line:hover { background: rgba(255,255,255,.03); border-color: var(--border); }
-.arc-line.arc-active { background: rgba(200,16,46,.07); border-color: rgba(200,16,46,.2); }
-.arc-line.arc-match { background: rgba(255,215,0,.05); border-color: rgba(255,215,0,.15); }
-.arc-line.arc-active.arc-match { background: rgba(200,16,46,.07); border-color: rgba(200,16,46,.25); }
+.arc-line.arc-on { background: rgba(200,16,46,.07); border-color: rgba(200,16,46,.2); }
+.arc-line.arc-hit { background: rgba(255,215,0,.05); border-color: rgba(255,215,0,.15); }
+.arc-line.arc-sel { background: rgba(95,207,207,.07); border-color: rgba(95,207,207,.2); }
 .arc-ts {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--grey-2);
-  white-space: nowrap;
-  padding-top: 3px;
-  flex-shrink: 0;
-  width: 44px;
-  transition: color .12s;
+  font-family: var(--mono); font-size: 9px; color: var(--grey-2);
+  white-space: nowrap; padding-top: 3px; flex-shrink: 0; width: 40px;
 }
-.arc-line:hover .arc-ts { color: var(--grey); }
-.arc-line.arc-active .arc-ts { color: var(--crimson-hi); }
+.arc-line.arc-on .arc-ts { color: var(--crimson-hi); }
 .arc-spk {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  white-space: nowrap;
-  flex-shrink: 0;
-  width: 68px;
-  padding-top: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  white-space: nowrap; flex-shrink: 0; width: 66px;
+  padding-top: 3px; overflow: hidden; text-overflow: ellipsis;
 }
-.arc-txt {
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--grey);
-  flex: 1;
-  min-width: 0;
-}
-.arc-line.arc-active .arc-txt { color: var(--white); }
-.arc-txt mark {
-  background: rgba(255,215,0,.25);
-  color: var(--gold);
-  border-radius: 2px;
-  padding: 0 2px;
-}
+.arc-txt { font-size: 13px; line-height: 1.55; color: var(--grey); flex: 1; min-width: 0; }
+.arc-line.arc-on .arc-txt { color: var(--white); }
+.arc-txt mark { background: rgba(255,215,0,.25); color: var(--gold); border-radius: 2px; padding: 0 2px; }
 .arc-event {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--grey-2);
-  font-style: italic;
-  padding: 6px 10px 3px;
-  letter-spacing: .05em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-family: var(--mono); font-size: 9px; color: var(--grey-2);
+  padding: 5px 8px 2px; display: flex; align-items: center; gap: 8px;
 }
-.arc-event::before { content:''; height:1px; width:16px; background:var(--border); flex-shrink:0; }
+.arc-event::before { content:''; height:1px; width:14px; background:var(--border); flex-shrink:0; }
 .arc-event::after  { content:''; height:1px; flex:1; background:var(--border); }
 
-/* speaker colours */
-.arc-s0 { color: #5fcfcf; }
-.arc-s1 { color: var(--gold); }
-.arc-s2 { color: #d4607a; }
-.arc-s3 { color: #5abf8a; }
-.arc-s4 { color: #8b7fd4; }
-.arc-s5 { color: #e8a87c; }
+/* Speaker colours */
+.arc-c0 { color: #5fcfcf; }
+.arc-c1 { color: var(--gold); }
+.arc-c2 { color: #e8608a; }
+.arc-c3 { color: #5abf8a; }
+.arc-c4 { color: #9b7fd4; }
+.arc-c5 { color: #e8a87c; }
 
-/* no-session state */
-.arc-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: var(--grey-2);
+/* Loading */
+.arc-loading { padding: 30px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--grey-2); }
+.arc-loading-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--crimson-hi); animation: arc-pulse 1s ease-in-out infinite;
 }
-.arc-empty-icon { font-size: 36px; }
-.arc-empty-title { font-size: 14px; color: var(--grey); }
-.arc-empty-sub { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; line-height: 1.8; text-align: center; }
+@keyframes arc-pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
 
-/* Google Drive URL input in upload modal */
-.arc-modal .arc-modal-row { display:flex; flex-direction:column; gap:6px; }
-.arc-modal .arc-lbl { font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--grey); }
-.arc-modal .arc-inp-row { display:flex; gap:8px; align-items:center; }
-.arc-modal .arc-file-name { flex:1; font-family:var(--mono); font-size:10px; color:var(--grey); background:var(--bg); border:1px solid var(--border); border-radius:3px; padding:6px 10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.arc-modal .arc-file-name.ok { color:var(--green); border-color:rgba(46,204,138,.3); }
-.arc-modal .arc-browse { font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; padding:6px 12px; border:1px solid var(--border); background:var(--bg-3); color:var(--grey); cursor:pointer; border-radius:3px; white-space:nowrap; transition:all .2s; position:relative; }
-.arc-modal .arc-browse:hover { border-color:var(--crimson-hi); color:var(--white); }
-.arc-modal .arc-browse input { position:absolute; width:0; height:0; opacity:0; }
-.arc-hint { font-family:var(--mono); font-size:9px; color:var(--grey-2); padding:4px 0; letter-spacing:.05em; line-height:1.7; }
-.arc-drive-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:3px; padding:6px 10px; font-family:var(--mono); font-size:10px; color:var(--white); outline:none; transition:border-color .2s; }
-.arc-drive-input:focus { border-color:var(--crimson-hi); }
-.arc-drive-input::placeholder { color:var(--grey-2); }
-
-
-/* ─── ARC PLAYER EXTRAS ─── */
-.arc-stop-btn {
-  width: 28px; height: 28px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--grey);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: all .2s;
-  font-size: 10px;
+/* ── PERSISTENT BOTTOM PLAYER ─────────────────────────── */
+.arc-mini-player {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9000;
+  background: var(--bg-2); border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.4);
+  transform: translateY(100%);
+  transition: transform .25s ease;
 }
-.arc-stop-btn:hover { border-color: var(--crimson-hi); color: var(--crimson-hi); }
-.arc-stop-btn:disabled { opacity: .3; cursor: default; }
-
-.arc-progress-thumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--crimson-hi);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .15s;
+.arc-mini-player.visible { transform: translateY(0); }
+.arc-mini-title {
+  flex: 1; min-width: 0;
+  font-size: 12px; color: var(--white);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.arc-progress-wrap:hover .arc-progress-thumb { opacity: 1; }
-.arc-progress-wrap { cursor: pointer; user-select: none; }
-.arc-progress-wrap.dragging { cursor: grabbing; }
-.arc-progress-wrap.dragging .arc-progress-thumb { opacity: 1; }
-
-/* selection-jump highlight */
-.arc-line.arc-sel-preview {
-  background: rgba(95,207,207,.08);
-  border-color: rgba(95,207,207,.25);
+.arc-mini-time {
+  font-family: var(--mono); font-size: 10px; color: var(--grey);
+  white-space: nowrap; flex-shrink: 0;
 }
-.arc-line.arc-sel-preview .arc-ts { color: #5fcfcf; }
-
-/* dept tag in info bar */
-.arc-dept-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 3px;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: .08em;
-  font-weight: 700;
-  text-transform: uppercase;
-  border: 1px solid currentColor;
-  opacity: .85;
+.arc-mini-close {
+  background: transparent; border: none; color: var(--grey-2);
+  cursor: pointer; font-size: 14px; padding: 4px 6px;
+  flex-shrink: 0; transition: color .15s; line-height: 1;
 }
+.arc-mini-close:hover { color: var(--white); }
+
 
 </style>
 </head>
@@ -1784,106 +1674,91 @@ textarea.inp { resize:vertical; }
       </div>
     </div>
 
-    <!-- ── TRANSCRIPTS ── -->
+    <!-- ── MISSION LOGS ── -->
     <div class="view" id="view-transcripts">
-      <div class="page-hdr" style="flex-shrink:0;padding-bottom:8px;">
-        <div class="page-hdr-left">
-          <div class="ph-title">MISSION LOGS</div>
-          <div class="ph-sub">Meeting recordings · transcripts · audio playback</div>
-        </div>
-        <div class="ph-actions" id="arc-admin-btn-wrap">
-          <!-- admin/lead only button injected by JS -->
-        </div>
-      </div>
+      <div class="arc-layout">
 
-      <!-- Filters bar -->
-      <div id="arc-filters" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 0 10px 0;flex-shrink:0;">
-        <input id="arc-global-search" class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search archive…" oninput="arcApplyFilters()">
-        <select id="arc-dept-filter" class="inp" style="width:150px;padding:5px 10px;font-size:12px;" onchange="arcApplyFilters()">
-          <option value="">All Departments</option>
-          <option value="general">General</option>
-          <option value="programming">Programming</option>
-          <option value="2d-art">2D Art</option>
-          <option value="3d-art">3D Art</option>
-          <option value="marketing">Marketing</option>
-          <option value="sound">Sound Design</option>
-          <option value="vfx">VFX</option>
-          <option value="narrative">Narrative</option>
-        </select>
-        <select id="arc-sort" class="inp" style="width:130px;padding:5px 10px;font-size:12px;" onchange="arcApplyFilters()">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-        </select>
-        <span id="arc-result-count" style="font-family:var(--mono);font-size:10px;color:var(--grey-2);margin-left:4px;"></span>
-      </div>
-
-      <!-- Archive UI -->
-      <div class="arc-wrap" id="arcWrap">
-
-        <!-- Sessions sidebar -->
-        <aside class="arc-sidebar">
-          <div class="arc-sidebar-hdr">
-            <span class="arc-sidebar-lbl">Sessions</span>
-            <span class="arc-count" id="arcCount">0 recorded</span>
+        <!-- LEFT SIDEBAR -->
+        <aside class="arc-sb">
+          <div class="arc-sb-top">
+            <div class="arc-sb-hdr">
+              <span class="arc-sb-lbl">SESSIONS</span>
+              <span class="arc-sb-count" id="arcCount">0</span>
+            </div>
+            <div class="arc-sb-filters">
+              <input class="inp arc-search-inp" id="arcSideSearch" placeholder="Search…" oninput="arcFilter()">
+              <select class="inp arc-dept-sel" id="arcDeptFilter" onchange="arcFilter()">
+                <option value="">All Depts</option>
+                <option value="general">General</option>
+                <option value="programming">Programming</option>
+                <option value="2d-art">2D Art</option>
+                <option value="3d-art">3D Art</option>
+                <option value="marketing">Marketing</option>
+                <option value="sound">Sound Design</option>
+                <option value="vfx">VFX</option>
+                <option value="narrative">Narrative</option>
+              </select>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span style="font-family:var(--mono);font-size:9px;color:var(--grey-2);">SORT</span>
+                <button class="arc-sort-btn active" id="arcSortNewest" onclick="arcSetSort('newest')">Newest</button>
+                <button class="arc-sort-btn" id="arcSortOldest" onclick="arcSetSort('oldest')">Oldest</button>
+              </div>
+            </div>
           </div>
-          <div class="arc-session-list" id="arcSessionList"></div>
-          <div class="arc-sidebar-foot" id="arc-sidebar-foot-btn">
-            <!-- admin/lead add button injected -->
-          </div>
+          <div class="arc-sb-list" id="arcList"></div>
+          <div class="arc-sb-foot" id="arcAdminBtn"></div>
         </aside>
 
-        <!-- Main viewer -->
-        <div class="arc-main" id="arcMain">
+        <!-- MAIN VIEWER -->
+        <div class="arc-viewer" id="arcViewer">
 
           <!-- Empty state -->
           <div class="arc-empty" id="arcEmpty">
-            <div class="arc-empty-icon">🌌</div>
-            <div class="arc-empty-title">No session selected</div>
-            <div class="arc-empty-sub">Select a meeting from the archive<br>or add a new recording</div>
+            <div style="font-size:40px;">🌌</div>
+            <div style="font-size:16px;color:var(--grey);margin-top:8px;">No session selected</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--grey-2);margin-top:6px;letter-spacing:.1em;">SELECT A MEETING FROM THE ARCHIVE</div>
           </div>
 
-          <!-- Meeting view (hidden until session loaded) -->
-          <div id="arcView" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+          <!-- Active meeting view -->
+          <div id="arcMeetingView" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;">
 
             <!-- Player bar -->
-            <div class="arc-player">
-              <!-- Play/Pause -->
-              <button class="arc-play-btn" id="arcPlayBtn" onclick="arcTogglePlay()" disabled title="Play / Pause (Space)">▶</button>
-              <!-- Stop -->
-              <button class="arc-stop-btn" id="arcStopBtn" onclick="arcStop()" disabled title="Stop">⏹</button>
-              <!-- Time -->
-              <div class="arc-time" id="arcTime">0:00 / 0:00</div>
-              <!-- Progress -->
-              <div class="arc-progress-wrap" id="arcProgressWrap"
-                   onmousedown="arcProgressDragStart(event)"
-                   onclick="arcSeek(event)">
-                <div class="arc-progress-fill" id="arcProgressFill" style="width:0%"></div>
-                <div class="arc-progress-thumb" id="arcProgressThumb" style="left:0%"></div>
+            <div class="arc-player-bar">
+              <button class="arc-btn-play" id="arcPlayBtn" onclick="arcPlay()" disabled>▶</button>
+              <button class="arc-btn-stop" id="arcStopBtn" onclick="arcStopFn()" disabled>⏹</button>
+              <div class="arc-time-disp" id="arcTimeDisp">0:00 / 0:00</div>
+              <div class="arc-prog-wrap" id="arcProgWrap"
+                   onmousedown="arcDragStart(event)"
+                   onclick="arcProgClick(event)">
+                <div class="arc-prog-fill" id="arcProgFill" style="width:0%"></div>
+                <div class="arc-prog-thumb" id="arcProgThumb"></div>
               </div>
-              <!-- Speed -->
-              <button class="arc-speed-btn" id="arcSpeedBtn" onclick="arcCycleSpeed()" title="Playback speed">1×</button>
-              <!-- No audio indicator -->
-              <span id="arcNoAudio" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);display:none;">NO AUDIO</span>
+              <button class="arc-btn-speed" id="arcSpeedBtn" onclick="arcSpeedCycle()">1×</button>
+              <span class="arc-no-audio" id="arcNoAudio">NO AUDIO</span>
             </div>
+
+            <!-- Meeting info + controls -->
+            <div class="arc-info-bar" id="arcInfoBar"></div>
 
             <!-- Transcript search -->
-            <div class="arc-search">
-              <span style="color:var(--grey-2);font-size:12px;">⌕</span>
-              <input id="arcSearch" placeholder="Search transcript… (select text to jump)" oninput="arcOnSearch(this.value)">
-              <span class="arc-search-count" id="arcSearchCount"></span>
-              <span id="arcSelHint" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);display:none;padding-left:8px;">↑ selection jump ready</span>
+            <div class="arc-tsearch">
+              <span style="color:var(--grey-2)">⌕</span>
+              <input id="arcTSearch" placeholder="Search transcript… or select text to jump to it" oninput="arcTSearchFn(this.value)">
+              <span id="arcTSearchCount" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);white-space:nowrap;"></span>
             </div>
 
-            <!-- Info bar -->
-            <div class="arc-info" id="arcInfoBar"></div>
-
-            <!-- Transcript -->
-            <div class="arc-transcript" id="arcTranscript"
-                 onmouseup="arcHandleTextSelection()"
-                 ontouchend="arcHandleTextSelection()">
-              <div id="arcSummary"></div>
-              <div id="arcLines"></div>
+            <!-- Transcript body -->
+            <div class="arc-tbody" id="arcTBody"
+                 onmouseup="arcSelectionJump()"
+                 ontouchend="arcSelectionJump()">
+              <div id="arcTSummary"></div>
+              <div id="arcTLines">
+                <div class="arc-loading" id="arcTLoading" style="display:none;">
+                  <span class="arc-loading-dot"></span> Loading transcript…
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -2101,33 +1976,6 @@ textarea.inp { resize:vertical; }
   </div>
 </div>
 
-<!-- Transcript -->
-<div class="modal-bg" id="m-transcript">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">▸ ADD MISSION LOG</span><button class="modal-x" onclick="closeModal('m-transcript')">✕</button></div>
-    <div class="modal-body">
-      <div class="field">
-        <span class="field-label">NoteCat Link <span style="color:var(--crimson-hi)">*</span></span>
-        <input class="inp" id="tr-link" placeholder="Paste NoteCat link here..." oninput="onTranscriptLinkPaste(this.value)">
-        <div style="font-size:10px;color:var(--grey-2);margin-top:4px;letter-spacing:.5px;">Paste the link first — title and date will auto-fill if detectable</div>
-      </div>
-      <div class="field"><span class="field-label">Meeting Title <span style="color:var(--crimson-hi)">*</span></span><input class="inp" id="tr-title" placeholder="e.g. Crew Sync · Nov 12"></div>
-      <div class="grid-2">
-        <div class="field"><span class="field-label">Date</span><input class="inp" id="tr-date" type="date"></div>
-        <div class="field"><span class="field-label">Duration</span><input class="inp" id="tr-dur" placeholder="e.g. 45 min"></div>
-      </div>
-      <div class="field"><span class="field-label">Notes / Summary <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional)</span></span><textarea class="inp" id="tr-summary" rows="2" placeholder="Key decisions, action items..."></textarea></div>
-      <div class="field">
-        <span class="field-label">Tags <span style="font-size:10px;color:var(--grey-2);font-weight:400;">optional</span></span>
-        <div id="tr-tag-checks" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;"></div>
-        <input class="inp" id="tr-tags-custom" placeholder="Extra tags, comma separated..." style="margin-top:6px;">
-        <input type="hidden" id="tr-tags">
-      </div>
-    </div>
-    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-transcript')">Cancel</button><button class="btn btn-primary" onclick="submitTranscript()">Save Log</button></div>
-  </div>
-</div>
-
 
 
 <!-- Availability Editor Modal -->
@@ -2180,34 +2028,6 @@ textarea.inp { resize:vertical; }
   </div>
 </div>
 
-<!-- Edit Transcript -->
-<div class="modal-bg" id="m-edit-transcript">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">▸ EDIT MISSION LOG</span><button class="modal-x" onclick="closeModal('m-edit-transcript')">✕</button></div>
-    <div class="modal-body">
-      <div class="field">
-        <span class="field-label">NoteCat Link <span style="color:var(--crimson-hi)">*</span></span>
-        <input class="inp" id="etr-link" placeholder="https://notecat.fyi/...">
-      </div>
-      <div class="field"><span class="field-label">Meeting Title <span style="color:var(--crimson-hi)">*</span></span><input class="inp" id="etr-title" placeholder="e.g. Crew Sync · Nov 12"></div>
-      <div class="grid-2">
-        <div class="field"><span class="field-label">Date</span><input class="inp" id="etr-date" type="date"></div>
-        <div class="field"><span class="field-label">Duration</span><input class="inp" id="etr-dur" placeholder="e.g. 45 min"></div>
-      </div>
-      <div class="field"><span class="field-label">Notes / Summary</span><textarea class="inp" id="etr-summary" rows="2" placeholder="Key decisions, action items..."></textarea></div>
-      <div class="field">
-        <span class="field-label">Tags</span>
-        <div id="etr-tag-checks" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;"></div>
-        <input class="inp" id="etr-tags-custom" placeholder="Extra tags, comma separated..." style="margin-top:6px;">
-      </div>
-      <input type="hidden" id="etr-id">
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('m-edit-transcript')">Cancel</button>
-      <button class="btn btn-primary" onclick="submitEditTranscript()">Save Changes</button>
-    </div>
-  </div>
-</div>
 
 <!-- Add Member (Admin) -->
 <div class="modal-bg" id="m-add-member">
@@ -2406,7 +2226,7 @@ const STATUS_LABEL = { online:'Online', working:'Working', gaming:'Gaming', offl
 let db, auth, currentUser, currentProfile;
 let listeners = [];
 let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{} };
-let crewSearch = '', logSearch = '', logTagFilter = '';
+let crewSearch = '';
 let dragTask = null;
 
 // ─── FIREBASE CONFIG ──────────────────────────────────────
@@ -3990,216 +3810,6 @@ function renderDashTasks() {
 
 // ─── TRANSCRIPT TAG SYSTEM ────────────────────────────────
 
-function populateTranscriptTagChecks(containerId, selectedTags) {
-  var el = document.getElementById(containerId);
-  if (!el) return;
-  var tags = ['General','Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative'];
-  el.innerHTML = tags.map(function(tag) {
-    var checked = selectedTags && selectedTags.includes(tag) ? 'checked' : '';
-    var color = tag === 'General' ? 'var(--grey)' : 'var(--gold)';
-    return '<label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid var(--border);">' +
-      '<input type="checkbox" value="' + tag + '" ' + checked + ' style="accent-color:var(--crimson-hi);"> ' + tag + '</label>';
-  }).join('');
-}
-
-function getCheckedTags(containerId, customId) {
-  var checked = Array.from(document.querySelectorAll('#' + containerId + ' input:checked')).map(function(c){ return c.value; });
-  var custom = document.getElementById(customId) ? document.getElementById(customId).value.split(',').map(function(t){ return t.trim(); }).filter(Boolean) : [];
-  return checked.concat(custom.filter(function(t){ return !checked.includes(t); }));
-}
-
-function renderTagFilters() {
-  var el = document.getElementById('tr-tag-filters');
-  if (!el) return;
-  var tags = ['All'].concat(['General','Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative']);
-  // Also collect any custom tags from existing transcripts
-  var customTags = [];
-  liveData.transcripts.forEach(function(t){
-    (t.tags||[]).forEach(function(tag){
-      if (!tags.includes(tag) && !customTags.includes(tag)) customTags.push(tag);
-    });
-  });
-  var allTags = tags.concat(customTags);
-  el.innerHTML = allTags.map(function(tag) {
-    var active = (tag === 'All' && !logTagFilter) || logTagFilter === tag;
-    return '<button data-tag="' + esc(tag) + '" onclick="setTagFilter(this.dataset.tag)" style="text-align:left;padding:6px 10px;border-radius:4px;border:1px solid ' + (active?'var(--crimson-hi)':'var(--border)') + ';background:' + (active?'rgba(200,16,46,.12)':'transparent') + ';color:' + (active?'var(--white)':'var(--grey)') + ';font-size:11px;font-family:Share Tech Mono,monospace;letter-spacing:1px;cursor:pointer;transition:all .15s;">' + (active?'▸ ':'') + tag.toUpperCase() + '</button>';
-  }).join('');
-  // Show/hide upload panel based on role
-  var adminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
-  var uploadPanel = document.getElementById('tr-upload-panel');
-  if (uploadPanel) uploadPanel.style.display = adminLead ? '' : 'none';
-  // Add button
-  var btnWrap = document.getElementById('tr-add-btn-wrap');
-  if (btnWrap) btnWrap.innerHTML = adminLead ? '<button class="btn btn-primary" onclick="openAddTranscript()">+ Add Log</button>' : '';
-  // Upload zone
-  var zoneWrap = document.getElementById('tr-upload-zone-wrap');
-  if (zoneWrap) zoneWrap.innerHTML = adminLead ? '<div class="upload-zone" onclick="openAddTranscript()" style="margin:12px;"><div style="font-size:28px;margin-bottom:8px;">📋</div><div style="font-size:13px;color:var(--grey);">Add a transcript</div><div style="font-size:11px;color:var(--grey-2);letter-spacing:1px;margin-top:4px;">Paste NoteCat link</div></div>' : '';
-}
-
-function setTagFilter(tag) {
-  logTagFilter = (tag === 'All') ? '' : tag;
-  renderTagFilters();
-  renderTranscripts();
-}
-
-function openAddTranscript() {
-  populateTranscriptTagChecks('tr-tag-checks', []);
-  document.getElementById('tr-tags-custom').value = '';
-  openModal('m-transcript');
-}
-
-function openEditTranscript(id) {
-  var t = liveData.transcripts.find(function(x){ return x.id === id; });
-  if (!t) { toast('Log not found','err'); return; }
-  document.getElementById('etr-id').value    = id;
-  document.getElementById('etr-title').value = t.title || '';
-  document.getElementById('etr-link').value  = t.link  || '';
-  document.getElementById('etr-date').value  = t.date  || '';
-  document.getElementById('etr-dur').value   = t.duration || '';
-  document.getElementById('etr-summary').value = t.summary || '';
-  // Standard tags vs custom
-  var standardTags = ['General','Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative'];
-  var allTags = t.tags || [];
-  var customTags = allTags.filter(function(tag){ return !standardTags.includes(tag); });
-  populateTranscriptTagChecks('etr-tag-checks', allTags);
-  document.getElementById('etr-tags-custom').value = customTags.join(', ');
-  openModal('m-edit-transcript');
-}
-
-async function submitEditTranscript() {
-  var id    = document.getElementById('etr-id').value;
-  var title = document.getElementById('etr-title').value.trim();
-  var link  = document.getElementById('etr-link').value.trim();
-  if (!title) { toast('Enter a title','err'); return; }
-  if (!link)  { toast('Paste the NoteCat link','err'); return; }
-  var tags = getCheckedTags('etr-tag-checks', 'etr-tags-custom');
-  await db.collection('transcripts').doc(id).update({
-    title: title, link: link,
-    date: document.getElementById('etr-date').value,
-    duration: document.getElementById('etr-dur').value.trim(),
-    summary: document.getElementById('etr-summary').value.trim(),
-    tags: tags,
-    updatedAt: new Date().toISOString()
-  });
-  closeModal('m-edit-transcript');
-  toast('Log updated!','ok');
-}
-
-function filterLogs(val) { logSearch = val.toLowerCase(); renderTranscripts(); }
-
-
-function onTranscriptLinkPaste(val) {
-  // Auto-set date to today if not already set
-  var dateEl = document.getElementById('tr-date');
-  if (dateEl && !dateEl.value) {
-    dateEl.value = new Date().toISOString().slice(0,10);
-  }
-  // Try to extract a date from the URL (e.g. 2024-11-12 or nov-12-2024 patterns)
-  var dateMatch = val.match(/(\d{4}[-_]\d{2}[-_]\d{2})/);
-  if (dateMatch && dateEl) {
-    dateEl.value = dateMatch[1].replace(/_/g,'-');
-  }
-  // Focus title field so user can type it quickly
-  var titleEl = document.getElementById('tr-title');
-  if (titleEl && !titleEl.value) {
-    setTimeout(function(){ titleEl.focus(); }, 50);
-  }
-}
-
-async function submitTranscript() {
-  var title = document.getElementById('tr-title').value.trim();
-  var link  = document.getElementById('tr-link').value.trim();
-  if (!title) { toast('Enter a meeting title','err'); document.getElementById('tr-title').focus(); return; }
-  if (!link)  { toast('Paste the NoteCat link','err'); document.getElementById('tr-link').focus(); return; }
-  var tr = {
-    title: title,
-    date:  document.getElementById('tr-date').value || new Date().toISOString().slice(0,10),
-    duration: document.getElementById('tr-dur').value.trim(),
-    link:  link,
-    summary: document.getElementById('tr-summary').value.trim(),
-    tags: getCheckedTags('tr-tag-checks', 'tr-tags-custom'),
-    addedBy: currentUser.uid,
-    addedByName: currentProfile.name,
-    createdAt: new Date().toISOString()
-  };
-  await db.collection('transcripts').add(tr);
-  closeModal('m-transcript');
-  ['tr-title','tr-date','tr-dur','tr-link','tr-summary','tr-tags'].forEach(function(id){ document.getElementById(id).value = ''; });
-  toast('Mission log saved!','ok');
-}
-
-async function deleteTranscript(id) {
-  if (currentProfile.role !== 'admin' && currentProfile.role !== 'lead') { toast('Only admins and leads can delete logs','err'); return; }
-  if (!confirm('Delete this transcript?')) return;
-  await db.collection('transcripts').doc(id).delete();
-  toast('Transcript removed','inf');
-}
-
-function renderTranscripts() {
-  var el = document.getElementById('transcript-list');
-  if (!el) return;
-  var items = liveData.transcripts.slice(); // copy, already sorted newest first by Firestore
-  if (logSearch) {
-    var q = logSearch.toLowerCase();
-    items = items.filter(function(t){
-      return (t.title||'').toLowerCase().includes(q) ||
-             (t.summary||'').toLowerCase().includes(q) ||
-             (t.tags||[]).some(function(tag){ return tag.toLowerCase().includes(q); });
-    });
-  }
-  if (logTagFilter) {
-    items = items.filter(function(t){
-      return (t.tags||[]).includes(logTagFilter);
-    });
-  }
-  if (!items.length) {
-    el.innerHTML = '<div class="no-data">' + (logSearch ? 'No results for "'+esc(logSearch)+'"' : 'No mission logs yet. Add the first one!') + '</div>';
-    return;
-  }
-  var adminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
-  el.innerHTML = items.map(function(t) {
-    var dateStr = t.date ? new Date(t.date + 'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '';
-    var html = '<div class="tc-card" style="border-left:2px solid rgba(200,16,46,.4);gap:12px;">';
-    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;width:32px;">';
-    html += '<span style="font-size:18px;">📋</span>';
-    html += '</div>';
-    html += '<div style="flex:1;min-width:0;">';
-    // Title row with link
-    html += '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px;flex-wrap:wrap;">';
-    if (t.link) {
-      html += '<a href="' + esc(t.link) + '" target="_blank" style="font-size:14px;font-weight:700;color:var(--white);text-decoration:none;letter-spacing:.3px;" class="tr-title-link">' + esc(t.title) + ' <span style="font-size:11px;color:var(--crimson-hi);">↗</span></a>';
-    } else {
-      html += '<span style="font-size:14px;font-weight:700;">' + esc(t.title) + '</span>';
-    }
-    html += '</div>';
-    // Meta row
-    html += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">';
-    if (dateStr) html += '<span style="font-family:Share Tech Mono,monospace;font-size:11px;color:var(--gold);">' + dateStr + '</span>';
-    if (t.duration) html += '<span style="font-size:11px;color:var(--grey);">⏱ ' + esc(t.duration) + '</span>';
-    if (t.addedByName) html += '<span style="font-size:10px;color:var(--grey-2);">by ' + esc(t.addedByName) + '</span>';
-    html += '</div>';
-    // Summary
-    if (t.summary) html += '<div style="font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:5px;">' + esc(t.summary) + '</div>';
-    // Tags
-    var tags = (t.tags||[]);
-    if (tags.length) {
-      html += '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
-      tags.forEach(function(tag){ html += '<span class="dept-tag" style="color:var(--grey);border-color:var(--border);">' + esc(tag) + '</span>'; });
-      html += '</div>';
-    }
-    html += '</div>';
-    // Delete button
-    if (adminLead) {
-      html += '<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">';
-      html += '<button class="icon-btn" title="Edit" onclick="openEditTranscript(\'' + t.id + '\')">✎</button>';
-      html += '<button class="icon-btn danger" title="Delete" onclick="deleteTranscript(\'' + t.id + '\')">✕</button>';
-      html += '</div>';
-    }
-    html += '</div>';
-    return html;
-  }).join('');
-}
-
 // ─── ADMIN ────────────────────────────────────────────────
 function populateDeptChecks() {
   const el = document.getElementById('am-dept-checks');
@@ -5167,130 +4777,124 @@ async function saveAvailability() {
 // (already reads m.weeklyAvail from the user doc via the users snapshot)
 
 
-// ═══════════════════════════════════════════════════════════════════
-//  COSMIC MEETINGS ARCHIVE — v3 (Firestore-backed)
-// ═══════════════════════════════════════════════════════════════════
 
-// ── State ──────────────────────────────────────────────────────────
-var arcCurrentId     = null;
-var arcLines         = [];
-var arcActiveIdx     = -1;
-var arcSearchQuery   = '';
-var arcSpeeds        = [0.5, 0.75, 1, 1.25, 1.5, 2];
-var arcSpeedIdx      = 2; // default 1×
-var arcAutoScroll    = true;
-var arcIsDragging    = false;
-var arcFilterDept    = '';
-var arcFilterSearch  = '';
-var arcSortOrder     = 'newest';
-var arcPendingMd     = null; // { name, text, parsed }
 
-var arcAudio = document.getElementById('arcAudio');
 
-// ── DEPT colours ───────────────────────────────────────────────────
-var ARC_DEPT_COLORS = {
-  'general':     '#8899aa',
-  'programming': '#4a90d9',
-  '2d-art':      '#e84393',
-  '3d-art':      '#9b6cf0',
-  'marketing':   '#e8a020',
-  'sound':       '#2ecc8a',
-  'vfx':         '#00d4ff',
-  'narrative':   '#ff6b35'
-};
-var ARC_DEPT_LABELS = {
-  'general':'General','programming':'Programming','2d-art':'2D Art',
-  '3d-art':'3D Art','marketing':'Marketing','sound':'Sound Design',
-  'vfx':'VFX','narrative':'Narrative'
+// === MISSION LOGS ===
+// ═══════════════════════════════════════════════════════════
+//  MISSION LOGS ARCHIVE — clean build
+// ═══════════════════════════════════════════════════════════
+
+// ── State ──────────────────────────────────────────────────
+var arc = {
+  currentId:   null,
+  lines:       [],
+  activeIdx:   -1,
+  query:       '',
+  speeds:      [0.5, 0.75, 1, 1.25, 1.5, 2],
+  speedIdx:    2,
+  autoScroll:  true,
+  dragging:    false,
+  sortOrder:   'newest',
+  filterDept:  '',
+  filterSearch:''
 };
 
-// ── Google Drive URL → streamable URL ──────────────────────────────
-function arcDriveToStream(url) {
-  if (!url || !url.trim()) return null;
+// ── Audio element (created once, persists across nav) ──────
+var arcAudio = new Audio();
+arcAudio.preload = 'none';
+
+// ── Dept meta ──────────────────────────────────────────────
+var ARC_DEPT = {
+  general:    { label:'General',      color:'#8899aa' },
+  programming:{ label:'Programming',  color:'#4a90d9' },
+  '2d-art':   { label:'2D Art',       color:'#e84393' },
+  '3d-art':   { label:'3D Art',       color:'#9b6cf0' },
+  marketing:  { label:'Marketing',    color:'#e8a020' },
+  sound:      { label:'Sound Design', color:'#2ecc8a' },
+  vfx:        { label:'VFX',          color:'#00d4ff' },
+  narrative:  { label:'Narrative',    color:'#ff6b35' }
+};
+
+// ── Drive URL → direct streamable/fetchable URL ────────────
+function arcDriveUrl(url) {
+  if (!url) return null;
   url = url.trim();
-  // Format 1: /file/d/FILE_ID/
-  var m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m1) return 'https://drive.google.com/uc?export=download&id=' + m1[1];
-  // Format 2: ?id=FILE_ID
+  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return 'https://drive.google.com/uc?export=download&id=' + m[1];
   var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (m2) return 'https://drive.google.com/uc?export=download&id=' + m2[1];
-  // Already a direct URL or something else — return as-is
   if (url.startsWith('http')) return url;
   return null;
 }
 
-function arcDriveUrlStatus(inputId, statusId) {
-  var val = document.getElementById(inputId).value.trim();
-  var statusEl = document.getElementById(statusId);
-  if (!val) { statusEl.textContent = ''; return; }
-  var streamUrl = arcDriveToStream(val);
-  if (streamUrl) {
-    statusEl.textContent = '✓ Drive link detected';
-    statusEl.style.color = 'var(--green)';
-  } else {
-    statusEl.textContent = '⚠ Unrecognised URL format';
-    statusEl.style.color = 'var(--crimson-hi)';
-  }
+function arcDriveId(url) {
+  if (!url) return null;
+  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return m2[1];
+  return null;
 }
 
-// ── Parse Notecat Markdown ─────────────────────────────────────────
-function arcParseMarkdown(text) {
+// ── Parse Notecat markdown ─────────────────────────────────
+function arcParse(text) {
   var rawLines = text.split('\n');
   var title = 'Meeting', date = '', duration = '', speakerCount = '', summary = '';
+  var speakerRe = /^\*\*(.+?)\*\*\s*-\s*(\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM))\s*$/i;
+  var eventRe   = /^\*([^*].+?)\*$/;
   var parsed = [];
 
+  // Header metadata
   for (var i = 0; i < rawLines.length; i++) {
     var l = rawLines[i].trim();
-    if (l.startsWith('# ')) title = l.slice(2).trim();
-    if (l.startsWith('- **Date**:'))     date = l.replace('- **Date**:', '').trim();
-    if (l.startsWith('- **Duration**:')) duration = l.replace('- **Duration**:', '').trim();
-    if (l.startsWith('- **Speakers**:')) speakerCount = l.replace('- **Speakers**:', '').trim();
+    if (l.startsWith('# '))              title        = l.slice(2).trim();
+    if (l.startsWith('- **Date**:'))     date         = l.replace('- **Date**:','').trim();
+    if (l.startsWith('- **Duration**:')) duration     = l.replace('- **Duration**:','').trim();
+    if (l.startsWith('- **Speakers**:')) speakerCount = l.replace('- **Speakers**:','').trim();
     if (l === '## Summary') {
-      var j = i + 1, sumLines = [];
-      while (j < rawLines.length && !rawLines[j].startsWith('##')) { sumLines.push(rawLines[j]); j++; }
-      summary = sumLines.join(' ').replace(/\s+/g, ' ').trim();
+      var j = i+1, sl = [];
+      while (j < rawLines.length && !rawLines[j].startsWith('##')) { sl.push(rawLines[j]); j++; }
+      summary = sl.join(' ').replace(/\s+/g,' ').trim();
     }
   }
 
-  var speakerRe = /^\*\*(.+?)\*\*\s*-\s*(\d{1,2}:\d{2}:\d{2}\s*(?:AM|PM))\s*$/i;
-  var eventRe   = /^\*(.+?)\*$/;
-  var speakerColors = {}, colorIdx = 0, startSeconds = null;
-
-  function timeToSec(ts) {
+  // Timestamp helpers
+  function toSec(ts) {
     var m = ts.trim().match(/(\d+):(\d+):(\d+)\s*(AM|PM)/i);
     if (!m) return null;
     var h = parseInt(m[1]), mn = parseInt(m[2]), s = parseInt(m[3]);
     var pm = m[4].toUpperCase() === 'PM';
     if (pm && h !== 12) h += 12;
     if (!pm && h === 12) h = 0;
-    return h * 3600 + mn * 60 + s;
+    return h*3600 + mn*60 + s;
   }
-  function timeToOffset(ts) {
-    var abs = timeToSec(ts);
+  var startSec = null;
+  function toOffset(ts) {
+    var abs = toSec(ts);
     if (abs === null) return null;
-    if (startSeconds === null) { startSeconds = abs; return 0; }
-    var diff = abs - startSeconds;
-    if (diff < -3600) diff += 86400;
-    return Math.max(0, diff);
+    if (startSec === null) { startSec = abs; return 0; }
+    var d = abs - startSec;
+    if (d < -3600) d += 86400;
+    return Math.max(0, d);
   }
 
-  // First pass: find start time
+  // Find start time
   for (var k = 0; k < rawLines.length; k++) {
-    var sm0 = rawLines[k].match(speakerRe);
-    if (sm0 && startSeconds === null) { startSeconds = timeToSec(sm0[2]); break; }
+    if (speakerRe.test(rawLines[k].trim())) { startSec = toSec(rawLines[k].trim().match(speakerRe)[2]); break; }
   }
 
-  // Second pass: build lines
-  var inTranscript = false, ii = 0;
+  // Parse transcript
+  var spkColors = {}, colorIdx = 0, inTr = false, ii = 0;
   while (ii < rawLines.length) {
     var ll = rawLines[ii].trim();
-    if (ll === '## Transcript') { inTranscript = true; ii++; continue; }
-    if (!inTranscript) { ii++; continue; }
+    if (ll === '## Transcript') { inTr = true; ii++; continue; }
+    if (!inTr) { ii++; continue; }
     var sm = ll.match(speakerRe);
     if (sm) {
-      var spk = sm[1], tstr = sm[2], off = timeToOffset(tstr);
-      if (!(spk in speakerColors)) speakerColors[spk] = colorIdx++ % 6;
-      var txt = '', jj = ii + 1;
+      var spk = sm[1], off = toOffset(sm[2]);
+      if (!(spk in spkColors)) spkColors[spk] = colorIdx++ % 6;
+      var txt = '', jj = ii+1;
       while (jj < rawLines.length) {
         var nxt = rawLines[jj].trim();
         if (nxt === '') { jj++; break; }
@@ -5298,7 +4902,7 @@ function arcParseMarkdown(text) {
         txt += (txt ? ' ' : '') + nxt;
         jj++;
       }
-      parsed.push({ type:'speech', speaker:spk, colorIdx:speakerColors[spk], timeStr:tstr, offset:off, text:txt || '…' });
+      parsed.push({ type:'speech', speaker:spk, ci:spkColors[spk], offset:off, text:txt||'…' });
       ii = jj; continue;
     }
     var em = ll.match(eventRe);
@@ -5308,774 +4912,660 @@ function arcParseMarkdown(text) {
   return { title, date, duration, speakerCount, summary, lines:parsed };
 }
 
-// ── Add meeting handlers ───────────────────────────────────────────
+// ── Render all (called on snapshot + nav) ─────────────────
+function arcRenderAll() {
+  var admin = currentProfile && (currentProfile.role==='admin'||currentProfile.role==='lead');
+  var btnWrap = document.getElementById('arcAdminBtn');
+  if (btnWrap) btnWrap.innerHTML = admin
+    ? '<button class="btn btn-primary fw" style="font-size:11px;" onclick="arcOpenAdd()">+ Add Meeting</button>'
+    : '';
+  arcFilter();
+}
+
+// ── Filter + sort + render sidebar ────────────────────────
+function arcFilter() {
+  arc.filterSearch = (document.getElementById('arcSideSearch')||{}).value||'';
+  arc.filterDept   = (document.getElementById('arcDeptFilter')||{}).value||'';
+
+  var items = (liveData.archiveMeetings||[]).slice();
+  var q = arc.filterSearch.toLowerCase();
+  if (q) items = items.filter(function(m){
+    return (m.title||'').toLowerCase().includes(q) ||
+           (m.summary||'').toLowerCase().includes(q);
+  });
+  if (arc.filterDept) items = items.filter(function(m){
+    return (m.dept||'general') === arc.filterDept;
+  });
+  items.sort(function(a,b){
+    return arc.sortOrder==='oldest'
+      ? (a.date||'').localeCompare(b.date||'')
+      : (b.date||'').localeCompare(a.date||'');
+  });
+
+  var countEl = document.getElementById('arcCount');
+  if (countEl) countEl.textContent = (liveData.archiveMeetings||[]).length;
+
+  var list = document.getElementById('arcList');
+  if (!list) return;
+  if (!items.length) {
+    list.innerHTML = '<div style="padding:20px 10px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--grey-2);letter-spacing:.1em;line-height:2;">' +
+      ((liveData.archiveMeetings||[]).length===0 ? 'NO MEETINGS YET' : 'NO RESULTS') + '</div>';
+    return;
+  }
+  list.innerHTML = items.map(function(m){
+    var dept = ARC_DEPT[m.dept||'general'] || ARC_DEPT.general;
+    var dateStr = m.date ? new Date(m.date+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '';
+    var active = m.id === arc.currentId;
+    return '<div class="arc-item'+(active?' active':'')+'" data-id="'+m.id+'" onclick="arcSelect(this.dataset.id)">' +
+      '<div class="arc-item-title">'+esc(m.title)+'</div>' +
+      '<div class="arc-item-meta">'+dateStr+(m.duration?' · '+esc(m.duration):'')+'</div>' +
+      '<div class="arc-item-tags">' +
+        '<span style="font-family:var(--mono);font-size:8px;font-weight:700;color:'+dept.color+';">'+dept.label+'</span>' +
+        (m.audioUrl ? '<span style="font-size:9px;color:var(--grey-2);" title="Has audio">♪</span>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function arcSetSort(order) {
+  arc.sortOrder = order;
+  document.getElementById('arcSortNewest').classList.toggle('active', order==='newest');
+  document.getElementById('arcSortOldest').classList.toggle('active', order==='oldest');
+  arcFilter();
+}
+
+// ── Select a meeting ───────────────────────────────────────
+function arcSelect(id) {
+  var m = (liveData.archiveMeetings||[]).find(function(x){ return x.id===id; });
+  if (!m) return;
+
+  arc.currentId  = id;
+  arc.lines      = [];
+  arc.activeIdx  = -1;
+  arc.query      = '';
+  arc.autoScroll = true;
+
+  // Reset search
+  var ts = document.getElementById('arcTSearch'); if (ts) ts.value='';
+  var tc = document.getElementById('arcTSearchCount'); if (tc) tc.textContent='';
+
+  // Show meeting view, hide empty
+  document.getElementById('arcEmpty').style.display = 'none';
+  var mv = document.getElementById('arcMeetingView');
+  mv.style.display = 'flex';
+
+  // Re-render sidebar to show active
+  arcFilter();
+
+  // Render info bar
+  arcInfoBar(m);
+
+  // Show summary immediately, transcript loading state
+  var sumEl = document.getElementById('arcTSummary');
+  if (sumEl) sumEl.innerHTML = m.summary
+    ? '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">'+esc(m.summary)+'</div></div>'
+    : '';
+
+  var linesEl = document.getElementById('arcTLines');
+  var loading = document.getElementById('arcTLoading');
+  if (linesEl) linesEl.innerHTML = '';
+  if (loading) loading.style.display = 'block';
+
+  // Set up audio
+  arcAudio.pause();
+  var playBtn = document.getElementById('arcPlayBtn');
+  var stopBtn = document.getElementById('arcStopBtn');
+  var noAudio = document.getElementById('arcNoAudio');
+  if (m.audioUrl) {
+    arcAudio.src = m.audioUrl;
+    arcAudio.load();
+    if (playBtn) { playBtn.disabled=false; playBtn.textContent='▶'; }
+    if (stopBtn) stopBtn.disabled=false;
+    if (noAudio) noAudio.style.display='none';
+  } else {
+    arcAudio.src='';
+    if (playBtn) { playBtn.disabled=true; playBtn.textContent='▶'; }
+    if (stopBtn) stopBtn.disabled=true;
+    if (noAudio) noAudio.style.display='inline';
+  }
+  arcResetProg();
+
+  // Fetch + parse transcript from Drive
+  arcLoadTranscript(m);
+}
+
+// ── Load transcript from Drive (or fallback) ───────────────
+function arcLoadTranscript(m) {
+  var mdUrl = m.mdUrl;
+  if (!mdUrl) {
+    // No markdown URL — show empty state
+    arcShowLines([]);
+    return;
+  }
+
+  fetch(mdUrl, { method:'GET', mode:'cors' })
+    .then(function(r){
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      return r.text();
+    })
+    .then(function(text){
+      var parsed = arcParse(text);
+      arc.lines = parsed.lines;
+      arcShowLines(arc.lines);
+    })
+    .catch(function(err){
+      console.warn('Drive fetch failed:', err);
+      // Show CORS fallback UI
+      var linesEl = document.getElementById('arcTLines');
+      var loading = document.getElementById('arcTLoading');
+      if (loading) loading.style.display='none';
+      if (linesEl) linesEl.innerHTML =
+        '<div style="padding:20px;background:var(--bg-3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;margin:10px 0;">' +
+          '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:10px;">TRANSCRIPT UNAVAILABLE</div>' +
+          '<div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px;">' +
+            'The transcript could not be fetched from Google Drive. This is usually a CORS restriction.<br><br>' +
+            'Paste the transcript text below to load it manually:' +
+          '</div>' +
+          '<textarea id="arcMdPaste" class="inp" rows="6" placeholder="Paste markdown transcript text here…" style="width:100%;font-family:var(--mono);font-size:10px;resize:vertical;"></textarea>' +
+          '<div style="margin-top:8px;display:flex;justify-content:flex-end;">' +
+            '<button class="btn btn-primary btn-sm" onclick="arcLoadPasted()">Load Transcript</button>' +
+          '</div>' +
+        '</div>';
+    });
+}
+
+function arcLoadPasted() {
+  var el = document.getElementById('arcMdPaste');
+  if (!el || !el.value.trim()) return;
+  var parsed = arcParse(el.value);
+  arc.lines = parsed.lines;
+  arcShowLines(arc.lines);
+}
+
+function arcShowLines(lines) {
+  var loading = document.getElementById('arcTLoading');
+  if (loading) loading.style.display='none';
+  var linesEl = document.getElementById('arcTLines');
+  if (!linesEl) return;
+
+  if (!lines.length) {
+    linesEl.innerHTML = '<div style="padding:20px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--grey-2);">No transcript lines</div>';
+    return;
+  }
+
+  var q = arc.query.toLowerCase();
+  linesEl.innerHTML = lines.map(function(line, idx){
+    if (line.type==='event') return '<div class="arc-event">'+esc(line.text)+'</div>';
+    var isOn  = idx === arc.activeIdx;
+    var isHit = q && (line.text.toLowerCase().includes(q) || line.speaker.toLowerCase().includes(q));
+    var txt = esc(line.text);
+    if (isHit) txt = txt.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+    var offStr = (line.offset!==null&&line.offset!==undefined) ? arcFmt(line.offset) : '—';
+    return '<div class="arc-line'+(isOn?' arc-on':'')+(isHit?' arc-hit':'')+'" id="arcl'+idx+'" onclick="arcSeekLine('+idx+')">' +
+      '<div class="arc-ts">'+offStr+'</div>' +
+      '<div class="arc-spk arc-c'+line.ci+'">'+esc(line.speaker)+'</div>' +
+      '<div class="arc-txt">'+txt+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function arcInfoBar(m) {
+  var el = document.getElementById('arcInfoBar');
+  if (!el) return;
+  var admin = currentProfile && (currentProfile.role==='admin'||currentProfile.role==='lead');
+  var dept  = ARC_DEPT[m.dept||'general'] || ARC_DEPT.general;
+  var dateStr = m.date ? new Date(m.date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '';
+  el.innerHTML =
+    '<span class="arc-dept-pill" style="color:'+dept.color+';border-color:'+dept.color+'">'+dept.label+'</span>' +
+    (dateStr ? '<span class="arc-chip">'+dateStr+'</span>' : '') +
+    (m.duration ? '<span class="arc-chip">'+esc(m.duration)+'</span>' : '') +
+    '<div style="flex:1"></div>' +
+    (admin ? '<button class="btn btn-ghost btn-xs" data-id="'+m.id+'" onclick="arcOpenEdit(this.dataset.id)">✎ Edit</button>' : '');
+}
+
+// ── Audio controls ─────────────────────────────────────────
+arcAudio.addEventListener('timeupdate', function(){
+  var dur = arcAudio.duration||0, cur = arcAudio.currentTime;
+  if (!arc.dragging) {
+    var pct = dur ? (cur/dur*100) : 0;
+    var f = document.getElementById('arcProgFill');
+    var t = document.getElementById('arcProgThumb');
+    if (f) f.style.width  = pct+'%';
+    if (t) t.style.left   = pct+'%';
+    // Mini player
+    var mf = document.getElementById('arcMiniFill');
+    var mt = document.getElementById('arcMiniThumb');
+    if (mf) mf.style.width = pct+'%';
+    if (mt) mt.style.left  = pct+'%';
+  }
+  var d = document.getElementById('arcTimeDisp');
+  if (d) d.textContent = arcFmt(cur)+' / '+arcFmt(dur);
+  var md = document.getElementById('arcMiniTime');
+  if (md) md.textContent = arcFmt(cur)+' / '+arcFmt(dur);
+  arcActiveLine(cur);
+});
+
+arcAudio.addEventListener('play', function(){
+  var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='⏸';
+  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='⏸';
+  arcMiniShow();
+});
+arcAudio.addEventListener('pause', function(){
+  var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='▶';
+  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='▶';
+});
+arcAudio.addEventListener('ended', function(){
+  var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='▶';
+  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='▶';
+  arc.activeIdx=-1;
+});
+
+function arcPlay() {
+  if (!arcAudio.src) return;
+  if (arcAudio.paused) arcAudio.play().catch(function(){});
+  else arcAudio.pause();
+}
+
+function arcStopFn() {
+  arcAudio.pause();
+  arcAudio.currentTime=0;
+  arc.activeIdx=-1;
+  arcResetProg();
+  arcShowLines(arc.lines);
+}
+
+function arcResetProg() {
+  var f=document.getElementById('arcProgFill'); if(f) f.style.width='0%';
+  var t=document.getElementById('arcProgThumb'); if(t) t.style.left='0%';
+  var d=document.getElementById('arcTimeDisp'); if(d) d.textContent='0:00 / 0:00';
+}
+
+// Draggable progress
+function arcDragStart(e) {
+  if (!arcAudio.duration) return;
+  arc.dragging=true;
+  var w = document.getElementById('arcProgWrap'); if(w) w.classList.add('dragging');
+  arcDragMove(e);
+}
+function arcDragMove(e) {
+  if (!arc.dragging || !arcAudio.duration) return;
+  var w=document.getElementById('arcProgWrap'); if(!w) return;
+  var r=w.getBoundingClientRect();
+  var x=(e.touches?e.touches[0].clientX:e.clientX);
+  var p=Math.max(0,Math.min(1,(x-r.left)/r.width));
+  var f=document.getElementById('arcProgFill'); if(f) f.style.width=(p*100)+'%';
+  var t=document.getElementById('arcProgThumb'); if(t) t.style.left=(p*100)+'%';
+}
+function arcDragEnd(e) {
+  if (!arc.dragging) return;
+  arc.dragging=false;
+  var w=document.getElementById('arcProgWrap'); if(w) w.classList.remove('dragging');
+  if (!arcAudio.duration) return;
+  var r=w.getBoundingClientRect();
+  var x=(e.changedTouches?e.changedTouches[0].clientX:e.clientX);
+  arcAudio.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*arcAudio.duration;
+}
+document.addEventListener('mousemove', arcDragMove);
+document.addEventListener('mouseup',   arcDragEnd);
+document.addEventListener('touchmove', arcDragMove, {passive:true});
+document.addEventListener('touchend',  arcDragEnd);
+
+function arcProgClick(e) {
+  if (arc.dragging||!arcAudio.duration) return;
+  var w=document.getElementById('arcProgWrap'); if(!w) return;
+  var r=w.getBoundingClientRect();
+  arcAudio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*arcAudio.duration;
+}
+
+function arcSeekLine(idx) {
+  var line=arc.lines[idx];
+  if (!line||line.offset==null) return;
+  if (!arcAudio.src) return;
+  var doSeek=function(){ arcAudio.currentTime=line.offset; if(arcAudio.paused) arcAudio.play().catch(function(){}); arc.autoScroll=true; };
+  if (arcAudio.readyState>=1) doSeek();
+  else { arcAudio.addEventListener('loadedmetadata',function onM(){ arcAudio.removeEventListener('loadedmetadata',onM); doSeek(); }); arcAudio.load(); }
+}
+
+function arcSpeedCycle() {
+  arc.speedIdx=(arc.speedIdx+1)%arc.speeds.length;
+  arcAudio.playbackRate=arc.speeds[arc.speedIdx];
+  var b=document.getElementById('arcSpeedBtn'); if(b) b.textContent=arc.speeds[arc.speedIdx]+'×';
+  var mb=document.getElementById('arcMiniSpeed'); if(mb) mb.textContent=arc.speeds[arc.speedIdx]+'×';
+}
+
+function arcActiveLine(t) {
+  if (!arc.lines.length) return;
+  var speech=arc.lines.map(function(l,i){return{l:l,i:i};}).filter(function(x){return x.l.type==='speech'&&x.l.offset!=null;});
+  var newIdx=-1;
+  for (var i=speech.length-1;i>=0;i--) { if(t>=speech[i].l.offset-0.3){newIdx=speech[i].i;break;} }
+  if (newIdx===arc.activeIdx) return;
+  var old=document.getElementById('arcl'+arc.activeIdx); if(old) old.classList.remove('arc-on');
+  arc.activeIdx=newIdx;
+  if (newIdx>=0) {
+    var el=document.getElementById('arcl'+newIdx);
+    if (el) { el.classList.add('arc-on'); if(arc.autoScroll) el.scrollIntoView({block:'center',behavior:'smooth'}); }
+  }
+}
+
+// Disable auto-scroll when user manually scrolls
+document.addEventListener('DOMContentLoaded',function(){
+  var tb=document.getElementById('arcTBody');
+  if(tb) tb.addEventListener('wheel',function(){ arc.autoScroll=false; },{ passive:true });
+});
+
+// ── Transcript search ──────────────────────────────────────
+function arcTSearchFn(val) {
+  arc.query=val;
+  arcShowLines(arc.lines);
+  if (val) {
+    var first=document.querySelector('.arc-line.arc-hit');
+    if(first) first.scrollIntoView({block:'center',behavior:'smooth'});
+  }
+  var hits=document.querySelectorAll('.arc-line.arc-hit').length;
+  var c=document.getElementById('arcTSearchCount');
+  if(c) c.textContent=val?(hits+' match'+(hits!==1?'es':'')):'';
+}
+
+// ── Text selection → seek ──────────────────────────────────
+function arcSelectionJump() {
+  var sel=window.getSelection();
+  if (!sel||sel.isCollapsed) return;
+  var txt=sel.toString().trim().toLowerCase();
+  if (txt.length<3) return;
+  var best=-1, bestScore=0;
+  for (var i=0;i<arc.lines.length;i++) {
+    var l=arc.lines[i];
+    if (l.type!=='speech'||l.offset==null) continue;
+    var lt=(l.text||'').toLowerCase();
+    if (lt.includes(txt)&&best===-1){best=i;break;}
+    var words=txt.split(/\s+/);
+    var score=words.filter(function(w){return w.length>2&&lt.includes(w);}).length;
+    if(score>bestScore){bestScore=score;best=i;}
+  }
+  if (best>=0) {
+    document.querySelectorAll('.arc-sel').forEach(function(el){el.classList.remove('arc-sel');});
+    var el=document.getElementById('arcl'+best);
+    if(el){el.classList.add('arc-sel');el.scrollIntoView({block:'center',behavior:'smooth'});}
+    arcSeekLine(best);
+  }
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')) return;
+  if (e.code==='Space')      { e.preventDefault(); arcPlay(); }
+  if (e.code==='ArrowLeft')  { e.preventDefault(); if(arcAudio.src) arcAudio.currentTime=Math.max(0,arcAudio.currentTime-5); }
+  if (e.code==='ArrowRight') { e.preventDefault(); if(arcAudio.src) arcAudio.currentTime=Math.min(arcAudio.duration||0,arcAudio.currentTime+5); }
+});
+
+// ── Mini player ────────────────────────────────────────────
+function arcMiniShow() {
+  var p=document.getElementById('arcMiniPlayer');
+  if(!p) return;
+  p.classList.add('visible');
+  // Update title
+  var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===arc.currentId;});
+  var t=document.getElementById('arcMiniTitle');
+  if(t&&m) t.textContent=m.title||'Meeting';
+}
+function arcMiniHide() {
+  arcAudio.pause();
+  var p=document.getElementById('arcMiniPlayer'); if(p) p.classList.remove('visible');
+}
+function arcMiniDragStart(e) {
+  if (!arcAudio.duration) return;
+  arc.dragging=true;
+  arcMiniDragMove(e);
+}
+function arcMiniDragMove(e) {
+  if (!arc.dragging||!arcAudio.duration) return;
+  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
+  var r=w.getBoundingClientRect();
+  var x=(e.touches?e.touches[0].clientX:e.clientX);
+  var p=Math.max(0,Math.min(1,(x-r.left)/r.width));
+  var f=document.getElementById('arcMiniFill'); if(f) f.style.width=(p*100)+'%';
+}
+function arcMiniDragEnd(e) {
+  if (!arc.dragging) return;
+  arc.dragging=false;
+  if (!arcAudio.duration) return;
+  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
+  var r=w.getBoundingClientRect();
+  var x=(e.changedTouches?e.changedTouches[0].clientX:e.clientX);
+  arcAudio.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*arcAudio.duration;
+}
+function arcMiniProgClick(e) {
+  if (arc.dragging||!arcAudio.duration) return;
+  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
+  var r=w.getBoundingClientRect();
+  arcAudio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*arcAudio.duration;
+}
+
+// ── Add meeting ────────────────────────────────────────────
 function arcOpenAdd() {
-  arcPendingMd = null;
-  document.getElementById('arc-add-title').value    = '';
-  document.getElementById('arc-add-date').value     = '';
-  document.getElementById('arc-add-dur').value      = '';
-  document.getElementById('arc-add-summary').value  = '';
-  document.getElementById('arc-add-audio-url').value = '';
-  document.getElementById('arc-add-audio-status').textContent = '';
-  var mdNameEl = document.getElementById('arc-add-md-name');
-  mdNameEl.textContent = 'No file selected';
-  mdNameEl.style.color = 'var(--grey-2)';
-  document.getElementById('arc-add-dept').value = 'general';
-  // set default date = today
-  document.getElementById('arc-add-date').value = new Date().toISOString().slice(0,10);
+  ['arc-a-title','arc-a-md','arc-a-audio','arc-a-dur','arc-a-summary'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var d=document.getElementById('arc-a-dept'); if(d) d.value='general';
+  document.getElementById('arc-a-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('arc-a-md-status').textContent='';
+  document.getElementById('arc-a-audio-status').textContent='';
   openModal('m-arc-add');
 }
 
-function arcHandleAddMd(input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var text = e.target.result;
-    var parsed = arcParseMarkdown(text);
-    arcPendingMd = { name:file.name, text:text, parsed:parsed };
-    var mdNameEl = document.getElementById('arc-add-md-name');
-    mdNameEl.textContent = '✓ ' + file.name;
-    mdNameEl.style.color = 'var(--green)';
-    // Auto-fill fields from transcript if blank
-    if (!document.getElementById('arc-add-title').value && parsed.title && parsed.title !== 'Meeting') {
-      document.getElementById('arc-add-title').value = parsed.title;
-    }
-    if (!document.getElementById('arc-add-dur').value && parsed.duration) {
-      document.getElementById('arc-add-dur').value = parsed.duration;
-    }
-    if (!document.getElementById('arc-add-summary').value && parsed.summary) {
-      document.getElementById('arc-add-summary').value = parsed.summary;
-    }
-    // Try to parse date from transcript
-    if (!document.getElementById('arc-add-date').value || document.getElementById('arc-add-date').value === new Date().toISOString().slice(0,10)) {
-      if (parsed.date) {
-        // Try to parse various date formats
-        var tryDate = new Date(parsed.date);
-        if (!isNaN(tryDate)) {
-          document.getElementById('arc-add-date').value = tryDate.toISOString().slice(0,10);
-        }
-      }
-    }
-  };
-  reader.readAsText(file);
+function arcUrlStatus(inputId, statusId) {
+  var val=(document.getElementById(inputId)||{}).value||'';
+  var el=document.getElementById(statusId); if(!el) return;
+  if (!val.trim()) { el.textContent=''; return; }
+  var id=arcDriveId(val.trim());
+  if (id) { el.textContent='✓ Drive link detected'; el.style.color='var(--green)'; }
+  else    { el.textContent='⚠ Unrecognised URL'; el.style.color='var(--crimson-hi)'; }
 }
 
 async function arcSubmitAdd() {
-  var title = document.getElementById('arc-add-title').value.trim();
-  var date  = document.getElementById('arc-add-date').value;
-  if (!title) { toast('Enter a meeting title', 'err'); return; }
-  if (!date)  { toast('Enter a date', 'err'); return; }
-  if (!arcPendingMd) { toast('Select a transcript .md file', 'err'); return; }
+  var title = document.getElementById('arc-a-title').value.trim();
+  var date  = document.getElementById('arc-a-date').value;
+  var mdRaw = document.getElementById('arc-a-md').value.trim();
+  var auRaw = document.getElementById('arc-a-audio').value.trim();
 
-  var audioRaw = document.getElementById('arc-add-audio-url').value.trim();
-  var audioUrl = audioRaw ? (arcDriveToStream(audioRaw) || audioRaw) : null;
+  if (!title) { toast('Enter a meeting title','err'); return; }
+  if (!date)  { toast('Enter a date','err'); return; }
+  if (!mdRaw) { toast('Paste the Google Drive link for the .md transcript file','err'); return; }
+
+  var mdUrl   = arcDriveUrl(mdRaw);
+  var audioUrl= auRaw ? arcDriveUrl(auRaw) : null;
+
+  if (!mdUrl)    { toast('Unrecognised markdown Drive URL','err'); return; }
+  if (auRaw && !audioUrl) { toast('Unrecognised audio Drive URL','err'); return; }
+
+  // Try to fetch summary from transcript to pre-fill
+  var summary = document.getElementById('arc-a-summary').value.trim();
 
   var rec = {
-    title:        title,
-    date:         date,
-    dept:         document.getElementById('arc-add-dept').value || 'general',
-    duration:     document.getElementById('arc-add-dur').value.trim(),
-    summary:      document.getElementById('arc-add-summary').value.trim() || (arcPendingMd.parsed.summary || ''),
-    audioUrl:     audioUrl,
-    speakers:     arcPendingMd.parsed.speakerCount || '',
-    markdownText: arcPendingMd.text,  // store raw md — parsed client-side on load (avoids Firestore 1MB limit)
-    addedBy:      currentUser.uid,
-    addedByName:  currentProfile.name,
-    createdAt:    new Date().toISOString()
+    title:    title,
+    date:     date,
+    dept:     document.getElementById('arc-a-dept').value || 'general',
+    duration: document.getElementById('arc-a-dur').value.trim(),
+    summary:  summary,
+    mdUrl:    mdUrl,
+    audioUrl: audioUrl || null,
+    addedBy:  currentUser.uid,
+    addedByName: currentProfile.name,
+    createdAt: new Date().toISOString()
   };
 
   try {
     var docRef = await db.collection('archive_meetings').add(rec);
     closeModal('m-arc-add');
-    toast('Meeting added to archive!', 'ok');
-    // Select it using the data we already have — don't wait for Firestore snapshot
-    var newMeeting = Object.assign({ id: docRef.id }, rec);
-    // Pre-populate liveData so arcSelectMeeting can find it immediately
-    if (!liveData.archiveMeetings) liveData.archiveMeetings = [];
-    liveData.archiveMeetings.unshift(newMeeting);
-    arcApplyFilters();
-    arcSelectMeeting(docRef.id);
+    toast('Meeting added!','ok');
+    // Pre-populate immediately so arcSelect can find it
+    if (!liveData.archiveMeetings) liveData.archiveMeetings=[];
+    liveData.archiveMeetings.unshift(Object.assign({id:docRef.id},rec));
+    arcFilter();
+    arcSelect(docRef.id);
   } catch(e) {
-    toast('Error saving: ' + e.message, 'err');
+    toast('Error: '+e.message,'err');
   }
 }
 
-// ── Edit handlers ──────────────────────────────────────────────────
+// ── Edit meeting ───────────────────────────────────────────
 function arcOpenEdit(id) {
-  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
-  if (!m) { toast('Meeting not found', 'err'); return; }
-  document.getElementById('arc-edit-id').value       = id;
-  document.getElementById('arc-edit-title').value    = m.title || '';
-  document.getElementById('arc-edit-date').value     = m.date  || '';
-  document.getElementById('arc-edit-dept').value     = m.dept  || 'general';
-  document.getElementById('arc-edit-dur').value      = m.duration || '';
-  document.getElementById('arc-edit-summary').value  = m.summary || '';
-  document.getElementById('arc-edit-audio-url').value = m.audioUrl || '';
-  document.getElementById('arc-edit-audio-status').textContent = '';
+  var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===id;});
+  if (!m) { toast('Meeting not found','err'); return; }
+  document.getElementById('arc-e-id').value      = id;
+  document.getElementById('arc-e-title').value   = m.title||'';
+  document.getElementById('arc-e-date').value    = m.date||'';
+  document.getElementById('arc-e-dept').value    = m.dept||'general';
+  document.getElementById('arc-e-dur').value     = m.duration||'';
+  document.getElementById('arc-e-summary').value = m.summary||'';
+  document.getElementById('arc-e-md').value      = m.mdUrl||'';
+  document.getElementById('arc-e-audio').value   = m.audioUrl||'';
+  document.getElementById('arc-e-md-status').textContent='';
+  document.getElementById('arc-e-audio-status').textContent='';
   openModal('m-arc-edit');
 }
 
 async function arcSubmitEdit() {
-  var id    = document.getElementById('arc-edit-id').value;
-  var title = document.getElementById('arc-edit-title').value.trim();
-  var date  = document.getElementById('arc-edit-date').value;
-  if (!title) { toast('Title required', 'err'); return; }
+  var id    = document.getElementById('arc-e-id').value;
+  var title = document.getElementById('arc-e-title').value.trim();
+  var date  = document.getElementById('arc-e-date').value;
+  var mdRaw = document.getElementById('arc-e-md').value.trim();
+  var auRaw = document.getElementById('arc-e-audio').value.trim();
 
-  var audioRaw = document.getElementById('arc-edit-audio-url').value.trim();
-  var audioUrl = audioRaw ? (arcDriveToStream(audioRaw) || audioRaw) : null;
+  if (!title) { toast('Title required','err'); return; }
+
+  var mdUrl    = mdRaw ? arcDriveUrl(mdRaw) : null;
+  var audioUrl = auRaw ? arcDriveUrl(auRaw) : null;
 
   try {
     await db.collection('archive_meetings').doc(id).update({
       title:    title,
       date:     date,
-      dept:     document.getElementById('arc-edit-dept').value || 'general',
-      duration: document.getElementById('arc-edit-dur').value.trim(),
-      summary:  document.getElementById('arc-edit-summary').value.trim(),
-      audioUrl: audioUrl
+      dept:     document.getElementById('arc-e-dept').value||'general',
+      duration: document.getElementById('arc-e-dur').value.trim(),
+      summary:  document.getElementById('arc-e-summary').value.trim(),
+      mdUrl:    mdUrl,
+      audioUrl: audioUrl||null
     });
     closeModal('m-arc-edit');
-    toast('Meeting updated!', 'ok');
-    // If currently viewing, refresh info bar
-    if (arcCurrentId === id) arcRefreshInfoBar(id);
-  } catch(e) {
-    toast('Error: ' + e.message, 'err');
-  }
+    toast('Meeting updated!','ok');
+    // Refresh info bar if currently viewing
+    if (arc.currentId===id) {
+      var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===id;});
+      if (m) arcInfoBar(m);
+    }
+  } catch(e) { toast('Error: '+e.message,'err'); }
 }
 
-async function arcConfirmDelete(id) {
-  if (!id) return;
-  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
-  var name = m ? m.title : 'this meeting';
-  if (!confirm('Delete "' + name + '" from the archive? This cannot be undone.')) return;
+async function arcDelete(id) {
+  var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===id;});
+  if (!confirm('Delete "'+((m&&m.title)||'this meeting')+'"? Cannot be undone.')) return;
   try {
     await db.collection('archive_meetings').doc(id).delete();
     closeModal('m-arc-edit');
-    toast('Meeting deleted', 'inf');
-    if (arcCurrentId === id) {
-      arcCurrentId = null;
-      arcAudio.pause();
-      arcAudio.src = '';
-      document.getElementById('arcEmpty').style.display = '';
-      var view = document.getElementById('arcView');
-      if (view) view.style.display = 'none';
+    toast('Meeting deleted','inf');
+    if (arc.currentId===id) {
+      arc.currentId=null;
+      arcAudio.pause(); arcAudio.src='';
+      document.getElementById('arcEmpty').style.display='';
+      document.getElementById('arcMeetingView').style.display='none';
+      var mp=document.getElementById('arcMiniPlayer'); if(mp) mp.classList.remove('visible');
     }
-  } catch(e) {
-    toast('Error deleting: ' + e.message, 'err');
-  }
+  } catch(e) { toast('Error: '+e.message,'err'); }
 }
 
-// ── Render ALL (sidebar + filters) ────────────────────────────────
-function arcRenderAll() {
-  if (!currentProfile) return; // not logged in yet
-  var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
-
-  // Show/hide admin buttons
-  var adminBtnWrap = document.getElementById('arc-admin-btn-wrap');
-  if (adminBtnWrap) {
-    adminBtnWrap.innerHTML = isAdminLead
-      ? '<button class="btn btn-primary btn-xs" onclick="arcOpenAdd()">+ Add Meeting</button>'
-      : '';
-  }
-  var sidebarFoot = document.getElementById('arc-sidebar-foot-btn');
-  if (sidebarFoot) {
-    sidebarFoot.innerHTML = isAdminLead
-      ? '<button class="btn btn-ghost fw" style="font-size:10px;" onclick="arcOpenAdd()">+ Add Meeting</button>'
-      : '';
-  }
-
-  arcApplyFilters();
+// ── Utils ──────────────────────────────────────────────────
+function arcFmt(s) {
+  if (!isFinite(s)||s<0) return '0:00';
+  s=Math.floor(s);
+  var h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  var p=function(n){return n<10?'0'+n:''+n;};
+  return h>0 ? h+':'+p(m)+':'+p(sec) : m+':'+p(sec);
 }
 
-function arcApplyFilters() {
-  arcFilterSearch = (document.getElementById('arc-global-search') || {}).value || '';
-  arcFilterDept   = (document.getElementById('arc-dept-filter') || {}).value || '';
-  arcSortOrder    = (document.getElementById('arc-sort') || {}).value || 'newest';
-
-  var items = (liveData.archiveMeetings || []).slice();
-
-  // Filter
-  var q = arcFilterSearch.toLowerCase();
-  if (q) {
-    items = items.filter(function(m) {
-      return (m.title || '').toLowerCase().includes(q) ||
-             (m.summary || '').toLowerCase().includes(q) ||
-             (m.dept || '').toLowerCase().includes(q) ||
-             ((m.lines || []).some(function(l) {
-               return l.type === 'speech' && (l.text || '').toLowerCase().includes(q);
-             }));
-    });
-  }
-  if (arcFilterDept) {
-    items = items.filter(function(m) { return (m.dept || 'general') === arcFilterDept; });
-  }
-
-  // Sort
-  items.sort(function(a, b) {
-    var da = a.date || '', db2 = b.date || '';
-    return arcSortOrder === 'oldest' ? da.localeCompare(db2) : db2.localeCompare(da);
-  });
-
-  // Count
-  var countEl = document.getElementById('arc-result-count');
-  if (countEl) countEl.textContent = items.length + ' session' + (items.length !== 1 ? 's' : '');
-
-  arcRenderSidebar(items);
-}
-
-function arcRenderSidebar(items) {
-  var list = document.getElementById('arcSessionList');
-  var countEl = document.getElementById('arcCount');
-  if (!list) return;
-
-  var total = (liveData.archiveMeetings || []).length;
-  if (countEl) countEl.textContent = total + ' recorded';
-
-  if (!items || !items.length) {
-    list.innerHTML = '<div style="padding:16px 10px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--grey-2);letter-spacing:.1em;line-height:2;">' +
-      ((liveData.archiveMeetings || []).length === 0 ? 'NO MEETINGS YET<br>ADD YOUR FIRST RECORDING' : 'NO RESULTS') + '</div>';
-    return;
-  }
-
-  list.innerHTML = items.map(function(m) {
-    var isActive = m.id === arcCurrentId;
-    var deptColor = ARC_DEPT_COLORS[m.dept || 'general'] || '#8899aa';
-    var deptLabel = ARC_DEPT_LABELS[m.dept || 'general'] || 'General';
-    var dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) : '';
-    var hasAudio = !!m.audioUrl;
-    return '<div class="arc-session-item' + (isActive ? ' active' : '') + '" data-mid="' + m.id + '" onclick="arcSelectMeeting(this.dataset.mid)">' +
-      '<div class="arc-session-title">' + esc(m.title) + '</div>' +
-      '<div class="arc-session-meta">' + dateStr + (m.duration ? ' · ' + esc(m.duration) : '') + '</div>' +
-      '<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">' +
-        '<span style="font-family:var(--mono);font-size:8px;font-weight:700;color:' + deptColor + ';letter-spacing:.08em;">' + deptLabel + '</span>' +
-        (hasAudio ? '<span style="font-family:var(--mono);font-size:8px;color:var(--grey-2);">♪</span>' : '') +
-      '</div>' +
-      '</div>';
-  }).join('');
-}
-
-// ── Select + load meeting ──────────────────────────────────────────
-function arcSelectMeeting(id) {
-  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
-  if (!m) return;
-
-  arcCurrentId = id;
-  // Parse transcript on demand — stored as raw markdown to stay under Firestore 1MB limit
-  if (m.markdownText) {
-    arcLines = arcParseMarkdown(m.markdownText).lines;
-  } else if (m.lines && m.lines.length) {
-    arcLines = m.lines; // legacy: old records stored parsed lines directly
-  } else {
-    arcLines = [];
-  }
-  arcActiveIdx = -1;
-  arcSearchQuery = '';
-  arcAutoScroll  = true;
-
-  var searchEl = document.getElementById('arcSearch');
-  if (searchEl) { searchEl.value = ''; }
-  var countEl = document.getElementById('arcSearchCount');
-  if (countEl) countEl.textContent = '';
-
-  arcRefreshInfoBar(id);
-  arcRenderSidebar(arcGetFilteredItems()); // re-render to highlight active
-
-  // Summary
-  var sumEl = document.getElementById('arcSummary');
-  if (sumEl) {
-    sumEl.innerHTML = m.summary
-      ? '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">' + esc(m.summary) + '</div></div>'
-      : '';
-  }
-
-  arcRenderTranscript();
-
-  // Audio
-  var playBtn = document.getElementById('arcPlayBtn');
-  var stopBtn = document.getElementById('arcStopBtn');
-  var noAudio = document.getElementById('arcNoAudio');
-
-  arcAudio.pause();
-  if (m.audioUrl) {
-    arcAudio.src = m.audioUrl;
-    arcAudio.load();
-    if (playBtn) { playBtn.disabled = false; playBtn.textContent = '▶'; }
-    if (stopBtn) stopBtn.disabled = false;
-    if (noAudio) noAudio.style.display = 'none';
-  } else {
-    arcAudio.src = '';
-    if (playBtn) { playBtn.disabled = true; playBtn.textContent = '▶'; }
-    if (stopBtn) stopBtn.disabled = true;
-    if (noAudio) noAudio.style.display = 'inline';
-  }
-
-  var fillEl = document.getElementById('arcProgressFill');
-  var thumbEl = document.getElementById('arcProgressThumb');
-  if (fillEl) fillEl.style.width = '0%';
-  if (thumbEl) thumbEl.style.left = '0%';
-  var timeEl = document.getElementById('arcTime');
-  if (timeEl) timeEl.textContent = '0:00 / 0:00';
-
-  // Show view
-  document.getElementById('arcEmpty').style.display = 'none';
-  var view = document.getElementById('arcView');
-  view.style.display = 'flex';
-  view.style.flexDirection = 'column';
-  view.style.flex = '1';
-  view.style.overflow = 'hidden';
-}
-
-function arcGetFilteredItems() {
-  var items = (liveData.archiveMeetings || []).slice();
-  var q = arcFilterSearch.toLowerCase();
-  if (q) items = items.filter(function(m) { return (m.title||'').toLowerCase().includes(q) || (m.summary||'').toLowerCase().includes(q); });
-  if (arcFilterDept) items = items.filter(function(m) { return (m.dept||'general') === arcFilterDept; });
-  items.sort(function(a, b) {
-    var da = a.date||'', db2 = b.date||'';
-    return arcSortOrder === 'oldest' ? da.localeCompare(db2) : db2.localeCompare(da);
-  });
-  return items;
-}
-
-function arcRefreshInfoBar(id) {
-  var m = (liveData.archiveMeetings || []).find(function(x){ return x.id === id; });
-  if (!m) return;
-  var isAdminLead = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
-  var info = document.getElementById('arcInfoBar');
-  if (!info) return;
-  var deptColor = ARC_DEPT_COLORS[m.dept || 'general'] || '#8899aa';
-  var deptLabel = ARC_DEPT_LABELS[m.dept || 'general'] || 'General';
-  var dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric', year:'numeric'}) : '';
-  info.innerHTML =
-    '<span class="arc-dept-tag" style="color:' + deptColor + ';border-color:' + deptColor + ';">' + esc(deptLabel) + '</span>' +
-    (dateStr ? '<div class="arc-chip">Date: <strong>' + dateStr + '</strong></div>' : '') +
-    (m.duration ? '<div class="arc-chip">Duration: <strong>' + esc(m.duration) + '</strong></div>' : '') +
-    (m.speakers ? '<div class="arc-chip">Speakers: <strong>' + esc(m.speakers) + '</strong></div>' : '') +
-    '<div class="arc-chip">Lines: <strong>' + arcLines.filter(function(l){ return l.type==='speech'; }).length + '</strong></div>' +
-    '<div style="flex:1"></div>' +
-    (isAdminLead
-      ? '<button class="btn btn-ghost btn-xs" data-mid="' + id + '" onclick="arcOpenEdit(this.dataset.mid)">✎ Edit</button>'
-      : '');
-}
-
-// ── Render transcript ──────────────────────────────────────────────
-function arcRenderTranscript() {
-  var container = document.getElementById('arcLines');
-  if (!container) return;
-  var ql = arcSearchQuery.toLowerCase();
-  var matchCount = 0;
-  var escRe = function(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
-
-  container.innerHTML = arcLines.map(function(line, idx) {
-    if (line.type === 'event') {
-      return '<div class="arc-event">' + esc(line.text) + '</div>';
-    }
-    var isActive = idx === arcActiveIdx;
-    var textHtml = esc(line.text);
-    var isMatch = false;
-    if (ql && (line.text.toLowerCase().includes(ql) || line.speaker.toLowerCase().includes(ql))) {
-      isMatch = true;
-      matchCount++;
-      textHtml = esc(line.text).replace(new RegExp('(' + escRe(ql) + ')', 'gi'), '<mark>$1</mark>');
-    }
-    var offsetStr = (line.offset !== null && line.offset !== undefined) ? arcFmtSec(line.offset) : '—';
-    return '<div class="arc-line' + (isActive ? ' arc-active' : '') + (isMatch ? ' arc-match' : '') + '"' +
-      ' id="arcl-' + idx + '" onclick="arcSeekToLine(' + idx + ')">' +
-      '<div class="arc-ts">' + offsetStr + '</div>' +
-      '<div class="arc-spk arc-s' + line.colorIdx + '">' + esc(line.speaker) + '</div>' +
-      '<div class="arc-txt">' + textHtml + '</div>' +
-      '</div>';
-  }).join('');
-
-  var sc = document.getElementById('arcSearchCount');
-  if (sc) sc.textContent = ql ? (matchCount + ' match' + (matchCount !== 1 ? 'es' : '')) : '';
-}
-
-// ── Audio controls ─────────────────────────────────────────────────
-arcAudio.addEventListener('timeupdate', function() {
-  var dur = arcAudio.duration || 0;
-  var cur = arcAudio.currentTime;
-  if (!arcIsDragging) {
-    var pct = dur ? (cur / dur * 100) : 0;
-    var fillEl = document.getElementById('arcProgressFill');
-    var thumbEl = document.getElementById('arcProgressThumb');
-    if (fillEl)  fillEl.style.width = pct + '%';
-    if (thumbEl) thumbEl.style.left = pct + '%';
-  }
-  var tm = document.getElementById('arcTime');
-  if (tm) tm.textContent = arcFmtSec(cur) + ' / ' + arcFmtSec(dur);
-  arcUpdateActiveLine(cur);
-});
-
-arcAudio.addEventListener('play', function() {
-  var b = document.getElementById('arcPlayBtn');
-  if (b) b.textContent = '⏸';
-});
-arcAudio.addEventListener('pause', function() {
-  var b = document.getElementById('arcPlayBtn');
-  if (b) b.textContent = '▶';
-});
-arcAudio.addEventListener('ended', function() {
-  var b = document.getElementById('arcPlayBtn');
-  if (b) b.textContent = '▶';
-  arcActiveIdx = -1;
-});
-
-function arcTogglePlay() {
-  if (!arcAudio.src || arcAudio.readyState === 0) return;
-  if (arcAudio.paused) arcAudio.play().catch(function(){});
-  else arcAudio.pause();
-}
-
-function arcStop() {
-  arcAudio.pause();
-  arcAudio.currentTime = 0;
-  arcActiveIdx = -1;
-  var fillEl = document.getElementById('arcProgressFill');
-  var thumbEl = document.getElementById('arcProgressThumb');
-  if (fillEl)  fillEl.style.width = '0%';
-  if (thumbEl) thumbEl.style.left = '0%';
-  var tm = document.getElementById('arcTime');
-  if (tm && arcAudio.duration) tm.textContent = '0:00 / ' + arcFmtSec(arcAudio.duration);
-  arcRenderTranscript();
-}
-
-// Draggable progress bar
-function arcProgressDragStart(e) {
-  if (!arcAudio.duration) return;
-  arcIsDragging = true;
-  var wrap = document.getElementById('arcProgressWrap');
-  if (wrap) wrap.classList.add('dragging');
-  arcProgressDragMove(e);
-}
-
-function arcProgressDragMove(e) {
-  if (!arcIsDragging || !arcAudio.duration) return;
-  var wrap = document.getElementById('arcProgressWrap');
-  if (!wrap) return;
-  var rect = wrap.getBoundingClientRect();
-  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-  var fillEl = document.getElementById('arcProgressFill');
-  var thumbEl = document.getElementById('arcProgressThumb');
-  if (fillEl)  fillEl.style.width = (pct * 100) + '%';
-  if (thumbEl) thumbEl.style.left = (pct * 100) + '%';
-}
-
-function arcProgressDragEnd(e) {
-  if (!arcIsDragging) return;
-  arcIsDragging = false;
-  var wrap = document.getElementById('arcProgressWrap');
-  if (wrap) wrap.classList.remove('dragging');
-  if (!arcAudio.duration) return;
-  var rect = wrap.getBoundingClientRect();
-  var clientX = e.touches ? e.changedTouches[0].clientX : e.clientX;
-  var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-  arcAudio.currentTime = pct * arcAudio.duration;
-}
-
-document.addEventListener('mousemove', arcProgressDragMove);
-document.addEventListener('mouseup',   arcProgressDragEnd);
-document.addEventListener('touchmove', arcProgressDragMove, { passive: true });
-document.addEventListener('touchend',  arcProgressDragEnd);
-
-function arcSeek(e) {
-  if (!arcAudio.duration || arcIsDragging) return;
-  var wrap = document.getElementById('arcProgressWrap');
-  if (!wrap) return;
-  var rect = wrap.getBoundingClientRect();
-  var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  arcAudio.currentTime = pct * arcAudio.duration;
-}
-
-function arcSeekToLine(idx) {
-  var line = arcLines[idx];
-  if (!line || line.offset === null || line.offset === undefined) return;
-  if (arcAudio.src) {
-    var trySeek = function() {
-      arcAudio.currentTime = line.offset;
-      if (arcAudio.paused) arcAudio.play().catch(function(){});
-      arcAutoScroll = true;
-    };
-    if (arcAudio.readyState >= 1) {
-      trySeek();
-    } else {
-      arcAudio.addEventListener('loadedmetadata', function onMeta() {
-        arcAudio.removeEventListener('loadedmetadata', onMeta);
-        trySeek();
-      });
-      arcAudio.load();
-    }
-  }
-}
-
-function arcCycleSpeed() {
-  arcSpeedIdx = (arcSpeedIdx + 1) % arcSpeeds.length;
-  arcAudio.playbackRate = arcSpeeds[arcSpeedIdx];
-  var b = document.getElementById('arcSpeedBtn');
-  if (b) b.textContent = arcSpeeds[arcSpeedIdx] + '\u00d7';
-}
-
-function arcUpdateActiveLine(currentTime) {
-  if (!arcLines.length) return;
-  var speechLines = arcLines
-    .map(function(l, i) { return Object.assign({}, l, { idx:i }); })
-    .filter(function(l) { return l.type === 'speech' && l.offset !== null && l.offset !== undefined; });
-
-  var newActive = -1;
-  for (var i = speechLines.length - 1; i >= 0; i--) {
-    if (currentTime >= speechLines[i].offset - 0.3) { newActive = speechLines[i].idx; break; }
-  }
-  if (newActive !== arcActiveIdx) {
-    if (arcActiveIdx >= 0) {
-      var oldEl = document.getElementById('arcl-' + arcActiveIdx);
-      if (oldEl) oldEl.classList.remove('arc-active');
-    }
-    arcActiveIdx = newActive;
-    if (newActive >= 0) {
-      var el = document.getElementById('arcl-' + newActive);
-      if (el) {
-        el.classList.add('arc-active');
-        if (arcAutoScroll) el.scrollIntoView({ block:'center', behavior:'smooth' });
-      }
-    }
-  }
-}
-
-// ── Transcript search ──────────────────────────────────────────────
-function arcOnSearch(val) {
-  arcSearchQuery = val;
-  arcRenderTranscript();
-  if (val) {
-    var first = document.querySelector('.arc-line.arc-match');
-    if (first) first.scrollIntoView({ block:'center', behavior:'smooth' });
-  }
-}
-
-// ── Text selection → seek ──────────────────────────────────────────
-function arcHandleTextSelection() {
-  var sel = window.getSelection();
-  if (!sel || sel.isCollapsed) { arcClearSelPreview(); return; }
-  var selText = sel.toString().trim().toLowerCase();
-  if (selText.length < 3) { arcClearSelPreview(); return; }
-
-  // Find best matching speech line
-  var bestIdx = -1, bestScore = 0;
-  for (var i = 0; i < arcLines.length; i++) {
-    var line = arcLines[i];
-    if (line.type !== 'speech' || line.offset === null || line.offset === undefined) continue;
-    var lineText = (line.text || '').toLowerCase();
-    if (lineText.includes(selText)) {
-      // Exact substring match — prefer first occurrence
-      if (bestIdx === -1) bestIdx = i;
-      break; // take first exact match
-    }
-    // Partial word match: count overlapping words
-    var selWords = selText.split(/\s+/);
-    var score = selWords.filter(function(w) { return w.length > 2 && lineText.includes(w); }).length;
-    if (score > bestScore) { bestScore = score; bestIdx = i; }
-  }
-
-  if (bestIdx >= 0) {
-    // Show preview highlight
-    arcClearSelPreview();
-    var el = document.getElementById('arcl-' + bestIdx);
-    if (el) {
-      el.classList.add('arc-sel-preview');
-      el.scrollIntoView({ block:'center', behavior:'smooth' });
-    }
-    // Show hint
-    var hint = document.getElementById('arcSelHint');
-    if (hint) hint.style.display = 'inline';
-    // Auto-seek to the line
-    arcSeekToLine(bestIdx);
-  } else {
-    arcClearSelPreview();
-  }
-}
-
-function arcClearSelPreview() {
-  document.querySelectorAll('.arc-sel-preview').forEach(function(el) { el.classList.remove('arc-sel-preview'); });
-  var hint = document.getElementById('arcSelHint');
-  if (hint) hint.style.display = 'none';
-}
-
-// ── Keyboard shortcuts ─────────────────────────────────────────────
-document.addEventListener('keydown', function(e) {
-  var logsActive = document.getElementById('view-transcripts') &&
-                   document.getElementById('view-transcripts').classList.contains('active');
-  if (!logsActive) return;
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-
-  if (e.code === 'Space') {
-    e.preventDefault();
-    arcTogglePlay();
-  }
-  // Left/right arrow: skip 5s
-  if (e.code === 'ArrowLeft')  { e.preventDefault(); if (arcAudio.src) arcAudio.currentTime = Math.max(0, arcAudio.currentTime - 5); }
-  if (e.code === 'ArrowRight') { e.preventDefault(); if (arcAudio.src) arcAudio.currentTime = Math.min(arcAudio.duration || 0, arcAudio.currentTime + 5); }
-  // A key: re-enable auto-scroll
-  if (e.code === 'KeyA') arcAutoScroll = true;
-});
-
-// Disable auto-scroll on manual transcript scroll
-document.addEventListener('DOMContentLoaded', function() {
-  var t = document.getElementById('arcTranscript');
-  if (t) t.addEventListener('wheel', function() { arcAutoScroll = false; });
-});
-
-// ── Utils ──────────────────────────────────────────────────────────
-function arcFmtSec(s) {
-  if (!isFinite(s)) return '0:00';
-  s = Math.floor(s);
-  var h = Math.floor(s / 3600);
-  var m = Math.floor((s % 3600) / 60);
-  var sec = s % 60;
-  var p = function(n) { return n < 10 ? '0' + n : '' + n; };
-  if (h > 0) return h + ':' + p(m) + ':' + p(sec);
-  return m + ':' + p(sec);
-}
-
-// ── Init (called after auth) ───────────────────────────────────────
-// arcRenderAll() is called from the Firestore snapshot when view is active
-// and also from navTo('transcripts')
 
 </script>
 
-<!-- ─── COSMIC ARCHIVE AUDIO ─── -->
-<audio id="arcAudio" preload="auto" style="display:none;"></audio>
 
-<!-- ─── ARCHIVE: ADD MEETING MODAL ─── -->
+
+<!-- MINI PLAYER -->
+<div class="arc-mini-player" id="arcMiniPlayer">
+  <button class="arc-btn-play" id="arcMiniPlay" onclick="arcPlay()" style="width:26px;height:26px;font-size:10px;">▶</button>
+  <div class="arc-mini-title" id="arcMiniTitle">No meeting selected</div>
+  <div class="arc-mini-time"  id="arcMiniTime">0:00 / 0:00</div>
+  <div class="arc-prog-wrap"  id="arcMiniProgWrap" style="max-width:200px;" onmousedown="arcMiniDragStart(event)" onclick="arcMiniProgClick(event)">
+    <div class="arc-prog-fill" id="arcMiniFill" style="width:0%"></div>
+    <div class="arc-prog-thumb" id="arcMiniThumb"></div>
+  </div>
+  <button class="arc-btn-speed" id="arcMiniSpeed" onclick="arcSpeedCycle()">1×</button>
+  <button class="arc-mini-close" onclick="arcMiniHide()" title="Close player">✕</button>
+</div>
+
+<!-- ADD MEETING MODAL -->
 <div class="modal-bg" id="m-arc-add">
-  <div class="modal" style="max-width:520px;">
-    <div class="modal-hdr">
-      <span class="modal-title">▸ ADD MEETING RECORDING</span>
-      <button class="modal-x" onclick="closeModal('m-arc-add')">✕</button>
-    </div>
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-hdr"><span class="modal-title">▸ ADD MEETING RECORDING</span><button class="modal-x" onclick="closeModal('m-arc-add')">✕</button></div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
-
-      <!-- Title + Date -->
       <div class="grid-2">
-        <div class="field"><span class="field-label">Meeting Title <span style="color:var(--crimson-hi)">*</span></span>
-          <input class="inp" id="arc-add-title" placeholder="e.g. Weekly Sync · Jan 14">
-        </div>
-        <div class="field"><span class="field-label">Date <span style="color:var(--crimson-hi)">*</span></span>
-          <input class="inp" id="arc-add-date" type="date">
-        </div>
+        <div class="field"><span class="field-label">Title <span style="color:var(--crimson-hi)">*</span></span><input class="inp" id="arc-a-title" placeholder="e.g. Weekly Sync"></div>
+        <div class="field"><span class="field-label">Date <span style="color:var(--crimson-hi)">*</span></span><input class="inp" id="arc-a-date" type="date"></div>
       </div>
-
-      <!-- Dept + Duration -->
       <div class="grid-2">
         <div class="field"><span class="field-label">Department</span>
-          <select class="inp" id="arc-add-dept">
-            <option value="general">General</option>
-            <option value="programming">Programming</option>
-            <option value="2d-art">2D Art</option>
-            <option value="3d-art">3D Art</option>
-            <option value="marketing">Marketing</option>
-            <option value="sound">Sound Design</option>
-            <option value="vfx">VFX</option>
-            <option value="narrative">Narrative</option>
-          </select>
+          <select class="inp" id="arc-a-dept"><option value="general">General</option><option value="programming">Programming</option><option value="2d-art">2D Art</option><option value="3d-art">3D Art</option><option value="marketing">Marketing</option><option value="sound">Sound Design</option><option value="vfx">VFX</option><option value="narrative">Narrative</option></select>
         </div>
-        <div class="field"><span class="field-label">Duration (optional)</span>
-          <input class="inp" id="arc-add-dur" placeholder="e.g. 45 min">
-        </div>
+        <div class="field"><span class="field-label">Duration (optional)</span><input class="inp" id="arc-a-dur" placeholder="e.g. 1h 45min"></div>
       </div>
-
-      <!-- Transcript .md file -->
       <div class="field">
-        <span class="field-label">Transcript (.md file) <span style="color:var(--crimson-hi)">*</span></span>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div class="inp" id="arc-add-md-name" style="flex:1;font-family:var(--mono);font-size:10px;color:var(--grey-2);">No file selected</div>
-          <label class="btn btn-ghost btn-xs" style="cursor:pointer;position:relative;white-space:nowrap;">
-            Browse
-            <input type="file" accept=".md,.txt" style="position:absolute;width:0;height:0;opacity:0;" onchange="arcHandleAddMd(this)">
-          </label>
-        </div>
-        <div style="font-size:10px;color:var(--grey-2);margin-top:3px;">The transcript is parsed and stored — you only need to upload it once</div>
+        <span class="field-label">Transcript .md - Google Drive share link <span style="color:var(--crimson-hi)">*</span></span>
+        <input class="inp" id="arc-a-md" placeholder="https://drive.google.com/file/d/.../view" oninput="arcUrlStatus('arc-a-md','arc-a-md-status')">
+        <div id="arc-a-md-status" style="font-size:10px;margin-top:3px;"></div>
+        <div style="font-size:10px;color:var(--grey-2);margin-top:2px;">Upload .md to Drive, share with Anyone with the link, then paste here</div>
       </div>
-
-      <!-- Audio: Drive URL -->
       <div class="field">
-        <span class="field-label">Audio — Google Drive share link (optional)</span>
-        <input class="inp" id="arc-add-audio-url" placeholder="https://drive.google.com/file/d/…/view?usp=sharing" oninput="arcDriveUrlStatus('arc-add-audio-url','arc-add-audio-status')">
-        <div style="font-size:10px;color:var(--grey-2);margin-top:3px;">Share the .ogg file with "Anyone with the link", paste that URL here. Audio will stream directly from your Drive.</div>
-        <div id="arc-add-audio-status" style="font-size:10px;margin-top:3px;"></div>
+        <span class="field-label">Audio .ogg - Google Drive share link (optional)</span>
+        <input class="inp" id="arc-a-audio" placeholder="https://drive.google.com/file/d/.../view" oninput="arcUrlStatus('arc-a-audio','arc-a-audio-status')">
+        <div id="arc-a-audio-status" style="font-size:10px;margin-top:3px;"></div>
       </div>
-
-      <!-- Summary -->
-      <div class="field">
-        <span class="field-label">Notes / Summary <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional — auto-filled from transcript)</span></span>
-        <textarea class="inp" id="arc-add-summary" rows="2" placeholder="Key decisions, action items…"></textarea>
+      <div class="field"><span class="field-label">Summary / Notes <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional)</span></span>
+        <textarea class="inp" id="arc-a-summary" rows="2" placeholder="Key decisions, action items..."></textarea>
       </div>
-
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('m-arc-add')">Cancel</button>
-      <button class="btn btn-primary" onclick="arcSubmitAdd()">Add to Archive</button>
-    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-arc-add')">Cancel</button><button class="btn btn-primary" onclick="arcSubmitAdd()">Add to Archive</button></div>
   </div>
 </div>
 
-<!-- ─── ARCHIVE: EDIT MEETING MODAL ─── -->
+<!-- EDIT MEETING MODAL -->
 <div class="modal-bg" id="m-arc-edit">
-  <div class="modal" style="max-width:520px;">
-    <div class="modal-hdr">
-      <span class="modal-title">▸ EDIT MEETING RECORD</span>
-      <button class="modal-x" onclick="closeModal('m-arc-edit')">✕</button>
-    </div>
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-hdr"><span class="modal-title">▸ EDIT MEETING</span><button class="modal-x" onclick="closeModal('m-arc-edit')">✕</button></div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
-      <input type="hidden" id="arc-edit-id">
-
+      <input type="hidden" id="arc-e-id">
       <div class="grid-2">
-        <div class="field"><span class="field-label">Meeting Title</span>
-          <input class="inp" id="arc-edit-title" placeholder="Meeting title">
-        </div>
-        <div class="field"><span class="field-label">Date</span>
-          <input class="inp" id="arc-edit-date" type="date">
-        </div>
+        <div class="field"><span class="field-label">Title</span><input class="inp" id="arc-e-title"></div>
+        <div class="field"><span class="field-label">Date</span><input class="inp" id="arc-e-date" type="date"></div>
       </div>
-
       <div class="grid-2">
         <div class="field"><span class="field-label">Department</span>
-          <select class="inp" id="arc-edit-dept">
-            <option value="general">General</option>
-            <option value="programming">Programming</option>
-            <option value="2d-art">2D Art</option>
-            <option value="3d-art">3D Art</option>
-            <option value="marketing">Marketing</option>
-            <option value="sound">Sound Design</option>
-            <option value="vfx">VFX</option>
-            <option value="narrative">Narrative</option>
-          </select>
+          <select class="inp" id="arc-e-dept"><option value="general">General</option><option value="programming">Programming</option><option value="2d-art">2D Art</option><option value="3d-art">3D Art</option><option value="marketing">Marketing</option><option value="sound">Sound Design</option><option value="vfx">VFX</option><option value="narrative">Narrative</option></select>
         </div>
-        <div class="field"><span class="field-label">Duration</span>
-          <input class="inp" id="arc-edit-dur" placeholder="e.g. 1h 30min">
-        </div>
+        <div class="field"><span class="field-label">Duration</span><input class="inp" id="arc-e-dur"></div>
       </div>
-
-      <div class="field">
-        <span class="field-label">Audio Drive URL</span>
-        <input class="inp" id="arc-edit-audio-url" placeholder="Google Drive share link for .ogg" oninput="arcDriveUrlStatus('arc-edit-audio-url','arc-edit-audio-status')">
-        <div id="arc-edit-audio-status" style="font-size:10px;margin-top:3px;"></div>
+      <div class="field"><span class="field-label">Transcript .md Drive link</span>
+        <input class="inp" id="arc-e-md" placeholder="https://drive.google.com/file/d/..." oninput="arcUrlStatus('arc-e-md','arc-e-md-status')">
+        <div id="arc-e-md-status" style="font-size:10px;margin-top:3px;"></div>
       </div>
-
-      <div class="field">
-        <span class="field-label">Notes / Summary</span>
-        <textarea class="inp" id="arc-edit-summary" rows="2"></textarea>
+      <div class="field"><span class="field-label">Audio .ogg Drive link</span>
+        <input class="inp" id="arc-e-audio" placeholder="https://drive.google.com/file/d/..." oninput="arcUrlStatus('arc-e-audio','arc-e-audio-status')">
+        <div id="arc-e-audio-status" style="font-size:10px;margin-top:3px;"></div>
       </div>
+      <div class="field"><span class="field-label">Summary / Notes</span><textarea class="inp" id="arc-e-summary" rows="2"></textarea></div>
     </div>
     <div class="modal-foot" style="justify-content:space-between;">
-      <button class="btn btn-ghost btn-xs" style="color:var(--crimson-hi);border-color:rgba(200,16,46,.3);" onclick="arcConfirmDelete(document.getElementById('arc-edit-id').value)">🗑 Delete</button>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-ghost" onclick="closeModal('m-arc-edit')">Cancel</button>
-        <button class="btn btn-primary" onclick="arcSubmitEdit()">Save Changes</button>
-      </div>
+      <button class="btn btn-ghost btn-xs" style="color:var(--crimson-hi);border-color:rgba(200,16,46,.3);" onclick="arcDelete(document.getElementById('arc-e-id').value)">Delete</button>
+      <div style="display:flex;gap:8px;"><button class="btn btn-ghost" onclick="closeModal('m-arc-edit')">Cancel</button><button class="btn btn-primary" onclick="arcSubmitEdit()">Save Changes</button></div>
     </div>
   </div>
 </div>
-
-
 </body>
 </html>
