@@ -5460,20 +5460,10 @@ function arcOpenAdd() {
     var el=document.getElementById(id); if(el) el.value='';
   });
   var d=document.getElementById('arc-a-dept'); if(d) d.value='general';
-  document.getElementById('arc-a-date').value=new Date().toISOString().slice(0,10);
-  document.getElementById('arc-a-md-status').textContent='';
-  document.getElementById('arc-a-audio-status').textContent='';
+  var dateEl=document.getElementById('arc-a-date'); if(dateEl) dateEl.value=new Date().toISOString().slice(0,10);
   openModal('m-arc-add');
 }
 
-function arcUrlStatus(inputId, statusId) {
-  var val=(document.getElementById(inputId)||{}).value||'';
-  var el=document.getElementById(statusId); if(!el) return;
-  if (!val.trim()) { el.textContent=''; return; }
-  var id=arcDriveId(val.trim());
-  if (id) { el.textContent='✓ Drive link detected'; el.style.color='var(--green)'; }
-  else    { el.textContent='⚠ Unrecognised URL'; el.style.color='var(--crimson-hi)'; }
-}
 
 async function arcSubmitAdd() {
   var title = document.getElementById('arc-a-title').value.trim();
@@ -5531,8 +5521,6 @@ function arcOpenEdit(id) {
   document.getElementById('arc-e-summary').value = m.summary||'';
   document.getElementById('arc-e-md').value      = m.mdUrl||'';
   document.getElementById('arc-e-audio').value   = m.audioUrl||'';
-  document.getElementById('arc-e-md-status').textContent='';
-  document.getElementById('arc-e-audio-status').textContent='';
   openModal('m-arc-edit');
 }
 
