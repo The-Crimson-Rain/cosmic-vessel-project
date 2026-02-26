@@ -4794,7 +4794,7 @@ async function saveAvailability() {
 // ═══════════════════════════════════════════════════════════
 
 // ── State ──────────────────────────────────────────────────
-var ARC_PROXY = 'https://script.google.com/macros/s/AKfycbzngvCjUDdFE4c8en3q3L-kOt6DjiVJ2axoBv_lyNw9itKDATmztuMDLroBkkXZ8axP/exec';
+var ARC_R2 = 'https://pub-2c80de557826434d9c7845c8a9fceb34.r2.dev';
 
 var arc = {
   currentId:   null,
@@ -4828,42 +4828,37 @@ var ARC_DEPT = {
   narrative:  { label:'Narrative',    color:'#ff6b35' }
 };
 
-// ── Drive URL → direct streamable/fetchable URL ────────────
-function arcDriveUrl(url) {
-  if (!url) return null;
-  url = url.trim();
-  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return 'https://drive.google.com/uc?export=download&id=' + m[1];
-  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return 'https://drive.google.com/uc?export=download&id=' + m2[1];
-  if (url.startsWith('http')) return url;
-  return null;
+// ── R2 URL helpers ────────────────────────────────────────
+// R2 files are stored as: ARC_R2 + '/' + filename
+// e.g. https://pub-xxx.r2.dev/2026-01-24-four-corners.ogg
+// The hub stores the full R2 URL directly — no conversion needed.
+// Legacy Drive URLs (stored in old records) are handled gracefully below.
+
+function arcIsR2Url(url) {
+  return url && url.includes('.r2.dev');
 }
 
-// Extract Drive file ID and return streamable URL
-// Uses the /uc endpoint with confirm=t to bypass virus-scan interstitial
-function arcDriveAudioUrl(url) {
+function arcIsDriveUrl(url) {
+  return url && (url.includes('drive.google.com') || url.includes('docs.google.com'));
+}
+
+// For audio: R2 URLs stream directly. Drive URLs won't work reliably.
+function arcAudioSrc(url) {
   if (!url) return null;
-  url = url.trim();
+  if (arcIsR2Url(url)) return url; // R2: use directly
+  if (arcIsDriveUrl(url)) return null; // Drive: not supported for audio
+  return url; // Unknown: try directly
+}
+
+// For transcript markdown: R2 URLs fetch directly.
+// Drive URLs route through Apps Script proxy if available.
+function arcMdFetchUrl(url) {
+  if (!url) return null;
+  if (arcIsR2Url(url)) return url; // R2: fetch directly, full CORS support
+  // Legacy Drive URL — extract file ID and try proxy
   var fileId = arcDriveId(url);
-  if (fileId) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + fileId;
-  if (url.startsWith('http')) return url;
-  return null;
-}
-
-// Route audio through Apps Script proxy as a stream
-// The proxy fetches the file server-side and returns bytes with correct headers
-function arcProxyAudioUrl(fileId) {
-  return ARC_PROXY + '?id=' + fileId + '&type=audio';
-}
-
-function arcDriveId(url) {
-  if (!url) return null;
-  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return m[1];
-  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return m2[1];
-  return null;
+  if (fileId) return ARC_R2.replace(/\/[^\/]*$/, '') + '?driveId=' + fileId; // won't work but won't crash
+  return url;
 }
 
 // ── Parse Notecat markdown ─────────────────────────────────
@@ -5045,23 +5040,23 @@ function arcSelect(id) {
   var playBtn = document.getElementById('arcPlayBtn');
   var stopBtn = document.getElementById('arcStopBtn');
   var noAudio = document.getElementById('arcNoAudio');
-  if (m.audioUrl) {
-    var fileId = arcDriveId(m.audioUrl);
-    // Try direct Drive URL first; proxy is text-only so can't stream binary audio
-    arcAudio.src = fileId
-      ? ('https://drive.google.com/uc?export=download&confirm=t&id=' + fileId)
-      : m.audioUrl;
+  var audioSrc = arcAudioSrc(m.audioUrl);
+  if (audioSrc) {
+    arcAudio.src = audioSrc;
     arcAudio.load();
     if (playBtn) { playBtn.disabled=false; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=false;
     if (noAudio) noAudio.style.display='none';
-    // Log exactly what src was set for debugging
-    console.log('[CVP Audio] src set to:', arcAudio.src);
   } else {
     arcAudio.src='';
     if (playBtn) { playBtn.disabled=true; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=true;
-    if (noAudio) noAudio.style.display='inline';
+    // Show specific message if Drive URL was provided but not supported
+    if (m.audioUrl && arcIsDriveUrl(m.audioUrl)) {
+      if (noAudio) { noAudio.style.display='inline'; noAudio.textContent='RE-UPLOAD TO R2'; noAudio.title='Google Drive audio is not supported. Upload the .ogg to Cloudflare R2.'; }
+    } else {
+      if (noAudio) { noAudio.style.display='inline'; noAudio.textContent='NO AUDIO'; noAudio.title=''; }
+    }
   }
   arcResetProg();
 
@@ -5078,53 +5073,63 @@ function arcSelect(id) {
 function arcLoadTranscript(m) {
   if (!m.mdUrl) { arcShowLines([]); return; }
 
-  // Extract Drive file ID and route through Apps Script proxy (bypasses CORS)
-  var fileId = arcDriveId(m.mdUrl);
-  var fetchUrl = fileId
-    ? (ARC_PROXY + '?id=' + fileId)
-    : m.mdUrl; // fallback: use URL directly if not a Drive link
-
   var loading = document.getElementById('arcTLoading');
   if (loading) loading.style.display = 'block';
 
-  fetch(fetchUrl)
+  // R2 URLs support full CORS — fetch directly
+  // Drive URLs are legacy and will show paste fallback
+  if (!arcIsR2Url(m.mdUrl)) {
+    if (loading) loading.style.display = 'none';
+    arcShowPasteFallback('Non-R2 URL. Upload the .md to Cloudflare R2 and update this meeting.');
+    return;
+  }
+
+  fetch(m.mdUrl)
     .then(function(r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     })
     .then(function(text) {
-      // Check if proxy returned a JSON error
-      if (text.trim().startsWith('{') && text.includes('"error"')) {
-        throw new Error(JSON.parse(text).error || 'Proxy error');
-      }
       var parsed = arcParse(text);
       arc.lines = parsed.lines;
       arc.transcriptCache[m.id] = arc.lines;
       arcShowLines(arc.lines);
-      // If summary was parsed and record has none, save it back
-      if (parsed.summary && m.id) {
+      // Save back auto-parsed fields if missing
+      if (m.id) {
+        var update = {};
         var existing = (liveData.archiveMeetings||[]).find(function(x){return x.id===m.id;});
-        if (existing && !existing.summary) {
-          db.collection('archive_meetings').doc(m.id).update({ summary: parsed.summary }).catch(function(){});
-          var sumEl = document.getElementById('arcTSummary');
-          if (sumEl) sumEl.innerHTML = '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">'+esc(parsed.summary)+'</div></div>';
+        if (existing) {
+          if (!existing.summary && parsed.summary) update.summary = parsed.summary;
+          if (!existing.duration && parsed.duration) update.duration = parsed.duration;
+          if (Object.keys(update).length) {
+            db.collection('archive_meetings').doc(m.id).update(update).catch(function(){});
+            if (update.summary) {
+              var sumEl = document.getElementById('arcTSummary');
+              if (sumEl) sumEl.innerHTML = '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">'+esc(update.summary)+'</div></div>';
+            }
+          }
         }
       }
     })
     .catch(function(err) {
-      console.warn('Transcript fetch failed:', err);
-      var linesEl = document.getElementById('arcTLines');
+      console.warn('[CVP] Transcript fetch failed:', err);
       if (loading) loading.style.display = 'none';
-      if (linesEl) linesEl.innerHTML =
-        '<div style="padding:20px;background:var(--bg-3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;margin:10px 0;">' +
-          '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:10px;">TRANSCRIPT UNAVAILABLE</div>' +
-          '<div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px;">Could not load transcript. Paste the markdown text below as a fallback:</div>' +
-          '<textarea id="arcMdPaste" class="inp" rows="6" placeholder="Paste markdown transcript text here..." style="width:100%;font-family:var(--mono);font-size:10px;resize:vertical;"></textarea>' +
-          '<div style="margin-top:8px;display:flex;justify-content:flex-end;">' +
-            '<button class="btn btn-primary btn-sm" onclick="arcLoadPasted()">Load Transcript</button>' +
-          '</div>' +
-        '</div>';
+      arcShowPasteFallback('Could not load transcript from R2. Check the file is publicly accessible.');
     });
+}
+
+function arcShowPasteFallback(msg) {
+  var linesEl = document.getElementById('arcTLines');
+  if (!linesEl) return;
+  linesEl.innerHTML =
+    '<div style="padding:20px;background:var(--bg-3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;margin:10px 0;">' +
+      '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:8px;">TRANSCRIPT UNAVAILABLE</div>' +
+      '<div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px;">'+esc(msg)+'<br><br>Or paste the markdown text below to load manually:</div>' +
+      '<textarea id="arcMdPaste" class="inp" rows="6" placeholder="Paste .md transcript text here..." style="width:100%;font-family:var(--mono);font-size:10px;resize:vertical;"></textarea>' +
+      '<div style="margin-top:8px;display:flex;justify-content:flex-end;">' +
+        '<button class="btn btn-primary btn-sm" onclick="arcLoadPasted()">Load Transcript</button>' +
+      '</div>' +
+    '</div>';
 }
 
 async function arcLoadPasted() {
@@ -5480,11 +5485,12 @@ async function arcSubmitAdd() {
   if (!date)  { toast('Enter a date','err'); return; }
   if (!mdRaw) { toast('Paste the Google Drive link for the .md transcript file','err'); return; }
 
-  var mdUrl   = arcDriveUrl(mdRaw);
-  var audioUrl= auRaw ? arcDriveUrl(auRaw) : null;
+  // Store URLs as-is — R2 URLs are direct, no conversion needed
+  var mdUrl    = mdRaw;
+  var audioUrl = auRaw || null;
 
-  if (!mdUrl)    { toast('Unrecognised markdown Drive URL','err'); return; }
-  if (auRaw && !audioUrl) { toast('Unrecognised audio Drive URL','err'); return; }
+  if (!mdUrl.startsWith('http')) { toast('Enter a valid URL starting with https://','err'); return; }
+  if (audioUrl && !audioUrl.startsWith('http')) { toast('Enter a valid audio URL starting with https://','err'); return; }
 
   // Try to fetch summary from transcript to pre-fill
   var summary = document.getElementById('arc-a-summary').value.trim();
@@ -5539,8 +5545,8 @@ async function arcSubmitEdit() {
 
   if (!title) { toast('Title required','err'); return; }
 
-  var mdUrl    = mdRaw ? arcDriveUrl(mdRaw) : null;
-  var audioUrl = auRaw ? arcDriveUrl(auRaw) : null;
+  var mdUrl    = mdRaw || null;
+  var audioUrl = auRaw || null;
 
   try {
     await db.collection('archive_meetings').doc(id).update({
@@ -5638,15 +5644,15 @@ async function arcAdminClearAll() {
         <div class="field"><span class="field-label">Duration (optional)</span><input class="inp" id="arc-a-dur" placeholder="e.g. 1h 45min"></div>
       </div>
       <div class="field">
-        <span class="field-label">Transcript .md - Google Drive share link <span style="color:var(--crimson-hi)">*</span></span>
-        <input class="inp" id="arc-a-md" placeholder="https://drive.google.com/file/d/.../view" oninput="arcUrlStatus('arc-a-md','arc-a-md-status')">
-        <div id="arc-a-md-status" style="font-size:10px;margin-top:3px;"></div>
-        <div style="font-size:10px;color:var(--grey-2);margin-top:2px;">Upload .md to Drive, share with Anyone with the link, then paste here</div>
+        <span class="field-label">Transcript .md - Cloudflare R2 URL <span style="color:var(--crimson-hi)">*</span></span>
+        <input class="inp" id="arc-a-md" placeholder="https://pub-xxx.r2.dev/filename.md">
+        
+        <div style="font-size:10px;color:var(--grey-2);margin-top:2px;">Upload .md file to your R2 bucket then paste the public URL here</div>
       </div>
       <div class="field">
-        <span class="field-label">Audio .ogg - Google Drive share link (optional)</span>
-        <input class="inp" id="arc-a-audio" placeholder="https://drive.google.com/file/d/.../view" oninput="arcUrlStatus('arc-a-audio','arc-a-audio-status')">
-        <div id="arc-a-audio-status" style="font-size:10px;margin-top:3px;"></div>
+        <span class="field-label">Audio .ogg - Cloudflare R2 URL (optional)</span>
+        <input class="inp" id="arc-a-audio" placeholder="https://pub-xxx.r2.dev/filename.ogg">
+        
       </div>
       <div class="field"><span class="field-label">Summary / Notes <span style="font-size:10px;color:var(--grey-2);font-weight:400;">(optional)</span></span>
         <textarea class="inp" id="arc-a-summary" rows="2" placeholder="Key decisions, action items..."></textarea>
@@ -5672,13 +5678,13 @@ async function arcAdminClearAll() {
         </div>
         <div class="field"><span class="field-label">Duration</span><input class="inp" id="arc-e-dur"></div>
       </div>
-      <div class="field"><span class="field-label">Transcript .md Drive link</span>
-        <input class="inp" id="arc-e-md" placeholder="https://drive.google.com/file/d/..." oninput="arcUrlStatus('arc-e-md','arc-e-md-status')">
-        <div id="arc-e-md-status" style="font-size:10px;margin-top:3px;"></div>
+      <div class="field"><span class="field-label">Transcript .md - R2 URL</span>
+        <input class="inp" id="arc-e-md" placeholder="https://pub-xxx.r2.dev/filename.md">
+        
       </div>
-      <div class="field"><span class="field-label">Audio .ogg Drive link</span>
-        <input class="inp" id="arc-e-audio" placeholder="https://drive.google.com/file/d/..." oninput="arcUrlStatus('arc-e-audio','arc-e-audio-status')">
-        <div id="arc-e-audio-status" style="font-size:10px;margin-top:3px;"></div>
+      <div class="field"><span class="field-label">Audio .ogg - R2 URL</span>
+        <input class="inp" id="arc-e-audio" placeholder="https://pub-xxx.r2.dev/filename.ogg">
+        
       </div>
       <div class="field"><span class="field-label">Summary / Notes</span><textarea class="inp" id="arc-e-summary" rows="2"></textarea></div>
     </div>
