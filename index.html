@@ -4794,6 +4794,8 @@ async function saveAvailability() {
 // ═══════════════════════════════════════════════════════════
 
 // ── State ──────────────────────────────────────────────────
+var ARC_PROXY = 'https://script.google.com/macros/s/AKfycbzngvCjUDdFE4c8en3q3L-kOt6DjiVJ2axoBv_lyNw9itKDATmztuMDLroBkkXZ8axP/exec';
+
 var arc = {
   currentId:   null,
   pendingSelect: null,
@@ -5064,38 +5066,50 @@ function arcSelect(id) {
 
 // ── Load transcript from Drive (or fallback) ───────────────
 function arcLoadTranscript(m) {
-  var mdUrl = m.mdUrl;
-  if (!mdUrl) {
-    // No markdown URL — show empty state
-    arcShowLines([]);
-    return;
-  }
+  if (!m.mdUrl) { arcShowLines([]); return; }
 
-  fetch(mdUrl, { method:'GET', mode:'cors' })
-    .then(function(r){
-      if (!r.ok) throw new Error('HTTP '+r.status);
+  // Extract Drive file ID and route through Apps Script proxy (bypasses CORS)
+  var fileId = arcDriveId(m.mdUrl);
+  var fetchUrl = fileId
+    ? (ARC_PROXY + '?id=' + fileId)
+    : m.mdUrl; // fallback: use URL directly if not a Drive link
+
+  var loading = document.getElementById('arcTLoading');
+  if (loading) loading.style.display = 'block';
+
+  fetch(fetchUrl)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
     })
-    .then(function(text){
+    .then(function(text) {
+      // Check if proxy returned a JSON error
+      if (text.trim().startsWith('{') && text.includes('"error"')) {
+        throw new Error(JSON.parse(text).error || 'Proxy error');
+      }
       var parsed = arcParse(text);
       arc.lines = parsed.lines;
-      arc.transcriptCache[m.id] = arc.lines; // cache for session
+      arc.transcriptCache[m.id] = arc.lines;
       arcShowLines(arc.lines);
+      // If summary was parsed and record has none, save it back
+      if (parsed.summary && m.id) {
+        var existing = (liveData.archiveMeetings||[]).find(function(x){return x.id===m.id;});
+        if (existing && !existing.summary) {
+          db.collection('archive_meetings').doc(m.id).update({ summary: parsed.summary }).catch(function(){});
+          var sumEl = document.getElementById('arcTSummary');
+          if (sumEl) sumEl.innerHTML = '<div class="arc-summary"><div class="arc-summary-lbl">Session Summary</div><div class="arc-summary-txt">'+esc(parsed.summary)+'</div></div>';
+        }
+      }
     })
-    .catch(function(err){
-      console.warn('Drive fetch failed:', err);
-      // Show CORS fallback UI
+    .catch(function(err) {
+      console.warn('Transcript fetch failed:', err);
       var linesEl = document.getElementById('arcTLines');
-      var loading = document.getElementById('arcTLoading');
-      if (loading) loading.style.display='none';
+      if (loading) loading.style.display = 'none';
       if (linesEl) linesEl.innerHTML =
         '<div style="padding:20px;background:var(--bg-3);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;margin:10px 0;">' +
           '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:10px;">TRANSCRIPT UNAVAILABLE</div>' +
-          '<div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px;">' +
-            'The transcript could not be fetched from Google Drive. This is usually a CORS restriction.<br><br>' +
-            'Paste the transcript text below to load it manually:' +
-          '</div>' +
-          '<textarea id="arcMdPaste" class="inp" rows="6" placeholder="Paste markdown transcript text here…" style="width:100%;font-family:var(--mono);font-size:10px;resize:vertical;"></textarea>' +
+          '<div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:12px;">Could not load transcript. Paste the markdown text below as a fallback:</div>' +
+          '<textarea id="arcMdPaste" class="inp" rows="6" placeholder="Paste markdown transcript text here..." style="width:100%;font-family:var(--mono);font-size:10px;resize:vertical;"></textarea>' +
           '<div style="margin-top:8px;display:flex;justify-content:flex-end;">' +
             '<button class="btn btn-primary btn-sm" onclick="arcLoadPasted()">Load Transcript</button>' +
           '</div>' +
