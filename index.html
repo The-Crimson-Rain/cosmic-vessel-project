@@ -124,10 +124,14 @@ body::after {
 #app {
   position:relative; z-index:1;
   display:grid;
-  grid-template-rows: 56px 36px 1fr;
+  grid-template-rows: 56px 36px 1fr 0px;
   grid-template-columns: 220px 1fr;
   height:100vh;
   overflow:hidden;
+  transition: grid-template-rows .25s ease;
+}
+#app.player-open {
+  grid-template-rows: 56px 36px 1fr 52px;
 }
 
 /* ── HEADER ──────────────────────────────── */
@@ -296,6 +300,12 @@ body::after {
 /* ── VIEWS ───────────────────────────────── */
 .view { display:none; }
 .view.active { display:block; }
+#view-transcripts.active {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
 /* ── PAGE HEADER ─────────────────────────── */
 .page-hdr {
@@ -1054,7 +1064,7 @@ textarea.inp { resize:vertical; }
 /* Layout */
 .arc-layout {
   display: flex;
-  height: calc(100vh - 104px); /* hub topbar ~52px + page-hdr ~52px */
+  height: 100%;
   overflow: hidden;
   gap: 0;
 }
@@ -1303,15 +1313,20 @@ textarea.inp { resize:vertical; }
 
 /* ── PERSISTENT BOTTOM PLAYER ─────────────────────────── */
 .arc-mini-player {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9000;
-  background: var(--bg-2); border-top: 1px solid var(--border);
+  grid-column: 1 / -1;
+  grid-row: 4;
+  background: var(--bg-1);
+  border-top: 2px solid var(--border);
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 16px;
-  box-shadow: 0 -4px 20px rgba(0,0,0,.4);
-  transform: translateY(100%);
-  transition: transform .25s ease;
+  padding: 0 16px;
+  height: 0;
+  overflow: hidden;
+  transition: height .25s ease;
+  z-index: 100;
 }
-.arc-mini-player.visible { transform: translateY(0); }
+.arc-mini-player.visible {
+  height: 52px;
+}
 .arc-mini-title {
   flex: 1; min-width: 0;
   font-size: 12px; color: var(--white);
@@ -5084,9 +5099,10 @@ function arcLoadTranscript(m) {
     return;
   }
 
+  console.log('[CVP] Fetching transcript from:', m.mdUrl);
   fetch(m.mdUrl)
     .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' from ' + m.mdUrl);
       return r.text();
     })
     .then(function(text) {
@@ -5112,9 +5128,9 @@ function arcLoadTranscript(m) {
       }
     })
     .catch(function(err) {
-      console.warn('[CVP] Transcript fetch failed:', err);
+      console.error('[CVP] Transcript fetch failed:', err.message || err, '| URL:', m.mdUrl);
       if (loading) loading.style.display = 'none';
-      arcShowPasteFallback('Could not load transcript from R2. Check the file is publicly accessible.');
+      arcShowPasteFallback('Could not load transcript: ' + (err.message || err) + '. Check the R2 file URL and that public access is enabled on the bucket.');
     });
 }
 
@@ -5416,6 +5432,7 @@ function arcMiniShow() {
   var p=document.getElementById('arcMiniPlayer');
   if(!p) return;
   p.classList.add('visible');
+  document.getElementById('app').classList.add('player-open');
   // Update title
   var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===arc.currentId;});
   var t=document.getElementById('arcMiniTitle');
@@ -5423,7 +5440,9 @@ function arcMiniShow() {
 }
 function arcMiniHide() {
   arcAudio.pause();
-  var p=document.getElementById('arcMiniPlayer'); if(p) p.classList.remove('visible');
+  var p=document.getElementById('arcMiniPlayer');
+  if(p) p.classList.remove('visible');
+  document.getElementById('app').classList.remove('player-open');
 }
 function arcMiniDragStart(e) {
   if (!arcAudio.duration) return;
