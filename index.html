@@ -4840,16 +4840,18 @@ function arcDriveUrl(url) {
   return null;
 }
 
-// For audio streaming - export=view works better than download for large .ogg files
+// For audio streaming — confirm=t bypasses Google's virus-scan interstitial for large files
 function arcDriveAudioUrl(url) {
   if (!url) return null;
   url = url.trim();
   var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+  if (m) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + m[1];
   var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return 'https://drive.google.com/uc?export=view&id=' + m2[1];
-  // Already a direct URL - use as-is
-  if (url.includes('uc?export=download')) return url.replace('export=download','export=view');
+  if (m2) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + m2[1];
+  if (url.includes('uc?export=')) {
+    var id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (id) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + id[1];
+  }
   return url;
 }
 
@@ -5210,6 +5212,15 @@ arcAudio.addEventListener('timeupdate', function(){
   arcActiveLine(cur);
 });
 
+arcAudio.addEventListener('error', function(e) {
+  var codes = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'SRC_NOT_SUPPORTED'};
+  var code = arcAudio.error ? (codes[arcAudio.error.code]||arcAudio.error.code) : 'UNKNOWN';
+  console.warn('Audio error:', code, arcAudio.src);
+  if (code === 'SRC_NOT_SUPPORTED' || code === 'DECODE') {
+    toast('Audio format not supported or Drive link returned wrong content', 'err');
+  }
+});
+
 arcAudio.addEventListener('play', function(){
   var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='⏸';
   var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='⏸';
@@ -5226,9 +5237,16 @@ arcAudio.addEventListener('ended', function(){
 });
 
 function arcPlay() {
-  if (!arcAudio.src) return;
-  if (arcAudio.paused) arcAudio.play().catch(function(){});
-  else arcAudio.pause();
+  // arcAudio.src returns page URL when empty — check duration or networkState instead
+  if (!arcAudio.src || arcAudio.src === window.location.href) return;
+  if (arcAudio.paused) {
+    arcAudio.play().catch(function(err) {
+      console.warn('Audio play failed:', err);
+      toast('Audio could not play — check Drive link is shared correctly', 'err');
+    });
+  } else {
+    arcAudio.pause();
+  }
 }
 
 function arcStopFn() {
