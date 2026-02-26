@@ -4840,19 +4840,21 @@ function arcDriveUrl(url) {
   return null;
 }
 
-// For audio streaming — confirm=t bypasses Google's virus-scan interstitial for large files
+// Extract Drive file ID and return streamable URL
+// Uses the /uc endpoint with confirm=t to bypass virus-scan interstitial
 function arcDriveAudioUrl(url) {
   if (!url) return null;
   url = url.trim();
-  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + m[1];
-  var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if (m2) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + m2[1];
-  if (url.includes('uc?export=')) {
-    var id = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (id) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + id[1];
-  }
-  return url;
+  var fileId = arcDriveId(url);
+  if (fileId) return 'https://drive.google.com/uc?export=download&confirm=t&id=' + fileId;
+  if (url.startsWith('http')) return url;
+  return null;
+}
+
+// Route audio through Apps Script proxy as a stream
+// The proxy fetches the file server-side and returns bytes with correct headers
+function arcProxyAudioUrl(fileId) {
+  return ARC_PROXY + '?id=' + fileId + '&type=audio';
 }
 
 function arcDriveId(url) {
@@ -5044,11 +5046,17 @@ function arcSelect(id) {
   var stopBtn = document.getElementById('arcStopBtn');
   var noAudio = document.getElementById('arcNoAudio');
   if (m.audioUrl) {
-    arcAudio.src = arcDriveAudioUrl(m.audioUrl) || m.audioUrl;
+    var fileId = arcDriveId(m.audioUrl);
+    // Try direct Drive URL first; proxy is text-only so can't stream binary audio
+    arcAudio.src = fileId
+      ? ('https://drive.google.com/uc?export=download&confirm=t&id=' + fileId)
+      : m.audioUrl;
     arcAudio.load();
     if (playBtn) { playBtn.disabled=false; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=false;
     if (noAudio) noAudio.style.display='none';
+    // Log exactly what src was set for debugging
+    console.log('[CVP Audio] src set to:', arcAudio.src);
   } else {
     arcAudio.src='';
     if (playBtn) { playBtn.disabled=true; playBtn.textContent='▶'; }
@@ -5215,10 +5223,14 @@ arcAudio.addEventListener('timeupdate', function(){
 arcAudio.addEventListener('error', function(e) {
   var codes = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'SRC_NOT_SUPPORTED'};
   var code = arcAudio.error ? (codes[arcAudio.error.code]||arcAudio.error.code) : 'UNKNOWN';
-  console.warn('Audio error:', code, arcAudio.src);
-  if (code === 'SRC_NOT_SUPPORTED' || code === 'DECODE') {
-    toast('Audio format not supported or Drive link returned wrong content', 'err');
-  }
+  console.error('[CVP Audio] Error:', code, '| src:', arcAudio.src);
+  var msg = {
+    'NETWORK': 'Network error — Drive may be redirecting to a login or scan page',
+    'DECODE': 'File loaded but could not be decoded as audio',
+    'SRC_NOT_SUPPORTED': 'Drive returned an HTML page instead of audio bytes',
+    'ABORTED': 'Audio load was aborted'
+  }[code] || ('Audio error: ' + code);
+  toast(msg, 'err');
 });
 
 arcAudio.addEventListener('play', function(){
