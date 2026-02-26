@@ -131,7 +131,7 @@ body::after {
   transition: grid-template-rows .25s ease;
 }
 #app.player-open {
-  grid-template-rows: 56px 36px 1fr 44px;
+  grid-template-rows: 56px 36px 1fr 48px;
 }
 
 /* ── HEADER ──────────────────────────────── */
@@ -1242,6 +1242,19 @@ textarea.inp { resize:vertical; }
   font-family: var(--mono); font-size: 11px; color: var(--white);
 }
 .arc-tsearch input::placeholder { color: var(--grey-2); }
+.arc-scroll-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .08em;
+  padding: 3px 8px; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--grey-2); white-space: nowrap; flex-shrink: 0;
+  transition: all .15s;
+}
+.arc-scroll-btn.active {
+  border-color: var(--crimson-hi);
+  color: var(--crimson-hi);
+  background: rgba(200,16,46,.08);
+}
+.arc-scroll-btn:hover { border-color: var(--white); color: var(--white); }
 
 /* Transcript body */
 .arc-tbody {
@@ -1316,17 +1329,38 @@ textarea.inp { resize:vertical; }
   grid-column: 1 / -1;
   grid-row: 4;
   background: var(--bg-1);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 16px;
+  border-top: 2px solid rgba(200,16,46,.4);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px;
   height: 0;
   overflow: hidden;
   transition: height .25s ease;
   z-index: 100;
 }
 .arc-mini-player.visible {
-  height: 44px;
+  height: 48px;
 }
+.arc-mini-player .arc-prog-wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+  height: 4px;
+}
+.arc-mini-title {
+  font-size: 12px; color: var(--white); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 80px; max-width: 200px; flex-shrink: 1;
+}
+.arc-mini-time {
+  font-family: var(--mono); font-size: 10px; color: var(--grey);
+  white-space: nowrap; flex-shrink: 0;
+}
+.arc-mini-close {
+  background: transparent; border: none; color: var(--grey-2);
+  cursor: pointer; font-size: 14px; padding: 4px 6px;
+  flex-shrink: 0; transition: color .15s; line-height: 1;
+}
+.arc-mini-close:hover { color: var(--white); }
 .arc-mini-title {
   flex: 1; min-width: 0;
   font-size: 12px; color: var(--white);
@@ -1760,6 +1794,9 @@ textarea.inp { resize:vertical; }
               <span style="color:var(--grey-2)">⌕</span>
               <input id="arcTSearch" placeholder="Search transcript… or select text to jump to it" oninput="arcTSearchFn(this.value)">
               <span id="arcTSearchCount" style="font-family:var(--mono);font-size:9px;color:var(--grey-2);white-space:nowrap;"></span>
+              <button id="arcScrollToggle" class="arc-scroll-btn active" onclick="arcToggleScroll()" title="Auto-scroll follows audio">
+                ↕ AUTO-SCROLL
+              </button>
             </div>
 
             <!-- Transcript body -->
@@ -5023,6 +5060,8 @@ function arcSelect(id) {
   arc.activeIdx  = -1;
   arc.query      = '';
   arc.autoScroll = true;
+  var scrollBtn = document.getElementById('arcScrollToggle');
+  if (scrollBtn) { scrollBtn.classList.add('active'); scrollBtn.title = 'Auto-scroll follows audio'; }
 
   // Reset search
   var ts = document.getElementById('arcTSearch'); if (ts) ts.value='';
@@ -5257,6 +5296,8 @@ arcAudio.addEventListener('error', function(e) {
 arcAudio.addEventListener('play', function(){
   var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='⏸';
   var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='⏸';
+  // Always show mini player when audio plays, even if it was manually closed
+  arc._miniHidden = false;
   arcMiniShow();
 });
 arcAudio.addEventListener('pause', function(){
@@ -5379,8 +5420,28 @@ function arcActiveLine(t) {
 // Disable auto-scroll when user manually scrolls
 document.addEventListener('DOMContentLoaded',function(){
   var tb=document.getElementById('arcTBody');
-  if(tb) tb.addEventListener('wheel',function(){ arc.autoScroll=false; },{ passive:true });
+  if(tb) tb.addEventListener('wheel',function(){
+    if (arc.autoScroll) {
+      arc.autoScroll=false;
+      var btn=document.getElementById('arcScrollToggle');
+      if(btn) btn.classList.remove('active');
+    }
+  },{ passive:true });
 });
+
+function arcToggleScroll() {
+  arc.autoScroll = !arc.autoScroll;
+  var btn = document.getElementById('arcScrollToggle');
+  if (btn) {
+    btn.classList.toggle('active', arc.autoScroll);
+    btn.title = arc.autoScroll ? 'Auto-scroll follows audio' : 'Auto-scroll paused — click to catch up';
+  }
+  // If turning back on, immediately scroll to active line
+  if (arc.autoScroll && arc.activeIdx >= 0) {
+    var el = document.getElementById('arcl' + arc.activeIdx);
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
 
 // ── Transcript search ──────────────────────────────────────
 function arcTSearchFn(val) {
@@ -5433,7 +5494,6 @@ function arcMiniShow() {
   if(!p) return;
   p.classList.add('visible');
   document.getElementById('app').classList.add('player-open');
-  // Update title
   var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===arc.currentId;});
   var t=document.getElementById('arcMiniTitle');
   if(t&&m) t.textContent=m.title||'Meeting';
@@ -5443,6 +5503,8 @@ function arcMiniHide() {
   var p=document.getElementById('arcMiniPlayer');
   if(p) p.classList.remove('visible');
   document.getElementById('app').classList.remove('player-open');
+  // Clear src so play event doesn't re-open the bar on next session
+  arc._miniHidden = true;
 }
 function arcMiniDragStart(e) {
   if (!arcAudio.duration) return;
@@ -5625,14 +5687,16 @@ async function arcAdminClearAll() {
 <!-- MINI PLAYER -->
 <div class="arc-mini-player" id="arcMiniPlayer">
   <button class="arc-btn-play" id="arcMiniPlay" onclick="arcPlay()" style="width:28px;height:28px;font-size:10px;flex-shrink:0;">▶</button>
+  <button class="arc-btn-stop" id="arcMiniStop" onclick="arcStopFn()" style="flex-shrink:0;">⏹</button>
   <div class="arc-mini-title" id="arcMiniTitle">No meeting selected</div>
-  <div class="arc-mini-time"  id="arcMiniTime">0:00 / 0:00</div>
-  <div class="arc-prog-wrap"  id="arcMiniProgWrap" style="max-width:200px;" onmousedown="arcMiniDragStart(event)" onclick="arcMiniProgClick(event)">
+  <div class="arc-prog-wrap" id="arcMiniProgWrap"
+       onmousedown="arcMiniDragStart(event)" onclick="arcMiniProgClick(event)">
     <div class="arc-prog-fill" id="arcMiniFill" style="width:0%"></div>
     <div class="arc-prog-thumb" id="arcMiniThumb"></div>
   </div>
-  <button class="arc-btn-speed" id="arcMiniSpeed" onclick="arcSpeedCycle()">1×</button>
-  <button class="arc-mini-close" onclick="arcMiniHide()" title="Close player">✕</button>
+  <div class="arc-mini-time" id="arcMiniTime">0:00 / 0:00</div>
+  <button class="arc-btn-speed" id="arcMiniSpeed" onclick="arcSpeedCycle()" style="flex-shrink:0;">1×</button>
+  <button class="arc-mini-close" onclick="arcMiniHide()" title="Close player" style="flex-shrink:0;">✕</button>
 </div>
 
 <!-- ADD MEETING MODAL -->
