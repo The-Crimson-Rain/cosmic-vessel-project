@@ -131,7 +131,7 @@ body::after {
   transition: grid-template-rows .25s ease;
 }
 #app.player-open {
-  grid-template-rows: 56px 36px 1fr 52px;
+  grid-template-rows: 56px 36px 1fr 44px;
 }
 
 /* ── HEADER ──────────────────────────────── */
@@ -1316,7 +1316,7 @@ textarea.inp { resize:vertical; }
   grid-column: 1 / -1;
   grid-row: 4;
   background: var(--bg-1);
-  border-top: 2px solid var(--border);
+  border-top: 1px solid var(--border);
   display: flex; align-items: center; gap: 10px;
   padding: 0 16px;
   height: 0;
@@ -1325,7 +1325,7 @@ textarea.inp { resize:vertical; }
   z-index: 100;
 }
 .arc-mini-player.visible {
-  height: 52px;
+  height: 44px;
 }
 .arc-mini-title {
   flex: 1; min-width: 0;
@@ -5624,7 +5624,7 @@ async function arcAdminClearAll() {
 
 <!-- MINI PLAYER -->
 <div class="arc-mini-player" id="arcMiniPlayer">
-  <button class="arc-btn-play" id="arcMiniPlay" onclick="arcPlay()" style="width:26px;height:26px;font-size:10px;">▶</button>
+  <button class="arc-btn-play" id="arcMiniPlay" onclick="arcPlay()" style="width:28px;height:28px;font-size:10px;flex-shrink:0;">▶</button>
   <div class="arc-mini-title" id="arcMiniTitle">No meeting selected</div>
   <div class="arc-mini-time"  id="arcMiniTime">0:00 / 0:00</div>
   <div class="arc-prog-wrap"  id="arcMiniProgWrap" style="max-width:200px;" onmousedown="arcMiniDragStart(event)" onclick="arcMiniProgClick(event)">
