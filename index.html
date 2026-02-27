@@ -441,6 +441,10 @@ textarea.inp { resize:vertical; }
   position:fixed; bottom:20px; right:20px; z-index:9999;
   display:flex; flex-direction:column; gap:8px;
 }
+@keyframes slideDown {
+  from { transform: translateY(-16px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
 .toast {
   background:var(--panel); border:1px solid var(--border);
   border-radius:6px; padding:11px 16px;
@@ -1363,23 +1367,7 @@ textarea.inp { resize:vertical; }
   font-family: var(--mono); font-size: 9px; color: var(--grey);
   flex: 1; text-align: right; white-space: nowrap;
 }
-.sb-prog-wrap {
-  position: relative; height: 4px;
-  background: var(--bg-3); border-radius: 2px; cursor: pointer;
-}
-.sb-prog-fill {
-  position: absolute; left: 0; top: 0; height: 100%;
-  background: var(--crimson-hi); border-radius: 2px; pointer-events: none;
-}
-.sb-prog-thumb {
-  position: absolute; top: 50%; width: 10px; height: 10px;
-  background: var(--white); border-radius: 50%;
-  transform: translate(-50%,-50%); pointer-events: none;
-  opacity: 0; transition: opacity .15s;
-}
-.sb-prog-wrap:hover .sb-prog-thumb { opacity: 1; }
 .sb-player.collapsed .sb-player-controls { display: none; }
-.sb-player.collapsed .sb-prog-wrap { display: none; }
 .sb-player.collapsed .sb-player-toggle { transform: rotate(-90deg); }
 
 
@@ -1581,10 +1569,7 @@ textarea.inp { resize:vertical; }
           <div class="sb-player-time" id="sbTime">0:00 / 0:00</div>
           <button class="arc-btn-speed" id="sbSpeed" onclick="arcSpeedCycle()" style="font-size:9px;padding:2px 5px;">1×</button>
         </div>
-        <div class="sb-prog-wrap" id="sbProgWrap" onmousedown="sbDragStart(event)" onclick="sbProgClick(event)">
-          <div class="sb-prog-fill" id="sbFill" style="width:0%"></div>
-          <div class="sb-prog-thumb" id="sbThumb"></div>
-        </div>
+
       </div>
     </div>
   </nav>
@@ -1672,21 +1657,21 @@ textarea.inp { resize:vertical; }
         <div class="page-hdr-left"><div class="ph-title">MISSION SCHEDULER</div><div class="ph-sub">Meetings · All times shown in your local timezone</div></div>
         <div class="ph-actions"><button class="btn btn-primary" onclick="openModal('m-meeting')">+ Schedule Meeting</button></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
-        <div>
-          <div class="panel">
-            <div class="panel-hdr"><span class="panel-title">Member Timezones · Live</span></div>
-            <div style="overflow-x:auto;">
-              <table class="tz-table" id="tz-table"><thead><tr><th>Member</th><th>Local Time</th><th>UTC Offset</th><th>Departments</th><th>Status</th></tr></thead><tbody id="tz-tbody"></tbody></table>
-            </div>
-          </div>
-        </div>
-        <div>
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:16px;">
+
           <div class="panel">
             <div class="panel-hdr"><span class="panel-title">Meetings</span></div>
             <div id="meetings-list" style="padding:10px;max-height:calc(100vh - 320px);overflow-y:auto;"></div>
             <div style="padding:10px;border-top:1px solid var(--border);">
               <button class="btn btn-gold btn-sm fw" onclick="openModal('m-meeting')">+ New Meeting</button>
+            </div>
+          </div>
+        </div>
+        <div>        <div>
+          <div class="panel">
+            <div class="panel-hdr"><span class="panel-title">Member Timezones · Live</span></div>
+            <div style="overflow-x:auto;">
+              <table class="tz-table" id="tz-table"><thead><tr><th>Member</th><th>Local Time</th><th>UTC Offset</th><th>Departments</th><th>Status</th></tr></thead><tbody id="tz-tbody"></tbody></table>
             </div>
           </div>
         </div>
@@ -1905,6 +1890,13 @@ textarea.inp { resize:vertical; }
               <div class="field">
                 <span class="field-label">New Password (optional)</span>
                 <input class="inp" id="edit-pass" type="password" placeholder="Leave blank to keep current">
+              </div>
+              <div class="field" style="display:flex;align-items:center;justify-content:space-between;">
+                <span class="field-label" style="margin-bottom:0;">Meeting Reminders (10 min before)</span>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox" id="edit-reminders" checked style="accent-color:var(--crimson-hi);width:14px;height:14px;">
+                  <span style="font-size:11px;color:var(--grey);">Enabled</span>
+                </label>
               </div>
               <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
             </div>
@@ -3156,8 +3148,6 @@ function updateNotifications() {
   if (taskNotif) taskNotif.classList.toggle('show', myPending.length > 0);
   
   // Meeting notifications - pending RSVP invitations + upcoming in 24hrs
-  var now2 = Date.now();
-  var soon2 = now2 + 24*60*60*1000;
   var pendingRsvp = (liveData.meetings||[]).filter(function(m) {
     if (m.cancelled) return false;
     var isAttendee = (m.attendees||[]).includes(uid);
@@ -3165,14 +3155,42 @@ function updateNotifications() {
     var isCreator = m.createdBy === uid;
     return isAttendee && notResponded && !isCreator;
   });
-  var upcomingMeetings = (liveData.meetings||[]).filter(function(m) {
-    if (m.cancelled) return false;
-    var mt = new Date(m.dateUtc).getTime();
-    return mt > now2 && mt < soon2 && (m.attendees||[]).includes(uid);
-  });
   var meetNotif = document.getElementById('notif-meetings');
-  var meetCount = pendingRsvp.length + upcomingMeetings.length;
-  if (meetNotif) meetNotif.classList.toggle('show', meetCount > 0);
+  if (meetNotif) meetNotif.classList.toggle('show', pendingRsvp.length > 0);
+  // Show invite toast once per session per meeting
+  if (!window._shownInvites) window._shownInvites = {};
+  pendingRsvp.forEach(function(m) {
+    if (!window._shownInvites[m.id]) {
+      window._shownInvites[m.id] = true;
+      showMeetingInviteToast(m);
+    }
+  });
+}
+
+function showMeetingInviteToast(m) {
+  var id = 'inv-' + m.id;
+  if (document.getElementById(id)) return;
+  var userTz = (currentProfile && currentProfile.tz) || 'UTC';
+  var dateUtc = m.dateUtc ? new Date(m.dateUtc) : null;
+  var localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'TBD';
+  var el = document.createElement('div');
+  el.id = id;
+  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(200,16,46,.5);border-left:3px solid var(--crimson-hi);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
+  var xBtn = document.createElement('button');
+  xBtn.textContent = '✕';
+  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
+  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
+  var body = document.createElement('div');
+  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--crimson-hi);margin-bottom:5px;">MEETING INVITE</div>' +
+    '<div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:3px;">' + esc(m.name) + '</div>' +
+    '<div style="font-size:10px;color:var(--grey);">' + localStr + '</div>' +
+    '<div style="font-size:10px;color:var(--grey-2);margin-top:5px;">Tap to open Scheduler</div>';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
+  row.appendChild(body); row.appendChild(xBtn);
+  el.appendChild(row);
+  el.addEventListener('click', function(){ navTo('scheduler'); el.remove(); });
+  document.body.appendChild(el);
 }
 
 function renderDeptBoard(dept) {
@@ -3369,9 +3387,48 @@ async function submitMeeting() {
 async function rsvpMeeting(meetingId, response) {
   var uid = currentUser.uid;
   var update = {};
-  update['rsvp.' + uid] = response; // 'accepted' | 'declined'
-  await db.collection('meetings').doc(meetingId).update(update);
-  toast(response === 'accepted' ? 'Meeting accepted ✓' : 'Meeting declined', response === 'accepted' ? 'ok' : 'inf');
+  update['rsvp.' + uid] = response;
+  try {
+    await db.collection('meetings').doc(meetingId).update(update);
+    updateNotifications();
+    if (response === 'accepted') {
+      toast('Meeting accepted ✓', 'ok');
+      var m = liveData.meetings.find(function(x){ return x.id === meetingId; });
+      if (m) showGCalPrompt(m);
+    } else {
+      toast('Meeting declined', 'inf');
+    }
+  } catch(e) { toast('Could not save: ' + e.message, 'err'); }
+}
+
+function showGCalPrompt(m) {
+  var existing = document.getElementById('gcal-prompt');
+  if (existing) existing.remove();
+  var url = makeGCalUrl(m);
+  var el = document.createElement('div');
+  el.id = 'gcal-prompt';
+  el.style.cssText = 'position:fixed;bottom:80px;right:20px;z-index:9999;background:var(--bg-2);border:1px solid rgba(66,133,244,.5);border-radius:8px;padding:16px 20px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.6);';
+  var titleDiv = document.createElement('div');
+  titleDiv.style.cssText = 'font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:#4285f4;margin-bottom:8px;';
+  titleDiv.textContent = 'ADD TO GOOGLE CALENDAR?';
+  var nameDiv = document.createElement('div');
+  nameDiv.style.cssText = 'font-size:12px;color:var(--white);margin-bottom:12px;';
+  nameDiv.textContent = m.name || '';
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px;';
+  var yesBtn = document.createElement('a');
+  yesBtn.href = url; yesBtn.target = '_blank';
+  yesBtn.style.cssText = 'flex:1;text-align:center;padding:6px 0;background:rgba(66,133,244,.15);border:1px solid rgba(66,133,244,.4);border-radius:4px;color:#4285f4;font-size:11px;font-weight:700;text-decoration:none;';
+  yesBtn.textContent = 'Yes, Add';
+  yesBtn.addEventListener('click', function(){ el.remove(); });
+  var noBtn = document.createElement('button');
+  noBtn.style.cssText = 'flex:1;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--grey);font-size:11px;cursor:pointer;';
+  noBtn.textContent = 'No Thanks';
+  noBtn.addEventListener('click', function(){ el.remove(); });
+  btnRow.appendChild(yesBtn); btnRow.appendChild(noBtn);
+  el.appendChild(titleDiv); el.appendChild(nameDiv); el.appendChild(btnRow);
+  document.body.appendChild(el);
+  setTimeout(function(){ if(document.getElementById('gcal-prompt')) document.getElementById('gcal-prompt').remove(); }, 15000);
 }
 
 
@@ -4109,6 +4166,8 @@ function renderProfile() {
   document.getElementById('prof-tz').textContent = (currentProfile.tz||'UTC') + ' · ' + getTzOffset(currentProfile.tz||'UTC');
   document.getElementById('edit-name').value = currentProfile.name;
   document.getElementById('edit-tz').value = currentProfile.tz || 'Europe/London';
+  var remEl = document.getElementById('edit-reminders');
+  if (remEl) remEl.checked = (currentProfile.meetingReminders !== false);
   const deptsEl = document.getElementById('prof-depts');
   var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
 }
@@ -4118,7 +4177,9 @@ async function saveProfile() {
   const tz   = document.getElementById('edit-tz').value;
   const pass = document.getElementById('edit-pass').value;
   if (!name) { toast('Name required','err'); return; }
-  const updates = { name: name, tz: tz };
+  var remindersEl = document.getElementById('edit-reminders');
+  var meetingReminders = remindersEl ? remindersEl.checked : true;
+  const updates = { name: name, tz: tz, meetingReminders: meetingReminders };
   await db.collection('users').doc(currentUser.uid).set(updates, { merge: true });
   currentProfile = { ...currentProfile, ...updates };
   if (pass) {
@@ -4167,6 +4228,49 @@ function setupPresenceHandlers() {
   // Start heartbeat
   writeHeartbeat();
   heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
+setInterval(checkMeetingReminders, 60000);
+window._remindedMeetings = {};
+function checkMeetingReminders() {
+  if (!currentUser || !currentProfile) return;
+  if (currentProfile.meetingReminders === false) return;
+  var uid = currentUser.uid;
+  var now = Date.now();
+  var tenMin = 10 * 60 * 1000;
+  (liveData.meetings||[]).forEach(function(m) {
+    if (m.cancelled || window._remindedMeetings[m.id]) return;
+    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    var until = mt - now;
+    if (until > 0 && until <= tenMin) {
+      var attending = (m.attendees||[]).includes(uid) && m.rsvp && m.rsvp[uid] === 'accepted';
+      if (attending || m.createdBy === uid) {
+        window._remindedMeetings[m.id] = true;
+        var mins = Math.ceil(until / 60000);
+        showReminderToast(m, mins);
+      }
+    }
+  });
+}
+function showReminderToast(m, minsLeft) {
+  var id = 'rem-' + m.id;
+  if (document.getElementById(id)) return;
+  var el = document.createElement('div');
+  el.id = id;
+  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(255,193,7,.5);border-left:3px solid var(--gold);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
+  var xBtn = document.createElement('button');
+  xBtn.textContent = '✕';
+  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
+  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
+  var body = document.createElement('div');
+  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:5px;">MEETING IN ' + minsLeft + ' MINUTE' + (minsLeft===1?'':'S') + '</div>' +
+    '<div style="font-size:12px;font-weight:700;color:var(--white);">' + esc(m.name) + '</div>';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
+  row.appendChild(body); row.appendChild(xBtn);
+  el.appendChild(row);
+  el.addEventListener('click', function(){ navTo('scheduler'); el.remove(); });
+  document.body.appendChild(el);
+  setTimeout(function(){ if(document.getElementById(id)) document.getElementById(id).remove(); }, 20000);
+}
 
   // Page/tab actually closing - go offline immediately
   window.addEventListener('pagehide', function() {
@@ -4189,6 +4293,49 @@ function setupPresenceHandlers() {
       // Back on tab - restart heartbeat and set online
       writeHeartbeat();
       heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
+setInterval(checkMeetingReminders, 60000);
+window._remindedMeetings = {};
+function checkMeetingReminders() {
+  if (!currentUser || !currentProfile) return;
+  if (currentProfile.meetingReminders === false) return;
+  var uid = currentUser.uid;
+  var now = Date.now();
+  var tenMin = 10 * 60 * 1000;
+  (liveData.meetings||[]).forEach(function(m) {
+    if (m.cancelled || window._remindedMeetings[m.id]) return;
+    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    var until = mt - now;
+    if (until > 0 && until <= tenMin) {
+      var attending = (m.attendees||[]).includes(uid) && m.rsvp && m.rsvp[uid] === 'accepted';
+      if (attending || m.createdBy === uid) {
+        window._remindedMeetings[m.id] = true;
+        var mins = Math.ceil(until / 60000);
+        showReminderToast(m, mins);
+      }
+    }
+  });
+}
+function showReminderToast(m, minsLeft) {
+  var id = 'rem-' + m.id;
+  if (document.getElementById(id)) return;
+  var el = document.createElement('div');
+  el.id = id;
+  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(255,193,7,.5);border-left:3px solid var(--gold);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
+  var xBtn = document.createElement('button');
+  xBtn.textContent = '✕';
+  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
+  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
+  var body = document.createElement('div');
+  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:5px;">MEETING IN ' + minsLeft + ' MINUTE' + (minsLeft===1?'':'S') + '</div>' +
+    '<div style="font-size:12px;font-weight:700;color:var(--white);">' + esc(m.name) + '</div>';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
+  row.appendChild(body); row.appendChild(xBtn);
+  el.appendChild(row);
+  el.addEventListener('click', function(){ navTo('scheduler'); el.remove(); });
+  document.body.appendChild(el);
+  setTimeout(function(){ if(document.getElementById(id)) document.getElementById(id).remove(); }, 20000);
+}
     }
   });
 
@@ -5337,11 +5484,7 @@ arcAudio.addEventListener('timeupdate', function(){
     var t = document.getElementById('arcProgThumb');
     if (f) f.style.width = pct+'%';
     if (t) t.style.left  = pct+'%';
-    // Sidebar player
-    var mf = document.getElementById('sbFill');
-    var mt = document.getElementById('sbThumb');
-    if (mf) mf.style.width = pct+'%';
-    if (mt) mt.style.left  = pct+'%';
+    // Sidebar player progress removed — use Mission Logs view to seek
   }
   var d  = document.getElementById('arcTimeDisp');
   if (d)  d.textContent  = arcFmt(cur)+' / '+arcFmt(dur);
@@ -5398,8 +5541,6 @@ function arcStopFn() {
   arcAudio.currentTime=0;
   arc.activeIdx=-1;
   var sbP = document.getElementById('sbPlay'); if(sbP) sbP.textContent='▶';
-  var sbF = document.getElementById('sbFill'); if(sbF) sbF.style.width='0%';
-  var sbTh = document.getElementById('sbThumb'); if(sbTh) sbTh.style.left='0%';
   var sbTm = document.getElementById('sbTime'); if(sbTm) sbTm.textContent='0:00 / 0:00';
   arcResetProg();
   arcShowLines(arc.lines);
@@ -5593,31 +5734,7 @@ function sbToggleCollapse() {
   var btn = document.getElementById('sbToggle');
   if (btn) btn.title = sb.classList.contains('collapsed') ? 'Expand' : 'Minimise';
 }
-function sbDragStart(e) {
-  if (!arcAudio.duration) return;
-  arc.dragging = true;
-  sbDragMove(e);
-  document.addEventListener('mousemove', sbDragMove);
-  document.addEventListener('mouseup', sbDragEnd);
-}
-function sbDragMove(e) {
-  if (!arc.dragging || !arcAudio.duration) return;
-  var w = document.getElementById('sbProgWrap'); if (!w) return;
-  var r = w.getBoundingClientRect();
-  var pct = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-  arcAudio.currentTime = pct * arcAudio.duration;
-}
-function sbDragEnd() {
-  arc.dragging = false;
-  document.removeEventListener('mousemove', sbDragMove);
-  document.removeEventListener('mouseup', sbDragEnd);
-}
-function sbProgClick(e) {
-  if (arc.dragging || !arcAudio.duration) return;
-  var w = document.getElementById('sbProgWrap'); if (!w) return;
-  var r = w.getBoundingClientRect();
-  arcAudio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * arcAudio.duration;
-}
+
 
 // ── Add meeting ────────────────────────────────────────────
 function arcOpenAdd() {
