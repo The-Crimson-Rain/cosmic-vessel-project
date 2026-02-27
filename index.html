@@ -1862,24 +1862,43 @@ textarea.inp { resize:vertical; }
             <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
               <div class="field"><span class="field-label">Display Name</span><input class="inp" id="edit-name" placeholder="Your name"></div>
               <div class="field">
+                <span class="field-label">Departments</span>
+                <div id="profile-dept-checks" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;"></div>
+              </div>
+              <div class="field">
+                <span class="field-label">Change Login Email</span>
+                <input class="inp" id="edit-email" type="email" placeholder="Leave blank to keep current">
+                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">A verification email will be sent to the new address. You may need to re-login.</div>
+              </div>
+              <div class="field">
                 <span class="field-label">Timezone</span>
                 <select class="inp" id="edit-tz">
-                  <option value="America/New_York">UTC-5 · New York</option>
-                  <option value="America/Chicago">UTC-6 · Chicago</option>
-                  <option value="America/Denver">UTC-7 · Denver</option>
-                  <option value="America/Los_Angeles">UTC-8 · Los Angeles</option>
-                  <option value="America/Sao_Paulo">UTC-3 · São Paulo</option>
-                  <option value="Europe/London">UTC+0 · London</option>
-                  <option value="Europe/Paris">UTC+1 · Paris</option>
-                  <option value="Europe/Berlin">UTC+2 · Berlin</option>
-                  <option value="Europe/Moscow">UTC+3 · Moscow</option>
-                  <option value="Asia/Dubai">UTC+4 · Dubai</option>
-                  <option value="Asia/Kolkata">UTC+5:30 · Mumbai</option>
-                  <option value="Asia/Bangkok">UTC+7 · Bangkok</option>
-                  <option value="Asia/Shanghai">UTC+8 · Shanghai</option>
-                  <option value="Asia/Tokyo">UTC+9 · Tokyo</option>
-                  <option value="Australia/Sydney">UTC+11 · Sydney</option>
-                  <option value="Pacific/Auckland">UTC+13 · Auckland</option>
+                  <option value="Pacific/Midway">UTC-11 · Midway Island</option>
+                  <option value="Pacific/Honolulu">UTC-10 · Honolulu, Hawaii</option>
+                  <option value="America/Anchorage">UTC-9 · Anchorage, Alaska</option>
+                  <option value="America/Los_Angeles">UTC-8 · Los Angeles, Vancouver</option>
+                  <option value="America/Denver">UTC-7 · Denver, Phoenix</option>
+                  <option value="America/Chicago">UTC-6 · Chicago, Mexico City</option>
+                  <option value="America/New_York">UTC-5 · New York, Toronto</option>
+                  <option value="America/Caracas">UTC-4 · Caracas, Halifax</option>
+                  <option value="America/Sao_Paulo">UTC-3 · São Paulo, Buenos Aires</option>
+                  <option value="Atlantic/South_Georgia">UTC-2 · South Georgia</option>
+                  <option value="Atlantic/Azores">UTC-1 · Azores</option>
+                  <option value="Europe/London">UTC+0 · London, Dublin, Lisbon</option>
+                  <option value="Europe/Paris">UTC+1 · Paris, Berlin, Madrid, Rome</option>
+                  <option value="Europe/Helsinki">UTC+2 · Helsinki, Kyiv, Cairo</option>
+                  <option value="Europe/Moscow">UTC+3 · Moscow, Istanbul, Riyadh</option>
+                  <option value="Asia/Dubai">UTC+4 · Dubai, Abu Dhabi, Baku</option>
+                  <option value="Asia/Karachi">UTC+5 · Karachi, Tashkent</option>
+                  <option value="Asia/Kolkata">UTC+5:30 · Mumbai, New Delhi, Colombo</option>
+                  <option value="Asia/Dhaka">UTC+6 · Dhaka, Almaty</option>
+                  <option value="Asia/Bangkok">UTC+7 · Bangkok, Jakarta, Hanoi</option>
+                  <option value="Asia/Shanghai">UTC+8 · Shanghai, Beijing, Singapore, Perth</option>
+                  <option value="Asia/Tokyo">UTC+9 · Tokyo, Seoul, Osaka</option>
+                  <option value="Australia/Adelaide">UTC+9:30 · Adelaide, Darwin</option>
+                  <option value="Australia/Sydney">UTC+10 · Sydney, Melbourne, Brisbane</option>
+                  <option value="Pacific/Auckland">UTC+12 · Auckland, Wellington</option>
+                  <option value="Pacific/Apia">UTC+13 · Samoa, Tonga</option>
                 </select>
               </div>
               <div class="field">
@@ -1946,6 +1965,13 @@ textarea.inp { resize:vertical; }
           </div>
           <div id="admin-arc-info" style="font-size:12px;color:var(--grey-2);padding:14px;">Delete all archive_meetings from Firestore (useful for removing broken test entries).</div>
         </div>
+        <div class="panel">
+          <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Department Management</span>
+            <button class="btn btn-gold btn-xs" onclick="openAddDeptModal()">+ Add Department</button>
+          </div>
+          <div id="admin-depts-list" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
       </div>
 
   </main>
@@ -1985,6 +2011,25 @@ textarea.inp { resize:vertical; }
 </div>
 
 <!-- New Meeting -->
+<div class="modal-bg" id="m-add-dept">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-hdr"><span class="modal-title">&#9658; ADD DEPARTMENT</span><button class="modal-x" onclick="closeModal('m-add-dept')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="field"><span class="field-label">Department Name</span><input class="inp" id="new-dept-name" placeholder="e.g. Sound Design"></div>
+      <div class="field"><span class="field-label">Colour</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="color" id="new-dept-color" value="#4a90d9" style="width:48px;height:32px;border:1px solid var(--border);border-radius:4px;background:var(--bg-3);cursor:pointer;">
+          <span style="font-size:11px;color:var(--grey);">Pick a colour for the dept tag</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m-add-dept')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddDept()">Add Department</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="m-meeting">
   <div class="modal">
     <div class="modal-hdr"><span class="modal-title">▸ SCHEDULE MEETING</span><button class="modal-x" onclick="closeModal('m-meeting')">✕</button></div>
@@ -2229,6 +2274,11 @@ textarea.inp { resize:vertical; }
     <div class="modal-hdr"><span class="modal-title">&#9658; EDIT TEAM MEMBER</span><button class="modal-x" onclick="closeModal('m-edit-member')">&#x2715;</button></div>
     <div class="modal-body">
       <div class="field"><span class="field-label">Display Name</span><input class="inp" id="em-name" placeholder="Full name"></div>
+      <div class="field">
+        <span class="field-label">Login Email (admin change)</span>
+        <input class="inp" id="em-email" type="email" placeholder="Leave blank to keep current">
+        <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Note: email changes require the user to be recently logged in. They may need to re-login first.</div>
+      </div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Role</span>
           <select class="inp" id="em-role">
@@ -2239,21 +2289,33 @@ textarea.inp { resize:vertical; }
         </div>
         <div class="field"><span class="field-label">Timezone</span>
           <select class="inp" id="em-tz">
-            <option value="UTC">UTC</option>
-            <option value="America/New_York">US Eastern</option>
-            <option value="America/Chicago">US Central</option>
-            <option value="America/Denver">US Mountain</option>
-            <option value="America/Los_Angeles">US Pacific</option>
-            <option value="America/Sao_Paulo">Brazil (BRT)</option>
-            <option value="Europe/London">UK (GMT/BST)</option>
-            <option value="Europe/Paris">Central Europe</option>
-            <option value="Europe/Helsinki">Eastern Europe</option>
-            <option value="Asia/Dubai">Gulf (GST)</option>
-            <option value="Asia/Kolkata">India (IST)</option>
-            <option value="Asia/Singapore">Singapore (SGT)</option>
-            <option value="Asia/Tokyo">Japan (JST)</option>
-            <option value="Australia/Sydney">Australia East</option>
-            <option value="Pacific/Auckland">New Zealand</option>
+            <option value="UTC">UTC+0 · UTC</option>
+                  <option value="Pacific/Midway">UTC-11 · Midway Island</option>
+                  <option value="Pacific/Honolulu">UTC-10 · Honolulu, Hawaii</option>
+                  <option value="America/Anchorage">UTC-9 · Anchorage, Alaska</option>
+                  <option value="America/Los_Angeles">UTC-8 · Los Angeles, Vancouver</option>
+                  <option value="America/Denver">UTC-7 · Denver, Phoenix</option>
+                  <option value="America/Chicago">UTC-6 · Chicago, Mexico City</option>
+                  <option value="America/New_York">UTC-5 · New York, Toronto</option>
+                  <option value="America/Caracas">UTC-4 · Caracas, Halifax</option>
+                  <option value="America/Sao_Paulo">UTC-3 · São Paulo, Buenos Aires</option>
+                  <option value="Atlantic/South_Georgia">UTC-2 · South Georgia</option>
+                  <option value="Atlantic/Azores">UTC-1 · Azores</option>
+                  <option value="Europe/London">UTC+0 · London, Dublin, Lisbon</option>
+                  <option value="Europe/Paris">UTC+1 · Paris, Berlin, Madrid, Rome</option>
+                  <option value="Europe/Helsinki">UTC+2 · Helsinki, Kyiv, Cairo</option>
+                  <option value="Europe/Moscow">UTC+3 · Moscow, Istanbul, Riyadh</option>
+                  <option value="Asia/Dubai">UTC+4 · Dubai, Abu Dhabi, Baku</option>
+                  <option value="Asia/Karachi">UTC+5 · Karachi, Tashkent</option>
+                  <option value="Asia/Kolkata">UTC+5:30 · Mumbai, New Delhi, Colombo</option>
+                  <option value="Asia/Dhaka">UTC+6 · Dhaka, Almaty</option>
+                  <option value="Asia/Bangkok">UTC+7 · Bangkok, Jakarta, Hanoi</option>
+                  <option value="Asia/Shanghai">UTC+8 · Shanghai, Beijing, Singapore, Perth</option>
+                  <option value="Asia/Tokyo">UTC+9 · Tokyo, Seoul, Osaka</option>
+                  <option value="Australia/Adelaide">UTC+9:30 · Adelaide, Darwin</option>
+                  <option value="Australia/Sydney">UTC+10 · Sydney, Melbourne, Brisbane</option>
+                  <option value="Pacific/Auckland">UTC+12 · Auckland, Wellington</option>
+                  <option value="Pacific/Apia">UTC+13 · Samoa, Tonga</option>
           </select>
         </div>
       </div>
@@ -2284,6 +2346,16 @@ const DEPTS = [
   { id:'narrative',   label:'Narrative',   color:'var(--dept-nar)'  },
 ];
 
+// Returns live dept list (Firestore custom depts) merged with built-in DEPTS
+function getDeptList() {
+  var custom = (liveData.customDepts || []);
+  if (!custom.length) return DEPTS;
+  // Merge: start with DEPTS, append any custom depts not already in list
+  var ids = DEPTS.map(function(d){ return d.id; });
+  var extras = custom.filter(function(d){ return !ids.includes(d.id); });
+  return DEPTS.concat(extras);
+}
+
 const DEPT_MAP = {
   'programming':'dept-prog','2d-art':'dept-art2','3d-art':'dept-art3',
   'marketing':'dept-mkt','sound':'dept-snd','vfx':'dept-vfx','narrative':'dept-nar'
@@ -2300,7 +2372,7 @@ const STATUS_LABEL = { online:'Online', working:'Working', gaming:'Gaming', offl
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{} };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[] };
 let crewSearch = '';
 let dragTask = null;
 
@@ -2351,6 +2423,19 @@ async function onAuthChange(user) {
     const snap = await db.collection('users').doc(user.uid).get();
     if (snap.exists) {
       currentProfile = { uid:user.uid, ...snap.data() };
+      // If admin has requested an email change, prompt the user to apply it
+      if (currentProfile.requestedEmail && currentProfile.requestedEmail !== user.email) {
+        setTimeout(function() {
+          if (confirm('An admin has requested your login email be changed to: ' + currentProfile.requestedEmail + '\n\nApply this change now?')) {
+            user.verifyBeforeUpdateEmail(currentProfile.requestedEmail).then(function() {
+              db.collection('users').doc(user.uid).update({ requestedEmail: firebase.firestore.FieldValue.delete() });
+              toast('Verification email sent to ' + currentProfile.requestedEmail,'ok');
+            }).catch(function(e) {
+              toast('Email change failed: ' + e.message,'err');
+            });
+          }
+        }, 2000);
+      }
     } else {
       // first login — create profile
       currentProfile = {
@@ -2622,7 +2707,7 @@ function navTo(view) {
     el.classList.add('active');
     if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
     if (view === 'profile')    renderProfile();
-    if (view === 'admin')      renderAdminRoster();
+    if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); }
     if (view === 'my-tasks')   renderMyTasks();
     if (view === 'crew')       renderCrew();
     if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
@@ -3714,25 +3799,19 @@ function openEditMember(uid) {
   document.getElementById('em-name').value = member.name || '';
   document.getElementById('em-role').value = member.role || 'crew';
   document.getElementById('em-tz').value   = member.tz || 'UTC';
-  var depts = [
-    {id:'programming', label:'Programming'},
-    {id:'2d-art',      label:'2D Art'},
-    {id:'3d-art',      label:'3D Art'},
-    {id:'marketing',   label:'Marketing'},
-    {id:'sound',       label:'Sound Design'},
-    {id:'vfx',         label:'Visual Effects'},
-    {id:'narrative',   label:'Narrative'}
-  ];
+  var depts = getDeptList();
   var memberDepts = member.depts || [];
-  // normalise any legacy full-name depts to short IDs for comparison
   var legacyMap = {'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art','Marketing':'marketing','Sound Design':'sound','Visual Effects':'vfx','Narrative':'narrative'};
   var normDepts = memberDepts.map(function(d){ return legacyMap[d] || d; });
   document.getElementById('em-dept-checks').innerHTML = depts.map(function(d) {
     var checked = normDepts.includes(d.id) ? 'checked' : '';
-    var color = {'programming':'#4a90d9','2d-art':'#e84393','3d-art':'#9b6cf0','marketing':'#e8a020','sound':'#2ecc8a','vfx':'#00d4ff','narrative':'#ff6b35'}[d.id] || '#fff';
+    var color = DEPT_COLORS[d.id] || d.color || '#888';
     return '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid ' + color + '44;color:' + color + ';">' +
       '<input type="checkbox" value="' + d.id + '" ' + checked + ' style="accent-color:' + color + ';"> ' + d.label + '</label>';
   }).join('');
+  // Pre-fill email field (blank — admin types new email only if changing)
+  var emEmailEl = document.getElementById('em-email');
+  if (emEmailEl) emEmailEl.value = '';
   openModal('m-edit-member');
 }
 
@@ -3740,11 +3819,18 @@ async function submitEditMember() {
   var uid  = document.getElementById('em-uid').value;
   var name = document.getElementById('em-name').value.trim();
   if (!name) { toast('Name is required','err'); return; }
-  var role = document.getElementById('em-role').value;
-  var tz   = document.getElementById('em-tz').value;
+  var role  = document.getElementById('em-role').value;
+  var tz    = document.getElementById('em-tz').value;
   var depts = Array.from(document.querySelectorAll('#em-dept-checks input:checked')).map(function(c){ return c.value; });
+  var newEmail = (document.getElementById('em-email') || {}).value || '';
   try {
     await db.collection('users').doc(uid).update({ name: name, role: role, tz: tz, depts: depts });
+    // Email change note: Firebase Auth email can only be changed by the user themselves
+    // (security requirement). We store the requested email and show a note.
+    if (newEmail) {
+      await db.collection('users').doc(uid).update({ requestedEmail: newEmail });
+      toast('Email change requested — member must re-login to confirm the change','inf');
+    }
     toast('Member updated!','ok');
     closeModal('m-edit-member');
   } catch(e) {
@@ -4122,6 +4208,70 @@ function renderOrphanTasks() {
 // REMOVED old function - replaced above
 
 
+
+// ─── DEPARTMENT MANAGEMENT ────────────────────────────────
+function renderAdminDepts() {
+  var el = document.getElementById('admin-depts-list');
+  if (!el) return;
+  var list = getDeptList();
+  el.innerHTML = '';
+  list.forEach(function(d) {
+    var color = DEPT_COLORS[d.id] || d.color || '#888';
+    var isCustom = (liveData.customDepts||[]).some(function(c){ return c.id === d.id; });
+    var chip = document.createElement('div');
+    chip.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:4px;border:1px solid ' + color + '44;background:' + color + '11;';
+    var dot = document.createElement('span');
+    dot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:' + color + ';display:inline-block;flex-shrink:0;';
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:12px;font-weight:600;color:' + color + ';';
+    lbl.textContent = d.label;
+    chip.appendChild(dot);
+    chip.appendChild(lbl);
+    if (isCustom) {
+      var delBtn = document.createElement('button');
+      delBtn.textContent = '✕';
+      delBtn.title = 'Remove custom dept';
+      delBtn.style.cssText = 'margin-left:6px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
+      delBtn.addEventListener('click', (function(id){ return function(){ deleteDept(id); }; })(d.id));
+      chip.appendChild(delBtn);
+    }
+    el.appendChild(chip);
+  });
+}
+
+function openAddDeptModal() {
+  document.getElementById('new-dept-name').value = '';
+  document.getElementById('new-dept-color').value = '#4a90d9';
+  openModal('m-add-dept');
+}
+
+async function submitAddDept() {
+  var name = document.getElementById('new-dept-name').value.trim();
+  var color = document.getElementById('new-dept-color').value;
+  if (!name) { toast('Department name required','err'); return; }
+  var id = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  var existing = getDeptList().find(function(d){ return d.id === id; });
+  if (existing) { toast('A department with that name already exists','err'); return; }
+  try {
+    await db.collection('config').doc('custom_depts').set({
+      depts: firebase.firestore.FieldValue.arrayUnion({ id: id, label: name, color: color })
+    }, { merge: true });
+    toast('Department added!','ok');
+    closeModal('m-add-dept');
+  } catch(e) { toast('Error: ' + e.message,'err'); }
+}
+
+async function deleteDept(id) {
+  if (!confirm('Remove this department? Members assigned to it will keep the tag but it won\'t appear in lists.')) return;
+  var dept = (liveData.customDepts||[]).find(function(d){ return d.id === id; });
+  if (!dept) { toast('Department not found','err'); return; }
+  try {
+    await db.collection('config').doc('custom_depts').update({
+      depts: firebase.firestore.FieldValue.arrayRemove(dept)
+    });
+    toast('Department removed','ok');
+  } catch(e) { toast('Error: ' + e.message,'err'); }
+}
 function renderAdminRoster() {
   const el = document.getElementById('admin-roster');
   if (!el) return;
@@ -4185,23 +4335,59 @@ function renderProfile() {
   document.getElementById('edit-tz').value = currentProfile.tz || 'Europe/London';
   var remEl = document.getElementById('edit-reminders');
   if (remEl) remEl.checked = (currentProfile.meetingReminders !== false);
+  // Populate dept checkboxes
+  var deptChecksEl = document.getElementById('profile-dept-checks');
+  if (deptChecksEl) {
+    var myDepts = currentProfile.depts || [];
+    var legacyMap2 = {'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art','Marketing':'marketing','Sound Design':'sound','Visual Effects':'vfx','Narrative':'narrative'};
+    var normMyDepts = myDepts.map(function(d){ return legacyMap2[d] || d; });
+    var allDepts = getDeptList();
+    deptChecksEl.innerHTML = allDepts.map(function(d) {
+      var checked = normMyDepts.includes(d.id) ? 'checked' : '';
+      var color = DEPT_COLORS[d.id] || '#888';
+      return '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:rgba(255,255,255,.04);padding:4px 8px;border-radius:4px;border:1px solid ' + color + '44;color:' + color + ';">' +
+        '<input type="checkbox" value="' + d.id + '" ' + checked + ' style="accent-color:' + color + ';"> ' + d.label + '</label>';
+    }).join('');
+  }
+  // Email field — leave blank, user types new email if they want to change
+  var emailEl = document.getElementById('edit-email');
+  if (emailEl) emailEl.value = '';
   const deptsEl = document.getElementById('prof-depts');
   var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
 }
 
 async function saveProfile() {
-  const name = document.getElementById('edit-name').value.trim();
-  const tz   = document.getElementById('edit-tz').value;
-  const pass = document.getElementById('edit-pass').value;
+  const name  = document.getElementById('edit-name').value.trim();
+  const tz    = document.getElementById('edit-tz').value;
+  const pass  = document.getElementById('edit-pass').value;
+  const newEmail = (document.getElementById('edit-email') || {}).value || '';
   if (!name) { toast('Name required','err'); return; }
   var remindersEl = document.getElementById('edit-reminders');
   var meetingReminders = remindersEl ? remindersEl.checked : true;
-  const updates = { name: name, tz: tz, meetingReminders: meetingReminders };
-  await db.collection('users').doc(currentUser.uid).set(updates, { merge: true });
-  currentProfile = { ...currentProfile, ...updates };
+  // Collect dept selections
+  var selectedDepts = Array.from(document.querySelectorAll('#profile-dept-checks input:checked')).map(function(c){ return c.value; });
+  const updates = { name: name, tz: tz, meetingReminders: meetingReminders, depts: selectedDepts };
+  try {
+    await db.collection('users').doc(currentUser.uid).set(updates, { merge: true });
+    currentProfile = { ...currentProfile, ...updates };
+  } catch(e) { toast('Save failed: ' + e.message,'err'); return; }
+  // Password change
   if (pass) {
     try { await currentUser.updatePassword(pass); toast('Password updated','ok'); }
-    catch(e) { toast('Password update failed: re-login required','err'); }
+    catch(e) { toast('Password update failed — try re-logging in first','err'); }
+  }
+  // Email change
+  if (newEmail && newEmail !== currentUser.email) {
+    try {
+      await currentUser.verifyBeforeUpdateEmail(newEmail);
+      toast('Verification sent to ' + newEmail + ' — check your inbox','ok');
+    } catch(e) {
+      if (e.code === 'auth/requires-recent-login') {
+        toast('Re-login required to change email — please sign out and back in','err');
+      } else {
+        toast('Email change failed: ' + e.message,'err');
+      }
+    }
   }
   if (name) await currentUser.updateProfile({ displayName: name });
   updateHeaderUI(); renderProfile();
