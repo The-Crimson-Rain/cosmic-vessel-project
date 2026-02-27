@@ -1542,13 +1542,15 @@ textarea.inp { resize:vertical; }
     <div class="nav-item" data-view="transcripts" onclick="nav(this)"><span class="ni-icon">◈</span> Mission Logs</div>
     <div class="sidebar-divider"></div>
     <div class="nav-section-label">Departments</div>
-    <div class="nav-item dept-prog" data-view="dept-programming" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-prog)">⬡</span> Programming</div>
-    <div class="nav-item dept-art2" data-view="dept-2d-art" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-art2)">⬡</span> 2D Art</div>
-    <div class="nav-item dept-art3" data-view="dept-3d-art" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-art3)">⬡</span> 3D Art</div>
-    <div class="nav-item dept-mkt" data-view="dept-marketing" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-mkt)">⬡</span> Marketing</div>
-    <div class="nav-item dept-snd" data-view="dept-sound" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-snd)">⬡</span> Sound Design</div>
-    <div class="nav-item dept-vfx" data-view="dept-vfx" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-vfx)">⬡</span> Visual Effects</div>
-    <div class="nav-item dept-nar" data-view="dept-narrative" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-nar)">⬡</span> Narrative</div>
+    <div id="dept-nav-items">
+    <div class="nav-item" data-view="dept-programming" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-prog)">⬡</span> Programming</div>
+    <div class="nav-item" data-view="dept-2d-art" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-art2)">⬡</span> 2D Art</div>
+    <div class="nav-item" data-view="dept-3d-art" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-art3)">⬡</span> 3D Art</div>
+    <div class="nav-item" data-view="dept-marketing" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-mkt)">⬡</span> Marketing</div>
+    <div class="nav-item" data-view="dept-sound" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-snd)">⬡</span> Sound Design</div>
+    <div class="nav-item" data-view="dept-vfx" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-vfx)">⬡</span> Visual Effects</div>
+    <div class="nav-item" data-view="dept-narrative" onclick="nav(this)"><span class="ni-icon" style="color:var(--dept-nar)">⬡</span> Narrative</div>
+    </div>
     <div class="sidebar-divider"></div>
     <div class="nav-item hidden" id="nav-admin" data-view="admin" onclick="nav(this)"><span class="ni-icon">★</span> Admin</div>
     <div class="nav-item" data-view="profile" onclick="nav(this)"><span class="ni-icon">◑</span> My Profile</div>
@@ -1832,6 +1834,7 @@ textarea.inp { resize:vertical; }
     <div class="view" id="view-dept-sound"><div class="dept-board-container" data-dept="sound"></div></div>
     <div class="view" id="view-dept-vfx"><div class="dept-board-container" data-dept="vfx"></div></div>
     <div class="view" id="view-dept-narrative"><div class="dept-board-container" data-dept="narrative"></div></div>
+    <div id="custom-dept-views"><!-- dynamic custom dept views injected here --></div>
 
     <!-- ── PROFILE ── -->
     <div class="view" id="view-profile">
@@ -2026,6 +2029,26 @@ textarea.inp { resize:vertical; }
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal('m-add-dept')">Cancel</button>
       <button class="btn btn-gold" onclick="submitAddDept()">Add Department</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-edit-dept">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-hdr"><span class="modal-title">&#9658; EDIT DEPARTMENT</span><button class="modal-x" onclick="closeModal('m-edit-dept')">&#x2715;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-dept-id">
+      <div class="field"><span class="field-label">Department Name</span><input class="inp" id="edit-dept-name" placeholder="Department name"></div>
+      <div class="field"><span class="field-label">Colour</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="color" id="edit-dept-color" value="#4a90d9" style="width:48px;height:32px;border:1px solid var(--border);border-radius:4px;background:var(--bg-3);cursor:pointer;">
+          <span style="font-size:11px;color:var(--grey);">Pick a colour for the dept tag</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('m-edit-dept')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitEditDept()">Save Changes</button>
     </div>
   </div>
 </div>
@@ -2635,7 +2658,18 @@ function startListeners() {
     if (schedView && schedView.classList.contains('active')) renderAvailHeatmap();
   });
 
-  listeners = [u1,u2,u3,u4,u5,u6];
+  const u7 = db.collection('config').doc('custom_depts').onSnapshot(function(doc) {
+    liveData.customDepts = doc.exists ? (doc.data().depts || []) : [];
+    renderDeptNav();
+    renderAdminDepts();
+    var profileView = document.getElementById('view-profile');
+    if (profileView && profileView.classList.contains('active')) renderProfile();
+    document.querySelectorAll('.dept-board-container').forEach(function(c) {
+      if (c.closest('.view.active')) renderDeptBoard(c.dataset.dept);
+    });
+  });
+
+  listeners = [u1,u2,u3,u4,u5,u6,u7];
 }
 
 // ─── CONFIG ───────────────────────────────────────────────
@@ -3944,7 +3978,13 @@ function renderCrew() {
   if (actionsEl && currentProfile.role==='admin') {
     actionsEl.innerHTML = "<button class='btn btn-gold' onclick='openModal(&quot;m-add-member&quot;);populateDeptChecks()'>+ Add Member</button>";
   }
-  let members = Object.values(liveData.members);
+  var STATUS_ORDER = { online:0, working:1, gaming:2, offline:3 };
+  let members = Object.values(liveData.members).slice().sort(function(a,b){
+    var sa = STATUS_ORDER[a.status] !== undefined ? STATUS_ORDER[a.status] : 3;
+    var sb = STATUS_ORDER[b.status] !== undefined ? STATUS_ORDER[b.status] : 3;
+    if (sa !== sb) return sa - sb;
+    return (a.name||'').localeCompare(b.name||'');
+  });
   if (crewFilter) members = members.filter(m=>m.name.toLowerCase().includes(crewFilter)||m.email?.toLowerCase().includes(crewFilter));
 
   if (!members.length) { el.innerHTML='<div class="no-data">No members</div>'; return; }
@@ -3952,7 +3992,7 @@ function renderCrew() {
   el.innerHTML = members.map(m => {
     const statusCls = STATUS_CLASS[m.status||'offline'];
     const localTime = getLocalTime(m.tz||'UTC');
-    const normD = normaliseDepts(m.depts); const depts = normD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
+    var _nd = normaliseDepts(m.depts); var depts = _nd.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+lbl+'</span>'; }).join('');
     return `<div class="roster-card">
       <div style="position:relative;">
         <div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;">${initials(m.name)}</div>
@@ -3989,7 +4029,7 @@ function renderTzTable() {
     return (a.name || '').localeCompare(b.name || '');
   });
   tbody.innerHTML = sortedMembers.map(m => {
-    const normD2 = normaliseDepts(m.depts); const depts = normD2.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
+    var _ndd = normaliseDepts(m.depts); var depts = _ndd.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+lbl+'</span>'; }).join('');
     // Only show as active if status is explicitly set to an active state
     const status = (m.status && m.status !== 'offline') ? m.status : 'offline';
     const hasLoggedIn = !!m.status; // if no status field, they haven't logged in yet
@@ -4094,10 +4134,12 @@ function renderDashTasks() {
 function populateDeptChecks() {
   const el = document.getElementById('am-dept-checks');
   if (!el) return;
-  el.innerHTML = DEPTS.map(d=>`
-    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:rgba(255,255,255,.04);padding:5px 10px;border-radius:4px;border:1px solid var(--border);font-weight:600;color:${d.color};">
-      <input type="checkbox" value="${d.id}" style="accent-color:${d.color};"> ${d.label}
-    </label>`).join('');
+  var list = getDeptList();
+  el.innerHTML = list.map(function(d) {
+    var color = DEPT_COLORS[d.id] || d.color || '#888';
+    return '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:rgba(255,255,255,.04);padding:5px 10px;border-radius:4px;border:1px solid ' + color + '44;font-weight:600;color:' + color + ';">' +
+      '<input type="checkbox" value="' + d.id + '" style="accent-color:' + color + ';"> ' + d.label + '</label>';
+  }).join('');
 }
 
 async function submitAddMember() {
@@ -4133,11 +4175,31 @@ async function submitAddMember() {
 
 async function removeMember(uid) {
   if (uid === currentUser.uid) { toast("You can't remove yourself",'err'); return; }
-  const m = liveData.members[uid];
-  if (!confirm(`Remove ${m?.name} from the crew?`)) return;
-  await db.collection('users').doc(uid).delete();
-  // Note about Google Calendar/Drive: handled via Google Cloud Functions (see setup guide)
-  toast(`${m?.name||'Member'} removed. Note: manual removal from Google Drive/Calendar required until Cloud Functions are set up.`,'inf');
+  var m = liveData.members[uid];
+  if (!m) return;
+  var typed = prompt('Type the member\'s full name "' + m.name + '" to confirm deletion.\nThis removes them from all tasks and cannot be undone.');
+  if (typed === null) return;
+  if (typed.trim() !== m.name) { toast('Name did not match — deletion cancelled','err'); return; }
+  try {
+    // Remove from all tasks (unassign)
+    var taskBatch = db.batch();
+    Object.values(liveData.tasks).forEach(function(t) {
+      if (t.assignee === uid) taskBatch.update(db.collection('tasks').doc(t.id), { assignee: '', state: 'unassigned' });
+    });
+    await taskBatch.commit();
+    // Remove from all meetings attendee lists
+    var mtgBatch = db.batch();
+    (liveData.meetings||[]).forEach(function(mtg) {
+      if ((mtg.attendees||[]).includes(uid)) {
+        var newAttendees = mtg.attendees.filter(function(a){ return a !== uid; });
+        mtgBatch.update(db.collection('meetings').doc(mtg.id), { attendees: newAttendees });
+      }
+    });
+    await mtgBatch.commit();
+    // Delete their Firestore profile
+    await db.collection('users').doc(uid).delete();
+    toast(m.name + ' removed from crew and unassigned from all tasks.','ok');
+  } catch(e) { toast('Error: ' + e.message,'err'); }
 }
 
 function renderOrphanTasks() {
@@ -4209,6 +4271,59 @@ function renderOrphanTasks() {
 
 
 
+
+// ─── DYNAMIC DEPARTMENT NAV ───────────────────────────────
+var BUILTIN_DEPT_IDS = ['programming','2d-art','3d-art','marketing','sound','vfx','narrative'];
+
+function renderDeptNav() {
+  var list = getDeptList();
+  var navContainer = document.getElementById('dept-nav-items');
+  var viewContainer = document.getElementById('custom-dept-views');
+  if (!navContainer || !viewContainer) return;
+
+  // Remove old custom nav items (keep builtin ones = first 7)
+  var items = navContainer.querySelectorAll('.nav-item');
+  items.forEach(function(item) {
+    if (!BUILTIN_DEPT_IDS.includes(item.dataset.view.replace('dept-',''))) {
+      item.remove();
+    }
+  });
+
+  // Remove old custom views
+  viewContainer.innerHTML = '';
+
+  // Add nav + view for each custom dept
+  list.forEach(function(d) {
+    if (BUILTIN_DEPT_IDS.includes(d.id)) return; // builtin handled statically
+    var color = DEPT_COLORS[d.id] || d.color || '#888';
+
+    // Nav item
+    var navItem = document.createElement('div');
+    navItem.className = 'nav-item';
+    navItem.dataset.view = 'dept-' + d.id;
+    navItem.addEventListener('click', function() { nav(this); });
+    navItem.innerHTML = '<span class="ni-icon" style="color:' + color + '">⬡</span> ' + esc(d.label);
+    navContainer.appendChild(navItem);
+
+    // View + board container
+    var viewEl = document.createElement('div');
+    viewEl.className = 'view';
+    viewEl.id = 'view-dept-' + d.id;
+    var boardDiv = document.createElement('div');
+    boardDiv.className = 'dept-board-container';
+    boardDiv.dataset.dept = d.id;
+    viewEl.appendChild(boardDiv);
+    viewContainer.appendChild(viewEl);
+  });
+
+  // Update DEPT_NAMES and DEPT_COLORS for custom depts
+  list.forEach(function(d) {
+    if (!BUILTIN_DEPT_IDS.includes(d.id)) {
+      DEPT_NAMES[d.id] = d.label;
+      DEPT_COLORS[d.id] = d.color || '#888';
+    }
+  });
+}
 // ─── DEPARTMENT MANAGEMENT ────────────────────────────────
 function renderAdminDepts() {
   var el = document.getElementById('admin-depts-list');
@@ -4233,6 +4348,12 @@ function renderAdminDepts() {
       delBtn.title = 'Remove custom dept';
       delBtn.style.cssText = 'margin-left:6px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
       delBtn.addEventListener('click', (function(id){ return function(){ deleteDept(id); }; })(d.id));
+      var editBtn = document.createElement('button');
+      editBtn.textContent = '✎';
+      editBtn.title = 'Rename / recolour';
+      editBtn.style.cssText = 'margin-left:2px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
+      editBtn.addEventListener('click', (function(id){ return function(){ openEditDept(id); }; })(d.id));
+      chip.appendChild(editBtn);
       chip.appendChild(delBtn);
     }
     el.appendChild(chip);
@@ -4262,14 +4383,60 @@ async function submitAddDept() {
 }
 
 async function deleteDept(id) {
-  if (!confirm('Remove this department? Members assigned to it will keep the tag but it won\'t appear in lists.')) return;
-  var dept = (liveData.customDepts||[]).find(function(d){ return d.id === id; });
+  var dept = getDeptList().find(function(d){ return d.id === id; });
   if (!dept) { toast('Department not found','err'); return; }
+  // Type-to-confirm modal
+  var typed = prompt('Type the department name "' + dept.label + '" to confirm deletion.\nThis will remove ALL tasks in this department and cannot be undone.');
+  if (typed === null) return; // cancelled
+  if (typed.trim() !== dept.label) { toast('Name did not match — deletion cancelled','err'); return; }
   try {
-    await db.collection('config').doc('custom_depts').update({
-      depts: firebase.firestore.FieldValue.arrayRemove(dept)
+    // Delete all tasks in this dept
+    var batch = db.batch();
+    var tasksToDelete = Object.values(liveData.tasks).filter(function(t){ return t.dept === id; });
+    tasksToDelete.forEach(function(t){ batch.delete(db.collection('tasks').doc(t.id)); });
+    await batch.commit();
+    // Remove dept from all members' depts array
+    var memberBatch = db.batch();
+    Object.values(liveData.members).forEach(function(m) {
+      if ((m.depts||[]).includes(id)) {
+        var newDepts = (m.depts||[]).filter(function(d){ return d !== id; });
+        memberBatch.update(db.collection('users').doc(m.uid), { depts: newDepts });
+      }
     });
-    toast('Department removed','ok');
+    await memberBatch.commit();
+    // Remove the dept config doc
+    if (BUILTIN_DEPT_IDS.includes(id)) {
+      toast('Cannot delete built-in departments','err'); return;
+    }
+    var updatedDepts = (liveData.customDepts||[]).filter(function(d){ return d.id !== id; });
+    await db.collection('config').doc('custom_depts').set({ depts: updatedDepts });
+    toast('Department "' + dept.label + '" deleted with ' + tasksToDelete.length + ' tasks','ok');
+  } catch(e) { toast('Error: ' + e.message,'err'); }
+}
+
+function openEditDept(id) {
+  var dept = getDeptList().find(function(d){ return d.id === id; });
+  if (!dept) return;
+  document.getElementById('edit-dept-id').value = id;
+  document.getElementById('edit-dept-name').value = dept.label;
+  document.getElementById('edit-dept-color').value = DEPT_COLORS[id] || dept.color || '#4a90d9';
+  openModal('m-edit-dept');
+}
+
+async function submitEditDept() {
+  var id    = document.getElementById('edit-dept-id').value;
+  var name  = document.getElementById('edit-dept-name').value.trim();
+  var color = document.getElementById('edit-dept-color').value;
+  if (!name) { toast('Name required','err'); return; }
+  var dept = (liveData.customDepts||[]).find(function(d){ return d.id === id; });
+  if (!dept) { toast('Can only rename custom departments','err'); return; }
+  var updatedDepts = (liveData.customDepts||[]).map(function(d){
+    return d.id === id ? { id: id, label: name, color: color } : d;
+  });
+  try {
+    await db.collection('config').doc('custom_depts').set({ depts: updatedDepts });
+    toast('Department renamed to "' + name + '"','ok');
+    closeModal('m-edit-dept');
   } catch(e) { toast('Error: ' + e.message,'err'); }
 }
 function renderAdminRoster() {
@@ -4297,8 +4464,8 @@ function renderAdminRoster() {
         </select>
       </td>
       <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${getTzOffset(m.tz||'UTC')}</td>
-      <td style="padding:10px 16px;">
-        ${m.uid!==currentUser.uid?`<button class="btn btn-danger btn-xs" onclick="removeMember('${m.uid}')">Remove</button>`:'<span style="font-size:11px;color:var(--grey-2);">You</span>'}
+      <td style="padding:10px 16px;display:flex;gap:6px;align-items:center;">
+        ${m.uid!==currentUser.uid?`<button class="btn btn-ghost btn-xs" onclick="openEditMember('${m.uid}')">Edit</button><button class="btn btn-danger btn-xs" onclick="removeMember('${m.uid}')">Delete</button>`:'<span style="font-size:11px;color:var(--grey-2);">You</span>'}
       </td>
     </tr>`).join('')}
     </tbody>
@@ -4353,7 +4520,7 @@ function renderProfile() {
   var emailEl = document.getElementById('edit-email');
   if (emailEl) emailEl.value = '';
   const deptsEl = document.getElementById('prof-depts');
-  var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return`<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
+  var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(lbl)+'</span>'; }).join('');
 }
 
 async function saveProfile() {
