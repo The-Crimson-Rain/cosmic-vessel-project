@@ -1612,7 +1612,7 @@ textarea.inp { resize:vertical; }
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Recent Tasks</span><button class="btn btn-ghost btn-sm" onclick="navTo('dept-programming')">View Boards</button></div>
+          <div class="panel-hdr"><span class="panel-title">Recent Tasks</span><button class="btn btn-ghost btn-sm" onclick="navToMyDept()">View Boards</button></div>
           <div id="dash-tasks" style="max-height:280px;overflow-y:auto;"></div>
         </div>
         <div class="panel">
@@ -3270,11 +3270,13 @@ function taskCardHTML(t) {
   html += '<span class="chip" style="color:' + priorityColor + ';border-color:' + priorityColor + '44;background:' + priorityColor + '11;">' + (t.priority||'medium').toUpperCase() + '</span>';
   html += '</div>';
   if (canAdminLead) {
-    html += '<div class="tc-actions" onclick="event.stopPropagation()">';
+    html += '<div class="tc-actions" onclick="event.stopPropagation()" style="flex-direction:column;align-items:flex-end;gap:3px;">';
+    html += '<div style="display:flex;gap:3px;">';
     html += '<button class="tc-btn" onclick="openEditTask(\'' + t.id + '\');event.stopPropagation()">Edit</button>';
     html += '<button class="tc-btn tc-del" onclick="deleteTask(\'' + t.id + '\');event.stopPropagation()">Del</button>';
     if (t.state==='review') html += '<button class="tc-btn" style="color:var(--green);" onclick="setTaskState(\'' + t.id + '\',\'completed\',this);event.stopPropagation()">Approve</button>';
-    if (t.state==='completed') html += '<button class="tc-btn" style="color:var(--amber);" onclick="setTaskState(\'' + t.id + '\',\'in-progress\',this);event.stopPropagation()">Reinstate</button>';
+    html += '</div>';
+    if (t.state==='completed') html += '<button class="tc-btn" style="color:var(--amber);width:100%;margin-top:1px;" onclick="setTaskState(\'' + t.id + '\',\'in-progress\',this);event.stopPropagation()">Reinstate</button>';
     html += '</div>';
   }
   html += '</div>';
@@ -3874,10 +3876,40 @@ function renderDashCrewStrip() {
 }
 
 // ─── DASHBOARD TASKS ──────────────────────────────────────
+
+function navToMyDept() {
+  var depts = currentProfile ? (currentProfile.depts || (currentProfile.dept ? [currentProfile.dept] : [])) : [];
+  // Map dept values to view IDs
+  var deptViewMap = {
+    'programming':'dept-programming','2d-art':'dept-2d-art','3d-art':'dept-3d-art',
+    'marketing':'dept-marketing','sound':'dept-sound','vfx':'dept-vfx',
+    'narrative':'dept-narrative','general':'dept-programming'
+  };
+  var target = 'dept-programming';
+  if (depts.length > 0) target = deptViewMap[depts[0]] || 'dept-programming';
+  navTo(target);
+}
 function renderDashTasks() {
   var el = document.getElementById('dash-tasks');
   if (!el) return;
-  var recent = Object.values(liveData.tasks).filter(function(t){ return t.state !== 'completed'; }).slice(0,6);
+  var uid  = currentUser ? currentUser.uid : '';
+  var role = currentProfile ? currentProfile.role : 'member';
+  var myDepts = currentProfile ? (currentProfile.depts || currentProfile.dept ? [currentProfile.dept] : []) : [];
+  if (currentProfile && currentProfile.depts) myDepts = currentProfile.depts;
+  var all = Object.values(liveData.tasks).filter(function(t){ return t.state !== 'completed'; });
+  var recent;
+  if (role === 'admin') {
+    recent = all; // admins see everything
+  } else if (role === 'lead') {
+    recent = all.filter(function(t){
+      return (myDepts.includes(t.dept)) || t.assignee === uid || t.createdBy === uid;
+    });
+  } else {
+    recent = all.filter(function(t){
+      return t.assignee === uid || t.createdBy === uid || (myDepts.includes(t.dept));
+    });
+  }
+  recent = recent.slice(0,8);
   if (!recent.length) { el.innerHTML = '<div class="no-data">No active tasks</div>'; return; }
   el.innerHTML = recent.map(function(t) {
     var taskName = t.name || t.title || 'Unnamed';
@@ -5300,20 +5332,21 @@ arcAudio.addEventListener('timeupdate', function(){
   var dur = arcAudio.duration||0, cur = arcAudio.currentTime;
   if (!arc.dragging) {
     var pct = dur ? (cur/dur*100) : 0;
+    // Inline player (on Mission Logs view)
     var f = document.getElementById('arcProgFill');
     var t = document.getElementById('arcProgThumb');
-    if (f) f.style.width  = pct+'%';
-    if (t) t.style.left   = pct+'%';
-    // Mini player
-    var mf = document.getElementById('arcMiniFill');
-    var mt = document.getElementById('arcMiniThumb');
+    if (f) f.style.width = pct+'%';
+    if (t) t.style.left  = pct+'%';
+    // Sidebar player
+    var mf = document.getElementById('sbFill');
+    var mt = document.getElementById('sbThumb');
     if (mf) mf.style.width = pct+'%';
     if (mt) mt.style.left  = pct+'%';
   }
-  var d = document.getElementById('arcTimeDisp');
-  if (d) d.textContent = arcFmt(cur)+' / '+arcFmt(dur);
-  var md = document.getElementById('arcMiniTime');
-  if (md) md.textContent = arcFmt(cur)+' / '+arcFmt(dur);
+  var d  = document.getElementById('arcTimeDisp');
+  if (d)  d.textContent  = arcFmt(cur)+' / '+arcFmt(dur);
+  var sd = document.getElementById('sbTime');
+  if (sd) sd.textContent = arcFmt(cur)+' / '+arcFmt(dur);
   arcActiveLine(cur);
 });
 
