@@ -124,14 +124,10 @@ body::after {
 #app {
   position:relative; z-index:1;
   display:grid;
-  grid-template-rows: 56px 36px 1fr 0px;
+  grid-template-rows: 56px 36px 1fr;
   grid-template-columns: 220px 1fr;
   height:100vh;
   overflow:hidden;
-  transition: grid-template-rows .25s ease;
-}
-#app.player-open {
-  grid-template-rows: 56px 36px 1fr 48px;
 }
 
 /* ── HEADER ──────────────────────────────── */
@@ -303,7 +299,8 @@ body::after {
 #view-transcripts.active {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -1064,7 +1061,8 @@ textarea.inp { resize:vertical; }
 /* Layout */
 .arc-layout {
   display: flex;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   gap: 0;
 }
@@ -1325,57 +1323,64 @@ textarea.inp { resize:vertical; }
 @keyframes arc-pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
 
 /* ── PERSISTENT BOTTOM PLAYER ─────────────────────────── */
-.arc-mini-player {
-  grid-column: 1 / -1;
-  grid-row: 4;
-  background: var(--bg-1);
-  border-top: 2px solid rgba(200,16,46,.4);
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 20px;
-  height: 0;
-  overflow: hidden;
-  transition: height .25s ease;
-  z-index: 100;
+/* ── SIDEBAR AUDIO PLAYER ─────────────────────────────── */
+.sb-player {
+  border-top: 1px solid var(--border);
+  background: rgba(4,5,8,.6);
+  flex-shrink: 0;
+  margin-top: auto;
 }
-.arc-mini-player.visible {
-  height: 48px;
+.sb-player-idle {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
 }
-.arc-mini-player .arc-prog-wrap {
-  flex: 1;
-  min-width: 0;
-  max-width: none;
-  height: 4px;
+.sb-player-idle-icon { font-size: 10px; color: var(--grey-2); }
+.sb-player-idle-txt {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: .12em; color: var(--grey-2);
 }
-.arc-mini-title {
-  font-size: 12px; color: var(--white); font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  min-width: 80px; max-width: 200px; flex-shrink: 1;
+.sb-player-active {
+  padding: 10px 14px 8px;
+  display: flex; flex-direction: column; gap: 8px;
 }
-.arc-mini-time {
-  font-family: var(--mono); font-size: 10px; color: var(--grey);
-  white-space: nowrap; flex-shrink: 0;
+.sb-player-hdr {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
 }
-.arc-mini-close {
+.sb-player-title {
+  font-size: 11px; font-weight: 700; color: var(--white);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+}
+.sb-player-toggle {
   background: transparent; border: none; color: var(--grey-2);
-  cursor: pointer; font-size: 14px; padding: 4px 6px;
-  flex-shrink: 0; transition: color .15s; line-height: 1;
+  cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1;
+  transition: color .15s, transform .2s; flex-shrink: 0;
 }
-.arc-mini-close:hover { color: var(--white); }
-.arc-mini-title {
-  flex: 1; min-width: 0;
-  font-size: 12px; color: var(--white);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.sb-player-toggle:hover { color: var(--white); }
+.sb-player-controls {
+  display: flex; align-items: center; gap: 8px;
 }
-.arc-mini-time {
-  font-family: var(--mono); font-size: 10px; color: var(--grey);
-  white-space: nowrap; flex-shrink: 0;
+.sb-player-time {
+  font-family: var(--mono); font-size: 9px; color: var(--grey);
+  flex: 1; text-align: right; white-space: nowrap;
 }
-.arc-mini-close {
-  background: transparent; border: none; color: var(--grey-2);
-  cursor: pointer; font-size: 14px; padding: 4px 6px;
-  flex-shrink: 0; transition: color .15s; line-height: 1;
+.sb-prog-wrap {
+  position: relative; height: 4px;
+  background: var(--bg-3); border-radius: 2px; cursor: pointer;
 }
-.arc-mini-close:hover { color: var(--white); }
+.sb-prog-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: var(--crimson-hi); border-radius: 2px; pointer-events: none;
+}
+.sb-prog-thumb {
+  position: absolute; top: 50%; width: 10px; height: 10px;
+  background: var(--white); border-radius: 50%;
+  transform: translate(-50%,-50%); pointer-events: none;
+  opacity: 0; transition: opacity .15s;
+}
+.sb-prog-wrap:hover .sb-prog-thumb { opacity: 1; }
+.sb-player.collapsed .sb-player-controls { display: none; }
+.sb-player.collapsed .sb-prog-wrap { display: none; }
+.sb-player.collapsed .sb-player-toggle { transform: rotate(-90deg); }
 
 
 </style>
@@ -1559,6 +1564,29 @@ textarea.inp { resize:vertical; }
     <div class="sidebar-divider"></div>
     <div class="nav-item hidden" id="nav-admin" data-view="admin" onclick="nav(this)"><span class="ni-icon">★</span> Admin</div>
     <div class="nav-item" data-view="profile" onclick="nav(this)"><span class="ni-icon">◑</span> My Profile</div>
+    <!-- SIDEBAR AUDIO PLAYER -->
+    <div id="sbPlayer" class="sb-player collapsed">
+      <div class="sb-player-idle" id="sbPlayerIdle">
+        <span class="sb-player-idle-icon">◈</span>
+        <span class="sb-player-idle-txt">NO ACTIVE SESSION</span>
+      </div>
+      <div class="sb-player-active" id="sbPlayerActive" style="display:none;">
+        <div class="sb-player-hdr">
+          <div class="sb-player-title" id="sbTitle">—</div>
+          <button class="sb-player-toggle" id="sbToggle" onclick="sbToggleCollapse()" title="Minimise">▾</button>
+        </div>
+        <div class="sb-player-controls" id="sbControls">
+          <button class="arc-btn-play" id="sbPlay" onclick="arcPlay()" style="width:26px;height:26px;font-size:10px;">▶</button>
+          <button class="arc-btn-stop" onclick="arcStopFn()" style="width:26px;height:26px;font-size:10px;">⏹</button>
+          <div class="sb-player-time" id="sbTime">0:00 / 0:00</div>
+          <button class="arc-btn-speed" id="sbSpeed" onclick="arcSpeedCycle()" style="font-size:9px;padding:2px 5px;">1×</button>
+        </div>
+        <div class="sb-prog-wrap" id="sbProgWrap" onmousedown="sbDragStart(event)" onclick="sbProgClick(event)">
+          <div class="sb-prog-fill" id="sbFill" style="width:0%"></div>
+          <div class="sb-prog-thumb" id="sbThumb"></div>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <!-- MAIN CONTENT -->
@@ -5101,16 +5129,25 @@ function arcSelect(id) {
     if (playBtn) { playBtn.disabled=false; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=false;
     if (noAudio) noAudio.style.display='none';
+    // Show sidebar player immediately with this meeting's title
+    var idle = document.getElementById('sbPlayerIdle');
+    var active = document.getElementById('sbPlayerActive');
+    if (idle) idle.style.display = 'none';
+    if (active) active.style.display = 'flex';
+    var sbT = document.getElementById('sbTitle');
+    if (sbT) sbT.textContent = m.title || 'Meeting';
+    var sbP = document.getElementById('sbPlay');
+    if (sbP) sbP.textContent = '▶';
   } else {
     arcAudio.src='';
     if (playBtn) { playBtn.disabled=true; playBtn.textContent='▶'; }
     if (stopBtn) stopBtn.disabled=true;
-    // Show specific message if Drive URL was provided but not supported
-    if (m.audioUrl && arcIsDriveUrl(m.audioUrl)) {
-      if (noAudio) { noAudio.style.display='inline'; noAudio.textContent='RE-UPLOAD TO R2'; noAudio.title='Google Drive audio is not supported. Upload the .ogg to Cloudflare R2.'; }
-    } else {
-      if (noAudio) { noAudio.style.display='inline'; noAudio.textContent='NO AUDIO'; noAudio.title=''; }
-    }
+    if (noAudio) noAudio.style.display='inline';
+    // Return sidebar player to idle if no audio
+    var idle2 = document.getElementById('sbPlayerIdle');
+    var active2 = document.getElementById('sbPlayerActive');
+    if (idle2) idle2.style.display = 'flex';
+    if (active2) active2.style.display = 'none';
   }
   arcResetProg();
 
@@ -5295,18 +5332,18 @@ arcAudio.addEventListener('error', function(e) {
 
 arcAudio.addEventListener('play', function(){
   var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='⏸';
-  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='⏸';
+  var mb=document.getElementById('sbPlay'); if(mb) mb.textContent='⏸';
   // Always show mini player when audio plays, even if it was manually closed
   arc._miniHidden = false;
   arcMiniShow();
 });
 arcAudio.addEventListener('pause', function(){
   var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='▶';
-  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='▶';
+  var mb=document.getElementById('sbPlay'); if(mb) mb.textContent='▶';
 });
 arcAudio.addEventListener('ended', function(){
   var b=document.getElementById('arcPlayBtn'); if(b) b.textContent='▶';
-  var mb=document.getElementById('arcMiniPlay'); if(mb) mb.textContent='▶';
+  var mb=document.getElementById('sbPlay'); if(mb) mb.textContent='▶';
   arc.activeIdx=-1;
 });
 
@@ -5327,6 +5364,10 @@ function arcStopFn() {
   arcAudio.pause();
   arcAudio.currentTime=0;
   arc.activeIdx=-1;
+  var sbP = document.getElementById('sbPlay'); if(sbP) sbP.textContent='▶';
+  var sbF = document.getElementById('sbFill'); if(sbF) sbF.style.width='0%';
+  var sbTh = document.getElementById('sbThumb'); if(sbTh) sbTh.style.left='0%';
+  var sbTm = document.getElementById('sbTime'); if(sbTm) sbTm.textContent='0:00 / 0:00';
   arcResetProg();
   arcShowLines(arc.lines);
 }
@@ -5400,14 +5441,14 @@ function arcSpeedCycle() {
   arc.speedIdx=(arc.speedIdx+1)%arc.speeds.length;
   arcAudio.playbackRate=arc.speeds[arc.speedIdx];
   var b=document.getElementById('arcSpeedBtn'); if(b) b.textContent=arc.speeds[arc.speedIdx]+'×';
-  var mb=document.getElementById('arcMiniSpeed'); if(mb) mb.textContent=arc.speeds[arc.speedIdx]+'×';
+  var mb=document.getElementById('sbSpeed'); if(mb) mb.textContent=arc.speeds[arc.speedIdx]+'×';
 }
 
 function arcActiveLine(t) {
   if (!arc.lines.length) return;
   var speech=arc.lines.map(function(l,i){return{l:l,i:i};}).filter(function(x){return x.l.type==='speech'&&x.l.offset!=null;});
   var newIdx=-1;
-  for (var i=speech.length-1;i>=0;i--) { if(t>=speech[i].l.offset-0.3){newIdx=speech[i].i;break;} }
+  for (var i=speech.length-1;i>=0;i--) { if(t>=speech[i].l.offset-1.5){newIdx=speech[i].i;break;} }
   if (newIdx===arc.activeIdx) return;
   var old=document.getElementById('arcl'+arc.activeIdx); if(old) old.classList.remove('arc-on');
   arc.activeIdx=newIdx;
@@ -5490,49 +5531,59 @@ document.addEventListener('keydown', function(e) {
 
 // ── Mini player ────────────────────────────────────────────
 function arcMiniShow() {
-  var p=document.getElementById('arcMiniPlayer');
-  if(!p) return;
-  p.classList.add('visible');
-  document.getElementById('app').classList.add('player-open');
-  var m=(liveData.archiveMeetings||[]).find(function(x){return x.id===arc.currentId;});
-  var t=document.getElementById('arcMiniTitle');
-  if(t&&m) t.textContent=m.title||'Meeting';
+  // Show sidebar player active state
+  var idle = document.getElementById('sbPlayerIdle');
+  var active = document.getElementById('sbPlayerActive');
+  if (idle) idle.style.display = 'none';
+  if (active) active.style.display = 'flex';
+  // Expand if collapsed
+  var sb = document.getElementById('sbPlayer');
+  if (sb) sb.classList.remove('collapsed');
+  // Update title
+  var m = (liveData.archiveMeetings||[]).find(function(x){ return x.id===arc.currentId; });
+  var t = document.getElementById('sbTitle');
+  if (t && m) t.textContent = m.title || 'Meeting';
 }
 function arcMiniHide() {
   arcAudio.pause();
-  var p=document.getElementById('arcMiniPlayer');
-  if(p) p.classList.remove('visible');
-  document.getElementById('app').classList.remove('player-open');
-  // Clear src so play event doesn't re-open the bar on next session
+  // Return to idle state
+  var idle = document.getElementById('sbPlayerIdle');
+  var active = document.getElementById('sbPlayerActive');
+  if (idle) idle.style.display = 'flex';
+  if (active) active.style.display = 'none';
   arc._miniHidden = true;
 }
-function arcMiniDragStart(e) {
+function sbToggleCollapse() {
+  var sb = document.getElementById('sbPlayer');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  var btn = document.getElementById('sbToggle');
+  if (btn) btn.title = sb.classList.contains('collapsed') ? 'Expand' : 'Minimise';
+}
+function sbDragStart(e) {
   if (!arcAudio.duration) return;
-  arc.dragging=true;
-  arcMiniDragMove(e);
+  arc.dragging = true;
+  sbDragMove(e);
+  document.addEventListener('mousemove', sbDragMove);
+  document.addEventListener('mouseup', sbDragEnd);
 }
-function arcMiniDragMove(e) {
-  if (!arc.dragging||!arcAudio.duration) return;
-  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
-  var r=w.getBoundingClientRect();
-  var x=(e.touches?e.touches[0].clientX:e.clientX);
-  var p=Math.max(0,Math.min(1,(x-r.left)/r.width));
-  var f=document.getElementById('arcMiniFill'); if(f) f.style.width=(p*100)+'%';
+function sbDragMove(e) {
+  if (!arc.dragging || !arcAudio.duration) return;
+  var w = document.getElementById('sbProgWrap'); if (!w) return;
+  var r = w.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  arcAudio.currentTime = pct * arcAudio.duration;
 }
-function arcMiniDragEnd(e) {
-  if (!arc.dragging) return;
-  arc.dragging=false;
-  if (!arcAudio.duration) return;
-  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
-  var r=w.getBoundingClientRect();
-  var x=(e.changedTouches?e.changedTouches[0].clientX:e.clientX);
-  arcAudio.currentTime=Math.max(0,Math.min(1,(x-r.left)/r.width))*arcAudio.duration;
+function sbDragEnd() {
+  arc.dragging = false;
+  document.removeEventListener('mousemove', sbDragMove);
+  document.removeEventListener('mouseup', sbDragEnd);
 }
-function arcMiniProgClick(e) {
-  if (arc.dragging||!arcAudio.duration) return;
-  var w=document.getElementById('arcMiniProgWrap'); if(!w) return;
-  var r=w.getBoundingClientRect();
-  arcAudio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*arcAudio.duration;
+function sbProgClick(e) {
+  if (arc.dragging || !arcAudio.duration) return;
+  var w = document.getElementById('sbProgWrap'); if (!w) return;
+  var r = w.getBoundingClientRect();
+  arcAudio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * arcAudio.duration;
 }
 
 // ── Add meeting ────────────────────────────────────────────
@@ -5684,20 +5735,7 @@ async function arcAdminClearAll() {
 
 
 
-<!-- MINI PLAYER -->
-<div class="arc-mini-player" id="arcMiniPlayer">
-  <button class="arc-btn-play" id="arcMiniPlay" onclick="arcPlay()" style="width:28px;height:28px;font-size:10px;flex-shrink:0;">▶</button>
-  <button class="arc-btn-stop" id="arcMiniStop" onclick="arcStopFn()" style="flex-shrink:0;">⏹</button>
-  <div class="arc-mini-title" id="arcMiniTitle">No meeting selected</div>
-  <div class="arc-prog-wrap" id="arcMiniProgWrap"
-       onmousedown="arcMiniDragStart(event)" onclick="arcMiniProgClick(event)">
-    <div class="arc-prog-fill" id="arcMiniFill" style="width:0%"></div>
-    <div class="arc-prog-thumb" id="arcMiniThumb"></div>
-  </div>
-  <div class="arc-mini-time" id="arcMiniTime">0:00 / 0:00</div>
-  <button class="arc-btn-speed" id="arcMiniSpeed" onclick="arcSpeedCycle()" style="flex-shrink:0;">1×</button>
-  <button class="arc-mini-close" onclick="arcMiniHide()" title="Close player" style="flex-shrink:0;">✕</button>
-</div>
+
 
 <!-- ADD MEETING MODAL -->
 <div class="modal-bg" id="m-arc-add">
