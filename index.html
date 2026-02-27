@@ -1657,23 +1657,18 @@ textarea.inp { resize:vertical; }
         <div class="page-hdr-left"><div class="ph-title">MISSION SCHEDULER</div><div class="ph-sub">Meetings · All times shown in your local timezone</div></div>
         <div class="ph-actions"><button class="btn btn-primary" onclick="openModal('m-meeting')">+ Schedule Meeting</button></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 360px;gap:16px;">
-
-          <div class="panel">
-            <div class="panel-hdr"><span class="panel-title">Meetings</span></div>
-            <div id="meetings-list" style="padding:10px;max-height:calc(100vh - 320px);overflow-y:auto;"></div>
-            <div style="padding:10px;border-top:1px solid var(--border);">
-              <button class="btn btn-gold btn-sm fw" onclick="openModal('m-meeting')">+ New Meeting</button>
-            </div>
-          </div>
+      <!-- Meetings full width + timezones below -->
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-hdr"><span class="panel-title">Meetings</span></div>
+        <div id="meetings-list" style="padding:10px;display:flex;flex-wrap:wrap;gap:10px;max-height:420px;overflow-y:auto;"></div>
+        <div style="padding:10px;border-top:1px solid var(--border);">
+          <button class="btn btn-gold btn-sm fw" onclick="openModal('m-meeting')">+ New Meeting</button>
         </div>
-        <div>        <div>
-          <div class="panel">
-            <div class="panel-hdr"><span class="panel-title">Member Timezones · Live</span></div>
-            <div style="overflow-x:auto;">
-              <table class="tz-table" id="tz-table"><thead><tr><th>Member</th><th>Local Time</th><th>UTC Offset</th><th>Departments</th><th>Status</th></tr></thead><tbody id="tz-tbody"></tbody></table>
-            </div>
-          </div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-hdr"><span class="panel-title">Member Timezones · Live</span></div>
+        <div style="overflow-x:auto;max-height:320px;overflow-y:auto;">
+          <table class="tz-table" id="tz-table"><thead><tr><th>Member</th><th>Local Time</th><th>UTC Offset</th><th>Departments</th><th>Status</th></tr></thead><tbody id="tz-tbody"></tbody></table>
         </div>
       </div>
       <!-- ── AVAILABILITY HEAT MAP ──────────────────── -->
@@ -3540,13 +3535,28 @@ function renderMeetings() {
   var userTz = (currentProfile && currentProfile.tz) || 'UTC';
   var now = Date.now();
 
-  // Separate active (future + recent past 2h grace) from cancelled
+  var role     = currentProfile ? currentProfile.role : 'member';
+  var myDepts2 = currentProfile ? (currentProfile.depts || (currentProfile.dept ? [currentProfile.dept] : [])) : [];
+
+  // Active: all non-cancelled meetings visible to this user
   var activeMeetings = liveData.meetings.filter(function(m) {
     if (m.cancelled) return false;
-    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
-    return mt > now - 2 * 60 * 60 * 1000; // show until 2h after start
+    var isCreator   = m.createdBy === uid;
+    var isAttendee  = (m.attendees||[]).includes(uid);
+    var isDeptLead2 = role === 'lead' && myDepts2.includes(m.dept);
+    if (role === 'admin') return true;
+    return isCreator || isAttendee || isDeptLead2;
   });
-  var cancelledMeetings = liveData.meetings.filter(function(m) { return m.cancelled; });
+  // Sort: upcoming first, then past
+  activeMeetings.sort(function(a,b){
+    var at = a.dateUtc ? new Date(a.dateUtc).getTime() : 0;
+    var bt = b.dateUtc ? new Date(b.dateUtc).getTime() : 0;
+    return at - bt;
+  });
+  var cancelledMeetings = liveData.meetings.filter(function(m) {
+    if (!m.cancelled) return false;
+    return role === 'admin' || (m.attendees||[]).includes(uid) || m.createdBy === uid;
+  });
 
   if (!activeMeetings.length && !cancelledMeetings.length) {
     list.innerHTML = '<div class="no-data">No meetings scheduled</div>';
@@ -3580,7 +3590,7 @@ function renderMeetings() {
       myRsvp === 'accepted' ? 'rgba(46,204,138,.4)' :
       myRsvp === 'declined' ? 'rgba(200,16,46,.3)' : 'var(--border)';
 
-    var h = '<div class="meeting-card" style="border-color:' + borderColor + ';' + (isCancelled?'opacity:.5;':'') + '">';
+    var h = '<div class="meeting-card" style="border-color:' + borderColor + ';' + (isCancelled?'opacity:.5;':'') + 'min-width:300px;max-width:420px;flex:1;">';
     if (isCancelled) {
       h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
       h += '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--grey-2);">✗ CANCELLED</div>';
@@ -3885,7 +3895,14 @@ function renderCrew() {
 function renderTzTable() {
   const tbody = document.getElementById('tz-tbody');
   if (!tbody) return;
-  tbody.innerHTML = Object.values(liveData.members).map(m => {
+  var STATUS_PRIORITY = { online: 0, working: 1, gaming: 2, offline: 3 };
+  var sortedMembers = Object.values(liveData.members).slice().sort(function(a, b) {
+    var sa = STATUS_PRIORITY[a.status] !== undefined ? STATUS_PRIORITY[a.status] : 3;
+    var sb = STATUS_PRIORITY[b.status] !== undefined ? STATUS_PRIORITY[b.status] : 3;
+    if (sa !== sb) return sa - sb;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+  tbody.innerHTML = sortedMembers.map(m => {
     const normD2 = normaliseDepts(m.depts); const depts = normD2.map(d=>{const dc=DEPT_COLORS[d]||'#888'; const lbl=({programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'})[d]||d; return `<span class="dept-tag" style="color:${dc};border-color:${dc}44;background:${dc}11;">${lbl}</span>`;}).join('');
     // Only show as active if status is explicitly set to an active state
     const status = (m.status && m.status !== 'offline') ? m.status : 'offline';
