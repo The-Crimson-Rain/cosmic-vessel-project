@@ -2622,7 +2622,6 @@ function startListeners() {
   // Meetings
   const u3 = db.collection('meetings').orderBy('dateUtc','asc').onSnapshot(snap => {
     liveData.meetings = snap.docs.map(d=>({id:d.id,...d.data()}));
-    setTimeout(cleanupPastMeetings, 500);
     var activeMtgs = liveData.meetings.filter(function(m){ return !m.cancelled; });
     document.getElementById('s-meetings').textContent = activeMtgs.length;
     renderMeetings(); renderDashMeetings(); updateNotifications();
@@ -2675,7 +2674,7 @@ function startListeners() {
 
   listeners = [u1,u2,u3,u4,u5,u6,u7];
   // Run cleanup shortly after data loads
-  setTimeout(cleanupPastMeetings, 3000);
+  setTimeout(cleanupPastMeetings, 8000); // wait for data to fully load
 }
 
 // ─── CONFIG ───────────────────────────────────────────────
@@ -4622,10 +4621,13 @@ async function cleanupPastMeetings() {
   sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
   var now = Date.now();
   var toDelete = (liveData.meetings||[]).filter(function(m) {
-    if (m.cancelled) return true; // also purge old cancelled ones
-    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    // SAFETY: must have a valid dateUtc — never delete meetings without one
+    if (!m.dateUtc) return false;
+    var mt = new Date(m.dateUtc).getTime();
+    if (isNaN(mt) || mt <= 0) return false;
     var dur = (m.duration || 60) * 60 * 1000;
-    return mt + dur < now; // past end time
+    // Only delete if past end time AND it's a real past date (after year 2020)
+    return mt > new Date('2020-01-01').getTime() && mt + dur < now;
   });
   if (!toDelete.length) return;
   try {
@@ -4634,7 +4636,7 @@ async function cleanupPastMeetings() {
       batch.delete(db.collection('meetings').doc(m.id));
     });
     await batch.commit();
-    if (toDelete.length) console.log('Cleaned up ' + toDelete.length + ' past meetings');
+    console.log('Cleaned up ' + toDelete.length + ' past meeting(s)');
   } catch(e) {
     console.warn('Meeting cleanup error:', e.message);
   }
@@ -4716,10 +4718,13 @@ async function cleanupPastMeetings() {
   sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
   var now = Date.now();
   var toDelete = (liveData.meetings||[]).filter(function(m) {
-    if (m.cancelled) return true; // also purge old cancelled ones
-    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    // SAFETY: must have a valid dateUtc — never delete meetings without one
+    if (!m.dateUtc) return false;
+    var mt = new Date(m.dateUtc).getTime();
+    if (isNaN(mt) || mt <= 0) return false;
     var dur = (m.duration || 60) * 60 * 1000;
-    return mt + dur < now; // past end time
+    // Only delete if past end time AND it's a real past date (after year 2020)
+    return mt > new Date('2020-01-01').getTime() && mt + dur < now;
   });
   if (!toDelete.length) return;
   try {
@@ -4728,7 +4733,7 @@ async function cleanupPastMeetings() {
       batch.delete(db.collection('meetings').doc(m.id));
     });
     await batch.commit();
-    if (toDelete.length) console.log('Cleaned up ' + toDelete.length + ' past meetings');
+    console.log('Cleaned up ' + toDelete.length + ' past meeting(s)');
   } catch(e) {
     console.warn('Meeting cleanup error:', e.message);
   }
