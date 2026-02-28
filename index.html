@@ -1870,11 +1870,8 @@ textarea.inp { resize:vertical; }
               </div>
               <div class="field">
                 <span class="field-label">Change Login Email</span>
-                <div style="display:flex;gap:8px;align-items:flex-start;">
-                  <input class="inp" id="edit-email" type="email" placeholder="Enter new email address" style="flex:1;">
-                  <button class="btn btn-ghost btn-sm" onclick="changeEmail()" style="white-space:nowrap;flex-shrink:0;">Send Verification</button>
-                </div>
-                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Enter a new email and click Send Verification. A confirmation link will be sent to the new address — the change takes effect once confirmed.</div>
+                <input class="inp" id="edit-email" type="email" placeholder="Leave blank to keep current">
+                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">A verification email will be sent to the new address. You may need to re-login.</div>
               </div>
               <div class="field">
                 <span class="field-label">Timezone</span>
@@ -1910,6 +1907,14 @@ textarea.inp { resize:vertical; }
               <div class="field">
                 <span class="field-label">New Password (optional)</span>
                 <input class="inp" id="edit-pass" type="password" placeholder="Leave blank to keep current">
+              </div>
+              <div class="field">
+                <span class="field-label">Change Login Email</span>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <input class="inp" id="edit-email" type="email" placeholder="Enter new email address" style="flex:1;">
+                  <button class="btn btn-ghost btn-sm" onclick="changeEmail()" style="white-space:nowrap;flex-shrink:0;">Send Verification</button>
+                </div>
+                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Enter a new email and click Send Verification. A confirmation link will be sent — the change takes effect once confirmed. You may need to sign out and back in first.</div>
               </div>
               <div class="field" style="display:flex;align-items:center;justify-content:space-between;">
                 <span class="field-label" style="margin-bottom:0;">Meeting Reminders (10 min before)</span>
@@ -2673,9 +2678,34 @@ function startListeners() {
   });
 
   listeners = [u1,u2,u3,u4,u5,u6,u7];
-  // Run cleanup shortly after data loads
-  setTimeout(cleanupPastMeetings, 8000); // wait for data to fully load
+  setTimeout(cleanupPastMeetings, 8000);
 }
+
+// ─── PAST MEETING CLEANUP ────────────────────────────────
+async function cleanupPastMeetings() {
+  if (!currentUser || !currentProfile) return;
+  // Throttle to once per 30 min per session
+  var lastRun = parseInt(sessionStorage.getItem('lastMtgCleanup') || '0');
+  if (Date.now() - lastRun < 30 * 60 * 1000) return;
+  sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
+  var now = Date.now();
+  var toDelete = (liveData.meetings || []).filter(function(m) {
+    if (!m.dateUtc) return false;                          // never delete if no date
+    var mt = new Date(m.dateUtc).getTime();
+    if (isNaN(mt) || mt <= 0) return false;                // never delete if bad date
+    if (mt < new Date('2020-01-01').getTime()) return false; // never delete ancient/zero dates
+    var dur = (m.duration || 60) * 60 * 1000;
+    return mt + dur < now;                                  // only delete if end time has passed
+  });
+  if (!toDelete.length) return;
+  try {
+    var batch = db.batch();
+    toDelete.forEach(function(m) { batch.delete(db.collection('meetings').doc(m.id)); });
+    await batch.commit();
+    console.log('Cleaned up ' + toDelete.length + ' past meeting(s)');
+  } catch(e) { console.warn('Meeting cleanup error:', e.message); }
+}
+
 
 // ─── CONFIG ───────────────────────────────────────────────
 async function loadConfig() {
@@ -4530,21 +4560,20 @@ function renderProfile() {
 
 async function changeEmail() {
   var newEmail = (document.getElementById('edit-email').value || '').trim();
-  if (!newEmail) { toast('Enter a new email address first','err'); return; }
-  if (newEmail === currentUser.email) { toast('That is already your current email','inf'); return; }
-  // Basic format check
-  if (!/^[^@]+@[^@]+\.[^@]+$/.test(newEmail)) { toast('Please enter a valid email address','err'); return; }
+  if (!newEmail) { toast('Enter a new email address first', 'err'); return; }
+  if (newEmail === currentUser.email) { toast('That is already your current email', 'inf'); return; }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(newEmail)) { toast('Please enter a valid email address', 'err'); return; }
   try {
     await currentUser.verifyBeforeUpdateEmail(newEmail);
-    toast('Verification sent to ' + newEmail + ' — check your inbox and confirm the link','ok');
+    toast('Verification sent to ' + newEmail + ' — check your inbox and confirm the link', 'ok');
     document.getElementById('edit-email').value = '';
   } catch(e) {
     if (e.code === 'auth/requires-recent-login') {
-      toast('For security, please sign out and sign back in before changing your email','err');
+      toast('Please sign out and sign back in, then try again', 'err');
     } else if (e.code === 'auth/email-already-in-use') {
-      toast('That email is already associated with another account','err');
+      toast('That email is already linked to another account', 'err');
     } else {
-      toast('Could not send verification: ' + e.message,'err');
+      toast('Could not send verification: ' + e.message, 'err');
     }
   }
 }
@@ -4553,7 +4582,7 @@ async function saveProfile() {
   const name  = document.getElementById('edit-name').value.trim();
   const tz    = document.getElementById('edit-tz').value;
   const pass  = document.getElementById('edit-pass').value;
-  // Email changes handled separately via changeEmail()
+  const newEmail = (document.getElementById('edit-email') || {}).value || '';
   if (!name) { toast('Name required','err'); return; }
   var remindersEl = document.getElementById('edit-reminders');
   var meetingReminders = remindersEl ? remindersEl.checked : true;
@@ -4569,7 +4598,19 @@ async function saveProfile() {
     try { await currentUser.updatePassword(pass); toast('Password updated','ok'); }
     catch(e) { toast('Password update failed — try re-logging in first','err'); }
   }
-
+  // Email change
+  if (newEmail && newEmail !== currentUser.email) {
+    try {
+      await currentUser.verifyBeforeUpdateEmail(newEmail);
+      toast('Verification sent to ' + newEmail + ' — check your inbox','ok');
+    } catch(e) {
+      if (e.code === 'auth/requires-recent-login') {
+        toast('Re-login required to change email — please sign out and back in','err');
+      } else {
+        toast('Email change failed: ' + e.message,'err');
+      }
+    }
+  }
   if (name) await currentUser.updateProfile({ displayName: name });
   updateHeaderUI(); renderProfile();
   toast('Profile saved!','ok');
@@ -4611,40 +4652,9 @@ function setupPresenceHandlers() {
 
   // Start heartbeat
   writeHeartbeat();
-  heartbeatInterval = 
-// ─── PAST MEETING CLEANUP ─────────────────────────────────
-async function cleanupPastMeetings() {
-  if (!currentUser || !currentProfile) return;
-  // Throttle: only run once per 30 minutes per browser session
-  var lastRun = parseInt(sessionStorage.getItem('lastMtgCleanup') || '0');
-  if (Date.now() - lastRun < 30 * 60 * 1000) return;
-  sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
-  var now = Date.now();
-  var toDelete = (liveData.meetings||[]).filter(function(m) {
-    // SAFETY: must have a valid dateUtc — never delete meetings without one
-    if (!m.dateUtc) return false;
-    var mt = new Date(m.dateUtc).getTime();
-    if (isNaN(mt) || mt <= 0) return false;
-    var dur = (m.duration || 60) * 60 * 1000;
-    // Only delete if past end time AND it's a real past date (after year 2020)
-    return mt > new Date('2020-01-01').getTime() && mt + dur < now;
-  });
-  if (!toDelete.length) return;
-  try {
-    var batch = db.batch();
-    toDelete.forEach(function(m) {
-      batch.delete(db.collection('meetings').doc(m.id));
-    });
-    await batch.commit();
-    console.log('Cleaned up ' + toDelete.length + ' past meeting(s)');
-  } catch(e) {
-    console.warn('Meeting cleanup error:', e.message);
-  }
-}
-
-setInterval(writeHeartbeat, HEARTBEAT_MS);
+  heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
 setInterval(checkMeetingReminders, 60000);
-setInterval(cleanupPastMeetings, 60 * 60 * 1000); // hourly cleanup
+setInterval(cleanupPastMeetings, 60 * 60 * 1000);
 window._remindedMeetings = {};
 function checkMeetingReminders() {
   if (!currentUser || !currentProfile) return;
@@ -4708,82 +4718,11 @@ function showReminderToast(m, minsLeft) {
     } else {
       // Back on tab - restart heartbeat and set online
       writeHeartbeat();
-      heartbeatInterval = 
-// ─── PAST MEETING CLEANUP ─────────────────────────────────
-async function cleanupPastMeetings() {
-  if (!currentUser || !currentProfile) return;
-  // Throttle: only run once per 30 minutes per browser session
-  var lastRun = parseInt(sessionStorage.getItem('lastMtgCleanup') || '0');
-  if (Date.now() - lastRun < 30 * 60 * 1000) return;
-  sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
-  var now = Date.now();
-  var toDelete = (liveData.meetings||[]).filter(function(m) {
-    // SAFETY: must have a valid dateUtc — never delete meetings without one
-    if (!m.dateUtc) return false;
-    var mt = new Date(m.dateUtc).getTime();
-    if (isNaN(mt) || mt <= 0) return false;
-    var dur = (m.duration || 60) * 60 * 1000;
-    // Only delete if past end time AND it's a real past date (after year 2020)
-    return mt > new Date('2020-01-01').getTime() && mt + dur < now;
-  });
-  if (!toDelete.length) return;
-  try {
-    var batch = db.batch();
-    toDelete.forEach(function(m) {
-      batch.delete(db.collection('meetings').doc(m.id));
-    });
-    await batch.commit();
-    console.log('Cleaned up ' + toDelete.length + ' past meeting(s)');
-  } catch(e) {
-    console.warn('Meeting cleanup error:', e.message);
-  }
-}
-
-setInterval(writeHeartbeat, HEARTBEAT_MS);
+      heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
 setInterval(checkMeetingReminders, 60000);
-setInterval(cleanupPastMeetings, 60 * 60 * 1000); // hourly cleanup
+setInterval(cleanupPastMeetings, 60 * 60 * 1000);
 window._remindedMeetings = {};
-function checkMeetingReminders() {
-  if (!currentUser || !currentProfile) return;
-  if (currentProfile.meetingReminders === false) return;
-  var uid = currentUser.uid;
-  var now = Date.now();
-  var tenMin = 10 * 60 * 1000;
-  (liveData.meetings||[]).forEach(function(m) {
-    if (m.cancelled || window._remindedMeetings[m.id]) return;
-    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
-    var until = mt - now;
-    if (until > 0 && until <= tenMin) {
-      var attending = (m.attendees||[]).includes(uid) && m.rsvp && m.rsvp[uid] === 'accepted';
-      if (attending || m.createdBy === uid) {
-        window._remindedMeetings[m.id] = true;
-        var mins = Math.ceil(until / 60000);
-        showReminderToast(m, mins);
-      }
-    }
-  });
-}
-function showReminderToast(m, minsLeft) {
-  var id = 'rem-' + m.id;
-  if (document.getElementById(id)) return;
-  var el = document.createElement('div');
-  el.id = id;
-  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(255,193,7,.5);border-left:3px solid var(--gold);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
-  var xBtn = document.createElement('button');
-  xBtn.textContent = '✕';
-  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
-  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
-  var body = document.createElement('div');
-  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:5px;">MEETING IN ' + minsLeft + ' MINUTE' + (minsLeft===1?'':'S') + '</div>' +
-    '<div style="font-size:12px;font-weight:700;color:var(--white);">' + esc(m.name) + '</div>';
-  var row = document.createElement('div');
-  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
-  row.appendChild(body); row.appendChild(xBtn);
-  el.appendChild(row);
-  el.addEventListener('click', function(){ navTo('scheduler'); el.remove(); });
-  document.body.appendChild(el);
-  setTimeout(function(){ if(document.getElementById(id)) document.getElementById(id).remove(); }, 20000);
-}
+
     }
   });
 
