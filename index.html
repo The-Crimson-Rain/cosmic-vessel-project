@@ -1499,7 +1499,7 @@ textarea.inp { resize:vertical; }
           <div class="status-dot s-online" id="hdr-status-dot"></div>
           <div class="u-avatar" id="hdr-avatar">?</div>
           <div class="u-name" id="hdr-name">...</div>
-          <div class="u-role crew" id="hdr-role">CREW</div>
+          <div class="u-role crew" id="hdr-role">MEMBER</div>
         </div>
         <div class="status-menu" id="status-menu">
           <div class="sm-item" onclick="setStatus('online')"><div class="status-dot s-online"></div> Online</div>
@@ -1648,7 +1648,7 @@ textarea.inp { resize:vertical; }
         <div class="ph-actions" id="crew-actions"></div>
       </div>
       <div class="panel">
-        <div class="panel-hdr"><span class="panel-title">Active Members</span><input class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search crew..." oninput="filterCrew(this.value)"></div>
+        <div class="panel-hdr"><span class="panel-title">Active Members</span><input class="inp" style="width:180px;padding:5px 10px;font-size:12px;" placeholder="Search..." oninput="filterCrew(this.value)"></div>
         <div class="roster-grid" id="crew-roster" style="max-height:calc(100vh - 280px);overflow-y:auto;"></div>
       </div>
     </div>
@@ -1838,7 +1838,7 @@ textarea.inp { resize:vertical; }
 
     <!-- ── PROFILE ── -->
     <div class="view" id="view-profile">
-      <div class="page-hdr"><div class="page-hdr-left"><div class="ph-title">MY PROFILE</div><div class="ph-sub">Your crew settings</div></div></div>
+      <div class="page-hdr"><div class="page-hdr-left"><div class="ph-title">MY PROFILE</div><div class="ph-sub">Your account settings</div></div></div>
       <div class="profile-grid">
         <div class="profile-card">
           <div class="profile-orb-wrap">
@@ -1870,8 +1870,11 @@ textarea.inp { resize:vertical; }
               </div>
               <div class="field">
                 <span class="field-label">Change Login Email</span>
-                <input class="inp" id="edit-email" type="email" placeholder="Leave blank to keep current">
-                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">A verification email will be sent to the new address. You may need to re-login.</div>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <input class="inp" id="edit-email" type="email" placeholder="Enter new email address" style="flex:1;">
+                  <button class="btn btn-ghost btn-sm" onclick="changeEmail()" style="white-space:nowrap;flex-shrink:0;">Send Verification</button>
+                </div>
+                <div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Enter a new email and click Send Verification. A confirmation link will be sent to the new address — the change takes effect once confirmed.</div>
               </div>
               <div class="field">
                 <span class="field-label">Timezone</span>
@@ -2057,7 +2060,7 @@ textarea.inp { resize:vertical; }
   <div class="modal">
     <div class="modal-hdr"><span class="modal-title">▸ SCHEDULE MEETING</span><button class="modal-x" onclick="closeModal('m-meeting')">✕</button></div>
     <div class="modal-body">
-      <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="mt-name" placeholder="e.g. Weekly Crew Sync"></div>
+      <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="mt-name" placeholder="e.g. Weekly Team Sync"></div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Date</span><input class="inp" id="mt-date" type="date"></div>
         <div class="field"><span class="field-label">Time (UTC)</span><input class="inp" id="mt-time" type="time"></div>
@@ -2209,7 +2212,7 @@ textarea.inp { resize:vertical; }
         </select>
       </div>
     </div>
-    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-add-member')">Cancel</button><button class="btn btn-gold" onclick="submitAddMember()">Add to Crew</button></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-add-member')">Cancel</button><button class="btn btn-gold" onclick="submitAddMember()">Add Member</button></div>
   </div>
 </div>
 <!-- Install App Modal -->
@@ -2590,7 +2593,7 @@ function updateHeaderUI() {
   document.getElementById('hdr-avatar').textContent = initials(currentProfile.name);
   document.getElementById('hdr-name').textContent   = currentProfile.name;
   const roleEl = document.getElementById('hdr-role');
-  roleEl.textContent = currentProfile.role.toUpperCase();
+  roleEl.textContent = ({crew:'MEMBER',lead:'LEAD',admin:'ADMIN'})[currentProfile.role||'crew']||'MEMBER';
   roleEl.className = 'u-role ' + currentProfile.role;
   updateStatusDot(currentProfile.status || 'online');
 }
@@ -2619,6 +2622,7 @@ function startListeners() {
   // Meetings
   const u3 = db.collection('meetings').orderBy('dateUtc','asc').onSnapshot(snap => {
     liveData.meetings = snap.docs.map(d=>({id:d.id,...d.data()}));
+    setTimeout(cleanupPastMeetings, 500);
     var activeMtgs = liveData.meetings.filter(function(m){ return !m.cancelled; });
     document.getElementById('s-meetings').textContent = activeMtgs.length;
     renderMeetings(); renderDashMeetings(); updateNotifications();
@@ -2670,6 +2674,8 @@ function startListeners() {
   });
 
   listeners = [u1,u2,u3,u4,u5,u6,u7];
+  // Run cleanup shortly after data loads
+  setTimeout(cleanupPastMeetings, 3000);
 }
 
 // ─── CONFIG ───────────────────────────────────────────────
@@ -4008,7 +4014,7 @@ function renderCrew() {
         <div style="font-size:10px;color:var(--grey);margin-top:2px;">${getTzOffset(m.tz||'UTC')}</div>
       </div>
       <div>
-        <span class="u-role ${m.role||'crew'}">${(m.role||'crew').toUpperCase()}</span>
+        <span class="u-role ${m.role||'crew'}">${({crew:'MEMBER',lead:'LEAD',admin:'ADMIN'})[m.role||'crew']||'MEMBER'}</span>
       </div>
       <div style="display:flex;gap:4px;">
         ${currentProfile.role==='admin'?`<button class="icon-btn" onclick="openEditMember('${m.uid}')" title="Edit">✎</button><button class="icon-btn danger" onclick="removeMember('${m.uid}')" title="Remove">✕</button>`:''}
@@ -4443,7 +4449,7 @@ function renderAdminRoster() {
   const el = document.getElementById('admin-roster');
   if (!el) return;
   const members = Object.values(liveData.members);
-  if (!members.length) { el.innerHTML='<div class="no-data">No crew</div>'; return; }
+  if (!members.length) { el.innerHTML='<div class="no-data">No members</div>'; return; }
   el.innerHTML = `<table style="width:100%;border-collapse:collapse;">
     <thead><tr>
       <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">NAME</th>
@@ -4458,7 +4464,7 @@ function renderAdminRoster() {
       <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${esc(m.email||'')}</td>
       <td style="padding:10px 16px;">
         <select class="u-role ${m.role||'crew'}" onchange="updateMemberRole('${m.uid}',this.value)" style="background:transparent;border:none;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;appearance:none;outline:none;padding:2px 6px;border-radius:3px;">
-          <option value="crew"  ${m.role==='crew'?'selected':''}>CREW</option>
+          <option value="crew"  ${m.role==='crew'?'selected':''}>MEMBER</option>
           <option value="lead"  ${m.role==='lead'?'selected':''}>LEAD</option>
           <option value="admin" ${m.role==='admin'?'selected':''}>ADMIN</option>
         </select>
@@ -4523,11 +4529,32 @@ function renderProfile() {
   var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(lbl)+'</span>'; }).join('');
 }
 
+async function changeEmail() {
+  var newEmail = (document.getElementById('edit-email').value || '').trim();
+  if (!newEmail) { toast('Enter a new email address first','err'); return; }
+  if (newEmail === currentUser.email) { toast('That is already your current email','inf'); return; }
+  // Basic format check
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(newEmail)) { toast('Please enter a valid email address','err'); return; }
+  try {
+    await currentUser.verifyBeforeUpdateEmail(newEmail);
+    toast('Verification sent to ' + newEmail + ' — check your inbox and confirm the link','ok');
+    document.getElementById('edit-email').value = '';
+  } catch(e) {
+    if (e.code === 'auth/requires-recent-login') {
+      toast('For security, please sign out and sign back in before changing your email','err');
+    } else if (e.code === 'auth/email-already-in-use') {
+      toast('That email is already associated with another account','err');
+    } else {
+      toast('Could not send verification: ' + e.message,'err');
+    }
+  }
+}
+
 async function saveProfile() {
   const name  = document.getElementById('edit-name').value.trim();
   const tz    = document.getElementById('edit-tz').value;
   const pass  = document.getElementById('edit-pass').value;
-  const newEmail = (document.getElementById('edit-email') || {}).value || '';
+  // Email changes handled separately via changeEmail()
   if (!name) { toast('Name required','err'); return; }
   var remindersEl = document.getElementById('edit-reminders');
   var meetingReminders = remindersEl ? remindersEl.checked : true;
@@ -4543,19 +4570,7 @@ async function saveProfile() {
     try { await currentUser.updatePassword(pass); toast('Password updated','ok'); }
     catch(e) { toast('Password update failed — try re-logging in first','err'); }
   }
-  // Email change
-  if (newEmail && newEmail !== currentUser.email) {
-    try {
-      await currentUser.verifyBeforeUpdateEmail(newEmail);
-      toast('Verification sent to ' + newEmail + ' — check your inbox','ok');
-    } catch(e) {
-      if (e.code === 'auth/requires-recent-login') {
-        toast('Re-login required to change email — please sign out and back in','err');
-      } else {
-        toast('Email change failed: ' + e.message,'err');
-      }
-    }
-  }
+
   if (name) await currentUser.updateProfile({ displayName: name });
   updateHeaderUI(); renderProfile();
   toast('Profile saved!','ok');
@@ -4597,8 +4612,37 @@ function setupPresenceHandlers() {
 
   // Start heartbeat
   writeHeartbeat();
-  heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
+  heartbeatInterval = 
+// ─── PAST MEETING CLEANUP ─────────────────────────────────
+async function cleanupPastMeetings() {
+  if (!currentUser || !currentProfile) return;
+  // Throttle: only run once per 30 minutes per browser session
+  var lastRun = parseInt(sessionStorage.getItem('lastMtgCleanup') || '0');
+  if (Date.now() - lastRun < 30 * 60 * 1000) return;
+  sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
+  var now = Date.now();
+  var toDelete = (liveData.meetings||[]).filter(function(m) {
+    if (m.cancelled) return true; // also purge old cancelled ones
+    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    var dur = (m.duration || 60) * 60 * 1000;
+    return mt + dur < now; // past end time
+  });
+  if (!toDelete.length) return;
+  try {
+    var batch = db.batch();
+    toDelete.forEach(function(m) {
+      batch.delete(db.collection('meetings').doc(m.id));
+    });
+    await batch.commit();
+    if (toDelete.length) console.log('Cleaned up ' + toDelete.length + ' past meetings');
+  } catch(e) {
+    console.warn('Meeting cleanup error:', e.message);
+  }
+}
+
+setInterval(writeHeartbeat, HEARTBEAT_MS);
 setInterval(checkMeetingReminders, 60000);
+setInterval(cleanupPastMeetings, 60 * 60 * 1000); // hourly cleanup
 window._remindedMeetings = {};
 function checkMeetingReminders() {
   if (!currentUser || !currentProfile) return;
@@ -4662,8 +4706,37 @@ function showReminderToast(m, minsLeft) {
     } else {
       // Back on tab - restart heartbeat and set online
       writeHeartbeat();
-      heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
+      heartbeatInterval = 
+// ─── PAST MEETING CLEANUP ─────────────────────────────────
+async function cleanupPastMeetings() {
+  if (!currentUser || !currentProfile) return;
+  // Throttle: only run once per 30 minutes per browser session
+  var lastRun = parseInt(sessionStorage.getItem('lastMtgCleanup') || '0');
+  if (Date.now() - lastRun < 30 * 60 * 1000) return;
+  sessionStorage.setItem('lastMtgCleanup', String(Date.now()));
+  var now = Date.now();
+  var toDelete = (liveData.meetings||[]).filter(function(m) {
+    if (m.cancelled) return true; // also purge old cancelled ones
+    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    var dur = (m.duration || 60) * 60 * 1000;
+    return mt + dur < now; // past end time
+  });
+  if (!toDelete.length) return;
+  try {
+    var batch = db.batch();
+    toDelete.forEach(function(m) {
+      batch.delete(db.collection('meetings').doc(m.id));
+    });
+    await batch.commit();
+    if (toDelete.length) console.log('Cleaned up ' + toDelete.length + ' past meetings');
+  } catch(e) {
+    console.warn('Meeting cleanup error:', e.message);
+  }
+}
+
+setInterval(writeHeartbeat, HEARTBEAT_MS);
 setInterval(checkMeetingReminders, 60000);
+setInterval(cleanupPastMeetings, 60 * 60 * 1000); // hourly cleanup
 window._remindedMeetings = {};
 function checkMeetingReminders() {
   if (!currentUser || !currentProfile) return;
