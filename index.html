@@ -3440,13 +3440,18 @@ async function onDrop(e, dept, memberId) {
   if (!task) return;
   var role = currentProfile ? currentProfile.role : '';
   var adminLead = role === 'admin' || role === 'lead';
+  var taskId = dragTask;
+  dragTask = null;
 
   // Dropping onto the completed column
   if (memberId === '__completed__') {
-    if (!adminLead) { toast('Only admin/lead can mark complete','err'); dragTask = null; return; }
-    await db.collection('tasks').doc(dragTask).update({ state: 'completed', updatedAt: new Date().toISOString() });
-    dragTask = null;
-    toast('Task marked complete','ok');
+    if (!adminLead) { toast('Only leads and admins can mark tasks complete','err'); return; }
+    try {
+      await db.collection('tasks').doc(taskId).update({ state: 'completed', updatedAt: new Date().toISOString() });
+      toast('Task marked complete','ok');
+    } catch(e) {
+      toast('Could not update task: ' + e.message, 'err');
+    }
     return;
   }
 
@@ -3458,8 +3463,11 @@ async function onDrop(e, dept, memberId) {
     update.assignee = '';
     update.state = 'unassigned';
   }
-  await db.collection('tasks').doc(dragTask).update(update);
-  dragTask = null;
+  try {
+    await db.collection('tasks').doc(taskId).update(update);
+  } catch(e) {
+    toast('Could not update task: ' + e.message, 'err');
+  }
 }
 
 // ─── MEETINGS ─────────────────────────────────────────────
