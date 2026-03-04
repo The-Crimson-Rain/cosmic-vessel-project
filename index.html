@@ -4108,13 +4108,10 @@ function renderDashTasks() {
   var recent;
   if (role === 'admin') {
     recent = all; // admins see everything
-  } else if (role === 'lead') {
-    recent = all.filter(function(t){
-      return (myDepts.includes(t.dept)) || t.assignee === uid || t.createdBy === uid;
-    });
   } else {
+    // Everyone else only sees their own tasks
     recent = all.filter(function(t){
-      return t.assignee === uid || t.createdBy === uid || (myDepts.includes(t.dept));
+      return t.assignee === uid || t.createdBy === uid;
     });
   }
   recent = recent.slice(0,8);
