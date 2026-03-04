@@ -3406,7 +3406,8 @@ function taskCardHTML(t) {
     html += '<div style="display:flex;gap:3px;">';
     html += '<button class="tc-btn" onclick="openEditTask(\'' + t.id + '\');event.stopPropagation()">Edit</button>';
     html += '<button class="tc-btn tc-del" onclick="deleteTask(\'' + t.id + '\');event.stopPropagation()">Del</button>';
-    if (t.state==='review') html += '<button class="tc-btn" style="color:var(--green);" onclick="setTaskState(\'' + t.id + '\',\'completed\',this);event.stopPropagation()">Approve</button>';
+    html += '</div>';
+    if (t.state==='review') html += '<button class="tc-btn" style="color:var(--green);width:100%;" onclick="setTaskState(\'' + t.id + '\',\'completed\',this);event.stopPropagation()">Approve</button>';
     html += '</div>';
     if (t.state==='completed') html += '<button class="tc-btn" style="color:var(--amber);width:100%;margin-top:1px;" onclick="setTaskState(\'' + t.id + '\',\'in-progress\',this);event.stopPropagation()">Reinstate</button>';
     html += '</div>';
