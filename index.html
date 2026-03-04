@@ -3394,7 +3394,7 @@ function taskCardHTML(t) {
   var priorityColor = {high:'var(--crimson-hi)',medium:'var(--amber)',low:'var(--grey)'}[t.priority||'medium'];
   var commentCount = (t.comments || []).length;
   var html = '';
-  html += '<div class="task-card' + (isOverdue?' overdue':'') + '" data-state="' + (t.state||'unassigned') + '" data-id="' + t.id + '" draggable="' + (canAdminLead?'true':'false') + '" ondragstart="dragStart(event)" onclick="openTaskDetail(\'' + t.id + '\')" style="cursor:pointer;">';
+  html += '<div class="task-card' + (isOverdue?' overdue':'') + '" data-state="' + (t.state||'unassigned') + '" data-id="' + t.id + '" draggable="' + (canAdminLead?'true':'false') + '" ondragstart="onDragStart(event)" onclick="openTaskDetail(\'' + t.id + '\')" style="cursor:pointer;">';
   html += '<div class="tc-top">';
   html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
   html += '<span class="chip ' + chipClass + '">' + stateLabel + '</span>';
