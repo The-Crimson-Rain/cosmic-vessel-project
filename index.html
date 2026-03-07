@@ -2060,7 +2060,7 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="mt-name" placeholder="e.g. Weekly Crew Sync"></div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Date</span><input class="inp" id="mt-date" type="date"></div>
-        <div class="field"><span class="field-label">Time (UTC)</span><input class="inp" id="mt-time" type="time"></div>
+        <div class="field"><span class="field-label">Time (your local time)</span><input class="inp" id="mt-time" type="time"></div>
       <div class="field"><span class="field-label">Duration</span>
         <select class="inp" id="mt-duration">
           <option value="30">30 minutes</option>
@@ -2093,7 +2093,7 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="edit-mt-name" placeholder="e.g. Weekly Sync"></div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Date</span><input class="inp" id="edit-mt-date" type="date"></div>
-        <div class="field"><span class="field-label">Time (UTC)</span><input class="inp" id="edit-mt-time" type="time"></div>
+        <div class="field"><span class="field-label">Time (your local time)</span><input class="inp" id="edit-mt-time" type="time"></div>
         <div class="field"><span class="field-label">Duration</span>
           <select class="inp" id="edit-mt-duration">
             <option value="30">30 minutes</option>
@@ -3477,7 +3477,24 @@ async function submitMeeting() {
   const checks = document.querySelectorAll('#attendee-checks input:checked');
   const dateStr = document.getElementById('mt-date').value;
   const timeStr = document.getElementById('mt-time').value || '00:00';
-  const dateUtc = dateStr ? new Date(dateStr+'T'+timeStr+':00Z').toISOString() : '';
+  // Convert creator's local time to UTC using their profile timezone
+  var creatorTz = (currentProfile && currentProfile.tz) || 'UTC';
+  var dateUtc = '';
+  if (dateStr && timeStr) {
+    try {
+      // Build a date string and interpret it in the creator's timezone
+      // by finding the UTC offset for that tz at that moment
+      var localDateStr = dateStr + 'T' + timeStr + ':00';
+      // Get offset by comparing what toLocaleString gives us for UTC vs creator tz
+      var ref = new Date(localDateStr + 'Z'); // treat as UTC temporarily
+      var utcParts = new Date(ref.toLocaleString('en-US', { timeZone: 'UTC' }));
+      var tzParts  = new Date(ref.toLocaleString('en-US', { timeZone: creatorTz }));
+      var offsetMs = utcParts.getTime() - tzParts.getTime();
+      dateUtc = new Date(ref.getTime() + offsetMs).toISOString();
+    } catch(e) {
+      dateUtc = new Date(dateStr + 'T' + timeStr + ':00Z').toISOString();
+    }
+  }
   const durVal = document.getElementById('mt-duration') ? document.getElementById('mt-duration').value : '60';
   var attendeeList = [...checks].map(c=>c.value);
   // Auto-include creator in attendees and auto-accept their RSVP
@@ -3569,13 +3586,21 @@ function openEditMeeting(id) {
   document.getElementById('edit-mt-id').value = id;
   document.getElementById('edit-mt-name').value = m.name || '';
   document.getElementById('edit-mt-notes').value = m.notes || '';
-  // Parse dateUtc back to date/time inputs
+  // Parse dateUtc back to date/time inputs in editor's local timezone
   if (m.dateUtc) {
+    var edTz = (currentProfile && currentProfile.tz) || 'UTC';
     var d = new Date(m.dateUtc);
-    var ds = d.toISOString().split('T')[0];
-    var ts = d.toISOString().split('T')[1].slice(0,5);
-    document.getElementById('edit-mt-date').value = ds;
-    document.getElementById('edit-mt-time').value = ts;
+    try {
+      var localParts = d.toLocaleString('en-CA', { timeZone: edTz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false });
+      // en-CA gives YYYY-MM-DD format
+      var datePart = localParts.slice(0,10);
+      var timePart = localParts.slice(12,17).replace('24:','00:');
+      document.getElementById('edit-mt-date').value = datePart;
+      document.getElementById('edit-mt-time').value = timePart;
+    } catch(e) {
+      document.getElementById('edit-mt-date').value = d.toISOString().split('T')[0];
+      document.getElementById('edit-mt-time').value = d.toISOString().split('T')[1].slice(0,5);
+    }
   }
   var durSel = document.getElementById('edit-mt-duration');
   if (durSel) durSel.value = String(m.duration || 60);
@@ -3600,7 +3625,21 @@ async function saveEditMeeting() {
   var notes    = document.getElementById('edit-mt-notes').value.trim();
   var checks   = document.querySelectorAll('#edit-attendee-checks input:checked');
   if (!name) { toast('Meeting name required','err'); return; }
-  var dateUtc = dateStr ? new Date(dateStr+'T'+timeStr+':00Z').toISOString() : '';
+  // Convert editor's local time to UTC using their profile timezone
+  var editorTz = (currentProfile && currentProfile.tz) || 'UTC';
+  var dateUtc = '';
+  if (dateStr && timeStr) {
+    try {
+      var localDateStr2 = dateStr + 'T' + timeStr + ':00';
+      var ref2 = new Date(localDateStr2 + 'Z');
+      var utcParts2 = new Date(ref2.toLocaleString('en-US', { timeZone: 'UTC' }));
+      var tzParts2  = new Date(ref2.toLocaleString('en-US', { timeZone: editorTz }));
+      var offsetMs2 = utcParts2.getTime() - tzParts2.getTime();
+      dateUtc = new Date(ref2.getTime() + offsetMs2).toISOString();
+    } catch(e) {
+      dateUtc = new Date(dateStr + 'T' + timeStr + ':00Z').toISOString();
+    }
+  }
   var attendeeList = [...checks].map(function(c){ return c.value; });
   if (!attendeeList.includes(currentUser.uid)) attendeeList.push(currentUser.uid);
   await db.collection('meetings').doc(id).update({
@@ -3724,9 +3763,8 @@ function renderMeetings() {
       h += '<button class="btn btn-ghost btn-xs" style="font-size:10px;" data-mid="' + m.id + '" onclick="removeMeeting(this.dataset.mid)">Remove</button>';
       h += '</div>';
     }
-    h += '<div class="mc-time">' + utcStr + ' · ' + durStr + '</div>';
+    h += '<div class="mc-time">' + localStr + ' · ' + durStr + '</div>';
     h += '<div class="mc-name">' + esc(m.name) + '</div>';
-    h += '<div class="mc-local">Your time: ' + localStr + '</div>';
     if (m.notes) h += '<div style="font-size:12px;color:var(--grey);margin-bottom:6px;">' + esc(m.notes) + '</div>';
     h += '<div class="mc-attendees">' + attendeeChips + '</div>';
 
