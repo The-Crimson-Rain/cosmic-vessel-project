@@ -1996,15 +1996,7 @@ textarea.inp { resize:vertical; }
         <div class="field"><span class="field-label">Due Date</span><input class="inp" id="t-due" type="date"></div>
       </div>
       <div class="field"><span class="field-label">Department</span>
-        <select class="inp" id="t-dept">
-          <option value="programming">Programming</option>
-          <option value="2d-art">2D Art</option>
-          <option value="3d-art">3D Art</option>
-          <option value="marketing">Marketing</option>
-          <option value="sound">Sound Design</option>
-          <option value="vfx">Visual Effects</option>
-          <option value="narrative">Narrative</option>
-        </select>
+        <select class="inp" id="t-dept"></select>
       </div>
       <div class="field"><span class="field-label">Assign To (optional)</span><select class="inp" id="t-assign"><option value="">Unassigned</option></select></div>
       <input type="hidden" id="t-edit-id">
@@ -2869,8 +2861,19 @@ function openEditTask(taskId) {
   openModal('m-task');
 }
 
+function populateTaskDeptSelect(selectedDept) {
+  var sel = document.getElementById('t-dept');
+  if (!sel) return;
+  var list = getDeptList();
+  sel.innerHTML = list.map(function(d) {
+    var selected = d.id === selectedDept ? ' selected' : '';
+    return '<option value="' + d.id + '"' + selected + '>' + d.label + '</option>';
+  }).join('');
+}
+
 function openNewTask(dept) {
   clearTaskForm();
+  populateTaskDeptSelect(dept || '');
   if (dept) document.getElementById('t-dept').value = dept;
   populateAssignSelect(dept);
   openModal('m-task');
@@ -4385,18 +4388,20 @@ function renderAdminDepts() {
     lbl.textContent = d.label;
     chip.appendChild(dot);
     chip.appendChild(lbl);
+    // Edit button for all depts
+    var editBtn = document.createElement('button');
+    editBtn.textContent = '✎';
+    editBtn.title = 'Rename / recolour';
+    editBtn.style.cssText = 'margin-left:6px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
+    editBtn.addEventListener('click', (function(id){ return function(){ openEditDept(id); }; })(d.id));
+    chip.appendChild(editBtn);
+    // Delete button only for custom depts
     if (isCustom) {
       var delBtn = document.createElement('button');
       delBtn.textContent = '✕';
       delBtn.title = 'Remove custom dept';
-      delBtn.style.cssText = 'margin-left:6px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
+      delBtn.style.cssText = 'margin-left:2px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
       delBtn.addEventListener('click', (function(id){ return function(){ deleteDept(id); }; })(d.id));
-      var editBtn = document.createElement('button');
-      editBtn.textContent = '✎';
-      editBtn.title = 'Rename / recolour';
-      editBtn.style.cssText = 'margin-left:2px;background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:11px;';
-      editBtn.addEventListener('click', (function(id){ return function(){ openEditDept(id); }; })(d.id));
-      chip.appendChild(editBtn);
       chip.appendChild(delBtn);
     }
     el.appendChild(chip);
