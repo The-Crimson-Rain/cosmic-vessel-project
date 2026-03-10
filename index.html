@@ -486,39 +486,51 @@ textarea.inp { resize:vertical; }
 .board-side {
   flex-shrink:0; display:flex; flex-direction:column;
   background:rgba(8,10,18,.85); border:1px solid var(--border);
-  border-radius:8px; overflow:hidden;
+  border-radius:8px;
   transition:width .3s cubic-bezier(.4,0,.2,1), opacity .3s;
-  position:relative;
+  position:relative; overflow:visible;
 }
-.board-side.left  { width:280px; margin-right:10px; border-right:1px solid var(--border); }
-.board-side.right { width:280px; margin-left:10px; border-left:1px solid var(--border); }
-.board-side.collapsed.left  { width:28px; }
-.board-side.collapsed.right { width:28px; }
+.board-side.left  { width:260px; margin-right:14px; }
+.board-side.right { width:260px; margin-left:14px; }
+.board-side.collapsed.left  { width:0px; margin-right:0; border-width:0; }
+.board-side.collapsed.right { width:0px; margin-left:0; border-width:0; }
 .board-side-inner {
   flex:1; overflow:hidden; transition:opacity .2s;
-  display:flex; flex-direction:column;
+  display:flex; flex-direction:column; border-radius:8px; overflow:hidden;
 }
 .board-side.collapsed .board-side-inner { opacity:0; pointer-events:none; }
+
+/* Bookmark tab — protrudes from the edge */
 .board-side-tab {
   position:absolute; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:rgba(20,22,36,.95); border:1px solid var(--border);
+  border-radius:0 6px 6px 0; padding:14px 8px;
+  cursor:pointer; user-select:none; z-index:10;
+  transition:background .15s, border-color .15s;
+  box-shadow:2px 0 8px rgba(0,0,0,.4);
+}
+.board-side.left .board-side-tab {
+  right:-34px; border-left:none; border-radius:0 6px 6px 0;
+}
+.board-side.right .board-side-tab {
+  left:-34px; border-right:none; border-radius:6px 0 0 6px;
+}
+.board-side-tab:hover { background:rgba(30,33,56,.95); border-color:var(--border-2); }
+.board-side-tab-arrow {
+  font-size:18px; color:var(--white); line-height:1;
+  transition:color .15s;
+}
+.board-side-tab-lbl {
   writing-mode:vertical-rl; text-orientation:mixed;
-  font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
+  font-family:'Orbitron',sans-serif; font-size:8px; font-weight:700;
   letter-spacing:2px; text-transform:uppercase; color:var(--grey);
-  cursor:pointer; user-select:none; padding:8px 0;
-  transition:color .15s; z-index:2;
+  transition:color .15s;
 }
-.board-side.left  .board-side-tab { right:6px; transform:translateY(-50%) rotate(180deg); }
-.board-side.right .board-side-tab { left:6px; }
-.board-side-tab:hover { color:var(--white); }
-.board-side:not(.collapsed) .board-side-tab { opacity:0; pointer-events:none; }
-.board-side-toggle {
-  position:absolute; top:8px; font-size:10px; color:var(--grey-2);
-  background:transparent; border:none; cursor:pointer; z-index:3;
-  transition:color .15s; padding:2px 4px;
-}
-.board-side.left  .board-side-toggle { right:6px; }
-.board-side.right .board-side-toggle { left:6px; }
-.board-side-toggle:hover { color:var(--white); }
+.board-side.left .board-side-tab-lbl { transform:rotate(180deg); }
+.board-side-tab:hover .board-side-tab-lbl,
+.board-side-tab:hover .board-side-tab-arrow { color:var(--crimson-hi); }
+
 /* Middle members area */
 .board-members {
   flex:1; overflow-y:auto; overflow-x:hidden; padding:10px;
@@ -526,20 +538,28 @@ textarea.inp { resize:vertical; }
 }
 .board-members::-webkit-scrollbar { width:4px; }
 .board-members::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
 /* Member row */
 .board-member-row {
   background:rgba(12,14,26,.7); border:1px solid var(--border);
   border-radius:8px; overflow:hidden;
 }
 .board-member-hdr {
-  padding:8px 14px; border-bottom:1px solid var(--border);
+  padding:10px 16px; border-bottom:1px solid var(--border);
   background:rgba(8,10,18,.6); display:flex; align-items:center;
   justify-content:space-between;
 }
+.board-member-name {
+  font-family:'Orbitron',sans-serif; font-size:13px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; color:var(--white);
+}
 .board-member-tasks {
-  display:flex; gap:8px; padding:8px;
-  overflow-x:hidden; overflow-y:auto; flex-wrap:wrap;
-  max-height:320px; min-height:70px;
+  display:flex; gap:8px; padding:10px;
+  overflow-y:auto; flex-wrap:wrap;
+  max-height:340px; min-height:80px;
+}
+.board-member-tasks .task-card {
+  width:220px; flex-shrink:0;
 }
 .board {
   display:flex; gap:14px; min-width:max-content; align-items:flex-start;
@@ -3407,8 +3427,10 @@ function renderDeptBoard(dept) {
 
       <!-- LEFT: Unassigned panel -->
       <div class="board-side left${leftCollapsed?' collapsed':''}" id="board-left-${dept}">
-        <div class="board-side-tab" onclick="toggleBoardSide('${dept}','left')">UNASSIGNED</div>
-        <button class="board-side-toggle" onclick="toggleBoardSide('${dept}','left')" title="Collapse">‹</button>
+        <div class="board-side-tab" onclick="toggleBoardSide('${dept}','left')">
+          <span class="board-side-tab-arrow" id="tab-arrow-left-${dept}">‹</span>
+          <span class="board-side-tab-lbl">Unassigned</span>
+        </div>
         <div class="board-side-inner">
           <div class="board-col-hdr" style="flex-shrink:0;">
             <span class="col-name" style="color:var(--grey)">Unassigned</span>
@@ -3429,7 +3451,7 @@ function renderDeptBoard(dept) {
             return `
             <div class="board-member-row">
               <div class="board-member-hdr">
-                <span class="col-name" style="color:${color}">${esc(m.name)}</span>
+                <span class="board-member-name" style="color:${color}">${esc(m.name)}</span>
                 <span class="col-count">${memberTasks.length}</span>
               </div>
               <div class="board-member-tasks task-drop-zone" id="drop-${dept}-${m.uid}"
@@ -3444,8 +3466,10 @@ function renderDeptBoard(dept) {
       <!-- RIGHT: Completed panel (admin/lead only) -->
       ${canCreate ? `
       <div class="board-side right${rightCollapsed?' collapsed':''}" id="board-right-${dept}">
-        <div class="board-side-tab" onclick="toggleBoardSide('${dept}','right')">COMPLETED</div>
-        <button class="board-side-toggle" onclick="toggleBoardSide('${dept}','right')" title="Collapse">›</button>
+        <div class="board-side-tab" onclick="toggleBoardSide('${dept}','right')">
+          <span class="board-side-tab-arrow" id="tab-arrow-right-${dept}">›</span>
+          <span class="board-side-tab-lbl">Completed</span>
+        </div>
         <div class="board-side-inner">
           <div class="board-col-hdr" style="flex-shrink:0;justify-content:space-between;">
             <span class="col-name" style="color:var(--green)">✓✓ Completed</span>
@@ -3470,14 +3494,13 @@ function toggleBoardSide(dept, side) {
   var container = document.querySelector('.dept-board-container[data-dept="' + dept + '"]');
   if (!el || !container) return;
   var isCollapsed = el.classList.toggle('collapsed');
-  // Store state so re-renders preserve it
   if (side === 'left')  container._leftCollapsed  = isCollapsed;
   if (side === 'right') container._rightCollapsed = isCollapsed;
-  // Flip toggle button arrow
-  var btn = el.querySelector('.board-side-toggle');
-  if (btn) {
-    if (side === 'left')  btn.textContent = isCollapsed ? '›' : '‹';
-    if (side === 'right') btn.textContent = isCollapsed ? '‹' : '›';
+  // Flip bookmark arrow
+  var arrow = document.getElementById('tab-arrow-' + side + '-' + dept);
+  if (arrow) {
+    if (side === 'left')  arrow.textContent = isCollapsed ? '›' : '‹';
+    if (side === 'right') arrow.textContent = isCollapsed ? '‹' : '›';
   }
 }
 
