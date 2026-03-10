@@ -485,11 +485,11 @@ textarea.inp { resize:vertical; }
 }
 
 .board-col {
-  width:220px; flex-shrink:0;
+  width:260px; flex-shrink:0;
   background:rgba(12,14,26,.7); border:1px solid var(--border);
   border-radius:8px; overflow:hidden;
 }
-.board-col.unassigned-col { width:240px; }
+.board-col.unassigned-col { width:280px; }
 .board-col-hdr {
   padding:10px 14px;
   border-bottom:1px solid var(--border);
@@ -497,11 +497,11 @@ textarea.inp { resize:vertical; }
   display:flex; align-items:center; justify-content:space-between;
 }
 .board-col-hdr .col-name {
-  font-family:'Orbitron',sans-serif; font-size:9px; font-weight:700;
+  font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700;
   letter-spacing:2px; text-transform:uppercase;
 }
 .board-col-hdr .col-count {
-  font-family:'Share Tech Mono',monospace; font-size:10px;
+  font-family:'Share Tech Mono',monospace; font-size:12px;
   background:rgba(255,255,255,.07); border-radius:8px; padding:1px 7px; color:var(--grey);
 }
 
@@ -515,7 +515,7 @@ textarea.inp { resize:vertical; }
 /* task card */
 .task-card {
   background:rgba(8,10,18,.8); border:1px solid var(--border);
-  border-radius:6px; padding:10px 12px;
+  border-radius:6px; padding:13px 15px;
   cursor:grab; transition:all .15s;
   position:relative;
   border-left:2px solid var(--lc, var(--border));
@@ -524,7 +524,7 @@ textarea.inp { resize:vertical; }
 .task-card.dragging { opacity:.5; transform:scale(.97); }
 .task-card:hover { border-color:var(--border-2); background:rgba(12,14,22,.9); }
 
-.tc-title { font-size:13px; font-weight:600; letter-spacing:.3px; margin-bottom:6px; }
+.tc-title { font-size:14px; font-weight:600; letter-spacing:.3px; margin-bottom:7px; }
 .tc-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .tc-tag {
   font-size:9px; letter-spacing:1.2px; padding:2px 6px; border-radius:3px;
@@ -594,12 +594,12 @@ textarea.inp { resize:vertical; }
   transition:border-color .15s;
 }
 .meeting-card:hover { border-color:var(--border-2); }
-.mc-time { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--gold); margin-bottom:4px; }
-.mc-name { font-size:15px; font-weight:600; margin-bottom:6px; }
-.mc-local { font-size:11px; color:var(--crimson-hi); margin-bottom:6px; font-family:'Share Tech Mono',monospace; }
+.mc-time { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--gold); margin-bottom:5px; }
+.mc-name { font-size:17px; font-weight:600; margin-bottom:8px; }
+.mc-local { font-size:13px; color:var(--crimson-hi); margin-bottom:6px; font-family:'Share Tech Mono',monospace; }
 .mc-attendees { display:flex; gap:4px; flex-wrap:wrap; }
 .ac-chip {
-  font-size:10px; color:var(--grey); background:rgba(255,255,255,.06);
+  font-size:12px; color:var(--grey-2); background:rgba(255,255,255,.06);
   border-radius:3px; padding:2px 7px; letter-spacing:.5px;
 }
 
