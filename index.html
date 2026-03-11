@@ -603,6 +603,9 @@ textarea.inp { resize:vertical; }
   display:flex; flex-direction:column; gap:6px;
   transition:background .15s;
 }
+.board-member-tasks.task-drop-zone {
+  flex-direction:row !important; flex-wrap:wrap !important; gap:8px !important;
+}
 .task-drop-zone.drag-over { background:rgba(200,16,46,.06); }
 
 /* task card */
@@ -6513,7 +6516,6 @@ function debugBoard() {
   var firstRow = document.querySelector('.board-member-row');
   var firstTasks = document.querySelector('.board-member-tasks');
   var firstCard = document.querySelector('.board-member-tasks .task-card');
-  
   var info = [];
   if (wrap) info.push('board-wrap: ' + wrap.offsetWidth + 'x' + wrap.offsetHeight + ' flex=' + getComputedStyle(wrap).flexDirection);
   if (members) info.push('board-members: ' + members.offsetWidth + 'x' + members.offsetHeight);
@@ -6523,17 +6525,14 @@ function debugBoard() {
     info.push('member-tasks: ' + firstTasks.offsetWidth + 'x' + firstTasks.offsetHeight + ' flex-dir=' + cs.flexDirection + ' flex-wrap=' + cs.flexWrap);
   }
   if (firstCard) info.push('task-card: ' + firstCard.offsetWidth + 'x' + firstCard.offsetHeight + ' display=' + getComputedStyle(firstCard).display);
-  
   var div = document.getElementById('__debug__') || document.createElement('div');
   div.id = '__debug__';
   div.style.cssText = 'position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:#000;color:#0f0;font:11px monospace;padding:10px;z-index:99999;border:1px solid #0f0;max-width:90vw;';
   div.innerHTML = info.join('<br>');
   document.body.appendChild(div);
 }
-// Run after board renders
 var __dbgInterval = setInterval(function() {
   if (document.querySelector('.board-member-tasks')) { debugBoard(); clearInterval(__dbgInterval); }
 }, 500);
-</script>
-</body>
+</script></body>
 </html>
