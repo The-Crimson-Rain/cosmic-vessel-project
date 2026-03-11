@@ -538,8 +538,8 @@ textarea.inp { resize:vertical; }
 
 /* Middle members area */
 .board-members {
-  width:100%; overflow-y:auto; overflow-x:hidden; padding:10px;
-  display:flex; flex-direction:column; gap:10px; box-sizing:border-box;
+  flex:1; overflow-y:auto; overflow-x:hidden; padding:10px;
+  display:flex; flex-direction:column; gap:10px; min-width:0;
 }
 .board-members::-webkit-scrollbar { width:4px; }
 .board-members::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
@@ -560,7 +560,7 @@ textarea.inp { resize:vertical; }
   letter-spacing:1px; text-transform:uppercase; color:var(--white);
 }
 .board-member-tasks {
-  display:flex; gap:8px; padding:10px;
+  display:flex; flex-direction:row; gap:8px; padding:10px;
   overflow-y:auto; overflow-x:hidden;
   flex-wrap:wrap; min-height:80px;
   width:100%; box-sizing:border-box;
