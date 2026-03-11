@@ -547,7 +547,7 @@ textarea.inp { resize:vertical; }
 /* Member row */
 .board-member-row {
   background:rgba(12,14,26,.7); border:1px solid var(--border);
-  border-radius:8px; overflow:hidden;
+  border-radius:8px; overflow:visible;
   width:100%; box-sizing:border-box;
 }
 .board-member-hdr {
@@ -561,7 +561,7 @@ textarea.inp { resize:vertical; }
 }
 .board-member-tasks {
   display:flex; flex-direction:row; gap:8px; padding:10px;
-  overflow-y:auto; overflow-x:hidden;
+  overflow:visible;
   flex-wrap:wrap; min-height:80px;
   width:100%; box-sizing:border-box;
 }
@@ -6508,31 +6508,5 @@ async function arcAdminClearAll() {
     </div>
   </div>
 </div>
-
-<script>
-function debugBoard() {
-  var wrap = document.querySelector('.board-wrap');
-  var members = document.querySelector('.board-members');
-  var firstRow = document.querySelector('.board-member-row');
-  var firstTasks = document.querySelector('.board-member-tasks');
-  var firstCard = document.querySelector('.board-member-tasks .task-card');
-  var info = [];
-  if (wrap) info.push('board-wrap: ' + wrap.offsetWidth + 'x' + wrap.offsetHeight + ' flex=' + getComputedStyle(wrap).flexDirection);
-  if (members) info.push('board-members: ' + members.offsetWidth + 'x' + members.offsetHeight);
-  if (firstRow) info.push('member-row: ' + firstRow.offsetWidth + 'x' + firstRow.offsetHeight);
-  if (firstTasks) {
-    var cs = getComputedStyle(firstTasks);
-    info.push('member-tasks: ' + firstTasks.offsetWidth + 'x' + firstTasks.offsetHeight + ' flex-dir=' + cs.flexDirection + ' flex-wrap=' + cs.flexWrap);
-  }
-  if (firstCard) info.push('task-card: ' + firstCard.offsetWidth + 'x' + firstCard.offsetHeight + ' display=' + getComputedStyle(firstCard).display);
-  var div = document.getElementById('__debug__') || document.createElement('div');
-  div.id = '__debug__';
-  div.style.cssText = 'position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:#000;color:#0f0;font:11px monospace;padding:10px;z-index:99999;border:1px solid #0f0;max-width:90vw;';
-  div.innerHTML = info.join('<br>');
-  document.body.appendChild(div);
-}
-var __dbgInterval = setInterval(function() {
-  if (document.querySelector('.board-member-tasks')) { debugBoard(); clearInterval(__dbgInterval); }
-}, 500);
-</script></body>
+</body>
 </html>
