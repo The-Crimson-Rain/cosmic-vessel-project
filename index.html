@@ -292,10 +292,20 @@ body::after {
   padding:20px 24px;
   background: rgba(4,5,8,.4);
 }
+#main:has([id^="view-dept-"].active) {
+  padding:0; overflow:hidden;
+}
+[id^="view-dept-"].active .page-hdr {
+  padding:16px 24px 10px; flex-shrink:0;
+}
 
 /* ── VIEWS ───────────────────────────────── */
 .view { display:none; }
 .view.active { display:block; }
+[id^="view-dept-"].active {
+  display:flex; flex-direction:column;
+  height:calc(100vh - 56px - 36px - 40px);
+}
 #view-transcripts.active {
   display: flex;
   flex-direction: column;
@@ -479,6 +489,9 @@ textarea.inp { resize:vertical; }
 .stat-lbl { font-size:10px; letter-spacing:2px; color:var(--grey); text-transform:uppercase; margin-top:3px; }
 
 /* ── TASK BOARD ──────────────────────────── */
+.dept-board-container {
+  display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;
+}
 .board-wrap {
   display:flex; gap:0; flex:1; min-height:0; overflow:hidden; position:relative;
 }
