@@ -480,7 +480,7 @@ textarea.inp { resize:vertical; }
 
 /* ── TASK BOARD ──────────────────────────── */
 .board-wrap {
-  display:flex; gap:0; height:calc(100vh - 184px); overflow:hidden; position:relative;
+  display:flex; gap:0; flex:1; min-height:0; overflow:hidden; position:relative;
 }
 /* Side panels */
 .board-side {
@@ -548,7 +548,6 @@ textarea.inp { resize:vertical; }
 .board-member-row {
   background:rgba(12,14,26,.7); border:1px solid var(--border);
   border-radius:8px; overflow:hidden;
-  width:100%; box-sizing:border-box;
 }
 .board-member-hdr {
   padding:10px 16px; border-bottom:1px solid var(--border);
@@ -560,10 +559,9 @@ textarea.inp { resize:vertical; }
   letter-spacing:1px; text-transform:uppercase; color:var(--white);
 }
 .board-member-tasks {
-  display:flex; flex-direction:row; gap:8px; padding:10px;
-  overflow-y:auto; overflow-x:hidden;
-  flex-wrap:wrap; min-height:80px;
-  width:100%; box-sizing:border-box;
+  display:flex; gap:8px; padding:10px;
+  overflow-x:auto; overflow-y:hidden;
+  flex-wrap:nowrap; min-height:80px;
 }
 .board-member-tasks::-webkit-scrollbar { height:4px; }
 .board-member-tasks::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
