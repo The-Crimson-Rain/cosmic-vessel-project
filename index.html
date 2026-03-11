@@ -560,10 +560,10 @@ textarea.inp { resize:vertical; }
 }
 .board-member-tasks {
   display:flex; gap:8px; padding:10px;
-  overflow-x:auto; overflow-y:hidden;
-  flex-wrap:nowrap; min-height:80px;
+  overflow-y:auto; overflow-x:hidden;
+  flex-wrap:wrap; min-height:80px; max-height:400px;
 }
-.board-member-tasks::-webkit-scrollbar { height:4px; }
+.board-member-tasks::-webkit-scrollbar { width:4px; }
 .board-member-tasks::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 .board-member-tasks .task-card {
   width:220px !important; flex-shrink:0; flex-grow:0; box-sizing:border-box;
