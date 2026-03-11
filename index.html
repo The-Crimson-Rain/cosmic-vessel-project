@@ -292,20 +292,10 @@ body::after {
   padding:20px 24px;
   background: rgba(4,5,8,.4);
 }
-#main:has([id^="view-dept-"].active) {
-  padding:0; overflow:hidden;
-}
-[id^="view-dept-"].active .page-hdr {
-  padding:16px 24px 10px; flex-shrink:0;
-}
 
 /* ── VIEWS ───────────────────────────────── */
 .view { display:none; }
 .view.active { display:block; }
-[id^="view-dept-"].active {
-  display:flex; flex-direction:column;
-  height:calc(100vh - 56px - 36px - 40px);
-}
 #view-transcripts.active {
   display: flex;
   flex-direction: column;
@@ -489,11 +479,8 @@ textarea.inp { resize:vertical; }
 .stat-lbl { font-size:10px; letter-spacing:2px; color:var(--grey); text-transform:uppercase; margin-top:3px; }
 
 /* ── TASK BOARD ──────────────────────────── */
-.dept-board-container {
-  display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;
-}
 .board-wrap {
-  display:flex; gap:0; flex:1; min-height:0; overflow:hidden; position:relative;
+  display:block; position:relative;
 }
 /* Side panels */
 .board-side {
@@ -503,10 +490,10 @@ textarea.inp { resize:vertical; }
   transition:width .3s cubic-bezier(.4,0,.2,1), opacity .3s;
   position:relative; overflow:visible;
 }
-.board-side.left  { width:260px; margin-right:14px; }
-.board-side.right { width:260px; margin-left:14px; }
-.board-side.collapsed.left  { width:0px; margin-right:0; border-width:0; }
-.board-side.collapsed.right { width:0px; margin-left:0; border-width:0; }
+.board-side.left  { width:260px; float:left; margin-right:14px; height:100%; }
+.board-side.right { width:260px; float:right; margin-left:14px; height:100%; }
+.board-side.collapsed.left  { width:0px; margin-right:0; border-width:0; overflow:hidden; }
+.board-side.collapsed.right { width:0px; margin-left:0; border-width:0; overflow:hidden; }
 .board-side-inner {
   flex:1; overflow:hidden; transition:opacity .2s;
   display:flex; flex-direction:column; border-radius:8px; overflow:hidden;
@@ -551,11 +538,9 @@ textarea.inp { resize:vertical; }
 
 /* Middle members area */
 .board-members {
-  flex:1; overflow-y:auto; overflow-x:hidden; padding:10px;
-  display:flex; flex-direction:column; gap:10px; min-width:0;
+  width:100%; padding:10px;
+  display:flex; flex-direction:column; gap:10px;
 }
-.board-members::-webkit-scrollbar { width:4px; }
-.board-members::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
 /* Member row */
 .board-member-row {
