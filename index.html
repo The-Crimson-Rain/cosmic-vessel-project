@@ -504,18 +504,23 @@ textarea.inp { resize:vertical; }
 .board-side-tab {
   position:absolute; top:50%; transform:translateY(-50%);
   display:flex; flex-direction:column; align-items:center; gap:6px;
-  background:rgba(20,22,36,.95); border:1px solid var(--border);
+  background:rgba(12,14,26,.97); border:1px solid var(--border);
   border-radius:0 6px 6px 0; padding:14px 8px;
   cursor:pointer; user-select:none; z-index:10;
   transition:background .15s, border-color .15s;
-  box-shadow:2px 0 8px rgba(0,0,0,.4);
+  box-shadow:3px 0 10px rgba(0,0,0,.5);
 }
 .board-side.left .board-side-tab {
-  right:-34px; border-left:none; border-radius:0 6px 6px 0;
+  right:-32px; border-left:none; border-radius:0 6px 6px 0;
+  margin-top:-1px; /* flush with panel border */
 }
 .board-side.right .board-side-tab {
-  left:-34px; border-right:none; border-radius:6px 0 0 6px;
+  left:-32px; border-right:none; border-radius:6px 0 0 6px;
+  margin-top:-1px;
 }
+/* Remove border radius on the edge where tab connects */
+.board-side.left  { border-radius:8px; }
+.board-side.right { border-radius:8px; }
 .board-side-tab:hover { background:rgba(30,33,56,.95); border-color:var(--border-2); }
 .board-side-tab-arrow {
   font-size:18px; color:var(--white); line-height:1;
