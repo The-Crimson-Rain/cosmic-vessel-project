@@ -564,7 +564,10 @@ textarea.inp { resize:vertical; }
   max-height:340px; min-height:80px;
 }
 .board-member-tasks .task-card {
-  width:220px; flex-shrink:0;
+  width:220px !important; flex-shrink:0; flex-grow:0; box-sizing:border-box;
+}
+.board-member-tasks .task-card .tc-btn[style*="width:100%"] {
+  width:100% !important; box-sizing:border-box;
 }
 .board {
   display:flex; gap:14px; min-width:max-content; align-items:flex-start;
