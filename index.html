@@ -175,10 +175,48 @@ html, body {
   width:8px; height:8px; border-radius:50%; flex-shrink:0;
   box-shadow: 0 0 6px currentColor;
 }
-.s-online  { color:var(--green);  background:var(--green); }
-.s-working { color:var(--amber);  background:var(--amber); }
-.s-gaming  { color:var(--purple); background:var(--purple); }
-.s-offline { color:var(--grey-2); background:var(--grey-2); box-shadow:none; }
+.s-online  { color:var(--green);  background:var(--green);  animation:statusPulse 2.5s ease-in-out infinite; }
+.s-working { color:var(--amber);  background:var(--amber);  animation:statusPulse 2.8s ease-in-out infinite; }
+.s-gaming  { color:var(--purple); background:var(--purple); animation:statusPulse 3.1s ease-in-out infinite; }
+.s-offline { color:var(--grey-2); background:var(--grey-2); box-shadow:none; animation:none; }
+@keyframes statusPulse {
+  0%,100% { box-shadow:0 0 4px currentColor; }
+  50%     { box-shadow:0 0 10px currentColor, 0 0 20px currentColor; }
+}
+/* Top-centre toast notifications */
+.cvp-toast-top {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  z-index:9998; min-width:280px; max-width:380px;
+  background:rgba(10,12,22,0.97); border:1px solid rgba(200,16,46,.5);
+  border-left:3px solid var(--crimson-hi); border-radius:8px;
+  padding:14px 18px; box-shadow:0 8px 40px rgba(0,0,0,.8), 0 0 20px rgba(200,16,46,.15);
+  cursor:pointer; animation:cvpToastIn 0.3s ease;
+}
+.cvp-toast-top.gold { border-color:rgba(255,193,7,.5); border-left-color:var(--gold); }
+@keyframes cvpToastIn {
+  from { opacity:0; transform:translateX(-50%) translateY(-12px); }
+  to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+/* Tab transitions — holographic swipe */
+.view { display:none; overflow:hidden; }
+.view.active { display:block; }
+
+/* Individual card swipe animations */
+@keyframes holoSwipeOut {
+  0%   { opacity:1; transform:translateX(0) scale(1); }
+  100% { opacity:0; transform:translateX(-120px) scale(0.92); }
+}
+@keyframes holoSwipeIn {
+  0%   { opacity:0; transform:translateX(140px) scale(0.92); }
+  100% { opacity:1; transform:translateX(0) scale(1); }
+}
+.holo-out {
+  animation: holoSwipeOut 0.28s cubic-bezier(0.4,0,1,1) forwards;
+}
+.holo-in {
+  animation: holoSwipeIn 0.36s cubic-bezier(0,0,0.2,1) forwards;
+  opacity: 0;
+}
 
 /* ── QUICK-LINKS BAR ─────────────────────── */
 #extbar {
@@ -267,8 +305,7 @@ html, body {
 }
 
 /* ── VIEWS ───────────────────────────────── */
-.view { display:none; }
-.view.active { display:block; }
+/* view rules moved above */
 #view-transcripts.active {
   display: flex;
   flex-direction: column;
@@ -1440,11 +1477,16 @@ textarea.inp { resize:vertical; }
 .sb-player.collapsed .sb-player-toggle { transform: rotate(-90deg); }
 
 
+
+/* ── Cursor visibility ── */
+* { cursor: default; }
+a, button, [onclick], .nav-item, .btn, input, select, textarea, label[for], .task-card, .meeting-row, .crew-card {
+  cursor: pointer !important;
+}
+body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M4 2l12 7-6 2-3 6z' fill='white' stroke='%23c8102e' stroke-width='1.5'/%3E%3C/svg%3E") 4 2, default; }
 </style>
 </head>
 <body>
-<canvas id="cvp-bg-canvas"></canvas>
-
 <!-- ═══════════════════ SETUP BANNER ═══════════════════ -->
 <div id="setup-banner">
   <div class="setup-content">
@@ -2657,18 +2699,16 @@ function clearLoginErr() {
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
-  // Full brightness on login screen
-  document.getElementById('cvp-bg-canvas').style.opacity = '1';
-  cvpBgMode = 'login';
+  // Deactivate torch effect
+  if (window.cvpDeactivateTorch) window.cvpDeactivateTorch();
   listeners.forEach(u => u()); listeners = [];
 }
 
 async function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
-  // Subtle in hub — 35% opacity so it doesn't compete with UI
-  document.getElementById('cvp-bg-canvas').style.opacity = '0.35';
-  cvpBgMode = 'hub';
+  // Activate torch effect
+  if (window.cvpActivateTorch) window.cvpActivateTorch();
 
   // set status online
   await db.collection('users').doc(currentUser.uid).update({ status:'online' }).catch(()=>{});
@@ -2829,22 +2869,122 @@ function nav(el) {
   navTo(view);
 }
 
+let _navAnimating = false;
+
+// Selectors for swipeable cards in each view
+const SWIPE_SELECTORS = [
+  '.stat-card', '.panel', '.meeting-card', '.crew-card',
+  '.task-card', '.ms-row', '.board-member-row', '.arc-row',
+  '.tz-table', '.avail-grid', '.milestone-card',
+  '[class*="card"]', '[class*="panel"]', '[class*="row"]:not(.ext-btn)'
+].join(',');
+
+function _getSwipeTargets(viewEl) {
+  // Get direct swipeable children — use broad selector, deduplicate
+  const all = Array.from(viewEl.querySelectorAll(SWIPE_SELECTORS));
+  // Only include elements that are meaningful size (not tiny icons etc)
+  return all.filter(el => {
+    const rect = el.getBoundingClientRect();
+    return rect.height > 30 && rect.width > 80;
+  }).slice(0, 20); // cap at 20 to avoid staggering forever
+}
+
 function navTo(view) {
+  if (_navAnimating) return;
+
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll(`.nav-item[data-view="${view}"]`).forEach(n => n.classList.add('active'));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const el = document.getElementById('view-'+view);
-  if (el) {
-    el.classList.add('active');
-    if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
-    if (view === 'profile')    renderProfile();
-    if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); }
-    if (view === 'my-tasks')   renderMyTasks();
-    if (view === 'crew')       renderCrew();
-    if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
-    if (view === 'scheduler')  { renderMeetings(); renderTzTable(); renderAvailHeatmap(); checkAvailPrompt(); }
-    if (view === 'transcripts') { arcRenderAll(); }
+
+  const current = document.querySelector('.view.active');
+  const next = document.getElementById('view-' + view);
+  if (!next) return;
+  if (current === next) { _renderView(view); return; }
+
+  _navAnimating = true;
+  const STAGGER = 45;   // ms between each card
+  const OUT_DUR = 280;  // ms for swipe out
+  const GAP     = 60;   // ms gap between last out and first in
+  const IN_DUR  = 360;  // ms for swipe in
+
+  // ── SWIPE OUT current view cards ──
+  if (current) {
+    const outCards = _getSwipeTargets(current);
+    if (outCards.length === 0) {
+      // No cards — just fade the view out
+      current.style.transition = 'opacity 0.22s ease';
+      current.style.opacity = '0';
+      setTimeout(() => {
+        current.style.opacity = '';
+        current.style.transition = '';
+        current.classList.remove('active');
+      }, 240);
+    } else {
+      outCards.forEach((card, i) => {
+        card.style.animationDelay = (i * STAGGER) + 'ms';
+        card.classList.add('holo-out');
+      });
+      const totalOut = OUT_DUR + (outCards.length - 1) * STAGGER;
+      setTimeout(() => {
+        current.classList.remove('active');
+        outCards.forEach(card => {
+          card.classList.remove('holo-out');
+          card.style.animationDelay = '';
+          card.style.opacity = '';
+          card.style.transform = '';
+        });
+      }, totalOut);
+    }
   }
+
+  // ── SWIPE IN next view cards ──
+  const outDelay = current ? (OUT_DUR + (_getSwipeTargets(current).length - 1) * STAGGER + GAP) : 0;
+
+  setTimeout(() => {
+    _renderView(view);
+    next.classList.add('active');
+
+    const inCards = _getSwipeTargets(next);
+    if (inCards.length === 0) {
+      // No cards — fade in
+      next.style.opacity = '0';
+      next.style.transition = 'opacity 0.3s ease';
+      requestAnimationFrame(() => {
+        next.style.opacity = '1';
+        setTimeout(() => {
+          next.style.transition = '';
+          _navAnimating = false;
+        }, 320);
+      });
+    } else {
+      inCards.forEach((card, i) => {
+        card.classList.add('holo-in');
+        card.style.animationDelay = (i * STAGGER) + 'ms';
+        card.style.animationFillMode = 'forwards';
+      });
+      const totalIn = IN_DUR + (inCards.length - 1) * STAGGER + 100;
+      setTimeout(() => {
+        inCards.forEach(card => {
+          card.classList.remove('holo-in');
+          card.style.animationDelay = '';
+          card.style.animationFillMode = '';
+          card.style.opacity = '';
+          card.style.transform = '';
+        });
+        _navAnimating = false;
+      }, totalIn);
+    }
+  }, outDelay);
+}
+
+function _renderView(view) {
+  if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
+  if (view === 'profile')    renderProfile();
+  if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); }
+  if (view === 'my-tasks')   renderMyTasks();
+  if (view === 'crew')       renderCrew();
+  if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
+  if (view === 'scheduler')  { renderMeetings(); renderTzTable(); renderAvailHeatmap(); checkAvailPrompt(); }
+  if (view === 'transcripts') { arcRenderAll(); }
 }
 
 // ─── STATUS ───────────────────────────────────────────────
@@ -3390,6 +3530,10 @@ function updateNotifications() {
 }
 
 function showMeetingInviteToast(m) {
+  // Deduplicate — remove any existing invite toast for same meeting
+  document.querySelectorAll('.cvp-toast-top[data-meeting-id]').forEach(el => {
+    if (el.dataset.meetingId === m.id) el.remove();
+  });
   var id = 'inv-' + m.id;
   if (document.getElementById(id)) return;
   var userTz = (currentProfile && currentProfile.tz) || 'UTC';
@@ -3397,7 +3541,7 @@ function showMeetingInviteToast(m) {
   var localStr = dateUtc ? dateUtc.toLocaleString('en-GB',{timeZone:userTz,day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'TBD';
   var el = document.createElement('div');
   el.id = id;
-  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(200,16,46,.5);border-left:3px solid var(--crimson-hi);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
+  el.className = 'cvp-toast-top'; el.dataset.meetingId = m.id || m.title;
   var xBtn = document.createElement('button');
   xBtn.textContent = '✕';
   xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
@@ -3695,7 +3839,7 @@ function showGCalPrompt(m) {
   var url = makeGCalUrl(m);
   var el = document.createElement('div');
   el.id = 'gcal-prompt';
-  el.style.cssText = 'position:fixed;bottom:80px;right:20px;z-index:9999;background:var(--bg-2);border:1px solid rgba(66,133,244,.5);border-radius:8px;padding:16px 20px;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.6);';
+  el.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(10,12,22,0.97);border:1px solid rgba(66,133,244,.5);border-radius:8px;padding:16px 20px;min-width:280px;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.8);';
   var titleDiv = document.createElement('div');
   titleDiv.style.cssText = 'font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:#4285f4;margin-bottom:8px;';
   titleDiv.textContent = 'ADD TO GOOGLE CALENDAR?';
@@ -4819,7 +4963,7 @@ function showReminderToast(m, minsLeft) {
   if (document.getElementById(id)) return;
   var el = document.createElement('div');
   el.id = id;
-  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(255,193,7,.5);border-left:3px solid var(--gold);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
+  el.className = 'cvp-toast-top gold';
   var xBtn = document.createElement('button');
   xBtn.textContent = '✕';
   xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
@@ -4857,49 +5001,6 @@ function showReminderToast(m, minsLeft) {
       // Back on tab - restart heartbeat and set online
       writeHeartbeat();
       heartbeatInterval = setInterval(writeHeartbeat, HEARTBEAT_MS);
-setInterval(checkMeetingReminders, 60000);
-window._remindedMeetings = {};
-function checkMeetingReminders() {
-  if (!currentUser || !currentProfile) return;
-  if (currentProfile.meetingReminders === false) return;
-  var uid = currentUser.uid;
-  var now = Date.now();
-  var tenMin = 10 * 60 * 1000;
-  (liveData.meetings||[]).forEach(function(m) {
-    if (m.cancelled || window._remindedMeetings[m.id]) return;
-    var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
-    var until = mt - now;
-    if (until > 0 && until <= tenMin) {
-      var attending = (m.attendees||[]).includes(uid) && m.rsvp && m.rsvp[uid] === 'accepted';
-      if (attending || m.createdBy === uid) {
-        window._remindedMeetings[m.id] = true;
-        var mins = Math.ceil(until / 60000);
-        showReminderToast(m, mins);
-      }
-    }
-  });
-}
-function showReminderToast(m, minsLeft) {
-  var id = 'rem-' + m.id;
-  if (document.getElementById(id)) return;
-  var el = document.createElement('div');
-  el.id = id;
-  el.style.cssText = 'position:fixed;top:70px;right:16px;z-index:9998;background:var(--bg-2);border:1px solid rgba(255,193,7,.5);border-left:3px solid var(--gold);border-radius:6px;padding:14px 16px;max-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.6);cursor:pointer;';
-  var xBtn = document.createElement('button');
-  xBtn.textContent = '✕';
-  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
-  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
-  var body = document.createElement('div');
-  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:5px;">MEETING IN ' + minsLeft + ' MINUTE' + (minsLeft===1?'':'S') + '</div>' +
-    '<div style="font-size:12px;font-weight:700;color:var(--white);">' + esc(m.name) + '</div>';
-  var row = document.createElement('div');
-  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
-  row.appendChild(body); row.appendChild(xBtn);
-  el.appendChild(row);
-  el.addEventListener('click', function(){ navTo('scheduler'); el.remove(); });
-  document.body.appendChild(el);
-  setTimeout(function(){ if(document.getElementById(id)) document.getElementById(id).remove(); }, 20000);
-}
     }
   });
 
@@ -6447,173 +6548,6 @@ async function arcAdminClearAll() {
 }
 </script>
 
-<script>
-// ═══════════════════════════════════════════════════
-// CVP HEX BACKGROUND ENGINE
-// ═══════════════════════════════════════════════════
-(function() {
-  const canvas = document.getElementById('cvp-bg-canvas');
-  const ctx    = canvas.getContext('2d');
-  let W, H, cells = [];
-  let cvpBgT0 = null;
-
-  // Expose mode globally so showLogin/showApp can set it
-  window.cvpBgMode = 'login';
-
-  const COL_DIM    = [65,  3,  10];
-  const COL_MID    = [200, 16, 46];
-  const COL_BRIGHT = [255, 100, 120];
-  const COL_GOLD   = [210, 140, 50];
-  const COL_STEEL  = [190, 215, 255];
-
-  const waves = [
-    { x:0.18, y:0.22, vx:0.00010, vy:0.00007,  speed:1.6, amp:1.0  },
-    { x:0.80, y:0.68, vx:-0.00008,vy:-0.00009, speed:1.4, amp:0.88 },
-    { x:0.55, y:0.08, vx:0.00006, vy:0.00012,  speed:1.2, amp:0.75 },
-  ];
-
-  const PANEL_GLOW_SPEED = 0.75;
-  const PANEL_GLOW_PHASE = 1.7;
-
-  function smoothstep(e0,e1,x){ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); }
-  function lerpCol(a,b,t){ t=Math.max(0,Math.min(1,t)); return [a[0]+(b[0]-a[0])*t|0,a[1]+(b[1]-a[1])*t|0,a[2]+(b[2]-a[2])*t|0]; }
-
-  function warpPt(fx,fy){
-    const ns=Math.min(W,H)*0.5;
-    const nx=fx/ns, ny=fy/ns;
-    const r=Math.sqrt(nx*nx+ny*ny);
-    if(r<0.0001) return {sx:W/2,sy:H/2};
-    const warp=1.0+smoothstep(0.0,1.8,r)*0.55;
-    const compress=1.0/(1.0+0.30/(r+0.20));
-    const fr=r*compress*warp;
-    return {sx:W/2+(nx/r)*fr*ns, sy:H/2+(ny/r)*fr*ns};
-  }
-
-  function buildGrid(){
-    cells=[];
-    W=canvas.width=window.innerWidth;
-    H=canvas.height=window.innerHeight;
-    const HEX_R=36, hexW=Math.sqrt(3)*HEX_R, hexH=2*HEX_R;
-    const cols=Math.ceil(W/hexW)+6, rows=Math.ceil(H/(hexH*0.75))+6;
-    const va=[0,1,2,3,4,5].map(i=>(Math.PI/3)*i-Math.PI/6);
-    for(let row=-2;row<rows;row++){
-      for(let col=-2;col<cols;col++){
-        const fcx=(col-cols/2+0.5)*hexW+(row%2===0?0:hexW*0.5);
-        const fcy=(row-rows/2+0.5)*hexH*0.75;
-        const pts=va.map(a=>warpPt(fcx+HEX_R*Math.cos(a),fcy+HEX_R*Math.sin(a)));
-        const scx=pts.reduce((s,p)=>s+p.sx,0)/6;
-        const scy=pts.reduce((s,p)=>s+p.sy,0)/6;
-        if(scx<-80||scx>W+80||scy<-80||scy>H+80) continue;
-        const size=Math.hypot(pts[0].sx-pts[3].sx,pts[0].sy-pts[3].sy)/2;
-        const pdx=(scx-W*0.5)/(W*0.13), pdy=(scy-H*0.5)/(H*0.18);
-        const panelDist=Math.sqrt(pdx*pdx+pdy*pdy);
-        const proximityFade=Math.max(0.10,smoothstep(0.0,2.2,panelDist));
-        const sdx=(scx-W*0.5)/(W*0.5), sdy=(scy-H*0.5)/(H*0.5);
-        const screenDist=Math.min(Math.sqrt(sdx*sdx+sdy*sdy),1.0);
-        const maxBright=proximityFade*(0.18+screenDist*0.82);
-        const seed=Math.abs(((col+50)*7+(row+50)*13)*2654435761)>>>0;
-        const rng=(seed%1000)/1000;
-        let thresh=panelDist<1.2?0.95:screenDist<0.42?0.72:screenDist<0.68?0.80:0.91;
-        if(rng>thresh) continue;
-        const phaseOffset=((Math.abs(col)*17+Math.abs(row)*31+(col*row+200))%628)/100;
-        const aS=(seed>>4)%100;
-        const accentType=aS<4?'steel':aS<10?'gold':'crimson';
-        cells.push({pts,cx:scx,cy:scy,size,phaseOffset,accentType,maxBright,screenDist,panelDist});
-      }
-    }
-    cells.sort((a,b)=>a.size-b.size);
-  }
-
-  function getBrightness(cell,t){
-    let total=0;
-    for(const wave of waves){
-      const wx=wave.x*W,wy=wave.y*H;
-      const dist=Math.hypot(cell.cx-wx,cell.cy-wy);
-      const norm=Math.min(dist/(Math.hypot(W,H)*0.65),1);
-      const phase=(norm*Math.PI*4.5)-(t*wave.speed)+cell.phaseOffset;
-      total+=(Math.sin(phase)*0.5+0.5)*(1-norm*0.5)*wave.amp;
-    }
-    const raw=Math.min(total/2.0,1);
-    return raw*raw*(3-2*raw)*cell.maxBright;
-  }
-
-  function getPanelGlow(t){
-    const raw=Math.sin(t*PANEL_GLOW_SPEED+PANEL_GLOW_PHASE)*0.5+0.5;
-    return raw*raw*(3-2*raw);
-  }
-
-  function applyPanelGlow(g){
-    const lb=document.querySelector('.login-box');
-    if(!lb) return;
-    const borderA=0.20+g*0.45;
-    const glow1A=g*0.50, glow2A=g*0.24, glow3A=g*0.10, glow4A=g*0.04;
-    lb.style.borderColor=`rgba(200,16,46,${borderA})`;
-    lb.style.boxShadow=[
-      `0 0 0 1px rgba(200,16,46,${g*0.30})`,
-      `0 0 ${8+g*8}px ${1+g*2}px rgba(200,16,46,${glow1A})`,
-      `0 0 ${20+g*22}px ${3+g*5}px rgba(200,16,46,${glow2A})`,
-      `0 0 ${50+g*40}px ${8+g*12}px rgba(200,16,46,${glow3A})`,
-      `0 0 ${90+g*60}px ${20+g*25}px rgba(200,16,46,${glow4A})`,
-      `inset 0 1px 0 rgba(255,255,255,0.05)`
-    ].join(',');
-  }
-
-  function drawFrame(t){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#04030a';
-    ctx.fillRect(0,0,W,H);
-    for(const w of waves){
-      w.x+=w.vx; w.y+=w.vy;
-      if(w.x<0.05||w.x>0.95) w.vx*=-1;
-      if(w.y<0.05||w.y>0.95) w.vy*=-1;
-    }
-    // Only apply panel glow on login screen
-    if(window.cvpBgMode==='login') applyPanelGlow(getPanelGlow(t));
-    for(const cell of cells){
-      const b=getBrightness(cell,t);
-      if(b<0.004) continue;
-      let edgeCol;
-      if(cell.accentType==='steel'&&b>0.68) edgeCol=lerpCol(COL_MID,COL_STEEL,(b-0.68)/0.32);
-      else if(cell.accentType==='gold') edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_GOLD,(b-0.45)/0.55);
-      else edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_BRIGHT,(b-0.45)/0.55);
-      const [er,eg,eb]=edgeCol;
-      const sizeNorm=Math.min(cell.size/36,1.6);
-      const lineW=(0.35+b*1.1)*Math.max(sizeNorm*0.65,0.22);
-      function tracePath(){
-        ctx.beginPath();
-        cell.pts.forEach(({sx,sy},i)=>i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy));
-        ctx.closePath();
-      }
-      if(b>0.07){
-        tracePath();
-        ctx.strokeStyle=`rgba(${er},${eg},${eb},${b*0.20})`;
-        ctx.lineWidth=lineW+4*Math.min(sizeNorm,1);
-        ctx.shadowColor=`rgba(${er},${eg},${eb},${b*0.45})`;
-        ctx.shadowBlur=4+b*16;
-        ctx.stroke();
-        ctx.shadowBlur=0;
-      }
-      tracePath();
-      ctx.strokeStyle=`rgba(${er},${eg},${eb},${0.15+b*0.82})`;
-      ctx.lineWidth=lineW;
-      ctx.stroke();
-    }
-  }
-
-  function loop(ts){
-    if(!cvpBgT0) cvpBgT0=ts;
-    drawFrame((ts-cvpBgT0)/1000);
-    requestAnimationFrame(loop);
-  }
-
-  buildGrid();
-  window.addEventListener('resize',buildGrid);
-  requestAnimationFrame(loop);
-
-  // Fade in canvas on load
-  setTimeout(()=>{ canvas.style.opacity='1'; },300);
-})();
-</script>
 
 
 
@@ -6685,5 +6619,303 @@ async function arcAdminClearAll() {
     </div>
   </div>
 </div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CVP HUB EFFECTS: Mouse Torch, Click Sparks, Idle
+// ═══════════════════════════════════════════════════
+(function() {
+
+// ── MOUSE TORCH ──
+const torchCanvas = document.createElement('canvas');
+torchCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+document.body.appendChild(torchCanvas);
+const tc = torchCanvas.getContext('2d');
+
+let TW, TH, torchHexes = [];
+const TORCH_R = 38; // hex radius — flat grid
+const TORCH_RADIUS = 230; // illumination radius
+const HEX_W = Math.sqrt(3) * TORCH_R;
+const HEX_H = 2 * TORCH_R;
+
+// Mouse tracking with lag
+let mouseX = -1000, mouseY = -1000;
+let torchX = -1000, torchY = -1000;
+const TORCH_LAG = 0.09; // easing factor — lower = more lag
+
+// Idle tracking
+let lastMove = Date.now();
+let torchAlpha = 0; // 0=invisible, 1=full
+let idleTimer = null;
+const IDLE_TIMEOUT = 4000; // ms before fade
+
+// Only active in hub mode
+let torchActive = false;
+
+function buildTorchGrid() {
+  TW = torchCanvas.width  = window.innerWidth;
+  TH = torchCanvas.height = window.innerHeight;
+  torchHexes = [];
+  // Build a grid large enough to cover screen — flat regular hexes
+  const cols = Math.ceil(TW / HEX_W) + 4;
+  const rows = Math.ceil(TH / (HEX_H * 0.75)) + 4;
+  for (let row = -2; row < rows; row++) {
+    for (let col = -2; col < cols; col++) {
+      const x = col * HEX_W + (row % 2 === 0 ? 0 : HEX_W * 0.5) - HEX_W;
+      const y = row * HEX_H * 0.75 - HEX_H;
+      torchHexes.push({ x, y });
+    }
+  }
+}
+
+function hexPath6(ctx, x, y, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (Math.PI / 3) * i - Math.PI / 6;
+    const px = x + r * Math.cos(a);
+    const py = y + r * Math.sin(a);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+let torchT0 = null;
+function torchLoop(ts) {
+  if (!torchT0) torchT0 = ts;
+  requestAnimationFrame(torchLoop);
+
+  // Only draw in hub mode
+  if (!torchActive) { tc.clearRect(0, 0, TW, TH); return; }
+
+  // Ease torch position toward mouse
+  torchX = lerp(torchX, mouseX, TORCH_LAG);
+  torchY = lerp(torchY, mouseY, TORCH_LAG);
+
+  // Idle fade
+  const idleMs = Date.now() - lastMove;
+  if (idleMs > IDLE_TIMEOUT) {
+    torchAlpha = Math.max(0, torchAlpha - 0.008);
+  } else {
+    torchAlpha = Math.min(1, torchAlpha + 0.06);
+  }
+
+  tc.clearRect(0, 0, TW, TH);
+  if (torchAlpha < 0.01) return;
+
+  const r = TORCH_R - 2;
+  for (const h of torchHexes) {
+    const dist = Math.hypot(h.x - torchX, h.y - torchY);
+    if (dist > TORCH_RADIUS + 40) continue;
+
+    // Brightness falls off from centre
+    const norm = Math.max(0, 1 - dist / TORCH_RADIUS);
+    const smoothNorm = norm * norm * (3 - 2 * norm); // smoothstep
+    const b = smoothNorm * torchAlpha;
+    if (b < 0.01) continue;
+
+    // Dim crimson — subdued for hub
+    const lineAlpha = 0.08 + b * 0.30;
+    const glowAlpha = b * 0.18;
+
+    hexPath6(tc, h.x, h.y, r);
+
+    // Soft outer glow
+    if (b > 0.15) {
+      tc.strokeStyle = `rgba(200,16,46,${glowAlpha})`;
+      tc.lineWidth = 3;
+      tc.shadowColor = `rgba(200,16,46,${b * 0.4})`;
+      tc.shadowBlur = 8;
+      tc.stroke();
+      tc.shadowBlur = 0;
+    }
+    // Core line
+    hexPath6(tc, h.x, h.y, r);
+    tc.strokeStyle = `rgba(200,16,46,${lineAlpha})`;
+    tc.lineWidth = 0.8;
+    tc.stroke();
+  }
+}
+
+// ── CLICK SPARKS ──
+const sparkCanvas = document.createElement('canvas');
+sparkCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9997;';
+document.body.appendChild(sparkCanvas);
+const sc = sparkCanvas.getContext('2d');
+let sparks = [];
+
+function resizeSpark() {
+  sparkCanvas.width  = window.innerWidth;
+  sparkCanvas.height = window.innerHeight;
+}
+resizeSpark();
+
+function spawnSparks(x, y) {
+  const count = 5 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1.5 + Math.random() * 3.5;
+    sparks.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      life: 0,
+      maxLife: 0.2 + Math.random() * 0.35,
+      size: 0.8 + Math.random() * 1.6,
+      bright: Math.random() < 0.2,
+    });
+  }
+}
+
+function sparkLoop() {
+  sc.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+  sparks = sparks.filter(s => {
+    s.life += 0.016;
+    s.x += s.vx; s.y += s.vy;
+    s.vy += 0.12; s.vx *= 0.96;
+    const p = s.life / s.maxLife;
+    const al = p < 0.2 ? p / 0.2 : 1 - (p - 0.2) / 0.8;
+    if (al <= 0.01) return false;
+    const g = sc.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 2.5);
+    if (s.bright) {
+      g.addColorStop(0, `rgba(255,230,210,${al * 0.95})`);
+      g.addColorStop(0.4, `rgba(220,50,30,${al * 0.7})`);
+    } else {
+      g.addColorStop(0, `rgba(255,140,80,${al * 0.9})`);
+      g.addColorStop(0.4, `rgba(200,16,46,${al * 0.65})`);
+    }
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    sc.beginPath();
+    sc.arc(s.x, s.y, s.size * 2.5, 0, Math.PI * 2);
+    sc.fillStyle = g; sc.fill();
+    return s.life < s.maxLife;
+  });
+  requestAnimationFrame(sparkLoop);
+}
+
+// ── RIPPLE NOTIFICATIONS ──
+const rippleCanvas = document.createElement('canvas');
+rippleCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9996;';
+document.body.appendChild(rippleCanvas);
+const rc = rippleCanvas.getContext('2d');
+let ripples = [];
+
+function resizeRipple() {
+  rippleCanvas.width  = window.innerWidth;
+  rippleCanvas.height = window.innerHeight;
+}
+resizeRipple();
+
+window.spawnRipple = function(x, y) {
+  ripples.push({ x, y, r: 0, maxR: 80, life: 0, maxLife: 1.2 });
+};
+
+function rippleLoop() {
+  rc.clearRect(0, 0, rippleCanvas.width, rippleCanvas.height);
+  ripples = ripples.filter(r => {
+    r.life += 0.016;
+    r.r = (r.life / r.maxLife) * r.maxR;
+    const al = 1 - r.life / r.maxLife;
+    if (al <= 0.01) return false;
+    rc.beginPath();
+    rc.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+    rc.strokeStyle = `rgba(200,16,46,${al * 0.6})`;
+    rc.lineWidth = 1.5;
+    rc.stroke();
+    // Second ring slightly behind
+    if (r.r > 20) {
+      rc.beginPath();
+      rc.arc(r.x, r.y, r.r * 0.6, 0, Math.PI * 2);
+      rc.strokeStyle = `rgba(200,16,46,${al * 0.35})`;
+      rc.lineWidth = 1;
+      rc.stroke();
+    }
+    return r.life < r.maxLife;
+  });
+  requestAnimationFrame(rippleLoop);
+}
+
+// ── IDLE STATE — dim hub at 60s ──
+let hubIdleTimer = null;
+let hubDimmed = false;
+const HUB_IDLE_MS = 60000;
+const appEl = document.getElementById('app');
+
+function resetHubIdle() {
+  if (hubDimmed) {
+    hubDimmed = false;
+    if (appEl) appEl.style.transition = 'opacity 0.5s ease';
+    if (appEl) appEl.style.opacity = '1';
+  }
+  clearTimeout(hubIdleTimer);
+  hubIdleTimer = setTimeout(() => {
+    if (!torchActive) return;
+    hubDimmed = true;
+    if (appEl) appEl.style.transition = 'opacity 3s ease';
+    if (appEl) appEl.style.opacity = '0.55';
+  }, HUB_IDLE_MS);
+}
+
+// ── EVENT LISTENERS ──
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  lastMove = Date.now();
+  if (torchActive) resetHubIdle();
+});
+
+document.addEventListener('click', e => {
+  if (torchActive) {
+    spawnSparks(e.clientX, e.clientY);
+    resetHubIdle();
+  }
+});
+
+document.addEventListener('keydown', () => {
+  if (torchActive) resetHubIdle();
+});
+
+window.addEventListener('resize', () => {
+  buildTorchGrid();
+  resizeSpark();
+  resizeRipple();
+});
+
+// Pause when tab not visible
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    torchActive = false;
+  } else {
+    // Re-enable if in hub
+    if (document.getElementById('app')?.style.display !== 'none') {
+      torchActive = true;
+    }
+  }
+});
+
+// ── HOOK INTO SHOWAPP / SHOWLOGIN ──
+// Patch the existing showApp and showLogin to toggle torch
+const _origShowApp = window.showApp;
+window.showApp = async function() {
+  const r = _origShowApp ? await _origShowApp.apply(this, arguments) : undefined;
+  torchActive = true;
+  torchAlpha = 0;
+  resetHubIdle();
+  return r;
+};
+
+// Also expose for direct calls
+window.cvpActivateTorch = () => { torchActive = true; torchAlpha = 0; resetHubIdle(); };
+window.cvpDeactivateTorch = () => { torchActive = false; };
+
+// ── START LOOPS ──
+buildTorchGrid();
+requestAnimationFrame(torchLoop);
+sparkLoop();
+rippleLoop();
+
+})();
+</script>
 </body>
 </html>
