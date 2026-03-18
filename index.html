@@ -1487,6 +1487,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 </style>
 </head>
 <body>
+<canvas id="cvp-bg-canvas"></canvas>
 <!-- ═══════════════════ SETUP BANNER ═══════════════════ -->
 <div id="setup-banner">
   <div class="setup-content">
@@ -2699,6 +2700,7 @@ function clearLoginErr() {
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
+  if (window.cvpBgResume) window.cvpBgResume();
   // Deactivate torch effect
   if (window.cvpDeactivateTorch) window.cvpDeactivateTorch();
   listeners.forEach(u => u()); listeners = [];
@@ -2707,6 +2709,7 @@ function showLogin() {
 async function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
+  if (window.cvpBgPause) window.cvpBgPause();
   // Activate torch effect
   if (window.cvpActivateTorch) window.cvpActivateTorch();
 
@@ -3100,6 +3103,7 @@ function openEditTask(taskId) {
   if (descEl)   descEl.value   = task.description || task.desc || '';
   if (dueEl)    dueEl.value    = task.dueDate || task.due || '';
   if (priEl)    priEl.value    = task.priority || 'medium';
+  populateTaskDeptSelect(task.dept || '');
   if (deptEl)   deptEl.value   = task.dept || '';
   if (assignEl) { populateAssignSelect(task.dept); assignEl.value = task.assignee || ''; }
   if (editEl)   editEl.value   = taskId;
@@ -4595,7 +4599,10 @@ function renderOrphanTasks() {
       html += '<div style="font-size:13px;color:var(--white);">' + esc(taskName) + '</div>';
       html += '<div style="font-size:10px;color:var(--grey-2);">dept: ' + (t.dept||'NONE') + ' · state: ' + (t.state||'?') + ' · id: ' + t.id + '</div>';
       html += '</div>';
+      html += '<div style="display:flex;gap:6px;">';
+      html += '<button class="btn btn-ghost btn-xs" onclick="openEditTask(\'' + t.id + '\')">Edit</button>';
       html += '<button class="btn btn-danger btn-xs" onclick="deleteTask(\'' + t.id + '\')">Delete</button>';
+      html += '</div>';
       html += '</div>';
     });
   }
@@ -6620,6 +6627,180 @@ async function arcAdminClearAll() {
   </div>
 </div>
 
+<script>
+// ═══════════════════════════════════════════════════
+// CVP HEX BACKGROUND ENGINE
+// ═══════════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('cvp-bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, cells = [];
+  let cvpBgT0 = null;
+
+  // Expose mode globally so showLogin/showApp can set it
+  window.cvpBgMode = 'login';
+  window.cvpBgModeSet = function(m) { window.cvpBgMode = m; };
+  // Expose so showApp/showLogin can control it
+
+  const COL_DIM    = [65,  3,  10];
+  const COL_MID    = [200, 16, 46];
+  const COL_BRIGHT = [255, 100, 120];
+  const COL_GOLD   = [210, 140, 50];
+  const COL_STEEL  = [190, 215, 255];
+
+  const waves = [
+    { x:0.18, y:0.22, vx:0.00010, vy:0.00007,  speed:1.6, amp:1.0  },
+    { x:0.80, y:0.68, vx:-0.00008,vy:-0.00009, speed:1.4, amp:0.88 },
+    { x:0.55, y:0.08, vx:0.00006, vy:0.00012,  speed:1.2, amp:0.75 },
+  ];
+
+  const PANEL_GLOW_SPEED = 0.75;
+  const PANEL_GLOW_PHASE = 1.7;
+
+  function smoothstep(e0,e1,x){ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); }
+  function lerpCol(a,b,t){ t=Math.max(0,Math.min(1,t)); return [a[0]+(b[0]-a[0])*t|0,a[1]+(b[1]-a[1])*t|0,a[2]+(b[2]-a[2])*t|0]; }
+
+  function warpPt(fx,fy){
+    const ns=Math.min(W,H)*0.5;
+    const nx=fx/ns, ny=fy/ns;
+    const r=Math.sqrt(nx*nx+ny*ny);
+    if(r<0.0001) return {sx:W/2,sy:H/2};
+    const warp=1.0+smoothstep(0.0,1.8,r)*0.55;
+    const compress=1.0/(1.0+0.30/(r+0.20));
+    const fr=r*compress*warp;
+    return {sx:W/2+(nx/r)*fr*ns, sy:H/2+(ny/r)*fr*ns};
+  }
+
+  function buildGrid(){
+    cells=[];
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+    const HEX_R=36, hexW=Math.sqrt(3)*HEX_R, hexH=2*HEX_R;
+    const cols=Math.ceil(W/hexW)+6, rows=Math.ceil(H/(hexH*0.75))+6;
+    const va=[0,1,2,3,4,5].map(i=>(Math.PI/3)*i-Math.PI/6);
+    for(let row=-2;row<rows;row++){
+      for(let col=-2;col<cols;col++){
+        const fcx=(col-cols/2+0.5)*hexW+(row%2===0?0:hexW*0.5);
+        const fcy=(row-rows/2+0.5)*hexH*0.75;
+        const pts=va.map(a=>warpPt(fcx+HEX_R*Math.cos(a),fcy+HEX_R*Math.sin(a)));
+        const scx=pts.reduce((s,p)=>s+p.sx,0)/6;
+        const scy=pts.reduce((s,p)=>s+p.sy,0)/6;
+        if(scx<-80||scx>W+80||scy<-80||scy>H+80) continue;
+        const size=Math.hypot(pts[0].sx-pts[3].sx,pts[0].sy-pts[3].sy)/2;
+        const pdx=(scx-W*0.5)/(W*0.13), pdy=(scy-H*0.5)/(H*0.18);
+        const panelDist=Math.sqrt(pdx*pdx+pdy*pdy);
+        const proximityFade=Math.max(0.10,smoothstep(0.0,2.2,panelDist));
+        const sdx=(scx-W*0.5)/(W*0.5), sdy=(scy-H*0.5)/(H*0.5);
+        const screenDist=Math.min(Math.sqrt(sdx*sdx+sdy*sdy),1.0);
+        const maxBright=proximityFade*(0.18+screenDist*0.82);
+        const seed=Math.abs(((col+50)*7+(row+50)*13)*2654435761)>>>0;
+        const rng=(seed%1000)/1000;
+        let thresh=panelDist<1.2?0.95:screenDist<0.42?0.72:screenDist<0.68?0.80:0.91;
+        if(rng>thresh) continue;
+        const phaseOffset=((Math.abs(col)*17+Math.abs(row)*31+(col*row+200))%628)/100;
+        const aS=(seed>>4)%100;
+        const accentType=aS<4?'steel':aS<10?'gold':'crimson';
+        cells.push({pts,cx:scx,cy:scy,size,phaseOffset,accentType,maxBright,screenDist,panelDist});
+      }
+    }
+    cells.sort((a,b)=>a.size-b.size);
+  }
+
+  function getBrightness(cell,t){
+    let total=0;
+    for(const wave of waves){
+      const wx=wave.x*W,wy=wave.y*H;
+      const dist=Math.hypot(cell.cx-wx,cell.cy-wy);
+      const norm=Math.min(dist/(Math.hypot(W,H)*0.65),1);
+      const phase=(norm*Math.PI*4.5)-(t*wave.speed)+cell.phaseOffset;
+      total+=(Math.sin(phase)*0.5+0.5)*(1-norm*0.5)*wave.amp;
+    }
+    const raw=Math.min(total/2.0,1);
+    return raw*raw*(3-2*raw)*cell.maxBright;
+  }
+
+  function getPanelGlow(t){
+    const raw=Math.sin(t*PANEL_GLOW_SPEED+PANEL_GLOW_PHASE)*0.5+0.5;
+    return raw*raw*(3-2*raw);
+  }
+
+  function applyPanelGlow(g){
+    const lb=document.querySelector('.login-box');
+    if(!lb) return;
+    const borderA=0.20+g*0.45;
+    const glow1A=g*0.50, glow2A=g*0.24, glow3A=g*0.10, glow4A=g*0.04;
+    lb.style.borderColor=`rgba(200,16,46,${borderA})`;
+    lb.style.boxShadow=[
+      `0 0 0 1px rgba(200,16,46,${g*0.30})`,
+      `0 0 ${8+g*8}px ${1+g*2}px rgba(200,16,46,${glow1A})`,
+      `0 0 ${20+g*22}px ${3+g*5}px rgba(200,16,46,${glow2A})`,
+      `0 0 ${50+g*40}px ${8+g*12}px rgba(200,16,46,${glow3A})`,
+      `0 0 ${90+g*60}px ${20+g*25}px rgba(200,16,46,${glow4A})`,
+      `inset 0 1px 0 rgba(255,255,255,0.05)`
+    ].join(',');
+  }
+
+  function drawFrame(t){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#04030a';
+    ctx.fillRect(0,0,W,H);
+    for(const w of waves){
+      w.x+=w.vx; w.y+=w.vy;
+      if(w.x<0.05||w.x>0.95) w.vx*=-1;
+      if(w.y<0.05||w.y>0.95) w.vy*=-1;
+    }
+    // Only apply panel glow on login screen
+    if(window.cvpBgMode==='login') applyPanelGlow(getPanelGlow(t));
+    for(const cell of cells){
+      const b=getBrightness(cell,t);
+      if(b<0.004) continue;
+      let edgeCol;
+      if(cell.accentType==='steel'&&b>0.68) edgeCol=lerpCol(COL_MID,COL_STEEL,(b-0.68)/0.32);
+      else if(cell.accentType==='gold') edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_GOLD,(b-0.45)/0.55);
+      else edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_BRIGHT,(b-0.45)/0.55);
+      const [er,eg,eb]=edgeCol;
+      const sizeNorm=Math.min(cell.size/36,1.6);
+      const lineW=(0.35+b*1.1)*Math.max(sizeNorm*0.65,0.22);
+      function tracePath(){
+        ctx.beginPath();
+        cell.pts.forEach(({sx,sy},i)=>i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy));
+        ctx.closePath();
+      }
+      if(b>0.07){
+        tracePath();
+        ctx.strokeStyle=`rgba(${er},${eg},${eb},${b*0.20})`;
+        ctx.lineWidth=lineW+4*Math.min(sizeNorm,1);
+        ctx.shadowColor=`rgba(${er},${eg},${eb},${b*0.45})`;
+        ctx.shadowBlur=4+b*16;
+        ctx.stroke();
+        ctx.shadowBlur=0;
+      }
+      tracePath();
+      ctx.strokeStyle=`rgba(${er},${eg},${eb},${0.15+b*0.82})`;
+      ctx.lineWidth=lineW;
+      ctx.stroke();
+    }
+  }
+
+  let bgRunning = true;
+  function loop(ts){
+    if(!cvpBgT0) cvpBgT0=ts;
+    if(bgRunning) drawFrame((ts-cvpBgT0)/1000);
+    requestAnimationFrame(loop);
+  }
+
+  buildGrid();
+  window.addEventListener('resize',buildGrid);
+  requestAnimationFrame(loop);
+
+  // Expose pause/resume so hub can stop the loop
+  window.cvpBgPause  = () => { bgRunning = false; canvas.style.opacity='0'; };
+  window.cvpBgResume = () => { bgRunning = true;  canvas.style.opacity='1'; };
+
+  // Fade in canvas on load
+  setTimeout(()=>{ canvas.style.opacity='1'; },300);
+})();
+</script>
 <script>
 // ═══════════════════════════════════════════════════
 // CVP HUB EFFECTS: Mouse Torch, Click Sparks, Idle
