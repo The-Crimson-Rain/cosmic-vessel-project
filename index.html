@@ -2058,7 +2058,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
           <div class="panel-hdr"><span class="panel-title">External Links</span></div>
           <div style="padding:18px;display:flex;flex-direction:column;gap:14px;">
             <div class="field"><span class="field-label">Discord Server URL</span><input class="inp" id="cfg-discord" placeholder="https://discord.gg/..."></div>
-            <div class="field"><span class="field-label">Discord Meeting Voice Channel</span><input class="inp" id="cfg-discord-vc" placeholder="discord://channels/SERVER_ID/CHANNEL_ID"><div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Right-click the voice channel in Discord → Copy Link</div></div>
+            <div class="field"><span class="field-label">Discord Meeting Voice Channel</span><input class="inp" id="cfg-discord-vc" placeholder="https://discord.com/channels/SERVER_ID/CHANNEL_ID"><div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Right-click the voice channel in Discord → Copy Link</div></div>
             <div class="field"><span class="field-label">Google Drive Folder URL</span><input class="inp" id="cfg-drive" placeholder="https://drive.google.com/..."></div>
             <div class="field"><span class="field-label">NoteCat Workspace URL</span><input class="inp" id="cfg-notecat" placeholder="https://notecat.app/..."></div>
             <button class="btn btn-gold" onclick="saveExtLinks()">Save Links</button>
@@ -4998,7 +4998,8 @@ function checkMeetingReminders() {
 function showMeetingStartedToast(m) {
   var id = 'started-' + m.id;
   if (document.getElementById(id)) return;
-  var vcUrl = (liveData.config && liveData.config.discordVc) || '';
+  var vcRaw = (liveData.config && liveData.config.discordVc) || '';
+  var vcUrl = vcRaw.replace(/^https:\/\/discord\.com/, 'discord://discord.com');
   var el = document.createElement('div');
   el.id = id;
   el.className = 'cvp-toast-top';
