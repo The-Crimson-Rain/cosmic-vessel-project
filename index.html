@@ -1523,6 +1523,7 @@ textarea.inp { resize:vertical; }
     <div class="login-tab-row">
       <button class="login-tab active" id="tab-login" onclick="switchLoginTab('login')">Sign In</button>
       <button class="login-tab" id="tab-reg" onclick="switchLoginTab('register')">Register</button>
+      <button class="login-tab" id="tab-forgot" onclick="switchLoginTab('forgot')">Forgot Password</button>
     </div>
     <!-- Sign in -->
     <div id="form-login" style="display:flex;flex-direction:column;gap:14px;">
@@ -1530,6 +1531,16 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Password</span><input class="inp" id="li-pass" type="password" placeholder="••••••••"></div>
       <button class="btn btn-primary fw" onclick="doLogin()">▸ INITIATE SEQUENCE</button>
       <div id="li-err" class="login-error"></div>
+    </div>
+    <!-- Forgot password -->
+    <div id="form-forgot" style="display:none;flex-direction:column;gap:14px;">
+      <div style="font-size:11px;color:var(--grey);letter-spacing:1px;line-height:1.6;">Enter the email address associated with your account. We'll send you a link to reset your password.</div>
+      <div class="field"><span class="field-label">Email</span><input class="inp" id="forgot-email" type="email" placeholder="your@email.com"></div>
+      <button class="btn btn-primary fw" onclick="doForgotPassword()">▸ SEND RESET LINK</button>
+      <div id="forgot-err" class="login-error"></div>
+      <div id="forgot-ok" style="display:none;font-size:11px;color:#4caf50;letter-spacing:1px;line-height:1.6;padding:10px;border:1px solid rgba(76,175,80,0.3);border-radius:6px;background:rgba(76,175,80,0.06);">
+        ✓ Reset link sent. Check your inbox — including spam. The link expires after 1 hour.
+      </div>
     </div>
     <!-- Register (shown if admin enables it or first launch) -->
     <div id="form-register" style="display:none;flex-direction:column;gap:14px;">
@@ -2578,8 +2589,30 @@ async function onAuthChange(user) {
 function switchLoginTab(tab) {
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
   document.getElementById('tab-reg').classList.toggle('active', tab==='register');
+  document.getElementById('tab-forgot').classList.toggle('active', tab==='forgot');
   document.getElementById('form-login').style.display    = tab==='login'    ? 'flex' : 'none';
   document.getElementById('form-register').style.display = tab==='register' ? 'flex' : 'none';
+  document.getElementById('form-forgot').style.display   = tab==='forgot'   ? 'flex' : 'none';
+  // Reset forgot form state when switching away
+  if (tab !== 'forgot') {
+    document.getElementById('forgot-ok').style.display = 'none';
+    document.getElementById('forgot-email').value = '';
+    clearLoginErr();
+  }
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  clearLoginErr();
+  document.getElementById('forgot-ok').style.display = 'none';
+  if (!email) { showLoginErr('forgot-err', 'Please enter your email address'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    document.getElementById('forgot-ok').style.display = 'block';
+    document.getElementById('forgot-email').value = '';
+  } catch(e) {
+    showLoginErr('forgot-err', friendlyAuthError(e));
+  }
 }
 
 async function doLogin() {
