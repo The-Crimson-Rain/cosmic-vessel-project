@@ -80,38 +80,11 @@ html, body {
   overflow: hidden;
 }
 
-/* Starfield */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background-image:
-    radial-gradient(1px 1px at 8% 15%, rgba(255,255,255,.55) 0%, transparent 100%),
-    radial-gradient(1px 1px at 22% 72%, rgba(255,255,255,.35) 0%, transparent 100%),
-    radial-gradient(1px 1px at 41% 8%, rgba(255,255,255,.45) 0%, transparent 100%),
-    radial-gradient(1px 1px at 63% 88%, rgba(255,255,255,.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 78% 33%, rgba(255,255,255,.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 91% 61%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 14% 47%, rgba(255,255,255,.35) 0%, transparent 100%),
-    radial-gradient(1px 1px at 55% 54%, rgba(255,255,255,.25) 0%, transparent 100%),
-    radial-gradient(1px 1px at 33% 91%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 87% 7%, rgba(255,255,255,.45) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 48% 29%, rgba(200,80,80,.4) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 71% 78%, rgba(80,80,200,.35) 0%, transparent 100%),
-    radial-gradient(1px 1px at 5% 82%, rgba(255,255,255,.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 96% 44%, rgba(255,255,255,.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 27% 19%, rgba(255,255,255,.5) 0%, transparent 100%);
-  pointer-events:none; z-index:0;
-}
-
-/* Ambient nebula */
-body::after {
-  content:'';
-  position:fixed; inset:0;
-  background:
-    radial-gradient(ellipse 900px 700px at 50% 50%, rgba(80,8,20,.09) 0%, transparent 65%),
-    radial-gradient(ellipse 500px 400px at 85% 15%, rgba(8,8,50,.15) 0%, transparent 55%),
-    radial-gradient(ellipse 400px 500px at 10% 85%, rgba(20,5,40,.12) 0%, transparent 55%);
-  pointer-events:none; z-index:0;
+/* Hex background canvas */
+#cvp-bg-canvas {
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
+  opacity:0; transition:opacity 1.5s ease;
 }
 
 /* ── SCROLLBARS ───────────────────────────── */
@@ -750,7 +723,7 @@ textarea.inp { resize:vertical; }
 /* ── LOGIN SCREEN ────────────────────────── */
 #login-screen {
   position:fixed; inset:0; z-index:9000;
-  background:var(--void); display:flex;
+  background:transparent; display:flex;
   align-items:center; justify-content:center; flex-direction:column;
 }
 .login-orb {
@@ -1470,6 +1443,7 @@ textarea.inp { resize:vertical; }
 </style>
 </head>
 <body>
+<canvas id="cvp-bg-canvas"></canvas>
 
 <!-- ═══════════════════ SETUP BANNER ═══════════════════ -->
 <div id="setup-banner">
@@ -1523,7 +1497,6 @@ textarea.inp { resize:vertical; }
     <div class="login-tab-row">
       <button class="login-tab active" id="tab-login" onclick="switchLoginTab('login')">Sign In</button>
       <button class="login-tab" id="tab-reg" onclick="switchLoginTab('register')">Register</button>
-      <button class="login-tab" id="tab-forgot" onclick="switchLoginTab('forgot')">Forgot Password</button>
     </div>
     <!-- Sign in -->
     <div id="form-login" style="display:flex;flex-direction:column;gap:14px;">
@@ -1531,16 +1504,6 @@ textarea.inp { resize:vertical; }
       <div class="field"><span class="field-label">Password</span><input class="inp" id="li-pass" type="password" placeholder="••••••••"></div>
       <button class="btn btn-primary fw" onclick="doLogin()">▸ INITIATE SEQUENCE</button>
       <div id="li-err" class="login-error"></div>
-    </div>
-    <!-- Forgot password -->
-    <div id="form-forgot" style="display:none;flex-direction:column;gap:14px;">
-      <div style="font-size:11px;color:var(--grey);letter-spacing:1px;line-height:1.6;">Enter the email address associated with your account. We'll send you a link to reset your password.</div>
-      <div class="field"><span class="field-label">Email</span><input class="inp" id="forgot-email" type="email" placeholder="your@email.com"></div>
-      <button class="btn btn-primary fw" onclick="doForgotPassword()">▸ SEND RESET LINK</button>
-      <div id="forgot-err" class="login-error"></div>
-      <div id="forgot-ok" style="display:none;font-size:11px;color:#4caf50;letter-spacing:1px;line-height:1.6;padding:10px;border:1px solid rgba(76,175,80,0.3);border-radius:6px;background:rgba(76,175,80,0.06);">
-        ✓ Reset link sent. Check your inbox — including spam. The link expires after 1 hour.
-      </div>
     </div>
     <!-- Register (shown if admin enables it or first launch) -->
     <div id="form-register" style="display:none;flex-direction:column;gap:14px;">
@@ -2589,30 +2552,8 @@ async function onAuthChange(user) {
 function switchLoginTab(tab) {
   document.getElementById('tab-login').classList.toggle('active', tab==='login');
   document.getElementById('tab-reg').classList.toggle('active', tab==='register');
-  document.getElementById('tab-forgot').classList.toggle('active', tab==='forgot');
   document.getElementById('form-login').style.display    = tab==='login'    ? 'flex' : 'none';
   document.getElementById('form-register').style.display = tab==='register' ? 'flex' : 'none';
-  document.getElementById('form-forgot').style.display   = tab==='forgot'   ? 'flex' : 'none';
-  // Reset forgot form state when switching away
-  if (tab !== 'forgot') {
-    document.getElementById('forgot-ok').style.display = 'none';
-    document.getElementById('forgot-email').value = '';
-    clearLoginErr();
-  }
-}
-
-async function doForgotPassword() {
-  const email = document.getElementById('forgot-email').value.trim();
-  clearLoginErr();
-  document.getElementById('forgot-ok').style.display = 'none';
-  if (!email) { showLoginErr('forgot-err', 'Please enter your email address'); return; }
-  try {
-    await auth.sendPasswordResetEmail(email);
-    document.getElementById('forgot-ok').style.display = 'block';
-    document.getElementById('forgot-email').value = '';
-  } catch(e) {
-    showLoginErr('forgot-err', friendlyAuthError(e));
-  }
 }
 
 async function doLogin() {
@@ -2687,12 +2628,18 @@ function clearLoginErr() {
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
+  // Full brightness on login screen
+  document.getElementById('cvp-bg-canvas').style.opacity = '1';
+  cvpBgMode = 'login';
   listeners.forEach(u => u()); listeners = [];
 }
 
 async function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'grid';
+  // Subtle in hub — 35% opacity so it doesn't compete with UI
+  document.getElementById('cvp-bg-canvas').style.opacity = '0.35';
+  cvpBgMode = 'hub';
 
   // set status online
   await db.collection('users').doc(currentUser.uid).update({ status:'online' }).catch(()=>{});
@@ -6469,6 +6416,174 @@ async function arcAdminClearAll() {
     document.getElementById('admin-arc-info').textContent = 'Archive cleared. '+count+' entries deleted.';
   } catch(e) { toast('Error: '+e.message,'err'); }
 }
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CVP HEX BACKGROUND ENGINE
+// ═══════════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('cvp-bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, cells = [];
+  let cvpBgT0 = null;
+
+  // Expose mode globally so showLogin/showApp can set it
+  window.cvpBgMode = 'login';
+
+  const COL_DIM    = [65,  3,  10];
+  const COL_MID    = [200, 16, 46];
+  const COL_BRIGHT = [255, 100, 120];
+  const COL_GOLD   = [210, 140, 50];
+  const COL_STEEL  = [190, 215, 255];
+
+  const waves = [
+    { x:0.18, y:0.22, vx:0.00010, vy:0.00007,  speed:1.6, amp:1.0  },
+    { x:0.80, y:0.68, vx:-0.00008,vy:-0.00009, speed:1.4, amp:0.88 },
+    { x:0.55, y:0.08, vx:0.00006, vy:0.00012,  speed:1.2, amp:0.75 },
+  ];
+
+  const PANEL_GLOW_SPEED = 0.75;
+  const PANEL_GLOW_PHASE = 1.7;
+
+  function smoothstep(e0,e1,x){ const t=Math.max(0,Math.min(1,(x-e0)/(e1-e0))); return t*t*(3-2*t); }
+  function lerpCol(a,b,t){ t=Math.max(0,Math.min(1,t)); return [a[0]+(b[0]-a[0])*t|0,a[1]+(b[1]-a[1])*t|0,a[2]+(b[2]-a[2])*t|0]; }
+
+  function warpPt(fx,fy){
+    const ns=Math.min(W,H)*0.5;
+    const nx=fx/ns, ny=fy/ns;
+    const r=Math.sqrt(nx*nx+ny*ny);
+    if(r<0.0001) return {sx:W/2,sy:H/2};
+    const warp=1.0+smoothstep(0.0,1.8,r)*0.55;
+    const compress=1.0/(1.0+0.30/(r+0.20));
+    const fr=r*compress*warp;
+    return {sx:W/2+(nx/r)*fr*ns, sy:H/2+(ny/r)*fr*ns};
+  }
+
+  function buildGrid(){
+    cells=[];
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+    const HEX_R=36, hexW=Math.sqrt(3)*HEX_R, hexH=2*HEX_R;
+    const cols=Math.ceil(W/hexW)+6, rows=Math.ceil(H/(hexH*0.75))+6;
+    const va=[0,1,2,3,4,5].map(i=>(Math.PI/3)*i-Math.PI/6);
+    for(let row=-2;row<rows;row++){
+      for(let col=-2;col<cols;col++){
+        const fcx=(col-cols/2+0.5)*hexW+(row%2===0?0:hexW*0.5);
+        const fcy=(row-rows/2+0.5)*hexH*0.75;
+        const pts=va.map(a=>warpPt(fcx+HEX_R*Math.cos(a),fcy+HEX_R*Math.sin(a)));
+        const scx=pts.reduce((s,p)=>s+p.sx,0)/6;
+        const scy=pts.reduce((s,p)=>s+p.sy,0)/6;
+        if(scx<-80||scx>W+80||scy<-80||scy>H+80) continue;
+        const size=Math.hypot(pts[0].sx-pts[3].sx,pts[0].sy-pts[3].sy)/2;
+        const pdx=(scx-W*0.5)/(W*0.13), pdy=(scy-H*0.5)/(H*0.18);
+        const panelDist=Math.sqrt(pdx*pdx+pdy*pdy);
+        const proximityFade=Math.max(0.10,smoothstep(0.0,2.2,panelDist));
+        const sdx=(scx-W*0.5)/(W*0.5), sdy=(scy-H*0.5)/(H*0.5);
+        const screenDist=Math.min(Math.sqrt(sdx*sdx+sdy*sdy),1.0);
+        const maxBright=proximityFade*(0.18+screenDist*0.82);
+        const seed=Math.abs(((col+50)*7+(row+50)*13)*2654435761)>>>0;
+        const rng=(seed%1000)/1000;
+        let thresh=panelDist<1.2?0.95:screenDist<0.42?0.72:screenDist<0.68?0.80:0.91;
+        if(rng>thresh) continue;
+        const phaseOffset=((Math.abs(col)*17+Math.abs(row)*31+(col*row+200))%628)/100;
+        const aS=(seed>>4)%100;
+        const accentType=aS<4?'steel':aS<10?'gold':'crimson';
+        cells.push({pts,cx:scx,cy:scy,size,phaseOffset,accentType,maxBright,screenDist,panelDist});
+      }
+    }
+    cells.sort((a,b)=>a.size-b.size);
+  }
+
+  function getBrightness(cell,t){
+    let total=0;
+    for(const wave of waves){
+      const wx=wave.x*W,wy=wave.y*H;
+      const dist=Math.hypot(cell.cx-wx,cell.cy-wy);
+      const norm=Math.min(dist/(Math.hypot(W,H)*0.65),1);
+      const phase=(norm*Math.PI*4.5)-(t*wave.speed)+cell.phaseOffset;
+      total+=(Math.sin(phase)*0.5+0.5)*(1-norm*0.5)*wave.amp;
+    }
+    const raw=Math.min(total/2.0,1);
+    return raw*raw*(3-2*raw)*cell.maxBright;
+  }
+
+  function getPanelGlow(t){
+    const raw=Math.sin(t*PANEL_GLOW_SPEED+PANEL_GLOW_PHASE)*0.5+0.5;
+    return raw*raw*(3-2*raw);
+  }
+
+  function applyPanelGlow(g){
+    const lb=document.querySelector('.login-box');
+    if(!lb) return;
+    const borderA=0.20+g*0.45;
+    const glow1A=g*0.50, glow2A=g*0.24, glow3A=g*0.10, glow4A=g*0.04;
+    lb.style.borderColor=`rgba(200,16,46,${borderA})`;
+    lb.style.boxShadow=[
+      `0 0 0 1px rgba(200,16,46,${g*0.30})`,
+      `0 0 ${8+g*8}px ${1+g*2}px rgba(200,16,46,${glow1A})`,
+      `0 0 ${20+g*22}px ${3+g*5}px rgba(200,16,46,${glow2A})`,
+      `0 0 ${50+g*40}px ${8+g*12}px rgba(200,16,46,${glow3A})`,
+      `0 0 ${90+g*60}px ${20+g*25}px rgba(200,16,46,${glow4A})`,
+      `inset 0 1px 0 rgba(255,255,255,0.05)`
+    ].join(',');
+  }
+
+  function drawFrame(t){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#04030a';
+    ctx.fillRect(0,0,W,H);
+    for(const w of waves){
+      w.x+=w.vx; w.y+=w.vy;
+      if(w.x<0.05||w.x>0.95) w.vx*=-1;
+      if(w.y<0.05||w.y>0.95) w.vy*=-1;
+    }
+    // Only apply panel glow on login screen
+    if(window.cvpBgMode==='login') applyPanelGlow(getPanelGlow(t));
+    for(const cell of cells){
+      const b=getBrightness(cell,t);
+      if(b<0.004) continue;
+      let edgeCol;
+      if(cell.accentType==='steel'&&b>0.68) edgeCol=lerpCol(COL_MID,COL_STEEL,(b-0.68)/0.32);
+      else if(cell.accentType==='gold') edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_GOLD,(b-0.45)/0.55);
+      else edgeCol=b<0.45?lerpCol(COL_DIM,COL_MID,b/0.45):lerpCol(COL_MID,COL_BRIGHT,(b-0.45)/0.55);
+      const [er,eg,eb]=edgeCol;
+      const sizeNorm=Math.min(cell.size/36,1.6);
+      const lineW=(0.35+b*1.1)*Math.max(sizeNorm*0.65,0.22);
+      function tracePath(){
+        ctx.beginPath();
+        cell.pts.forEach(({sx,sy},i)=>i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy));
+        ctx.closePath();
+      }
+      if(b>0.07){
+        tracePath();
+        ctx.strokeStyle=`rgba(${er},${eg},${eb},${b*0.20})`;
+        ctx.lineWidth=lineW+4*Math.min(sizeNorm,1);
+        ctx.shadowColor=`rgba(${er},${eg},${eb},${b*0.45})`;
+        ctx.shadowBlur=4+b*16;
+        ctx.stroke();
+        ctx.shadowBlur=0;
+      }
+      tracePath();
+      ctx.strokeStyle=`rgba(${er},${eg},${eb},${0.15+b*0.82})`;
+      ctx.lineWidth=lineW;
+      ctx.stroke();
+    }
+  }
+
+  function loop(ts){
+    if(!cvpBgT0) cvpBgT0=ts;
+    drawFrame((ts-cvpBgT0)/1000);
+    requestAnimationFrame(loop);
+  }
+
+  buildGrid();
+  window.addEventListener('resize',buildGrid);
+  requestAnimationFrame(loop);
+
+  // Fade in canvas on load
+  setTimeout(()=>{ canvas.style.opacity='1'; },300);
+})();
 </script>
 
 
