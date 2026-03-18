@@ -2058,6 +2058,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
           <div class="panel-hdr"><span class="panel-title">External Links</span></div>
           <div style="padding:18px;display:flex;flex-direction:column;gap:14px;">
             <div class="field"><span class="field-label">Discord Server URL</span><input class="inp" id="cfg-discord" placeholder="https://discord.gg/..."></div>
+            <div class="field"><span class="field-label">Discord Meeting Voice Channel</span><input class="inp" id="cfg-discord-vc" placeholder="discord://channels/SERVER_ID/CHANNEL_ID"><div style="font-size:10px;color:var(--grey-2);margin-top:4px;">Right-click the voice channel in Discord → Copy Link</div></div>
             <div class="field"><span class="field-label">Google Drive Folder URL</span><input class="inp" id="cfg-drive" placeholder="https://drive.google.com/..."></div>
             <div class="field"><span class="field-label">NoteCat Workspace URL</span><input class="inp" id="cfg-notecat" placeholder="https://notecat.app/..."></div>
             <button class="btn btn-gold" onclick="saveExtLinks()">Save Links</button>
@@ -2192,6 +2193,12 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
       </div>
       <div class="field"><span class="field-label">Notes / Agenda</span><textarea class="inp" id="mt-notes" rows="2"></textarea></div>
     </div>
+    <div style="padding:0 18px 14px;display:flex;align-items:center;gap:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--grey);cursor:pointer;user-select:none;">
+          <input type="checkbox" id="mt-discord-join" checked style="accent-color:var(--crimson-hi);width:14px;height:14px;">
+          <span>Send "Join Meeting" notification to attendees via hub</span>
+        </label>
+      </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-meeting')">Cancel</button><button class="btn btn-primary" onclick="submitMeeting()">Schedule</button></div>
   </div>
 </div>
@@ -2822,6 +2829,7 @@ async function loadConfig() {
       if (liveData.config.inviteCode && document.getElementById('invite-code-inp'))
         document.getElementById('invite-code-inp').value = liveData.config.inviteCode;
       if (document.getElementById('cfg-discord')) document.getElementById('cfg-discord').value = liveData.config.discord||'';
+      if (document.getElementById('cfg-discord-vc')) document.getElementById('cfg-discord-vc').value = liveData.config.discordVc||'';
       if (document.getElementById('cfg-drive'))   document.getElementById('cfg-drive').value   = liveData.config.drive||'';
       if (document.getElementById('cfg-notecat')) document.getElementById('cfg-notecat').value = liveData.config.notecat||'';
       if (document.getElementById('gcal-id'))     document.getElementById('gcal-id').value     = liveData.config.gcalId||'';
@@ -2833,6 +2841,7 @@ async function loadConfig() {
 async function saveExtLinks() {
   const data = {
     discord:  document.getElementById('cfg-discord').value.trim(),
+    discordVc: document.getElementById('cfg-discord-vc') ? document.getElementById('cfg-discord-vc').value.trim() : '',
     drive:    document.getElementById('cfg-drive').value.trim(),
     notecat:  document.getElementById('cfg-notecat').value.trim(),
   };
@@ -3803,6 +3812,7 @@ async function submitMeeting() {
     duration: parseInt(durVal) || 60,
     attendees: attendeeList,
     rsvp: initRsvp,
+    discordJoin: document.getElementById('mt-discord-join') ? document.getElementById('mt-discord-join').checked : true,
     createdBy: currentUser.uid, createdAt: new Date().toISOString()
   };
   await db.collection('meetings').add(meeting);
@@ -4951,19 +4961,65 @@ function checkMeetingReminders() {
   var uid = currentUser.uid;
   var now = Date.now();
   var tenMin = 10 * 60 * 1000;
+  var twoMin = 2 * 60 * 1000;
   (liveData.meetings||[]).forEach(function(m) {
-    if (m.cancelled || window._remindedMeetings[m.id]) return;
+    if (m.cancelled) return;
     var mt = m.dateUtc ? new Date(m.dateUtc).getTime() : 0;
+    var dur = (m.duration || 60) * 60 * 1000;
+    var endTime = mt + dur;
     var until = mt - now;
-    if (until > 0 && until <= tenMin) {
-      var attending = (m.attendees||[]).includes(uid) && m.rsvp && m.rsvp[uid] === 'accepted';
-      if (attending || m.createdBy === uid) {
-        window._remindedMeetings[m.id] = true;
-        var mins = Math.ceil(until / 60000);
-        showReminderToast(m, mins);
-      }
+    var isAttendee = (m.attendees||[]).includes(uid) && (m.rsvp ? m.rsvp[uid] === 'accepted' : true);
+    var isOrganiser = m.createdBy === uid;
+    var isInvolved = isAttendee || isOrganiser;
+    if (!isInvolved) return;
+
+    // "Starting soon" — within 3 mins, not yet reminded
+    var soonKey = 'soon_' + m.id;
+    if (!window._remindedMeetings[soonKey] && until > 0 && until <= (3 * 60 * 1000)) {
+      window._remindedMeetings[soonKey] = true;
+      var mins = Math.ceil(until / 60000);
+      showReminderToast(m, mins);
+    }
+
+    // "Meeting started" — within 2 mins past start, meeting still running
+    var startedKey = 'started_' + m.id;
+    if (!window._remindedMeetings[startedKey] && until <= 0 && now < endTime && now >= mt - twoMin) {
+      window._remindedMeetings[startedKey] = true;
+      showMeetingStartedToast(m);
+    }
+
+    // Auto-cleanup — delete meetings ended more than 24 hours ago
+    if (now > endTime + (24 * 60 * 60 * 1000) && isOrganiser) {
+      db.collection('meetings').doc(m.id).delete().catch(function(){});
     }
   });
+}
+
+function showMeetingStartedToast(m) {
+  var id = 'started-' + m.id;
+  if (document.getElementById(id)) return;
+  var vcUrl = (liveData.config && liveData.config.discordVc) || '';
+  var el = document.createElement('div');
+  el.id = id;
+  el.className = 'cvp-toast-top';
+  var xBtn = document.createElement('button');
+  xBtn.textContent = '✕';
+  xBtn.style.cssText = 'background:transparent;border:none;color:var(--grey-2);cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;';
+  xBtn.addEventListener('click', function(e){ e.stopPropagation(); el.remove(); });
+  var body = document.createElement('div');
+  body.style.flex = '1';
+  body.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--crimson-hi);margin-bottom:5px;">⬡ MEETING STARTED</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:8px;">' + esc(m.name) + '</div>' +
+    (vcUrl && m.discordJoin !== false ? '<a href="' + vcUrl + '" target="_blank" style="display:inline-block;padding:6px 14px;background:rgba(88,101,242,0.2);border:1px solid rgba(88,101,242,0.5);border-radius:4px;color:#7289da;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-decoration:none;">&#x25B8; JOIN ON DISCORD</a>' : '');
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
+  row.appendChild(body); row.appendChild(xBtn);
+  el.appendChild(row);
+  document.body.appendChild(el);
+  // Spawn a ripple near top-centre for extra attention
+  if (window.spawnRipple) window.spawnRipple(window.innerWidth/2, 60);
+  // Auto-dismiss after 5 minutes
+  setTimeout(function(){ if(el.parentNode) el.remove(); }, 5 * 60 * 1000);
 }
 function showReminderToast(m, minsLeft) {
   var id = 'rem-' + m.id;
