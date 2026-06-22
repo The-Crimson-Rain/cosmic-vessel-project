@@ -1738,6 +1738,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
     <div class="view" id="view-my-tasks">
       <div class="page-hdr">
         <div class="page-hdr-left"><div class="ph-title">MY TASKS</div><div class="ph-sub">Your assigned tasks · drag to update status</div></div>
+        <div class="ph-actions"><button class="btn btn-primary" onclick="openNewTaskForMe()">+ New Task</button></div>
       </div>
       <div class="my-tasks-board" id="my-tasks-board"></div>
     </div>
@@ -3078,6 +3079,8 @@ async function submitTask() {
   var allTasks = Object.values(liveData.tasks);
   var oldTask  = editId ? allTasks.find(function(t){ return t.id === editId; }) : null;
   var newState = assignee ? 'pending-accept' : 'unassigned';
+  // A member creating a task for themselves doesn't need to "accept" it
+  if (assignee && assignee === currentUser.uid && !editId) { newState = 'accepted'; }
   if (editId && oldTask && oldTask.assignee === assignee) { newState = oldTask.state; }
   var data = {
     name:         name,
@@ -3166,11 +3169,28 @@ function openNewTask(dept) {
   openModal('m-task');
 }
 
+// Opens the new-task modal pre-set to the current member's first department
+function openNewTaskForMe() {
+  var depts = currentProfile ? (currentProfile.depts || []) : [];
+  var dept = depts.length ? depts[0] : '';
+  openNewTask(dept);
+}
+
 function populateAssignSelect(dept) {
   var sel = document.getElementById('t-assign');
-  sel.innerHTML = '<option value="">Unassigned</option>';
   var role = currentProfile ? currentProfile.role : '';
   var canAssignAll = role === 'admin' || role === 'lead';
+  // Crew can only create tasks for themselves
+  if (!canAssignAll) {
+    sel.innerHTML = '';
+    var me = liveData.members[currentUser.uid];
+    var o = document.createElement('option');
+    o.value = currentUser.uid;
+    o.textContent = (me ? me.name : 'Me') + ' (you)';
+    sel.appendChild(o);
+    return;
+  }
+  sel.innerHTML = '<option value="">Unassigned</option>';
   Object.values(liveData.members).forEach(function(m) {
     // Admin/lead can assign anyone; otherwise restrict to dept members
     if (canAssignAll || !dept || (m.depts && m.depts.includes(dept))) {
@@ -3606,7 +3626,8 @@ function renderDeptBoard(dept) {
   if (!container) return;
   const color = DEPT_COLORS[dept] || '#fff';
   const deptTasks = Object.values(liveData.tasks).filter(t => t.dept === dept);
-  var canCreate = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  var canManage = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  var canCreate = true; // any member can create their own tasks
 
   // Get dept members
   const deptMembers = Object.values(liveData.members).filter(m => {
@@ -3674,7 +3695,7 @@ function renderDeptBoard(dept) {
       </div>
 
       <!-- RIGHT: Completed panel (admin/lead only) -->
-      ${canCreate ? `
+      ${canManage ? `
       <div class="board-side right${rightCollapsed?' collapsed':''}" id="board-right-${dept}">
         <div class="board-side-tab" onclick="toggleBoardSide('${dept}','right')">
           <span class="board-side-tab-arrow" id="tab-arrow-right-${dept}">›</span>
