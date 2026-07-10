@@ -989,6 +989,23 @@ textarea.inp { resize:vertical; }
 .dept-ov-fill { height:100%; border-radius:2px; transition:width .5s; }
 .dept-ov-stats{ display:flex; justify-content:space-between; font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--grey); }
 
+
+/* ── AUTO-SELECTED MEETING ATTENDEES ───────────── */
+.meeting-auto-group {
+  background:rgba(46,204,138,.055); border:1px solid rgba(46,204,138,.28);
+  border-radius:6px; overflow:hidden;
+}
+.meeting-auto-head {
+  padding:9px 12px; border-bottom:1px solid rgba(46,204,138,.2);
+  font-size:10px; letter-spacing:1.8px; text-transform:uppercase;
+  color:var(--green); font-weight:700;
+}
+.meeting-auto-list { display:flex; flex-direction:column; }
+.meeting-auto-empty { padding:11px 12px; color:var(--grey-2); font-size:11px; }
+.meeting-attendee-row.auto-selected { background:rgba(46,204,138,.035); }
+.meeting-availability-bad { color:var(--crimson-hi); font-weight:700; }
+.meeting-availability-good { color:var(--green); font-weight:700; }
+
 /* ── MISC UTIL ───────────────────────────── */
 .flex { display:flex; }
 .flex-col { flex-direction:column; }
@@ -1010,6 +1027,21 @@ textarea.inp { resize:vertical; }
   padding:32px; text-align:center;
   color:var(--grey-2); font-size:12px; letter-spacing:1px;
 }
+
+
+/* ── SCHEDULER FILTERS & MEETING PLANNER v3 ───────────── */
+.sched-filter-panel{padding:14px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr) auto;gap:12px;align-items:start;background:rgba(8,10,18,.35)}
+.sched-filter-group{display:flex;flex-direction:column;gap:6px}.sched-filter-title{font-size:9px;letter-spacing:2px;color:var(--grey);text-transform:uppercase;font-weight:700}
+.sched-chip-wrap{display:flex;flex-wrap:wrap;gap:5px;max-height:92px;overflow:auto;padding:6px;background:rgba(8,10,18,.65);border:1px solid var(--border);border-radius:5px}
+.sched-chip{display:flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.025);font-size:11px;color:var(--grey);cursor:pointer;user-select:none}.sched-chip.active{color:var(--white);border-color:var(--gold-dim);background:var(--gold-trace)}
+.sched-toggle-row{display:flex;gap:5px;flex-wrap:wrap}.sched-mode-btn{padding:5px 9px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--grey);font:600 10px 'Rajdhani';letter-spacing:1px;text-transform:uppercase;cursor:pointer}.sched-mode-btn.active{color:var(--crimson-hi);border-color:rgba(200,16,46,.45);background:var(--crimson-dim)}
+.sched-status{padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--grey);display:flex;gap:14px;flex-wrap:wrap}.sched-status strong{color:var(--white)}
+.avail-empty-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,5,8,.78);z-index:20;font:700 13px 'Orbitron';letter-spacing:2px;color:var(--gold);text-align:center;padding:20px}
+.suggested-times{display:flex;gap:7px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border)}.suggested-time{padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.025);color:var(--grey);cursor:pointer;font-size:11px}.suggested-time:hover{border-color:var(--gold-dim);color:var(--white)}
+.meeting-attendee-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 8px;border-bottom:1px solid rgba(30,33,56,.45);font-size:12px}.meeting-attendee-row:last-child{border-bottom:none}.meeting-attendee-meta{font-size:10px;color:var(--grey)}
+.meeting-summary{padding:10px 12px;border:1px solid var(--border);border-radius:5px;background:rgba(8,10,18,.55);font-size:11px;line-height:1.7;color:var(--grey)}.meeting-summary strong{color:var(--white)}
+.meeting-warning{color:var(--amber)}.meeting-conflict{color:var(--crimson-hi)}
+@media(max-width:900px){.sched-filter-panel{grid-template-columns:1fr}.meeting-attendee-row{grid-template-columns:1fr auto auto}}
 
 /* ── AVAILABILITY SYSTEM ──────────────────────────── */
 .avail-grid-wrap {
@@ -1484,6 +1516,22 @@ a, button, [onclick], .nav-item, .btn, input, select, textarea, label[for], .tas
   cursor: pointer !important;
 }
 body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M4 2l12 7-6 2-3 6z' fill='white' stroke='%23c8102e' stroke-width='1.5'/%3E%3C/svg%3E") 4 2, default; }
+
+/* ── MEETING PLANNER UI v3 ───────────────────────── */
+.meeting-planner-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 10px;border:1px solid var(--border);border-bottom:none;border-radius:5px 5px 0 0;background:rgba(8,10,18,.7)}
+.meeting-planner-toolbar .inp{flex:1;min-width:190px;padding:6px 9px;font-size:12px}
+.meeting-bulk-actions{display:flex;gap:5px;flex-wrap:wrap}
+.meeting-other-wrap{border:1px solid var(--border);border-radius:0 0 5px 5px;background:rgba(8,10,18,.9);max-height:245px;overflow-y:auto}
+.meeting-other-wrap.collapsed{max-height:0;overflow:hidden;border-width:0}
+.meeting-summary-sticky{position:sticky;bottom:-1px;z-index:8;box-shadow:0 -8px 24px rgba(4,5,8,.82);backdrop-filter:blur(8px)}
+.meeting-legend{display:flex;gap:12px;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(8,10,18,.45);font-size:10px;color:var(--grey)}
+.meeting-legend span{display:inline-flex;align-items:center;gap:5px}.meeting-legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.meeting-range-preview{font-family:'Share Tech Mono',monospace;color:var(--gold);font-size:11px;margin-top:5px}
+.meeting-alt-suggestion{margin-top:7px;padding:7px 9px;border:1px solid rgba(201,168,76,.25);border-radius:4px;background:rgba(201,168,76,.06);color:var(--gold);font-size:10px}
+.meeting-alt-suggestion button{margin-left:7px}
+.meeting-attendee-meta{line-height:1.45}.meeting-tz-detail{color:var(--grey-2);font-size:9px}
+.meeting-list-empty{padding:16px;text-align:center;color:var(--grey-2);font-size:11px}
+
 </style>
 </head>
 <body>
@@ -1779,14 +1827,14 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
     <div class="view" id="view-scheduler">
       <div class="page-hdr">
         <div class="page-hdr-left"><div class="ph-title">MISSION SCHEDULER</div><div class="ph-sub">Meetings · All times shown in your local timezone</div></div>
-        <div class="ph-actions"><button class="btn btn-primary" onclick="openModal('m-meeting')">+ Schedule Meeting</button></div>
+        <div class="ph-actions"><button class="btn btn-primary" onclick="openMeetingPlanner()">+ Schedule Meeting</button></div>
       </div>
       <!-- Meetings full width + timezones below -->
       <div class="panel" style="margin-bottom:16px;">
         <div class="panel-hdr"><span class="panel-title">Meetings</span></div>
         <div id="meetings-list" style="padding:10px;display:flex;flex-wrap:wrap;gap:10px;max-height:420px;overflow-y:auto;"></div>
         <div style="padding:10px;border-top:1px solid var(--border);">
-          <button class="btn btn-gold btn-sm fw" onclick="openModal('m-meeting')">+ New Meeting</button>
+          <button class="btn btn-gold btn-sm fw" onclick="openMeetingPlanner()">+ New Meeting</button>
         </div>
       </div>
       <div class="panel" style="margin-bottom:16px;">
@@ -1812,6 +1860,13 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
             <button class="btn btn-gold btn-sm" onclick="openAvailEditor()">✎ My Availability</button>
           </div>
         </div>
+        <div class="sched-filter-panel">
+          <div class="sched-filter-group"><div class="sched-filter-title">Departments</div><div class="sched-chip-wrap" id="sched-dept-filters"></div></div>
+          <div class="sched-filter-group"><div class="sched-filter-title">People</div><input class="inp" id="sched-person-search" placeholder="Search members..." style="padding:5px 8px;font-size:11px;" oninput="renderSchedulerFilters()"><div class="sched-chip-wrap" id="sched-person-filters"></div></div>
+          <div class="sched-filter-group"><div class="sched-filter-title">Display</div><div class="sched-toggle-row"><button class="sched-mode-btn active" id="sched-mode-all" onclick="setSchedulerOverlapMode('all')">All selected times</button><button class="sched-mode-btn" id="sched-mode-common" onclick="setSchedulerOverlapMode('common')">Common only</button></div><button class="btn btn-ghost btn-xs" onclick="clearSchedulerFilters()">Clear filters</button></div>
+        </div>
+        <div class="sched-status" id="sched-filter-status"></div>
+        <div class="suggested-times" id="suggested-times"></div>
         <div id="avail-prompt" style="display:none;padding:10px 16px;background:rgba(201,168,76,.07);border-bottom:1px solid var(--gold-dim);">
           <span style="font-size:12px;color:var(--gold);">⚠ You haven't set your availability yet — the team can't see when you're free.</span>
           <button class="btn btn-gold btn-xs" style="margin-left:10px;" onclick="openAvailEditor()">Set it now →</button>
@@ -2174,41 +2229,43 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 </div>
 
 <div class="modal-bg" id="m-meeting">
-  <div class="modal">
+  <div class="modal" style="width:720px;">
     <div class="modal-hdr"><span class="modal-title">▸ SCHEDULE MEETING</span><button class="modal-x" onclick="closeModal('m-meeting')">✕</button></div>
     <div class="modal-body">
-      <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="mt-name" placeholder="e.g. Weekly Crew Sync"></div>
+      <div class="field"><span class="field-label">Meeting Name</span><input class="inp" id="mt-name" placeholder="e.g. Weekly Crew Sync" oninput="updateMeetingPlannerSummary()"></div>
+      <div class="grid-3">
+        <div class="field"><span class="field-label">Date</span><input class="inp" id="mt-date" type="date" onchange="refreshMeetingPlanner()"></div>
+        <div class="field"><span class="field-label">Time (your local time)</span><input class="inp" id="mt-time" type="time" onchange="refreshMeetingPlanner()"></div>
+        <div class="field"><span class="field-label">Duration</span><select class="inp" id="mt-duration" onchange="refreshMeetingPlanner()"><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option><option value="240">4 hours</option></select></div>
+      </div>
       <div class="grid-2">
-        <div class="field"><span class="field-label">Date</span><input class="inp" id="mt-date" type="date"></div>
-        <div class="field"><span class="field-label">Time (your local time)</span><input class="inp" id="mt-time" type="time"></div>
-      <div class="field"><span class="field-label">Duration</span>
-        <select class="inp" id="mt-duration">
-          <option value="30">30 minutes</option>
-          <option value="60" selected>1 hour</option>
-          <option value="90">1.5 hours</option>
-          <option value="120">2 hours</option>
-          <option value="180">3 hours</option>
-          <option value="240">4 hours</option>
-          <option value="300">5 hours</option>
-          <option value="360">6 hours</option>
-        </select>
+        <div class="field"><span class="field-label">Status</span><select class="inp" id="mt-status"><option value="confirmed">Confirmed meeting</option><option value="provisional">Provisional / proposed time</option></select></div>
+        <div class="field"><span class="field-label">Recurrence</span><select class="inp" id="mt-recurrence"><option value="none">Does not repeat</option><option value="weekly">Weekly</option><option value="fortnightly">Every two weeks</option><option value="monthly">Monthly</option></select></div>
       </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--white);cursor:pointer;"><input type="checkbox" id="mt-owner-attending" checked onchange="refreshMeetingPlanner()" style="accent-color:var(--crimson-hi);"> I am attending this meeting</label>
+      <div class="field"><span class="field-label">Departments represented</span><div id="mt-dept-summary" class="sched-chip-wrap"></div></div>
+      <div class="field"><span class="field-label">Automatically selected from this time slot</span>
+        <div class="meeting-auto-group"><div class="meeting-auto-head">Available at the selected start time</div><div id="mt-auto-attendees" class="meeting-auto-list"></div></div>
       </div>
-      <div class="field"><span class="field-label">Attendees</span>
-        <div id="attendee-checks" style="background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:4px;padding:10px;max-height:130px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;"></div>
+      <div class="field"><span class="field-label">Add another attendee</span>
+        <div class="meeting-planner-toolbar">
+          <input class="inp" id="mt-attendee-search" placeholder="Search team members…" oninput="renderOtherAttendees()">
+          <button type="button" class="btn btn-ghost btn-xs" id="mt-toggle-others" onclick="toggleOtherAttendees()">Show team</button>
+          <div class="meeting-bulk-actions">
+            <button type="button" class="btn btn-ghost btn-xs" onclick="setAllInvitedRoles('required')">All required</button>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="setAllInvitedRoles('optional')">All optional</button>
+          </div>
+        </div>
+        <div id="attendee-checks" class="meeting-other-wrap collapsed"></div>
       </div>
+      <div class="meeting-legend"><span><i style="background:var(--green)"></i>Available</span><span><i style="background:var(--amber)"></i>Outside usual hours</span><span><i style="background:var(--crimson-hi)"></i>Conflict or unavailable</span></div>
+      <div id="meeting-invite-summary" class="meeting-summary meeting-summary-sticky"></div>
       <div class="field"><span class="field-label">Notes / Agenda</span><textarea class="inp" id="mt-notes" rows="2"></textarea></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--grey);cursor:pointer;"><input type="checkbox" id="mt-discord-join" checked style="accent-color:var(--crimson-hi);"> Send “Join Meeting” notification to attendees via hub</label>
     </div>
-    <div style="padding:0 18px 14px;display:flex;align-items:center;gap:10px;">
-        <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--grey);cursor:pointer;user-select:none;">
-          <input type="checkbox" id="mt-discord-join" checked style="accent-color:var(--crimson-hi);width:14px;height:14px;">
-          <span>Send "Join Meeting" notification to attendees via hub</span>
-        </label>
-      </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-meeting')">Cancel</button><button class="btn btn-primary" onclick="submitMeeting()">Schedule</button></div>
   </div>
 </div>
-
 
 <!-- Edit Meeting Modal -->
 <div class="modal-bg" id="m-edit-meeting">
@@ -2773,7 +2830,7 @@ function startListeners() {
     snap.forEach(d => { liveData.members[d.id] = { uid:d.id, ...d.data() }; });
     document.getElementById('nb-crew').textContent = Object.keys(liveData.members).length;
     document.getElementById('s-crew').textContent  = Object.values(liveData.members).filter(m=>m.status!=='offline').length;
-    renderCrew(); renderTzTable(); renderDashCrewStrip(); renderAdminRoster();
+    renderCrew(); renderTzTable(); renderDashCrewStrip(); renderAdminRoster(); renderSchedulerFilters();
   });
 
   // Tasks
@@ -3828,53 +3885,23 @@ async function onDrop(e, dept, memberId) {
 
 // ─── MEETINGS ─────────────────────────────────────────────
 async function submitMeeting() {
-  const name = document.getElementById('mt-name').value.trim();
-  if (!name) { toast('Enter a meeting name','err'); return; }
-  const checks = document.querySelectorAll('#attendee-checks input:checked');
-  const dateStr = document.getElementById('mt-date').value;
-  const timeStr = document.getElementById('mt-time').value || '00:00';
-  // Convert creator's local time to UTC using their profile timezone
-  var creatorTz = (currentProfile && currentProfile.tz) || 'UTC';
-  var dateUtc = '';
-  if (dateStr && timeStr) {
-    try {
-      // Build a date string and interpret it in the creator's timezone
-      // by finding the UTC offset for that tz at that moment
-      var localDateStr = dateStr + 'T' + timeStr + ':00';
-      // Get offset by comparing what toLocaleString gives us for UTC vs creator tz
-      var ref = new Date(localDateStr + 'Z'); // treat as UTC temporarily
-      var utcParts = new Date(ref.toLocaleString('en-US', { timeZone: 'UTC' }));
-      var tzParts  = new Date(ref.toLocaleString('en-US', { timeZone: creatorTz }));
-      var offsetMs = utcParts.getTime() - tzParts.getTime();
-      dateUtc = new Date(ref.getTime() + offsetMs).toISOString();
-    } catch(e) {
-      dateUtc = new Date(dateStr + 'T' + timeStr + ':00Z').toISOString();
-    }
-  }
-  const durVal = document.getElementById('mt-duration') ? document.getElementById('mt-duration').value : '60';
-  var attendeeList = [...checks].map(c=>c.value);
-  // Auto-include creator in attendees and auto-accept their RSVP
-  if (!attendeeList.includes(currentUser.uid)) attendeeList.push(currentUser.uid);
-  var initRsvp = {};
-  initRsvp[currentUser.uid] = 'accepted';
-  const meeting = {
-    name, dateUtc, notes: document.getElementById('mt-notes').value.trim(),
-    duration: parseInt(durVal) || 60,
-    attendees: attendeeList,
-    rsvp: initRsvp,
-    discordJoin: document.getElementById('mt-discord-join') ? document.getElementById('mt-discord-join').checked : true,
-    createdBy: currentUser.uid, createdAt: new Date().toISOString()
-  };
+  var name=document.getElementById('mt-name').value.trim();
+  if(!name){toast('Enter a meeting name','err');return;}
+  var dateStr=document.getElementById('mt-date').value, timeStr=document.getElementById('mt-time').value||'00:00';
+  if(!dateStr){toast('Choose a meeting date','err');return;}
+  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
+  var required=[], optional=[];
+  Object.keys(liveData.members).forEach(function(uid){var role=getMeetingRole(uid);if(role==='required')required.push(uid);else if(role==='optional')optional.push(uid);});
+  var ownerAttending=document.getElementById('mt-owner-attending').checked;
+  if(ownerAttending && !required.includes(currentUser.uid) && !optional.includes(currentUser.uid)) required.push(currentUser.uid);
+  if(!ownerAttending){required=required.filter(function(x){return x!==currentUser.uid;});optional=optional.filter(function(x){return x!==currentUser.uid;});}
+  var attendees=required.concat(optional.filter(function(x){return !required.includes(x);}));
+  if(!attendees.length){toast('Select at least one attendee','err');return;}
+  var initRsvp={}; if(ownerAttending)initRsvp[currentUser.uid]='accepted';
+  var meeting={name:name,dateUtc:dateUtc,notes:document.getElementById('mt-notes').value.trim(),duration:parseInt(document.getElementById('mt-duration').value)||60,attendees:attendees,requiredAttendees:required,optionalAttendees:optional,rsvp:initRsvp,ownerAttending:ownerAttending,createdBy:currentUser.uid,ownerId:currentUser.uid,status:document.getElementById('mt-status').value,provisional:document.getElementById('mt-status').value==='provisional',recurrence:document.getElementById('mt-recurrence').value,departments:Array.from(schedulerSelectedDepts),discordJoin:document.getElementById('mt-discord-join').checked,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
   await db.collection('meetings').add(meeting);
-
-  // Google Calendar integration hook
-  if (liveData.config.gcalId && liveData.config.gcalKey) {
-    addToGCal(meeting).catch(()=>{});
-  }
-
-  closeModal('m-meeting');
-  ['mt-name','mt-notes'].forEach(id=>document.getElementById(id).value='');
-  toast('Meeting scheduled!','ok');
+  if(liveData.config.gcalId&&liveData.config.gcalKey)addToGCal(meeting).catch(function(){});
+  closeModal('m-meeting'); resetMeetingPlanner(); toast(meeting.provisional?'Provisional meeting created!':'Meeting scheduled!','ok');
 }
 
 
@@ -4196,14 +4223,68 @@ function renderDashMeetings() {
   }).join('');
 }
 
-function populateAttendeeChecks() {
-  const box = document.getElementById('attendee-checks');
-  box.innerHTML = Object.values(liveData.members).map(m=>`
-    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;background:rgba(255,255,255,.04);padding:4px 9px;border-radius:4px;border:1px solid var(--border);">
-      <input type="checkbox" value="${m.uid}" style="accent-color:var(--crimson-hi);">
-      ${esc(m.name)}
-    </label>`).join('');
+function meetingAttendeeRow(m, isAuto) {
+  var role = meetingRoleState[m.uid] || (meetingAutoSelectedUids.has(m.uid) ? 'required' : 'none');
+  return '<div class="meeting-attendee-row '+(isAuto?'auto-selected':'')+'" data-uid="'+m.uid+'">' +
+    '<div><strong>'+esc(m.name)+'</strong><div class="meeting-attendee-meta" id="mt-meta-'+m.uid+'"></div></div>' +
+    '<label><input type="radio" name="mt-role-'+m.uid+'" value="required" '+(role==='required'?'checked':'')+' onchange="setMeetingRole(\''+m.uid+'\',\'required\')"> Required</label>' +
+    '<label><input type="radio" name="mt-role-'+m.uid+'" value="optional" '+(role==='optional'?'checked':'')+' onchange="setMeetingRole(\''+m.uid+'\',\'optional\')"> Optional</label>' +
+    '<input type="radio" name="mt-role-'+m.uid+'" value="none" '+(role==='none'?'checked':'')+' onchange="setMeetingRole(\''+m.uid+'\',\'none\')" style="display:none;">' +
+    '<button type="button" class="btn btn-ghost btn-xs" style="grid-column:2/4" onclick="setMeetingPersonNone(\''+m.uid+'\')">'+(isAuto?'Remove from meeting':'Not invited')+'</button>' +
+    '</div>';
 }
+
+function populateAttendeeChecks(seedUids) {
+  var autoBox=document.getElementById('mt-auto-attendees');
+  if(!autoBox)return;
+  (seedUids||[]).forEach(function(uid){meetingAutoSelectedUids.add(uid);if(!meetingRoleState[uid])meetingRoleState[uid]='required';});
+  var members=Object.values(liveData.members).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
+  var autoMembers=members.filter(function(m){return meetingAutoSelectedUids.has(m.uid)&&meetingRoleState[m.uid]!=='none';});
+  autoBox.innerHTML=autoMembers.length?autoMembers.map(function(m){return meetingAttendeeRow(m,true);}).join(''):'<div class="meeting-auto-empty">No one was automatically selected for this slot.</div>';
+  renderOtherAttendees();
+  refreshMeetingPlanner();
+}
+function renderOtherAttendees(){
+  var box=document.getElementById('attendee-checks');if(!box)return;
+  var q=((document.getElementById('mt-attendee-search')||{}).value||'').trim().toLowerCase();
+  if(q){box.classList.remove('collapsed');var btn=document.getElementById('mt-toggle-others');if(btn)btn.textContent='Hide team';}
+  var members=Object.values(liveData.members).filter(function(m){
+    if(meetingAutoSelectedUids.has(m.uid)&&meetingRoleState[m.uid]!=='none')return false;
+    if(!q)return getMeetingRole(m.uid)!=='none';
+    return (m.name||'').toLowerCase().includes(q);
+  }).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
+  box.innerHTML=members.length?members.map(function(m){return meetingAttendeeRow(m,false);}).join(''):'<div class="meeting-list-empty">'+(q?'No matching team members.':'Search for a person to add them, or choose “Show team”.')+'</div>';
+}
+function toggleOtherAttendees(){
+  var box=document.getElementById('attendee-checks'),btn=document.getElementById('mt-toggle-others');if(!box)return;
+  var opening=box.classList.contains('collapsed');box.classList.toggle('collapsed',!opening);
+  if(btn)btn.textContent=opening?'Hide team':'Show team';
+  if(opening&&!((document.getElementById('mt-attendee-search')||{}).value||'')){
+    var members=Object.values(liveData.members).filter(function(m){return !(meetingAutoSelectedUids.has(m.uid)&&getMeetingRole(m.uid)!=='none');}).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
+    box.innerHTML=members.length?members.map(function(m){return meetingAttendeeRow(m,false);}).join(''):'<div class="meeting-list-empty">Everyone is already selected.</div>';
+  }else renderOtherAttendees();
+}
+function setAllInvitedRoles(role){
+  Object.keys(liveData.members).forEach(function(uid){if(getMeetingRole(uid)!=='none')meetingRoleState[uid]=role;});
+  populateAttendeeChecks([]);
+}
+
+function setMeetingRole(uid,role){
+  meetingRoleState[uid]=role;
+  if(role==='none')meetingAutoSelectedUids.delete(uid);
+  populateAttendeeChecks([]);
+}
+function setMeetingPersonNone(uid){
+  meetingRoleState[uid]='none';
+  meetingAutoSelectedUids.delete(uid);
+  populateAttendeeChecks([]);
+}
+function getMeetingRole(uid){
+  if(meetingRoleState[uid])return meetingRoleState[uid];
+  var el=document.querySelector('input[name="mt-role-'+uid+'"]:checked');
+  return el?el.value:'none';
+}
+
 
 // ─── GOOGLE CALENDAR ──────────────────────────────────────
 async function addToGCal(meeting) {
@@ -5303,6 +5384,12 @@ var editorMode       = 'weekly';   // 'weekly' | 'override'
 var editorWeekOffset = 0;
 var editorSlots      = {};         // { 'mon': Set of hour strings } or { 'YYYY-MM-DD': Set }
 var availPromptDismissed = false;
+var schedulerSelectedPeople = new Set();
+var schedulerSelectedDepts = new Set();
+var schedulerOverlapMode = 'all';
+var meetingPlannerSeed = null;
+var meetingAutoSelectedUids = new Set();
+var meetingRoleState = {};
 
 var HOURS = [];
 for (var _h = 0; _h < 24; _h++) HOURS.push(String(_h).padStart(2,'0') + ':00');
@@ -5374,6 +5461,94 @@ function getMemberFreeHoursUtc(uid, dateIso, weekday) {
   return slots; // already stored in UTC hours ('14:00' etc)
 }
 
+
+function localDateTimeToUtc(dateStr,timeStr,tz){
+  try{var ref=new Date(dateStr+'T'+timeStr+':00Z');var utcParts=new Date(ref.toLocaleString('en-US',{timeZone:'UTC'}));var tzParts=new Date(ref.toLocaleString('en-US',{timeZone:tz}));return new Date(ref.getTime()+(utcParts.getTime()-tzParts.getTime())).toISOString();}catch(e){return new Date(dateStr+'T'+timeStr+':00Z').toISOString();}
+}
+function getSelectedSchedulerUids(){
+  var ids=new Set(schedulerSelectedPeople);
+  if(schedulerSelectedDepts.size){Object.values(liveData.members).forEach(function(m){var ds=normaliseDepts(m.depts);if(ds.some(function(d){return schedulerSelectedDepts.has(d);}))ids.add(m.uid);});}
+  return Array.from(ids);
+}
+function toggleSchedulerDept(id){schedulerSelectedDepts.has(id)?schedulerSelectedDepts.delete(id):schedulerSelectedDepts.add(id);renderSchedulerFilters();renderAvailHeatmap();}
+function toggleSchedulerPerson(uid){schedulerSelectedPeople.has(uid)?schedulerSelectedPeople.delete(uid):schedulerSelectedPeople.add(uid);renderSchedulerFilters();renderAvailHeatmap();}
+function setSchedulerOverlapMode(mode){schedulerOverlapMode=mode;document.getElementById('sched-mode-all').classList.toggle('active',mode==='all');document.getElementById('sched-mode-common').classList.toggle('active',mode==='common');renderAvailHeatmap();}
+function clearSchedulerFilters(){schedulerSelectedPeople.clear();schedulerSelectedDepts.clear();renderSchedulerFilters();renderAvailHeatmap();}
+function renderSchedulerFilters(){
+  var dbx=document.getElementById('sched-dept-filters'),pbx=document.getElementById('sched-person-filters');if(!dbx||!pbx)return;
+  dbx.innerHTML=getDeptList().map(function(d){return '<div class="sched-chip '+(schedulerSelectedDepts.has(d.id)?'active':'')+'" onclick="toggleSchedulerDept(\''+d.id+'\')">'+esc(d.label)+'</div>';}).join('');
+  var q=((document.getElementById('sched-person-search')||{}).value||'').toLowerCase();
+  pbx.innerHTML=Object.values(liveData.members).filter(function(m){return !q||(m.name||'').toLowerCase().includes(q);}).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');}).map(function(m){return '<div class="sched-chip '+(schedulerSelectedPeople.has(m.uid)?'active':'')+'" onclick="toggleSchedulerPerson(\''+m.uid+'\')">'+esc(m.name)+'</div>';}).join('');
+}
+function memberAvailableForDuration(uid,dateIso,weekday,startHour,duration,startIso){
+  // Validate the entire meeting window, including half-hours and UTC date rollovers.
+  var start=startIso?new Date(startIso):new Date(dateIso+'T'+startHour+':00Z');
+  if(isNaN(start.getTime()))return false;
+  var minutes=Math.max(1,parseInt(duration,10)||60);
+  for(var offset=0;offset<minutes;offset+=30){
+    var point=new Date(start.getTime()+offset*60000);
+    var ds=point.toISOString().slice(0,10);
+    var dayIndex=point.getUTCDay();
+    var wd=WEEK_DAYS[dayIndex===0?6:dayIndex-1];
+    var hour=String(point.getUTCHours()).padStart(2,'0')+':00';
+    if(!getMemberFreeHoursUtc(uid,ds,wd).includes(hour))return false;
+  }
+  return true;
+}
+function memberHasMeetingConflict(uid,startIso,duration,excludeId){var st=new Date(startIso).getTime(),en=st+duration*60000;return liveData.meetings.some(function(m){if(m.id===excludeId||m.cancelled||!(m.attendees||[]).includes(uid)||!m.dateUtc)return false;var ms=new Date(m.dateUtc).getTime(),me=ms+(m.duration||60)*60000;return st<me&&en>ms;});}
+function isOutsideWorkingHours(uid,startIso,duration){var m=liveData.members[uid]||{},tz=m.tz||'UTC',d=new Date(startIso);var sh=parseInt(d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',hour12:false}),10);var eh=sh+Math.ceil(duration/60);return sh<7||eh>23;}
+function openMeetingPlanner(seed){
+  seed=seed||{};meetingPlannerSeed=seed;meetingAutoSelectedUids=new Set(seed.uids||getSelectedSchedulerUids());meetingRoleState={};meetingAutoSelectedUids.forEach(function(uid){meetingRoleState[uid]='required';});populateAttendeeChecks(Array.from(meetingAutoSelectedUids));
+  if(seed.date)document.getElementById('mt-date').value=seed.date;if(seed.time)document.getElementById('mt-time').value=seed.time;
+  var ds=document.getElementById('mt-dept-summary');if(ds)ds.innerHTML=(schedulerSelectedDepts.size?Array.from(schedulerSelectedDepts).map(function(id){return '<span class="sched-chip active">'+esc(DEPT_NAMES[id]||id)+'</span>';}).join(''):'<span style="color:var(--grey-2);font-size:11px;">No department filter selected</span>');
+  refreshMeetingPlanner();openModal('m-meeting');
+}
+function resetMeetingPlanner(){['mt-name','mt-notes','mt-date','mt-time'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});document.getElementById('mt-owner-attending').checked=true;document.getElementById('mt-status').value='confirmed';document.getElementById('mt-recurrence').value='none';meetingPlannerSeed=null;meetingAutoSelectedUids.clear();meetingRoleState={};var q=document.getElementById('mt-attendee-search');if(q)q.value='';var b=document.getElementById('attendee-checks');if(b)b.classList.add('collapsed');var t=document.getElementById('mt-toggle-others');if(t)t.textContent='Show team';}
+function formatMeetingRangeForTz(startIso,duration,tz){
+  var st=new Date(startIso),en=new Date(st.getTime()+duration*60000),opts={timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false};
+  var dateOpts={timeZone:tz,weekday:'short',day:'2-digit',month:'short'};
+  return st.toLocaleDateString('en-GB',dateOpts)+' · '+st.toLocaleTimeString('en-GB',opts)+'–'+en.toLocaleTimeString('en-GB',opts);
+}
+function findBestAlternative(startIso,duration,uids){
+  if(!uids.length)return null;var base=new Date(startIso).getTime(),best=null;
+  for(var step=1;step<=24;step++){
+    for(var dirIndex=0;dirIndex<2;dirIndex++){
+      var dir=dirIndex===0?1:-1,candidate=new Date(base+dir*step*30*60000),iso=candidate.toISOString();
+      var score=uids.filter(function(uid){return memberAvailableForDuration(uid,'','','',duration,iso)&&!memberHasMeetingConflict(uid,iso,duration);}).length;
+      if(!best||score>best.score||(score===best.score&&Math.abs(candidate-base)<Math.abs(new Date(best.iso)-base)))best={iso:iso,score:score};
+      if(score===uids.length)return best;
+    }
+  }
+  return best;
+}
+function applyAlternativeMeetingTime(iso){
+  var d=new Date(iso),tz=(currentProfile&&currentProfile.tz)||'UTC';
+  var parts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d),map={};parts.forEach(function(x){map[x.type]=x.value;});
+  document.getElementById('mt-date').value=map.year+'-'+map.month+'-'+map.day;
+  document.getElementById('mt-time').value=d.toLocaleTimeString('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false});refreshMeetingPlanner();
+}
+function refreshMeetingPlanner(){
+  var date=document.getElementById('mt-date').value,time=document.getElementById('mt-time').value||'00:00',dur=parseInt(document.getElementById('mt-duration').value)||60;if(!date){updateMeetingPlannerSummary();return;}
+  var iso=localDateTimeToUtc(date,time,(currentProfile&&currentProfile.tz)||'UTC');
+  Object.keys(liveData.members).forEach(function(uid){var m=liveData.members[uid],meta=document.getElementById('mt-meta-'+uid);if(!meta)return;var flags=[];var startUtc=new Date(iso),ds=startUtc.toISOString().slice(0,10),di=startUtc.getUTCDay(),wd=WEEK_DAYS[di===0?6:di-1],uh=startUtc.toISOString().slice(11,16);if(!memberAvailableForDuration(uid,ds,wd,uh,dur,iso))flags.push('<span class="meeting-availability-bad">not available for full duration</span>');else if(getMeetingRole(uid)!=='none')flags.push('<span class="meeting-availability-good">available</span>');if(isOutsideWorkingHours(uid,iso,dur))flags.push('<span class="meeting-warning">outside usual hours</span>');if(memberHasMeetingConflict(uid,iso,dur))flags.push('<span class="meeting-conflict">conflict</span>');meta.innerHTML='<span>'+esc(formatMeetingRangeForTz(iso,dur,m.tz||'UTC'))+'</span>'+(flags.length?' · '+flags.join(' · '):'')+'<div class="meeting-tz-detail">'+esc(m.tz||'UTC')+'</div>';});updateMeetingPlannerSummary();
+}
+function updateMeetingPlannerSummary(){
+  var req=[],opt=[];Object.keys(liveData.members).forEach(function(uid){var r=getMeetingRole(uid);if(r==='required')req.push(uid);else if(r==='optional')opt.push(uid);});var owner=document.getElementById('mt-owner-attending');if(owner&&owner.checked&&!req.includes(currentUser.uid)&&!opt.includes(currentUser.uid))req.push(currentUser.uid);
+  var date=document.getElementById('mt-date').value,time=document.getElementById('mt-time').value||'00:00',dur=parseInt(document.getElementById('mt-duration').value)||60,conf=0,warn=0,available=0,iso=null,invited=req.concat(opt);
+  if(date){iso=localDateTimeToUtc(date,time,(currentProfile&&currentProfile.tz)||'UTC');var utcDate=new Date(iso),wd=WEEK_DAYS[utcDate.getUTCDay()===0?6:utcDate.getUTCDay()-1],utcHour=utcDate.toISOString().slice(11,16);invited.forEach(function(uid){if(memberHasMeetingConflict(uid,iso,dur))conf++;if(isOutsideWorkingHours(uid,iso,dur))warn++;if(memberAvailableForDuration(uid,utcDate.toISOString().slice(0,10),wd,utcHour,dur,iso))available++;});}
+  var el=document.getElementById('meeting-invite-summary');if(!el)return;
+  var range=iso?'<div class="meeting-range-preview">'+esc(formatMeetingRangeForTz(iso,dur,(currentProfile&&currentProfile.tz)||'UTC'))+' in your timezone</div>':'';
+  var alt='';if(iso&&invited.length&&available<invited.length){var best=findBestAlternative(iso,dur,invited);if(best&&best.score>available)alt='<div class="meeting-alt-suggestion">Best nearby alternative: '+esc(formatMeetingRangeForTz(best.iso,dur,(currentProfile&&currentProfile.tz)||'UTC'))+' ('+best.score+'/'+invited.length+' available)<button type="button" class="btn btn-gold btn-xs" onclick="applyAlternativeMeetingTime(&quot;'+best.iso+'&quot;)">Use time</button></div>';}
+  el.innerHTML='<strong>'+req.length+'</strong> required · <strong>'+opt.length+'</strong> optional · <strong>'+available+'/'+invited.length+'</strong> available for full duration · <span class="meeting-conflict">'+conf+' conflicts</span> · <span class="meeting-warning">'+warn+' working-hours warnings</span>'+range+alt;
+}
+
+function heatmapCellScheduleClick(dateStr,hour,freeCsv){var uids=(freeCsv||'').split(',').map(function(x){return x.trim();}).filter(Boolean);var local=utcHourToLocal(hour,(currentProfile&&currentProfile.tz)||'UTC');openMeetingPlanner({date:dateStr,time:local,uids:uids});}
+function renderSuggestedTimes(columns,displayHours,selectedUids){
+  var el=document.getElementById('suggested-times');if(!el)return;if(!selectedUids.length||availMode!=='dates'){el.innerHTML='<span style="font-size:11px;color:var(--grey-2);">Select people or departments and switch to DATES to see suggested meeting times.</span>';return;}
+  var scores=[];columns.forEach(function(col){displayHours.forEach(function(hour){var free=selectedUids.filter(function(uid){return getMemberFreeHoursUtc(uid,col.date,col.weekday).includes(hour);});scores.push({date:col.date,hour:hour,count:free.length,uids:free});});});scores.sort(function(a,b){return b.count-a.count||a.date.localeCompare(b.date)||a.hour.localeCompare(b.hour);});
+  el.innerHTML='<span style="font-size:10px;letter-spacing:2px;color:var(--gold);align-self:center;">SUGGESTED</span>'+scores.slice(0,5).filter(function(x){return x.count>0;}).map(function(x){return '<button class="suggested-time" onclick="heatmapCellScheduleClick(\''+x.date+'\',\''+x.hour+'\',\''+x.uids.join(',')+'\')">'+formatDateHdr(new Date(x.date+'T12:00:00Z'))+' · '+utcHourToLocal(x.hour,(currentProfile&&currentProfile.tz)||'UTC')+' · '+x.count+'/'+selectedUids.length+' free</button>';}).join('');
+}
+
 // ── Prompt ────────────────────────────────────────────────
 
 function checkAvailPrompt() {
@@ -5414,7 +5589,8 @@ function renderAvailHeatmap() {
   var wrap = document.getElementById('avail-heatmap');
   if (!wrap) return;
 
-  var allUids = Object.keys(liveData.members);
+  var filteredUids = getSelectedSchedulerUids();
+  var allUids = filteredUids.length ? filteredUids : Object.keys(liveData.members);
   var myUid   = currentUser ? currentUser.uid : '';
   var tz      = (currentProfile && currentProfile.tz) || 'UTC';
 
@@ -5477,7 +5653,7 @@ function renderAvailHeatmap() {
     var isToday = col.isToday;
     html += '<div class="avail-day-hdr' + (isToday?' today':'') + '">' +
       '<div>' + col.label + '</div>' +
-      (col.date ? '<button style="margin-top:4px;font-size:9px;padding:2px 6px;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.3);border-radius:3px;color:var(--crimson-hi);cursor:pointer;font-family:Share Tech Mono,monospace;letter-spacing:1px;" data-date="' + col.date + '" onclick="heatmapScheduleClick(this.dataset.date)">+ MEET</button>' : '') +
+      (col.date ? '<button style="margin-top:4px;font-size:9px;padding:2px 6px;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.3);border-radius:3px;color:var(--crimson-hi);cursor:pointer;font-family:Share Tech Mono,monospace;letter-spacing:1px;" data-date="' + col.date + '" onclick="openMeetingPlanner({date:this.dataset.date,uids:getSelectedSchedulerUids()})">+ MEET</button>' : '') +
       '</div>';
   });
 
@@ -5492,6 +5668,7 @@ function renderAvailHeatmap() {
       var totalPpl  = allUids.length;
       var freeCount = freeUids.length;
       var isMeFree  = freeUids.includes(myUid);
+      if (schedulerOverlapMode === 'common' && filteredUids.length && freeCount < allUids.length) { freeUids=[]; freeCount=0; isMeFree=false; }
 
       // Heat class
       var heatCls = 'heat-0';
@@ -5516,6 +5693,7 @@ function renderAvailHeatmap() {
       html += '<div class="avail-cell ' + heatCls + '" ' +
         'data-hour="' + hour + '" data-col="' + col.key + '" data-date="' + (col.date||'') + '" ' +
         'data-count="' + freeCount + '" data-people="' + encodeURIComponent(tipPeople) + '" ' +
+        'onclick="heatmapCellScheduleClick(this.dataset.date,this.dataset.hour,this.dataset.free)" data-free="' + freeUids.join(',') + '" ' +
         'onmouseenter="showAvailTooltip(event,this)" onmouseleave="hideAvailTooltip()">' +
         (freeCount > 0 ? '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.5);">' + freeCount + '</div>' : '') +
         '</div>';
@@ -5523,7 +5701,13 @@ function renderAvailHeatmap() {
   });
 
   html += '</div>';
+  wrap.style.position='relative';
   wrap.innerHTML = html;
+  var selectedCount=filteredUids.length;
+  var stale=allUids.filter(function(uid){var a=liveData.weeklyAvail[uid];if(!a||!a.updatedAt)return true;return Date.now()-new Date(a.updatedAt).getTime()>8*86400000;}).length;
+  var stEl=document.getElementById('sched-filter-status');if(stEl)stEl.innerHTML='<span><strong>'+allUids.length+'</strong> people shown</span><span><strong>'+(allUids.length-stale)+'</strong> recently confirmed</span><span><strong>'+stale+'</strong> stale/missing</span><span>Mode: <strong>'+(schedulerOverlapMode==='common'?'common times only':'all selected availability')+'</strong></span>';
+  renderSuggestedTimes(columns,displayHours,allUids);
+  if(schedulerOverlapMode==='common'&&selectedCount){var any=wrap.querySelector('.avail-cell:not(.heat-0)');if(!any){var ov=document.createElement('div');ov.className='avail-empty-overlay';ov.textContent='NO MATCHING TIMES FOR THE SELECTED MEMBERS';wrap.appendChild(ov);}}
 }
 
 // ── Tooltip ────────────────────────────────────────────────
@@ -5556,32 +5740,7 @@ function hideAvailTooltip() {
 
 // ── Heat map → meeting scheduler click ────────────────────
 
-function heatmapScheduleClick(dateStr) {
-  // Pre-fill meeting modal with this date and pre-check free members
-  var allUids = Object.keys(liveData.members);
-  // Find weekday for this date
-  var d   = new Date(dateStr + 'T12:00:00Z');
-  var wd  = WEEK_DAYS[d.getUTCDay() === 0 ? 6 : d.getUTCDay() - 1];
-
-  // Open meeting modal
-  populateAttendeeChecks();
-  document.getElementById('mt-date').value = dateStr;
-
-  // Pre-check people who have any availability on this date
-  allUids.forEach(function(uid) {
-    var freeHours = getMemberFreeHoursUtc(uid, dateStr, wd);
-    if (freeHours.length > 0) {
-      var cb = document.querySelector('#attendee-checks input[value="' + uid + '"]');
-      if (cb) {
-        cb.checked = true;
-        // Style the label to show they're free
-        var lbl = cb.closest('label');
-        if (lbl) lbl.style.borderColor = 'rgba(46,204,138,.5)';
-      }
-    }
-  });
-  openModal('m-meeting');
-}
+function heatmapScheduleClick(dateStr) { openMeetingPlanner({date:dateStr,uids:getSelectedSchedulerUids()}); }
 
 // ── Editor ────────────────────────────────────────────────
 
