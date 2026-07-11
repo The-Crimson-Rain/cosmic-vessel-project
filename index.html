@@ -1532,6 +1532,38 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
 .meeting-attendee-meta{line-height:1.45}.meeting-tz-detail{color:var(--grey-2);font-size:9px}
 .meeting-list-empty{padding:16px;text-align:center;color:var(--grey-2);font-size:11px}
 
+
+/* === Availability overhaul v2.1 === */
+.avail-fastbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(8,10,18,.55)}
+.avail-fast-days{display:flex;gap:4px;flex-wrap:wrap;margin-right:auto}.avail-fast-day{border:1px solid var(--border);background:transparent;color:var(--grey);border-radius:3px;padding:4px 7px;font:10px 'Share Tech Mono',monospace;cursor:pointer}.avail-fast-day.active{border-color:var(--gold);color:var(--gold);background:var(--gold-trace)}
+.avail-state-btn.available{border-color:rgba(46,204,138,.5);background:rgba(46,204,138,.1);color:var(--green)}.avail-state-btn.unavailable{border-color:rgba(232,21,58,.5);background:rgba(200,16,46,.1);color:var(--crimson-hi)}
+.avail-editor-legend{display:flex;gap:14px;padding:7px 14px;border-bottom:1px solid var(--border);font-size:10px;color:var(--grey)}.avail-editor-legend span{display:flex;align-items:center;gap:5px}.avail-editor-legend i{width:11px;height:11px;border-radius:2px;border:1px solid var(--border)}.avail-editor-legend i.available{background:rgba(46,204,138,.75)}.avail-editor-legend i.unavailable{background:rgba(200,16,46,.75)}.avail-editor-legend i.clear{background:rgba(255,255,255,.02)}
+.avail-editor-cell.state-available{background:rgba(46,204,138,.72);outline:1px solid rgba(46,204,138,.9)}.avail-editor-cell.state-unavailable{background:rgba(200,16,46,.68);outline:1px solid rgba(232,21,58,.85)}.avail-editor-cell.state-clear{background:rgba(255,255,255,.02)}
+.avail-cell.explicit-unavailable{background:repeating-linear-gradient(135deg,rgba(200,16,46,.32) 0 5px,rgba(200,16,46,.12) 5px 10px)}.avail-cell.flexible-slot{background:repeating-linear-gradient(135deg,rgba(155,108,240,.45) 0 6px,rgba(155,108,240,.2) 6px 12px)}
+.notif-toolbar{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:flex-end}.notification-list{max-height:520px;overflow:auto}.notification-item{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer}.notification-item.unread{background:rgba(200,16,46,.055);border-left:3px solid var(--crimson-hi)}.notification-title{font-size:13px;font-weight:700}.notification-body{font-size:12px;color:var(--grey);margin-top:3px;line-height:1.5}.notification-time{font:9px 'Share Tech Mono',monospace;color:var(--grey-2);margin-top:5px}
+@media(max-width:700px){.avail-fastbar{align-items:stretch}.avail-fast-days{width:100%}.avail-fastbar .inp{flex:1}.avail-fastbar .btn{flex:1}}
+
+/* ═══ CALENDAR COMPLETION PATCH v5 ═══ */
+:root { --ui-type-bump: 1px; }
+body { font-size:15px; }
+.nav-item { font-size:14px; }
+.nav-section-label,.field-label,.panel-title,.stat-lbl,.sched-filter-title { font-size:11px; }
+.btn { font-size:13px; }
+.btn-sm { font-size:11px; }
+.btn-xs { font-size:10px; }
+.text-small,.ph-sub,.comment-text,.notification-body,.mc-attendees,.ac-chip { font-size:13px; }
+.tc-tag,.state-chip,.tc-due,.overdue-badge,.u-role { font-size:10px; }
+.tz-loc,.meeting-tz-detail,.notification-time { font-size:11px; }
+.ni-icon svg { width:15px;height:15px;display:block;stroke:currentColor;fill:none;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round; }
+.recur-options { display:none; padding:12px; border:1px solid var(--border); border-radius:6px; background:rgba(8,10,18,.65); }
+.recur-options.show { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.series-badge { display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1px;color:var(--purple);border:1px solid rgba(155,108,240,.35);background:rgba(155,108,240,.08);padding:2px 6px;border-radius:3px;text-transform:uppercase; }
+.gcal-change-note { font-size:11px;color:var(--blue);padding:8px 10px;border:1px solid rgba(74,144,217,.3);background:rgba(74,144,217,.08);border-radius:4px;line-height:1.45; }
+@media (max-width:760px){
+  body{font-size:14px}.modal{max-width:98vw}.grid-3,.grid-2{grid-template-columns:1fr}.recur-options.show{grid-template-columns:1fr}
+  .sched-filter-panel{grid-template-columns:1fr}.meeting-summary-sticky{position:static}.avail-grid-wrap{max-height:60vh}
+}
+
 </style>
 </head>
 <body>
@@ -1707,6 +1739,7 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
     <div class="nav-item" data-view="my-tasks" onclick="nav(this)"><span class="ni-icon">◈</span> My Tasks<div class="nav-notif" id="notif-tasks"></div></div>
     <div class="nav-item" data-view="crew" onclick="nav(this)"><span class="ni-icon">◉</span> Members<span class="ni-badge" id="nb-crew">0</span></div>
     <div class="nav-item" data-view="scheduler" onclick="nav(this)"><span class="ni-icon">◎</span> Scheduler<div class="nav-notif" id="notif-meetings"></div></div>
+    <div class="nav-item" onclick="openNotificationCentre()"><span class="ni-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span> Notifications<span class="ni-badge" id="notif-count" style="display:none;">0</span></div>
     <div class="nav-item" data-view="milestones" onclick="nav(this)"><span class="ni-icon">◎</span> Milestones</div>
     <div class="nav-item" data-view="transcripts" onclick="nav(this)"><span class="ni-icon">◈</span> Mission Logs</div>
     <div class="sidebar-divider"></div>
@@ -2242,6 +2275,11 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
         <div class="field"><span class="field-label">Status</span><select class="inp" id="mt-status"><option value="confirmed">Confirmed meeting</option><option value="provisional">Provisional / proposed time</option></select></div>
         <div class="field"><span class="field-label">Recurrence</span><select class="inp" id="mt-recurrence"><option value="none">Does not repeat</option><option value="weekly">Weekly</option><option value="fortnightly">Every two weeks</option><option value="monthly">Monthly</option></select></div>
       </div>
+      <div class="recur-options" id="mt-recur-options">
+        <div class="field"><span class="field-label">Repeat until</span><input class="inp" id="mt-recur-until" type="date"></div>
+        <div class="field"><span class="field-label">Or number of meetings</span><input class="inp" id="mt-recur-count" type="number" min="2" max="52" value="6"></div>
+        <div class="field" style="grid-column:1/-1"><span class="field-label">Department membership for future meetings</span><select class="inp" id="mt-recur-membership"><option value="fixed">Keep this attendee list</option><option value="dynamic">Use current department members for each future occurrence</option></select></div>
+      </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--white);cursor:pointer;"><input type="checkbox" id="mt-owner-attending" checked onchange="refreshMeetingPlanner()" style="accent-color:var(--crimson-hi);"> I am attending this meeting</label>
       <div class="field"><span class="field-label">Departments represented</span><div id="mt-dept-summary" class="sched-chip-wrap"></div></div>
       <div class="field"><span class="field-label">Automatically selected from this time slot</span>
@@ -2290,6 +2328,8 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
           </select>
         </div>
       </div>
+      <div class="field" id="edit-series-scope-wrap" style="display:none"><span class="field-label">Apply changes to</span><select class="inp" id="edit-series-scope"><option value="one">This meeting only</option><option value="following">This and future meetings</option><option value="all">Entire series</option></select></div>
+      <div class="gcal-change-note">When a meeting changes, attendees receive a hub notification and an updated Google Calendar link. Previously added calendar entries cannot be silently edited without each member authorising Google access.</div>
       <div class="field"><span class="field-label">Attendees</span>
         <div id="edit-attendee-checks" style="background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:4px;padding:10px;max-height:130px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;"></div>
       </div>
@@ -2323,9 +2363,19 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
           <button class="avail-nav-btn" onclick="editorWeekNext()">▶</button>
         </div>
         <div style="margin-left:auto;font-size:11px;color:var(--grey-2);">
-          Click cells to toggle · Times in your local timezone (<span id="editor-tz-label" style="color:var(--gold);"></span>)
+          Click: available → unavailable → clear · Drag paints the chosen state · Times in your local timezone (<span id="editor-tz-label" style="color:var(--gold);"></span>)
         </div>
       </div>
+      <div class="avail-fastbar">
+        <div class="avail-fast-days" id="avail-fast-days"></div>
+        <select class="inp" id="avail-fast-start" style="width:92px;"></select>
+        <span style="color:var(--grey-2);">to</span>
+        <select class="inp" id="avail-fast-end" style="width:92px;"></select>
+        <button class="btn btn-sm avail-state-btn available" onclick="applyFastAvailability('available')">Available</button>
+        <button class="btn btn-sm avail-state-btn unavailable" onclick="applyFastAvailability('unavailable')">Unavailable</button>
+        <button class="btn btn-ghost btn-sm" onclick="applyFastAvailability('clear')">Clear</button>
+      </div>
+      <div class="avail-editor-legend"><span><i class="available"></i>Available</span><span><i class="unavailable"></i>Unavailable</span><span><i class="clear"></i>No information</span></div>
       <div id="editor-grid-wrap" class="avail-grid-wrap" style="max-height:420px;">
         <div id="editor-grid"></div>
       </div>
@@ -2336,6 +2386,32 @@ body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'
         <button class="btn btn-ghost" onclick="closeModal('m-avail-editor')">Cancel</button>
         <button class="btn btn-primary" onclick="saveAvailability()">Save</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Weekly availability confirmation -->
+<div class="modal-bg" id="m-avail-confirm">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-hdr"><span class="modal-title">◎ CONFIRM THIS WEEK</span></div>
+    <div class="modal-body">
+      <div style="font-size:15px;font-weight:700;">Is your availability still accurate?</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.6;">One click keeps your existing hours. Choose flexible when those hours remain a useful guide but you may be able to adjust.</div>
+      <button class="btn btn-primary fw" onclick="confirmAvailabilityWeek('confirmed')">Yes — keep my current hours</button>
+      <button class="btn btn-gold fw" onclick="confirmAvailabilityWeek('update')">Update my availability</button>
+      <button class="btn btn-ghost fw" onclick="confirmAvailabilityWeek('flexible')">My week is flexible</button>
+      <button class="btn btn-ghost btn-sm fw" onclick="remindAvailabilityTomorrow()">Remind me tomorrow</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification centre -->
+<div class="modal-bg" id="m-notifications">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-hdr"><span class="modal-title">🔔 NOTIFICATIONS</span><button class="modal-x" onclick="closeModal('m-notifications')">✕</button></div>
+    <div class="modal-body" style="padding:0;">
+      <div class="notif-toolbar"><button class="btn btn-ghost btn-sm" onclick="markAllNotificationsRead()">Mark all read</button></div>
+      <div id="notification-list" class="notification-list"></div>
     </div>
   </div>
 </div>
@@ -2578,7 +2654,7 @@ const STATUS_LABEL = { online:'Online', working:'Working', gaming:'Gaming', offl
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[] };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[] };
 let crewSearch = '';
 let dragTask = null;
 
@@ -2663,6 +2739,7 @@ async function onAuthChange(user) {
       }
     }
     showApp();
+    setTimeout(checkWeeklyAvailabilityConfirmation, 900);
   } else {
     currentUser = null; currentProfile = null;
     showLogin();
@@ -2875,6 +2952,7 @@ function startListeners() {
     snap.forEach(function(d){ liveData.weeklyAvail[d.id] = d.data(); });
     var schedView = document.getElementById('view-scheduler');
     if (schedView && schedView.classList.contains('active')) renderAvailHeatmap();
+    checkWeeklyAvailabilityConfirmation();
   });
 
   // Override availability (specific dates) — only last 21 days + future
@@ -2884,6 +2962,13 @@ function startListeners() {
     var schedView = document.getElementById('view-scheduler');
     if (schedView && schedView.classList.contains('active')) renderAvailHeatmap();
   });
+
+  const uNotif = db.collection('notifications').where('recipientId','==',currentUser.uid).onSnapshot(function(snap) {
+    liveData.notifications = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }).sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
+    renderNotificationBadge();
+    if(document.getElementById('m-notifications').classList.contains('open')) renderNotificationCentre();
+  });
+  listeners.push(uNotif);
 
   const u7 = db.collection('config').doc('custom_depts').onSnapshot(function(doc) {
     liveData.customDepts = doc.exists ? (doc.data().depts || []) : [];
@@ -3899,7 +3984,8 @@ async function submitMeeting() {
   if(!attendees.length){toast('Select at least one attendee','err');return;}
   var initRsvp={}; if(ownerAttending)initRsvp[currentUser.uid]='accepted';
   var meeting={name:name,dateUtc:dateUtc,notes:document.getElementById('mt-notes').value.trim(),duration:parseInt(document.getElementById('mt-duration').value)||60,attendees:attendees,requiredAttendees:required,optionalAttendees:optional,rsvp:initRsvp,ownerAttending:ownerAttending,createdBy:currentUser.uid,ownerId:currentUser.uid,status:document.getElementById('mt-status').value,provisional:document.getElementById('mt-status').value==='provisional',recurrence:document.getElementById('mt-recurrence').value,departments:Array.from(schedulerSelectedDepts),discordJoin:document.getElementById('mt-discord-join').checked,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
-  await db.collection('meetings').add(meeting);
+  var meetingRef=await db.collection('meetings').add(meeting);
+  await Promise.all(attendees.map(function(uid){return createUserNotification(uid,'meeting_invite',meeting.provisional?'Provisional meeting proposed: '+meeting.name:'Meeting invitation: '+meeting.name,formatMeetingRangeForTz(meeting.dateUtc,meeting.duration,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC'),meetingRef.id);}));
   if(liveData.config.gcalId&&liveData.config.gcalKey)addToGCal(meeting).catch(function(){});
   closeModal('m-meeting'); resetMeetingPlanner(); toast(meeting.provisional?'Provisional meeting created!':'Meeting scheduled!','ok');
 }
@@ -4000,39 +4086,8 @@ function openEditMeeting(id) {
   openModal('m-edit-meeting');
 }
 
-async function saveEditMeeting() {
-  var id       = document.getElementById('edit-mt-id').value;
-  var name     = document.getElementById('edit-mt-name').value.trim();
-  var dateStr  = document.getElementById('edit-mt-date').value;
-  var timeStr  = document.getElementById('edit-mt-time').value || '00:00';
-  var durVal   = document.getElementById('edit-mt-duration').value;
-  var notes    = document.getElementById('edit-mt-notes').value.trim();
-  var checks   = document.querySelectorAll('#edit-attendee-checks input:checked');
-  if (!name) { toast('Meeting name required','err'); return; }
-  // Convert editor's local time to UTC using their profile timezone
-  var editorTz = (currentProfile && currentProfile.tz) || 'UTC';
-  var dateUtc = '';
-  if (dateStr && timeStr) {
-    try {
-      var localDateStr2 = dateStr + 'T' + timeStr + ':00';
-      var ref2 = new Date(localDateStr2 + 'Z');
-      var utcParts2 = new Date(ref2.toLocaleString('en-US', { timeZone: 'UTC' }));
-      var tzParts2  = new Date(ref2.toLocaleString('en-US', { timeZone: editorTz }));
-      var offsetMs2 = utcParts2.getTime() - tzParts2.getTime();
-      dateUtc = new Date(ref2.getTime() + offsetMs2).toISOString();
-    } catch(e) {
-      dateUtc = new Date(dateStr + 'T' + timeStr + ':00Z').toISOString();
-    }
-  }
-  var attendeeList = [...checks].map(function(c){ return c.value; });
-  if (!attendeeList.includes(currentUser.uid)) attendeeList.push(currentUser.uid);
-  await db.collection('meetings').doc(id).update({
-    name: name, dateUtc: dateUtc, duration: parseInt(durVal)||60,
-    notes: notes, attendees: attendeeList
-  });
-  closeModal('m-edit-meeting');
-  toast('Meeting updated!','ok');
-}
+async function saveEditMeeting(){var id=document.getElementById('edit-mt-id').value,name=document.getElementById('edit-mt-name').value.trim(),dateStr=document.getElementById('edit-mt-date').value,timeStr=document.getElementById('edit-mt-time').value||'00:00',dur=parseInt(document.getElementById('edit-mt-duration').value)||60,notes=document.getElementById('edit-mt-notes').value.trim(),checks=document.querySelectorAll('#edit-attendee-checks input:checked');if(!name){toast('Meeting name required','err');return;}var old=liveData.meetings.find(function(m){return m.id===id;});if(!old)return;var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC'),attendees=Array.from(checks).map(function(c){return c.value;});var oldAtt=old.attendees||[],added=attendees.filter(function(u){return !oldAtt.includes(u);}),removed=oldAtt.filter(function(u){return !attendees.includes(u);}),timingChanged=old.dateUtc!==dateUtc||(old.duration||60)!==dur;var update={name:name,dateUtc:dateUtc,duration:dur,notes:notes,attendees:attendees,updatedAt:new Date().toISOString()};if(timingChanged){var r={};attendees.forEach(function(uid){r[uid]=uid===currentUser.uid?'accepted':'pending';});update.rsvp=r;}await db.collection('meetings').doc(id).update(update);var oldRange=formatMeetingRangeForTz(old.dateUtc,old.duration||60,(currentProfile&&currentProfile.tz)||'UTC'),newRange=formatMeetingRangeForTz(dateUtc,dur,(currentProfile&&currentProfile.tz)||'UTC');await Promise.all(attendees.filter(function(u){return !added.includes(u);}).map(function(uid){if(timingChanged)return createUserNotification(uid,'meeting_changed','Meeting changed: '+name,oldRange+' → '+newRange,id);return Promise.resolve();}).concat(added.map(function(uid){return createUserNotification(uid,'meeting_added','You were added: '+name,newRange,id);}),removed.map(function(uid){return createUserNotification(uid,'meeting_removed','You were removed: '+name,'You are no longer included in this meeting.',id);})));closeModal('m-edit-meeting');toast('Meeting updated and attendees notified','ok');}
+
 
 async function cancelMeeting(meetingId) {
   var meeting = liveData.meetings.find(function(m){ return m.id === meetingId; });
@@ -5382,7 +5437,7 @@ var availMode        = 'weekly';   // 'weekly' | 'dates'
 var availWeekOffset  = 0;          // 0 = current week
 var editorMode       = 'weekly';   // 'weekly' | 'override'
 var editorWeekOffset = 0;
-var editorSlots      = {};         // { 'mon': Set of hour strings } or { 'YYYY-MM-DD': Set }
+var editorSlots      = {};         // { key: {available:Set, unavailable:Set} }
 var availPromptDismissed = false;
 var schedulerSelectedPeople = new Set();
 var schedulerSelectedDepts = new Set();
@@ -5447,19 +5502,31 @@ function localHourToUtc(localHour, tz, dateIso) {
 }
 
 // Get all UTC hours that a member is free on a given date (YYYY-MM-DD) and weekday (e.g. 'mon')
-function getMemberFreeHoursUtc(uid, dateIso, weekday) {
-  var weekly   = liveData.weeklyAvail[uid];
-  var override = liveData.overrideAvail[uid];
-  var slots    = [];
-
-  // Override takes priority for this specific date
-  if (override && override.dates && override.dates[dateIso]) {
-    slots = override.dates[dateIso] || [];
-  } else if (weekly && weekly.slots && weekly.slots[weekday]) {
-    slots = weekly.slots[weekday] || [];
-  }
-  return slots; // already stored in UTC hours ('14:00' etc)
+function normaliseAvailabilityBucket(raw) {
+  if (Array.isArray(raw)) return { available: raw.slice(), unavailable: [] };
+  raw = raw || {};
+  return { available: (raw.available || []).slice(), unavailable: (raw.unavailable || []).slice() };
 }
+function getMemberAvailabilityStateUtc(uid,dateIso,weekday,hour){
+  var weekly=liveData.weeklyAvail[uid]||{}, override=liveData.overrideAvail[uid]||{};
+  var raw=null, source='none';
+  if(override.dates && Object.prototype.hasOwnProperty.call(override.dates,dateIso)){raw=override.dates[dateIso];source='override';}
+  else if(weekly.slots && Object.prototype.hasOwnProperty.call(weekly.slots,weekday)){raw=weekly.slots[weekday];source='weekly';}
+  var bucket=normaliseAvailabilityBucket(raw);
+  if(bucket.unavailable.includes(hour))return {state:'unavailable',source:source,explicit:true};
+  if(bucket.available.includes(hour))return {state:weekly.weekStatus==='flexible'?'flexible':'available',source:source,explicit:true};
+  return {state:'clear',source:source,explicit:false};
+}
+function getMemberFreeHoursUtc(uid, dateIso, weekday) {
+  return HOURS.filter(function(hour){var st=getMemberAvailabilityStateUtc(uid,dateIso,weekday,hour).state;return st==='available'||st==='flexible';});
+}
+function getAvailabilityFreshness(uid){
+  var a=liveData.weeklyAvail[uid];if(!a)return {state:'missing',days:Infinity};
+  var stamp=a.confirmedAt||a.updatedAt;if(!stamp)return {state:'stale',days:Infinity};
+  var days=Math.floor((Date.now()-new Date(stamp).getTime())/86400000);
+  return {state:a.weekStatus==='flexible'?'flexible':(days>7?'stale':'confirmed'),days:days};
+}
+
 
 
 function localDateTimeToUtc(dateStr,timeStr,tz){
@@ -5491,7 +5558,8 @@ function memberAvailableForDuration(uid,dateIso,weekday,startHour,duration,start
     var dayIndex=point.getUTCDay();
     var wd=WEEK_DAYS[dayIndex===0?6:dayIndex-1];
     var hour=String(point.getUTCHours()).padStart(2,'0')+':00';
-    if(!getMemberFreeHoursUtc(uid,ds,wd).includes(hour))return false;
+    var state=getMemberAvailabilityStateUtc(uid,ds,wd,hour).state;
+    if(state!=='available'&&state!=='flexible')return false;
   }
   return true;
 }
@@ -5551,19 +5619,17 @@ function renderSuggestedTimes(columns,displayHours,selectedUids){
 
 // ── Prompt ────────────────────────────────────────────────
 
-function checkAvailPrompt() {
-  if (availPromptDismissed) return;
-  var uid = currentUser ? currentUser.uid : '';
-  var hasAvail = liveData.weeklyAvail[uid] && Object.keys(liveData.weeklyAvail[uid].slots || {}).length > 0;
-  var el = document.getElementById('avail-prompt');
-  if (el) el.style.display = hasAvail ? 'none' : 'flex';
-}
-
-function dismissAvailPrompt() {
-  availPromptDismissed = true;
-  var el = document.getElementById('avail-prompt');
-  if (el) el.style.display = 'none';
-}
+function checkAvailPrompt(){checkWeeklyAvailabilityConfirmation();}
+function dismissAvailPrompt(){availPromptDismissed=true;var el=document.getElementById('avail-prompt');if(el)el.style.display='none';}
+function checkWeeklyAvailabilityConfirmation(){if(!currentUser||!liveData.weeklyAvail)return;var snooze=localStorage.getItem('cvp_avail_snooze_'+currentUser.uid);if(snooze&&Date.now()<Number(snooze))return;var f=getAvailabilityFreshness(currentUser.uid);var has=liveData.weeklyAvail[currentUser.uid]&&liveData.weeklyAvail[currentUser.uid].slots;if(!has||f.state==='stale'||f.state==='missing')openModal('m-avail-confirm');}
+async function confirmAvailabilityWeek(choice){var uid=currentUser.uid,now=new Date().toISOString();if(choice==='update'){closeModal('m-avail-confirm');openAvailEditor();return;}await db.collection('avail_weekly').doc(uid).set({confirmedAt:now,weekStatus:choice==='flexible'?'flexible':'confirmed',updatedAt:firebase.firestore.FieldValue.serverTimestamp?now:now},{merge:true});await db.collection('users').doc(uid).set({availabilityConfirmedAt:now,availabilityWeekStatus:choice==='flexible'?'flexible':'confirmed'},{merge:true});closeModal('m-avail-confirm');toast(choice==='flexible'?'Marked flexible for this week':'Availability confirmed','ok');}
+function remindAvailabilityTomorrow(){localStorage.setItem('cvp_avail_snooze_'+currentUser.uid,String(Date.now()+86400000));closeModal('m-avail-confirm');toast('I’ll ask again tomorrow','inf');}
+async function createUserNotification(uid,type,title,body,meetingId){if(!uid||uid===currentUser.uid)return;try{await db.collection('notifications').add({recipientId:uid,type:type,title:title,body:body,meetingId:meetingId||'',read:false,createdAt:new Date().toISOString()});}catch(e){console.warn('Notification failed',e);}}
+function renderNotificationBadge(){var n=(liveData.notifications||[]).filter(function(x){return !x.read;}).length,el=document.getElementById('notif-count');if(!el)return;el.textContent=n;el.style.display=n?'inline-block':'none';}
+function openNotificationCentre(){renderNotificationCentre();openModal('m-notifications');}
+function renderNotificationCentre(){var el=document.getElementById('notification-list');if(!el)return;var ns=liveData.notifications||[];el.innerHTML=ns.length?ns.map(function(n){return '<div class="notification-item '+(!n.read?'unread':'')+'" onclick="markNotificationRead(\''+n.id+'\')"><div class="notification-title">'+esc(n.title||'Notification')+'</div><div class="notification-body">'+esc(n.body||'')+'</div><div class="notification-time">'+esc(n.createdAt?new Date(n.createdAt).toLocaleString():'')+'</div></div>';}).join(''):'<div class="no-data">No notifications</div>';}
+async function markNotificationRead(id){await db.collection('notifications').doc(id).update({read:true});}
+async function markAllNotificationsRead(){var unread=(liveData.notifications||[]).filter(function(n){return !n.read;});await Promise.all(unread.map(function(n){return db.collection('notifications').doc(n.id).update({read:true});}));}
 
 // ── Mode switches ──────────────────────────────────────────
 
@@ -5704,8 +5770,8 @@ function renderAvailHeatmap() {
   wrap.style.position='relative';
   wrap.innerHTML = html;
   var selectedCount=filteredUids.length;
-  var stale=allUids.filter(function(uid){var a=liveData.weeklyAvail[uid];if(!a||!a.updatedAt)return true;return Date.now()-new Date(a.updatedAt).getTime()>8*86400000;}).length;
-  var stEl=document.getElementById('sched-filter-status');if(stEl)stEl.innerHTML='<span><strong>'+allUids.length+'</strong> people shown</span><span><strong>'+(allUids.length-stale)+'</strong> recently confirmed</span><span><strong>'+stale+'</strong> stale/missing</span><span>Mode: <strong>'+(schedulerOverlapMode==='common'?'common times only':'all selected availability')+'</strong></span>';
+  var stale=allUids.filter(function(uid){var f=getAvailabilityFreshness(uid);return f.state==='stale'||f.state==='missing';}).length;var flexible=allUids.filter(function(uid){return getAvailabilityFreshness(uid).state==='flexible';}).length;
+  var stEl=document.getElementById('sched-filter-status');if(stEl)stEl.innerHTML='<span><strong>'+allUids.length+'</strong> people shown</span><span><strong>'+(allUids.length-stale)+'</strong> recently confirmed</span><span><strong>'+stale+'</strong> stale/missing</span><span><strong>'+flexible+'</strong> flexible</span><span>Mode: <strong>'+(schedulerOverlapMode==='common'?'common times only':'all selected availability')+'</strong></span>';
   renderSuggestedTimes(columns,displayHours,allUids);
   if(schedulerOverlapMode==='common'&&selectedCount){var any=wrap.querySelector('.avail-cell:not(.heat-0)');if(!any){var ov=document.createElement('div');ov.className='avail-empty-overlay';ov.textContent='NO MATCHING TIMES FOR THE SELECTED MEMBERS';wrap.appendChild(ov);}}
 }
@@ -5744,243 +5810,30 @@ function heatmapScheduleClick(dateStr) { openMeetingPlanner({date:dateStr,uids:g
 
 // ── Editor ────────────────────────────────────────────────
 
+function makeEditorBucket(raw){var n=normaliseAvailabilityBucket(raw);return {available:new Set(n.available),unavailable:new Set(n.unavailable)};}
+function getEditorState(key,hour){var b=editorSlots[key]||makeEditorBucket(null);if(b.unavailable.has(hour))return 'unavailable';if(b.available.has(hour))return 'available';return 'clear';}
+function setEditorState(key,hour,state){if(!editorSlots[key])editorSlots[key]=makeEditorBucket(null);var b=editorSlots[key];b.available.delete(hour);b.unavailable.delete(hour);if(state==='available')b.available.add(hour);if(state==='unavailable')b.unavailable.add(hour);}
+function nextAvailabilityState(state){return state==='clear'?'available':state==='available'?'unavailable':'clear';}
 function openAvailEditor() {
-  var tz  = (currentProfile && currentProfile.tz) || 'UTC';
-  var uid = currentUser ? currentUser.uid : '';
-
-  // Load existing weekly slots
-  editorSlots  = {};
-  editorMode   = 'weekly';
-  editorWeekOffset = 0;
-
-  var existing = liveData.weeklyAvail[uid];
-  if (existing && existing.slots) {
-    WEEK_DAYS.forEach(function(d) {
-      editorSlots[d] = new Set(existing.slots[d] || []);
-    });
-  } else {
-    WEEK_DAYS.forEach(function(d) { editorSlots[d] = new Set(); });
-  }
-
-  // Set mode UI
-  document.querySelectorAll('#editor-mode-toggle .avail-week-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.emode === 'weekly');
-  });
-  var ovNav = document.getElementById('editor-override-nav');
-  if (ovNav) ovNav.style.display = 'none';
-
-  var tzLabel = document.getElementById('editor-tz-label');
-  if (tzLabel) tzLabel.textContent = tz;
-
-  renderEditorGrid();
-  initEditorDrag();
-  openModal('m-avail-editor');
+  var tz=(currentProfile&&currentProfile.tz)||'UTC',uid=currentUser?currentUser.uid:'';editorSlots={};editorMode='weekly';editorWeekOffset=0;
+  var existing=liveData.weeklyAvail[uid];WEEK_DAYS.forEach(function(d){editorSlots[d]=makeEditorBucket(existing&&existing.slots?existing.slots[d]:null);});
+  document.querySelectorAll('#editor-mode-toggle .avail-week-btn').forEach(function(b){b.classList.toggle('active',b.dataset.emode==='weekly');});
+  document.getElementById('editor-override-nav').style.display='none';document.getElementById('editor-tz-label').textContent=tz;renderFastAvailabilityControls();renderEditorGrid();initEditorDrag();openModal('m-avail-editor');
 }
-
-function setEditorMode(mode, btn) {
-  editorMode = mode;
-  editorWeekOffset = 0;
-  document.querySelectorAll('#editor-mode-toggle .avail-week-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.emode === mode);
-  });
-  var ovNav = document.getElementById('editor-override-nav');
-  if (ovNav) ovNav.style.display = mode === 'override' ? 'flex' : 'none';
-
-  // Load appropriate existing slots
-  var uid = currentUser ? currentUser.uid : '';
-  if (mode === 'override') {
-    var existing = liveData.overrideAvail[uid];
-    editorSlots = {};
-    if (existing && existing.dates) {
-      Object.keys(existing.dates).forEach(function(ds) {
-        editorSlots[ds] = new Set(existing.dates[ds] || []);
-      });
-    }
-  } else {
-    editorSlots = {};
-    var existW = liveData.weeklyAvail[uid];
-    WEEK_DAYS.forEach(function(d) {
-      editorSlots[d] = new Set((existW && existW.slots && existW.slots[d]) || []);
-    });
-  }
-  renderEditorGrid();
-}
-
-function renderEditorGrid() {
-  var grid = document.getElementById('editor-grid');
-  if (!grid) return;
-  var tz = (currentProfile && currentProfile.tz) || 'UTC';
-
-  var columns = [];
-  if (editorMode === 'weekly') {
-    WEEK_DAYS.forEach(function(d) { columns.push({ key: d, label: WEEK_LABELS[d] }); });
-    var wl = document.getElementById('editor-week-label');
-    if (wl) wl.textContent = 'REGULAR HOURS';
-  } else {
-    var weekStart = getWeekStart(editorWeekOffset);
-    for (var di = 0; di < 7; di++) {
-      var dd = new Date(weekStart.getTime() + di * 86400000);
-      var ds = dateStr(dd);
-      columns.push({ key: ds, label: formatDateHdr(dd) });
-    }
-    var wl2 = document.getElementById('editor-week-label');
-    var ws = getWeekStart(editorWeekOffset);
-    var we = new Date(ws.getTime() + 6*86400000);
-    if (wl2) wl2.textContent = formatDateHdr(ws) + ' – ' + formatDateHdr(we);
-  }
-
-  // Ensure all column keys have a Set
-  columns.forEach(function(col) {
-    if (!editorSlots[col.key]) editorSlots[col.key] = new Set();
-  });
-
-  var gridStyle = 'display:grid;grid-template-columns:52px ' + 'repeat(' + columns.length + ',1fr);' +
-    'min-width:' + (52 + columns.length*80) + 'px;';
-  var html = '<div style="' + gridStyle + '">';
-
-  // Header
-  html += '<div class="avail-day-hdr" style="border-right:1px solid var(--border);"></div>';
-  columns.forEach(function(col) {
-    html += '<div class="avail-day-hdr">' + col.label + '</div>';
-  });
-
-  // Rows
-  HOURS.forEach(function(hour) {
-    var localLabel = utcHourToLocal(hour, tz);
-    html += '<div class="avail-time-label">' + localLabel + '</div>';
-    columns.forEach(function(col) {
-      var isSelected = editorSlots[col.key] && editorSlots[col.key].has(hour);
-      html += '<div class="avail-editor-cell' + (isSelected?' selected':'') + '" ' +
-        'data-col="' + col.key + '" data-hour="' + hour + '"></div>';
-    });
-  });
-
-  html += '</div>';
-  grid.innerHTML = html;
-}
-
-var _dragPainting = false;
-var _dragPaintMode = null; // 'add' or 'remove'
-
-function toggleEditorCell(cell) {
-  var col  = cell.dataset.col;
-  var hour = cell.dataset.hour;
-  if (!editorSlots[col]) editorSlots[col] = new Set();
-  if (editorSlots[col].has(hour)) {
-    editorSlots[col].delete(hour);
-    cell.classList.remove('selected');
-  } else {
-    editorSlots[col].add(hour);
-    cell.classList.add('selected');
-  }
-}
-
-function editorCellPaint(cell) {
-  if (!_dragPainting || !cell) return;
-  var col  = cell.dataset.col;
-  var hour = cell.dataset.hour;
-  if (!col || !hour) return;
-  if (!editorSlots[col]) editorSlots[col] = new Set();
-  if (_dragPaintMode === 'add') {
-    editorSlots[col].add(hour);
-    cell.classList.add('selected');
-  } else {
-    editorSlots[col].delete(hour);
-    cell.classList.remove('selected');
-  }
-}
-
-function initEditorDrag() {
-  var wrap = document.getElementById('editor-grid-wrap');
-  if (!wrap || wrap._dragInit) return;
-  wrap._dragInit = true;
-
-  wrap.addEventListener('mousedown', function(e) {
-    var cell = e.target.closest('.avail-editor-cell');
-    if (!cell) return;
-    e.preventDefault();
-    _dragPainting = true;
-    var col  = cell.dataset.col;
-    var hour = cell.dataset.hour;
-    if (!editorSlots[col]) editorSlots[col] = new Set();
-    // Decide paint mode based on first cell state
-    _dragPaintMode = editorSlots[col].has(hour) ? 'remove' : 'add';
-    editorCellPaint(cell);
-  });
-
-  wrap.addEventListener('mousemove', function(e) {
-    if (!_dragPainting) return;
-    var cell = document.elementFromPoint(e.clientX, e.clientY);
-    if (cell && cell.classList.contains('avail-editor-cell')) editorCellPaint(cell);
-  });
-
-  // Touch support
-  wrap.addEventListener('touchstart', function(e) {
-    var cell = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-    if (!cell || !cell.classList.contains('avail-editor-cell')) return;
-    e.preventDefault();
-    _dragPainting = true;
-    var col = cell.dataset.col;
-    var hour = cell.dataset.hour;
-    if (!editorSlots[col]) editorSlots[col] = new Set();
-    _dragPaintMode = editorSlots[col].has(hour) ? 'remove' : 'add';
-    editorCellPaint(cell);
-  }, { passive: false });
-
-  wrap.addEventListener('touchmove', function(e) {
-    if (!_dragPainting) return;
-    e.preventDefault();
-    var cell = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-    if (cell && cell.classList.contains('avail-editor-cell')) editorCellPaint(cell);
-  }, { passive: false });
-}
-
-document.addEventListener('mouseup',   function(){ _dragPainting = false; });
-document.addEventListener('touchend',  function(){ _dragPainting = false; });
+function setEditorMode(mode,btn){editorMode=mode;editorWeekOffset=0;document.querySelectorAll('#editor-mode-toggle .avail-week-btn').forEach(function(b){b.classList.toggle('active',b.dataset.emode===mode);});document.getElementById('editor-override-nav').style.display=mode==='override'?'flex':'none';var uid=currentUser?currentUser.uid:'';editorSlots={};if(mode==='override'){var ex=liveData.overrideAvail[uid];if(ex&&ex.dates)Object.keys(ex.dates).forEach(function(ds){editorSlots[ds]=makeEditorBucket(ex.dates[ds]);});}else{var ew=liveData.weeklyAvail[uid];WEEK_DAYS.forEach(function(d){editorSlots[d]=makeEditorBucket(ew&&ew.slots?ew.slots[d]:null);});}renderFastAvailabilityControls();renderEditorGrid();}
+function renderFastAvailabilityControls(){var days=document.getElementById('avail-fast-days');if(!days)return;var keys=editorMode==='weekly'?WEEK_DAYS:(function(){var ws=getWeekStart(editorWeekOffset),a=[];for(var i=0;i<7;i++)a.push(dateStr(new Date(ws.getTime()+i*86400000)));return a;})();days.innerHTML=keys.map(function(k,i){return '<button type="button" class="avail-fast-day '+(i<5?'active':'')+'" data-key="'+k+'" onclick="this.classList.toggle(\'active\')">'+(editorMode==='weekly'?WEEK_LABELS[k]:formatDateHdr(new Date(k+'T12:00:00Z')).split(' ')[0])+'</button>';}).join('');var st=document.getElementById('avail-fast-start'),en=document.getElementById('avail-fast-end');var opts=HOURS.map(function(h){return '<option value="'+h+'">'+utcHourToLocal(h,(currentProfile&&currentProfile.tz)||'UTC')+'</option>';}).join('');st.innerHTML=opts;en.innerHTML=opts;st.value='18:00';en.value='22:00';}
+function applyFastAvailability(state){var keys=Array.from(document.querySelectorAll('.avail-fast-day.active')).map(function(b){return b.dataset.key;}),st=document.getElementById('avail-fast-start').value,en=document.getElementById('avail-fast-end').value,si=HOURS.indexOf(st),ei=HOURS.indexOf(en);if(!keys.length){toast('Select at least one day','err');return;}if(ei<=si){toast('End time must be later than start time','err');return;}keys.forEach(function(k){for(var i=si;i<ei;i++)setEditorState(k,HOURS[i],state);});renderEditorGrid();}
+function renderEditorGrid(){var grid=document.getElementById('editor-grid');if(!grid)return;var tz=(currentProfile&&currentProfile.tz)||'UTC',columns=[];if(editorMode==='weekly'){WEEK_DAYS.forEach(function(d){columns.push({key:d,label:WEEK_LABELS[d]});});document.getElementById('editor-week-label').textContent='REGULAR HOURS';}else{var ws=getWeekStart(editorWeekOffset);for(var di=0;di<7;di++){var dd=new Date(ws.getTime()+di*86400000),ds=dateStr(dd);columns.push({key:ds,label:formatDateHdr(dd)});}document.getElementById('editor-week-label').textContent=formatDateHdr(ws)+' – '+formatDateHdr(new Date(ws.getTime()+6*86400000));}columns.forEach(function(c){if(!editorSlots[c.key])editorSlots[c.key]=makeEditorBucket(null);});var html='<div style="display:grid;grid-template-columns:52px repeat('+columns.length+',1fr);min-width:'+(52+columns.length*80)+'px;">';html+='<div class="avail-day-hdr"></div>'+columns.map(function(c){return '<div class="avail-day-hdr">'+c.label+'<div style="margin-top:4px;display:flex;gap:3px;justify-content:center"><button class="icon-btn" title="Available all day" onclick="event.stopPropagation();setWholeEditorDay(\''+c.key+'\',\'available\')">✓</button><button class="icon-btn danger" title="Unavailable all day" onclick="event.stopPropagation();setWholeEditorDay(\''+c.key+'\',\'unavailable\')">×</button><button class="icon-btn" title="Clear day" onclick="event.stopPropagation();setWholeEditorDay(\''+c.key+'\',\'clear\')">○</button></div></div>';}).join('');HOURS.forEach(function(hour){html+='<div class="avail-time-label">'+utcHourToLocal(hour,tz)+'</div>';columns.forEach(function(c){var state=getEditorState(c.key,hour);html+='<div class="avail-editor-cell state-'+state+'" data-col="'+c.key+'" data-hour="'+hour+'" data-state="'+state+'"></div>';});});grid.innerHTML=html+'</div>';}
+function setWholeEditorDay(key,state){HOURS.forEach(function(h){setEditorState(key,h,state);});renderEditorGrid();}
+var _dragPainting=false,_dragPaintMode=null,_dragTouched=new Set();
+function toggleEditorCell(cell){var state=nextAvailabilityState(getEditorState(cell.dataset.col,cell.dataset.hour));setEditorState(cell.dataset.col,cell.dataset.hour,state);cell.className='avail-editor-cell state-'+state;cell.dataset.state=state;}
+function editorCellPaint(cell){if(!_dragPainting||!cell)return;var token=cell.dataset.col+'|'+cell.dataset.hour;if(_dragTouched.has(token))return;_dragTouched.add(token);setEditorState(cell.dataset.col,cell.dataset.hour,_dragPaintMode);cell.className='avail-editor-cell state-'+_dragPaintMode;cell.dataset.state=_dragPaintMode;}
+function initEditorDrag(){var wrap=document.getElementById('editor-grid-wrap');if(!wrap||wrap._dragInit)return;wrap._dragInit=true;wrap.addEventListener('mousedown',function(e){var cell=e.target.closest('.avail-editor-cell');if(!cell)return;e.preventDefault();_dragPainting=true;_dragTouched=new Set();_dragPaintMode=nextAvailabilityState(getEditorState(cell.dataset.col,cell.dataset.hour));editorCellPaint(cell);});wrap.addEventListener('mousemove',function(e){if(!_dragPainting)return;var c=document.elementFromPoint(e.clientX,e.clientY);if(c&&c.classList.contains('avail-editor-cell'))editorCellPaint(c);});wrap.addEventListener('touchstart',function(e){var c=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);if(!c||!c.classList.contains('avail-editor-cell'))return;e.preventDefault();_dragPainting=true;_dragTouched=new Set();_dragPaintMode=nextAvailabilityState(getEditorState(c.dataset.col,c.dataset.hour));editorCellPaint(c);},{passive:false});wrap.addEventListener('touchmove',function(e){if(!_dragPainting)return;e.preventDefault();var c=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY);if(c&&c.classList.contains('avail-editor-cell'))editorCellPaint(c);},{passive:false});}
+document.addEventListener('mouseup',function(){_dragPainting=false;_dragTouched.clear();});document.addEventListener('touchend',function(){_dragPainting=false;_dragTouched.clear();});
 
 
-function clearAvailEditor() {
-  if (!confirm('Clear all slots in the current view?')) return;
-  var grid = document.getElementById('editor-grid');
-  Object.keys(editorSlots).forEach(function(k) { editorSlots[k] = new Set(); });
-  grid.querySelectorAll('.avail-editor-cell.selected').forEach(function(c){ c.classList.remove('selected'); });
-}
-
-async function saveAvailability() {
-  var uid = currentUser ? currentUser.uid : '';
-  if (!uid) return;
-
-  if (editorMode === 'weekly') {
-    var slotsObj = {};
-    WEEK_DAYS.forEach(function(d) {
-      slotsObj[d] = editorSlots[d] ? Array.from(editorSlots[d]).sort() : [];
-    });
-    await db.collection('avail_weekly').doc(uid).set({
-      uid: uid, tz: (currentProfile && currentProfile.tz) || 'UTC',
-      slots: slotsObj, updatedAt: new Date().toISOString()
-    });
-    // Also write to user doc for profile display
-    await db.collection('users').doc(uid).set({ weeklyAvail: slotsObj }, { merge: true });
-    toast('Regular hours saved!', 'ok');
-  } else {
-    // Override: merge with existing overrides
-    var datesObj = {};
-    Object.keys(editorSlots).forEach(function(ds) {
-      if (ds.match(/\d{4}-\d{2}-\d{2}/)) {
-        datesObj[ds] = Array.from(editorSlots[ds]).sort();
-      }
-    });
-    var existOv = (liveData.overrideAvail[uid] && liveData.overrideAvail[uid].dates) || {};
-    var merged  = Object.assign({}, existOv, datesObj);
-    await db.collection('avail_override').doc(uid).set({
-      uid: uid, dates: merged, updatedAt: new Date().toISOString()
-    });
-    toast('Specific date availability saved!', 'ok');
-  }
-  closeModal('m-avail-editor');
-  dismissAvailPrompt();
-  renderAvailHeatmap();
-}
+function clearAvailEditor(){if(!confirm('Clear all slots in the current view?'))return;Object.keys(editorSlots).forEach(function(k){editorSlots[k]=makeEditorBucket(null);});renderEditorGrid();}
+async function saveAvailability(){var uid=currentUser?currentUser.uid:'';if(!uid)return;var now=new Date().toISOString();if(editorMode==='weekly'){var slotsObj={};WEEK_DAYS.forEach(function(d){var b=editorSlots[d]||makeEditorBucket(null);slotsObj[d]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};});await db.collection('avail_weekly').doc(uid).set({uid:uid,tz:(currentProfile&&currentProfile.tz)||'UTC',slots:slotsObj,updatedAt:now,confirmedAt:now,weekStatus:'confirmed'},{merge:true});await db.collection('users').doc(uid).set({weeklyAvail:slotsObj,availabilityConfirmedAt:now,availabilityWeekStatus:'confirmed'},{merge:true});toast('Regular hours saved and confirmed!','ok');}else{var datesObj={};Object.keys(editorSlots).forEach(function(ds){if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){var b=editorSlots[ds];datesObj[ds]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};}});var existing=(liveData.overrideAvail[uid]&&liveData.overrideAvail[uid].dates)||{};await db.collection('avail_override').doc(uid).set({uid:uid,dates:Object.assign({},existing,datesObj),updatedAt:now},{merge:true});toast('Specific-date availability saved!','ok');}closeModal('m-avail-editor');dismissAvailPrompt();renderAvailHeatmap();}
 
 // ── Update openMemberProfile to show weekly avail from avail_weekly ──
 // (already reads m.weeklyAvail from the user doc via the users snapshot)
@@ -7369,6 +7222,57 @@ buildTorchGrid();
 requestAnimationFrame(torchLoop);
 sparkLoop();
 rippleLoop();
+
+
+// ═══════════════════════════════════════════════════════════
+// CALENDAR COMPLETION PATCH v5
+// ═══════════════════════════════════════════════════════════
+function cvpAddMonthsUtc(date, months){var d=new Date(date);var day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+months);var last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));return d;}
+function cvpNextOccurrence(date, recurrence, index){var d=new Date(date);if(recurrence==='weekly')d.setUTCDate(d.getUTCDate()+7*index);else if(recurrence==='fortnightly')d.setUTCDate(d.getUTCDate()+14*index);else if(recurrence==='monthly')d=cvpAddMonthsUtc(d,index);return d;}
+function cvpSeriesDocs(seriesId){return (liveData.meetings||[]).filter(function(m){return m.seriesId===seriesId&&!m.seriesDetached;}).sort(function(a,b){return new Date(a.dateUtc)-new Date(b.dateUtc);});}
+function cvpGetDeptMembers(depts){var set=new Set();Object.values(liveData.members||{}).forEach(function(m){var md=m.departments||m.depts||[];if((depts||[]).some(function(d){return md.includes(d);}))set.add(m.uid);});return Array.from(set);}
+function cvpShowRecurrenceOptions(){var r=document.getElementById('mt-recurrence'),o=document.getElementById('mt-recur-options');if(o)o.classList.toggle('show',r&&r.value!=='none');}
+function cvpGenerateCalendarRevision(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);}
+function cvpMeetingExpiry(m){var end=new Date(m.dateUtc).getTime()+(m.duration||60)*60000;return end+86400000;}
+async function cvpCleanupMeetings(){if(!currentUser||!db)return;var now=Date.now(),canAdmin=currentProfile&&(currentProfile.role==='admin'||currentProfile.role==='lead');var old=(liveData.meetings||[]).filter(function(m){return m.dateUtc&&cvpMeetingExpiry(m)<now&&(canAdmin||m.ownerId===currentUser.uid||m.createdBy===currentUser.uid);});for(var i=0;i<old.length;i++){try{await db.collection('meetings').doc(old[i].id).delete();}catch(e){console.warn('Meeting cleanup skipped',old[i].id,e);}}}
+
+var _cvpOriginalResetMeetingPlanner=resetMeetingPlanner;
+resetMeetingPlanner=function(){_cvpOriginalResetMeetingPlanner();var until=document.getElementById('mt-recur-until'),count=document.getElementById('mt-recur-count'),mem=document.getElementById('mt-recur-membership');if(until)until.value='';if(count)count.value='6';if(mem)mem.value='fixed';cvpShowRecurrenceOptions();};
+
+submitMeeting=async function(){
+  var name=document.getElementById('mt-name').value.trim();if(!name){toast('Enter a meeting name','err');return;}
+  var dateStr=document.getElementById('mt-date').value,timeStr=document.getElementById('mt-time').value||'00:00';if(!dateStr){toast('Choose a meeting date','err');return;}
+  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC'),duration=parseInt(document.getElementById('mt-duration').value)||60;
+  var required=[],optional=[];Object.keys(liveData.members).forEach(function(uid){var role=getMeetingRole(uid);if(role==='required')required.push(uid);else if(role==='optional')optional.push(uid);});
+  var ownerAttending=document.getElementById('mt-owner-attending').checked;if(ownerAttending&&!required.includes(currentUser.uid)&&!optional.includes(currentUser.uid))required.push(currentUser.uid);if(!ownerAttending){required=required.filter(function(x){return x!==currentUser.uid;});optional=optional.filter(function(x){return x!==currentUser.uid;});}
+  var attendees=required.concat(optional.filter(function(x){return !required.includes(x);}));if(!attendees.length){toast('Select at least one attendee','err');return;}
+  var recurrence=document.getElementById('mt-recurrence').value,seriesId=recurrence==='none'?'':('series_'+currentUser.uid+'_'+Date.now().toString(36)),count=Math.max(2,Math.min(52,parseInt((document.getElementById('mt-recur-count')||{}).value)||6)),until=(document.getElementById('mt-recur-until')||{}).value,membership=(document.getElementById('mt-recur-membership')||{}).value||'fixed';
+  var base={name:name,notes:document.getElementById('mt-notes').value.trim(),duration:duration,requiredAttendees:required,optionalAttendees:optional,ownerAttending:ownerAttending,createdBy:currentUser.uid,ownerId:currentUser.uid,status:document.getElementById('mt-status').value,provisional:document.getElementById('mt-status').value==='provisional',recurrence:recurrence,seriesId:seriesId,seriesMembershipPolicy:membership,departments:Array.from(schedulerSelectedDepts),discordJoin:document.getElementById('mt-discord-join').checked,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),calendarRevision:cvpGenerateCalendarRevision()};
+  var dates=[new Date(dateUtc)];if(recurrence!=='none'){for(var i=1;i<count;i++){var next=cvpNextOccurrence(dateUtc,recurrence,i);if(until&&next>new Date(until+'T23:59:59Z'))break;dates.push(next);}}
+  var refs=[];for(var ix=0;ix<dates.length;ix++){var occAtt=attendees.slice();var occReq=required.slice(),occOpt=optional.slice();if(ix>0&&membership==='dynamic'&&base.departments.length){var dept=cvpGetDeptMembers(base.departments);occAtt=Array.from(new Set(dept.concat(ownerAttending?[currentUser.uid]:[])));occReq=occAtt.slice();occOpt=[];}var rsvp={};if(ownerAttending&&occAtt.includes(currentUser.uid))rsvp[currentUser.uid]='accepted';var doc=Object.assign({},base,{dateUtc:dates[ix].toISOString(),attendees:occAtt,requiredAttendees:occReq,optionalAttendees:occOpt,rsvp:rsvp,occurrenceIndex:ix,seriesStartUtc:dateUtc});var ref=await db.collection('meetings').add(doc);refs.push({id:ref.id,doc:doc});}
+  var first=refs[0];await Promise.all(first.doc.attendees.map(function(uid){return createUserNotification(uid,'meeting_invite',first.doc.provisional?'Provisional meeting proposed: '+name:(recurrence!=='none'?'Recurring meeting invitation: '+name:'Meeting invitation: '+name),formatMeetingRangeForTz(first.doc.dateUtc,duration,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC')+(recurrence!=='none'?' · '+dates.length+' occurrences':''),first.id);}));
+  closeModal('m-meeting');resetMeetingPlanner();toast(recurrence!=='none'?'Recurring meeting series created ('+dates.length+')':'Meeting scheduled!','ok');
+};
+
+var _cvpOriginalOpenEditMeeting=openEditMeeting;
+openEditMeeting=function(id){_cvpOriginalOpenEditMeeting(id);var m=(liveData.meetings||[]).find(function(x){return x.id===id;}),w=document.getElementById('edit-series-scope-wrap');if(w)w.style.display=m&&m.seriesId?'flex':'none';};
+
+async function cvpNotifyMeetingChanges(oldM,newData,meetingId,label){var oldAtt=oldM.attendees||[],newAtt=newData.attendees||oldAtt,added=newAtt.filter(function(u){return !oldAtt.includes(u);}),removed=oldAtt.filter(function(u){return !newAtt.includes(u);}),timingChanged=oldM.dateUtc!==newData.dateUtc||(oldM.duration||60)!==(newData.duration||oldM.duration||60),oldRange=formatMeetingRangeForTz(oldM.dateUtc,oldM.duration||60,(currentProfile&&currentProfile.tz)||'UTC'),newRange=formatMeetingRangeForTz(newData.dateUtc||oldM.dateUtc,newData.duration||oldM.duration||60,(currentProfile&&currentProfile.tz)||'UTC');await Promise.all(newAtt.filter(function(u){return !added.includes(u);}).map(function(uid){return createUserNotification(uid,'meeting_changed','Meeting changed: '+(newData.name||oldM.name),(timingChanged?oldRange+' → '+newRange:'Meeting details were updated.')+' Open the meeting for a refreshed Google Calendar link.',meetingId);}).concat(added.map(function(uid){return createUserNotification(uid,'meeting_added','You were added: '+(newData.name||oldM.name),newRange,meetingId);}),removed.map(function(uid){return createUserNotification(uid,'meeting_removed','You were removed: '+(newData.name||oldM.name),'You are no longer included in this meeting.',meetingId);})));}
+
+saveEditMeeting=async function(){
+  var id=document.getElementById('edit-mt-id').value,old=(liveData.meetings||[]).find(function(m){return m.id===id;});if(!old)return;var name=document.getElementById('edit-mt-name').value.trim();if(!name){toast('Meeting name required','err');return;}
+  var dateUtc=localDateTimeToUtc(document.getElementById('edit-mt-date').value,document.getElementById('edit-mt-time').value||'00:00',(currentProfile&&currentProfile.tz)||'UTC'),dur=parseInt(document.getElementById('edit-mt-duration').value)||60,notes=document.getElementById('edit-mt-notes').value.trim(),attendees=Array.from(document.querySelectorAll('#edit-attendee-checks input:checked')).map(function(c){return c.value;}),scope=(document.getElementById('edit-series-scope')||{}).value||'one',targets=[old];
+  if(old.seriesId&&scope!=='one'){var docs=cvpSeriesDocs(old.seriesId);targets=scope==='all'?docs:docs.filter(function(m){return new Date(m.dateUtc)>=new Date(old.dateUtc);});}
+  var delta=new Date(dateUtc).getTime()-new Date(old.dateUtc).getTime();for(var i=0;i<targets.length;i++){var t=targets[i],newDate=scope==='one'||t.id===old.id?dateUtc:new Date(new Date(t.dateUtc).getTime()+delta).toISOString(),newAtt=attendees;if(t.id!==old.id&&t.seriesMembershipPolicy==='dynamic'&&t.departments&&t.departments.length)newAtt=cvpGetDeptMembers(t.departments);var update={name:name,dateUtc:newDate,duration:dur,notes:notes,attendees:newAtt,requiredAttendees:newAtt,optionalAttendees:[],updatedAt:new Date().toISOString(),calendarRevision:cvpGenerateCalendarRevision()};var timingChanged=t.dateUtc!==newDate||(t.duration||60)!==dur;if(timingChanged){var r={};newAtt.forEach(function(uid){r[uid]=uid===currentUser.uid?'accepted':'pending';});update.rsvp=r;}await db.collection('meetings').doc(t.id).update(update);await cvpNotifyMeetingChanges(t,update,t.id,scope);}
+  closeModal('m-edit-meeting');toast(targets.length>1?'Meeting series updated ('+targets.length+')':'Meeting updated and attendees notified','ok');
+};
+
+cancelMeeting=async function(meetingId){var m=(liveData.meetings||[]).find(function(x){return x.id===meetingId;});if(!m)return;var allowed=m.ownerId===currentUser.uid||m.createdBy===currentUser.uid||(currentProfile&&(currentProfile.role==='admin'||currentProfile.role==='lead'));if(!allowed){toast('No permission to cancel this meeting','err');return;}var scope='one';if(m.seriesId){var ans=prompt('Cancel which meetings? Type ONE, FOLLOWING, or ALL','ONE');if(!ans)return;scope=ans.trim().toLowerCase();if(!['one','following','all'].includes(scope)){toast('Cancellation not recognised','err');return;}}else if(!confirm('Cancel this meeting? All attendees will be notified.'))return;var targets=[m];if(m.seriesId&&scope!=='one'){var docs=cvpSeriesDocs(m.seriesId);targets=scope==='all'?docs:docs.filter(function(x){return new Date(x.dateUtc)>=new Date(m.dateUtc);});}for(var i=0;i<targets.length;i++){var t=targets[i];await db.collection('meetings').doc(t.id).update({cancelled:true,cancelledBy:currentUser.uid,cancelledAt:new Date().toISOString(),updatedAt:new Date().toISOString(),calendarRevision:cvpGenerateCalendarRevision()});await Promise.all((t.attendees||[]).map(function(uid){return createUserNotification(uid,'meeting_cancelled','Meeting cancelled: '+t.name,formatMeetingRangeForTz(t.dateUtc,t.duration||60,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC'),t.id);}));}toast(targets.length>1?'Meeting series cancelled ('+targets.length+')':'Meeting cancelled','inf');};
+
+var _cvpOriginalRenderMeetings=renderMeetings;
+renderMeetings=function(){_cvpOriginalRenderMeetings();document.querySelectorAll('.meeting-card').forEach(function(card){var id=(card.querySelector('[data-mid]')||{}).dataset&&card.querySelector('[data-mid]').dataset.mid,m=(liveData.meetings||[]).find(function(x){return x.id===id;});if(m&&m.seriesId&&!card.querySelector('.series-badge')){var b=document.createElement('span');b.className='series-badge';b.textContent='↻ '+(m.recurrence||'recurring');card.insertBefore(b,card.firstChild);}});};
+
+(function cvpInitCalendarPatch(){var r=document.getElementById('mt-recurrence');if(r){r.addEventListener('change',cvpShowRecurrenceOptions);cvpShowRecurrenceOptions();}setTimeout(cvpCleanupMeetings,8000);setInterval(cvpCleanupMeetings,60*60*1000);})();
 
 })();
 </script>
