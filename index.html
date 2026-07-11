@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script>
 // Wait for Firebase to be ready before booting
 window.__fbReady = new Promise(resolve => {
@@ -1566,6 +1567,68 @@ body { font-size:15px; }
   .sched-filter-panel{grid-template-columns:1fr}.meeting-summary-sticky{position:static}.avail-grid-wrap{max-height:60vh}
 }
 
+
+
+/* ── ADMIN STORAGE MANAGEMENT ───────────────────────── */
+.storage-tabs { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+.storage-tab {
+  border:1px solid var(--border); background:rgba(8,10,18,.75); color:var(--grey);
+  border-radius:4px; padding:8px 14px; cursor:pointer; font-family:'Rajdhani',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  transition:all .16s;
+}
+.storage-tab:hover { color:var(--white); border-color:var(--border-2); }
+.storage-tab.active { color:var(--gold); border-color:var(--gold-dim); background:var(--gold-trace); }
+.storage-pane { display:none; }
+.storage-pane.active { display:block; }
+.storage-stat-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+.storage-stat {
+  background:rgba(17,19,32,.86); border:1px solid var(--border); border-radius:8px;
+  padding:15px 17px; min-width:0;
+}
+.storage-stat-label { font-size:10px; color:var(--grey); letter-spacing:1.8px; text-transform:uppercase; }
+.storage-stat-value { margin-top:5px; font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; }
+.storage-stat-sub { margin-top:5px; font-size:11px; color:var(--grey-2); }
+.storage-meter { height:10px; background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.storage-meter-fill { height:100%; width:0; background:linear-gradient(90deg,var(--green),var(--gold)); transition:width .35s ease; }
+.storage-meter-fill.warn { background:linear-gradient(90deg,var(--gold),var(--amber)); }
+.storage-meter-fill.danger { background:linear-gradient(90deg,var(--amber),var(--crimson-hi)); }
+.storage-status-pill { display:inline-flex; align-items:center; gap:6px; border:1px solid; border-radius:12px; padding:3px 9px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.storage-status-pill.safe { color:var(--green); border-color:rgba(46,204,138,.4); background:rgba(46,204,138,.08); }
+.storage-status-pill.warn { color:var(--amber); border-color:rgba(232,160,32,.4); background:rgba(232,160,32,.08); }
+.storage-status-pill.locked { color:var(--crimson-hi); border-color:rgba(200,16,46,.45); background:rgba(200,16,46,.1); }
+.storage-two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.storage-list { padding:12px 16px; }
+.storage-list-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; padding:9px 0; border-bottom:1px solid rgba(30,33,56,.45); }
+.storage-list-row:last-child { border-bottom:none; }
+.storage-bar { height:5px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:5px; }
+.storage-bar > span { display:block; height:100%; background:var(--gold); border-radius:4px; }
+.storage-settings-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.storage-note { border:1px solid var(--gold-dim); background:var(--gold-trace); border-radius:6px; padding:12px 14px; color:var(--grey); font-size:12px; line-height:1.5; }
+.storage-table-wrap { overflow:auto; border:1px solid var(--border); border-radius:7px; }
+.storage-table { width:100%; border-collapse:collapse; min-width:900px; }
+.storage-table th { position:sticky; top:0; background:var(--panel); z-index:2; text-align:left; padding:9px 10px; border-bottom:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:1.4px; color:var(--grey); text-transform:uppercase; }
+.storage-table td { padding:10px; border-bottom:1px solid rgba(30,33,56,.45); font-size:12px; vertical-align:middle; }
+.storage-table tr:last-child td { border-bottom:none; }
+.storage-table tr:hover td { background:rgba(255,255,255,.018); }
+.storage-thumb-placeholder { width:42px; height:34px; border:1px solid var(--border); border-radius:4px; display:flex; align-items:center; justify-content:center; color:var(--grey-2); background:rgba(8,10,18,.7); }
+.storage-filter-row { display:grid; grid-template-columns:minmax(180px,1fr) 180px 180px auto; gap:8px; margin-bottom:12px; }
+.storage-empty { padding:38px 20px; text-align:center; color:var(--grey-2); }
+.storage-drive-row { display:grid; grid-template-columns:180px minmax(0,1fr); gap:10px; align-items:center; }
+.storage-safety-rule { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(30,33,56,.45); }
+.storage-safety-rule:last-child { border-bottom:none; }
+.ni-icon svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
+@media (max-width:1000px) {
+  .storage-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .storage-settings-grid { grid-template-columns:1fr 1fr; }
+  .storage-two-col { grid-template-columns:1fr; }
+  .storage-filter-row { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:650px) {
+  .storage-stat-grid,.storage-settings-grid,.storage-filter-row { grid-template-columns:1fr; }
+  .storage-drive-row { grid-template-columns:1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -1757,6 +1820,7 @@ body { font-size:15px; }
     </div>
     <div class="sidebar-divider"></div>
     <div class="nav-item hidden" id="nav-admin" data-view="admin" onclick="nav(this)"><span class="ni-icon">★</span> Admin</div>
+    <div class="nav-item hidden" id="nav-storage" data-view="storage" onclick="nav(this)"><span class="ni-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path></svg></span> Storage</div>
     <div class="nav-item" data-view="profile" onclick="nav(this)"><span class="ni-icon">◑</span> My Profile</div>
     <!-- SIDEBAR AUDIO PLAYER -->
     <div id="sbPlayer" class="sb-player collapsed">
@@ -2194,6 +2258,114 @@ body { font-size:15px; }
           <div id="admin-depts-list" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
       </div>
+    </div>
+
+    <!-- ── STORAGE MANAGEMENT (ADMIN ONLY) ── -->
+    <div class="view" id="view-storage">
+      <div class="page-hdr">
+        <div class="page-hdr-left">
+          <div class="ph-title">STORAGE MANAGEMENT</div>
+          <div class="ph-sub">Private task-image monitoring · safety limits · expiry management</div>
+        </div>
+        <div class="ph-actions">
+          <span id="storage-upload-status" class="storage-status-pill safe">Uploads enabled</span>
+          <button class="btn btn-ghost btn-sm" onclick="renderStorageManagement()">Refresh</button>
+        </div>
+      </div>
+
+      <div class="storage-tabs">
+        <button class="storage-tab active" data-storage-tab="overview" onclick="switchStorageTab('overview',this)">Overview</button>
+        <button class="storage-tab" data-storage-tab="settings" onclick="switchStorageTab('settings',this)">Settings</button>
+        <button class="storage-tab" data-storage-tab="images" onclick="switchStorageTab('images',this)">Image Manager</button>
+      </div>
+
+      <section class="storage-pane active" id="storage-pane-overview">
+        <div class="storage-stat-grid">
+          <div class="storage-stat"><div class="storage-stat-label">Tracked storage</div><div class="storage-stat-value" id="storage-used-value">0 B</div><div class="storage-stat-sub" id="storage-used-sub">0% of 5 GB free allowance</div></div>
+          <div class="storage-stat"><div class="storage-stat-label">Active images</div><div class="storage-stat-value" id="storage-image-count">0</div><div class="storage-stat-sub" id="storage-expiring-count">0 expiring soon</div></div>
+          <div class="storage-stat"><div class="storage-stat-label">Uploads this month</div><div class="storage-stat-value" id="storage-month-uploads">0</div><div class="storage-stat-sub">Tracked through Mission Hub metadata</div></div>
+          <div class="storage-stat"><div class="storage-stat-label">Downloads this month</div><div class="storage-stat-value" id="storage-month-downloads">0</div><div class="storage-stat-sub" id="storage-bandwidth-est">0 B estimated transfer</div></div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-hdr"><span class="panel-title">Storage Safety Meter</span><span id="storage-meter-label" class="text-mono text-small text-grey">0 B / 4 GB hub lock</span></div>
+          <div style="padding:16px 18px;">
+            <div class="storage-meter"><div class="storage-meter-fill" id="storage-meter-fill"></div></div>
+            <div style="display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:10px;color:var(--grey-2);"><span>Warning <strong id="storage-warning-marker">3 GB</strong></span><span>Member restriction <strong id="storage-restrict-marker">3.75 GB</strong></span><span>Hard lock <strong id="storage-lock-marker">4 GB</strong></span></div>
+          </div>
+        </div>
+
+        <div class="storage-two-col">
+          <div class="panel">
+            <div class="panel-hdr"><span class="panel-title">Usage by Department</span></div>
+            <div class="storage-list" id="storage-dept-breakdown"><div class="storage-empty">No uploaded images yet.</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-hdr"><span class="panel-title">Needs Attention</span></div>
+            <div class="storage-list" id="storage-attention-list"><div class="storage-empty">Nothing currently needs attention.</div></div>
+          </div>
+        </div>
+
+        <div class="storage-note" style="margin-top:16px;">
+          <strong style="color:var(--gold);">Tracked usage:</strong> this page totals files registered by the Mission Hub. Google Cloud Billing and Storage Usage remain the authoritative figures and may update more slowly. The Hub will retain a safety buffer below the 5 GB free allowance.
+        </div>
+      </section>
+
+      <section class="storage-pane" id="storage-pane-settings">
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">Safety & Retention Settings</span></div>
+          <div style="padding:18px;">
+            <div class="storage-settings-grid">
+              <div class="field"><span class="field-label">Maximum image size (MB)</span><input class="inp" type="number" min="0.5" max="3.5" step="0.1" id="storage-set-max-file"></div>
+              <div class="field"><span class="field-label">Retention period (days)</span><input class="inp" type="number" min="1" max="365" id="storage-set-retention" readonly title="Controlled by the Google Cloud lifecycle rule"></div>
+              <div class="field"><span class="field-label">Free allowance reference (GB)</span><input class="inp" type="number" min="1" max="100" step="0.1" id="storage-set-free-gb"></div>
+              <div class="field"><span class="field-label">Warning threshold (GB)</span><input class="inp" type="number" min="0.1" step="0.05" id="storage-set-warning"></div>
+              <div class="field"><span class="field-label">Member restriction (GB)</span><input class="inp" type="number" min="0.1" step="0.05" id="storage-set-restrict"></div>
+              <div class="field"><span class="field-label">Absolute upload lock (GB)</span><input class="inp" type="number" min="0.1" step="0.05" id="storage-set-lock"></div>
+              <div class="field"><span class="field-label">Progress images per task</span><input class="inp" type="number" min="1" max="20" id="storage-set-progress-limit"></div>
+              <div class="field"><span class="field-label">Feedback images per task</span><input class="inp" type="number" min="1" max="20" id="storage-set-feedback-limit"></div>
+              <div class="field"><span class="field-label">Expiry reminders (days remaining)</span><input class="inp" id="storage-set-reminders" placeholder="14, 7, 3, 1"></div>
+            </div>
+            <div class="storage-note" style="margin-top:16px;">
+              Firebase currently enforces a <strong>3.5 MB server-side maximum</strong> and the Cloud Storage lifecycle rule deletes files under <code>task-uploads/</code> after <strong>45 days</strong>. Do not raise the Hub settings above the deployed Firebase rules without updating those rules too.
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:16px;"><button class="btn btn-gold" id="storage-save-settings-btn" onclick="saveStorageSettings()">Save Storage Settings</button></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <div class="panel-hdr"><span class="panel-title">Department Google Drive Folders</span></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:10px;" id="storage-drive-links"></div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <div class="panel-hdr"><span class="panel-title">Infrastructure Safeguards</span></div>
+          <div style="padding:12px 18px;">
+            <div class="storage-safety-rule"><span>Storage access</span><strong class="text-gold">Authenticated members only</strong></div>
+            <div class="storage-safety-rule"><span>Allowed file types</span><strong class="text-gold">JPEG · PNG · WebP</strong></div>
+            <div class="storage-safety-rule"><span>Lifecycle path</span><strong class="text-gold text-mono">task-uploads/</strong></div>
+            <div class="storage-safety-rule"><span>Soft-delete recovery</span><strong class="text-gold">7 days</strong></div>
+            <div class="storage-safety-rule"><span>Object versioning</span><strong class="text-gold">Off</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="storage-pane" id="storage-pane-images">
+        <div class="storage-filter-row">
+          <input class="inp" id="storage-image-search" placeholder="Search task, file or uploader…" oninput="renderStorageImageManager()">
+          <select class="inp" id="storage-image-dept" onchange="renderStorageImageManager()"><option value="">All departments</option></select>
+          <select class="inp" id="storage-image-status" onchange="renderStorageImageManager()"><option value="">All files</option><option value="expiring">Expiring within 14 days</option><option value="unarchived">Not archived externally</option><option value="archived">Archived externally</option><option value="largest">Largest first</option></select>
+          <button class="btn btn-ghost btn-sm" onclick="clearStorageImageFilters()">Clear</button>
+        </div>
+        <div class="storage-table-wrap">
+          <table class="storage-table">
+            <thead><tr><th>File</th><th>Task</th><th>Department</th><th>Uploaded by</th><th>Size</th><th>Expires</th><th>Archive status</th><th>Actions</th></tr></thead>
+            <tbody id="storage-image-table"><tr><td colspan="8"><div class="storage-empty">No uploaded images yet.</div></td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
 
   </main>
 </div>
@@ -2685,9 +2857,9 @@ STATUS_CLASS.away='s-working'; STATUS_LABEL.away='Away';
 
 
 // ─── STATE ────────────────────────────────────────────────
-let db, auth, currentUser, currentProfile;
+let db, auth, storage, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[] };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[], storageUploads:[], storageSettings:{} };
 let crewSearch = '';
 let dragTask = null;
 
@@ -2723,6 +2895,7 @@ function initFirebase(cfg) {
     if (!firebase.apps.length) firebase.initializeApp(cfg);
     db   = firebase.firestore();
     auth = firebase.auth();
+    storage = firebase.storage();
     auth.onAuthStateChanged(onAuthChange);
   } catch(e) {
     console.error(e);
@@ -2920,7 +3093,10 @@ async function showApp() {
   loadConfig();
   populateDeptChecks();
   startClock();
-  if (currentProfile.role === 'admin') document.getElementById('nav-admin').classList.remove('hidden');
+  if (normaliseRole(currentProfile.role) === 'admin') {
+    document.getElementById('nav-admin').classList.remove('hidden');
+    document.getElementById('nav-storage').classList.remove('hidden');
+  }
 }
 
 function updateHeaderUI() {
@@ -3022,8 +3198,175 @@ function startListeners() {
     });
   });
 
-  listeners = [u1,u2,u3,u4,u5,u6,u7];
+  var storageListeners = [];
+  if (isAdmin()) {
+    var uStorageFiles = db.collection('task_uploads').onSnapshot(function(snap) {
+      liveData.storageUploads = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      var storageView = document.getElementById('view-storage');
+      if (storageView && storageView.classList.contains('active')) renderStorageManagement();
+    }, function(err) { console.warn('Storage metadata listener:', err); });
+    var uStorageSettings = db.collection('config').doc('storage_settings').onSnapshot(function(doc) {
+      liveData.storageSettings = doc.exists ? doc.data() : {};
+      var storageView = document.getElementById('view-storage');
+      if (storageView && storageView.classList.contains('active')) renderStorageManagement();
+    }, function(err) { console.warn('Storage settings listener:', err); });
+    storageListeners.push(uStorageFiles, uStorageSettings);
+  }
+
+  listeners = [u1,u2,u3,u4,u5,u6,u7,uNotif].concat(storageListeners);
 }
+
+
+// ─── ADMIN STORAGE MANAGEMENT ─────────────────────────────
+const DEFAULT_STORAGE_SETTINGS = {
+  maxFileMb: 3.5,
+  retentionDays: 45,
+  freeAllowanceGb: 5,
+  warningGb: 3,
+  restrictGb: 3.75,
+  lockGb: 4,
+  progressLimit: 3,
+  feedbackLimit: 3,
+  reminderDays: [14,7,3,1],
+  departmentDriveLinks: {}
+};
+let activeStorageTab = 'overview';
+
+function getStorageSettings() {
+  return Object.assign({}, DEFAULT_STORAGE_SETTINGS, liveData.storageSettings || {}, {
+    departmentDriveLinks: Object.assign({}, DEFAULT_STORAGE_SETTINGS.departmentDriveLinks, (liveData.storageSettings||{}).departmentDriveLinks||{})
+  });
+}
+function storageGbBytes(gb) { return Number(gb||0) * 1024 * 1024 * 1024; }
+function formatBytes(bytes) {
+  bytes = Number(bytes||0);
+  if (!isFinite(bytes) || bytes <= 0) return '0 B';
+  var units=['B','KB','MB','GB','TB'], i=Math.min(Math.floor(Math.log(bytes)/Math.log(1024)),units.length-1);
+  var val=bytes/Math.pow(1024,i);
+  return (val >= 100 || i===0 ? val.toFixed(0) : val >= 10 ? val.toFixed(1) : val.toFixed(2))+' '+units[i];
+}
+function uploadDateMs(u) {
+  var v=u.uploadedAt||u.createdAt||u.uploadDate;
+  if (v && typeof v.toDate==='function') return v.toDate().getTime();
+  var ms=new Date(v||0).getTime(); return isFinite(ms)?ms:0;
+}
+function expiryDateMs(u, settings) {
+  var v=u.expiresAt||u.expiryDate;
+  if (v && typeof v.toDate==='function') return v.toDate().getTime();
+  var ms=new Date(v||0).getTime();
+  if (isFinite(ms) && ms>0) return ms;
+  var created=uploadDateMs(u); return created ? created + Number(settings.retentionDays||45)*86400000 : 0;
+}
+function storageStatus(total, settings) {
+  if(total >= storageGbBytes(settings.lockGb)) return {key:'locked',label:'Uploads locked'};
+  if(total >= storageGbBytes(settings.restrictGb)) return {key:'locked',label:'Members restricted'};
+  if(total >= storageGbBytes(settings.warningGb)) return {key:'warn',label:'Storage warning'};
+  return {key:'safe',label:'Uploads enabled'};
+}
+function switchStorageTab(tab, btn) {
+  if (!isAdmin()) return;
+  activeStorageTab=tab;
+  document.querySelectorAll('.storage-pane').forEach(function(p){p.classList.toggle('active',p.id==='storage-pane-'+tab);});
+  document.querySelectorAll('.storage-tab').forEach(function(b){b.classList.toggle('active',b.dataset.storageTab===tab);});
+  if(tab==='images') renderStorageImageManager();
+  if(tab==='settings') renderStorageSettings();
+}
+function renderStorageManagement() {
+  if (!isAdmin()) { toast('Admin access required','err'); return; }
+  renderStorageOverview();
+  renderStorageSettings();
+  renderStorageImageManager();
+  switchStorageTab(activeStorageTab, document.querySelector('[data-storage-tab="'+activeStorageTab+'"]'));
+}
+function renderStorageOverview() {
+  var settings=getStorageSettings(), uploads=(liveData.storageUploads||[]).filter(function(u){return u.deleted!==true;});
+  var total=uploads.reduce(function(n,u){return n+Number(u.sizeBytes||u.fileSize||0);},0);
+  var free=storageGbBytes(settings.freeAllowanceGb), lock=storageGbBytes(settings.lockGb);
+  var now=Date.now(), monthStart=new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+  var monthUploads=uploads.filter(function(u){return uploadDateMs(u)>=monthStart.getTime();}).length;
+  var monthDownloads=uploads.reduce(function(n,u){
+    if(u.downloadsByMonth && typeof u.downloadsByMonth==='object') {
+      var key=new Date().toISOString().slice(0,7); return n+Number(u.downloadsByMonth[key]||0);
+    }
+    return n+Number(u.downloadCountThisMonth||0);
+  },0);
+  var bandwidth=uploads.reduce(function(n,u){var key=new Date().toISOString().slice(0,7);return n+Number((u.downloadBytesByMonth&&u.downloadBytesByMonth[key])||u.downloadBytesThisMonth||0);},0);
+  var expiring=uploads.filter(function(u){var d=expiryDateMs(u,settings);return d>now&&d-now<=14*86400000;}).length;
+  var pctFree=free?Math.min(999,total/free*100):0, pctLock=lock?Math.min(100,total/lock*100):0;
+  var stat=storageStatus(total,settings);
+  function txt(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+  txt('storage-used-value',formatBytes(total)); txt('storage-used-sub',pctFree.toFixed(2)+'% of '+settings.freeAllowanceGb+' GB free allowance');
+  txt('storage-image-count',String(uploads.length)); txt('storage-expiring-count',expiring+' expiring within 14 days');
+  txt('storage-month-uploads',String(monthUploads)); txt('storage-month-downloads',String(monthDownloads)); txt('storage-bandwidth-est',formatBytes(bandwidth)+' estimated transfer');
+  txt('storage-meter-label',formatBytes(total)+' / '+settings.lockGb+' GB hub lock');
+  txt('storage-warning-marker',settings.warningGb+' GB'); txt('storage-restrict-marker',settings.restrictGb+' GB'); txt('storage-lock-marker',settings.lockGb+' GB');
+  var fill=document.getElementById('storage-meter-fill'); if(fill){fill.style.width=pctLock+'%';fill.className='storage-meter-fill '+(stat.key==='locked'?'danger':stat.key==='warn'?'warn':'');}
+  var pill=document.getElementById('storage-upload-status'); if(pill){pill.textContent=stat.label;pill.className='storage-status-pill '+stat.key;}
+  renderStorageDeptBreakdown(uploads,total);
+  renderStorageAttention(uploads,settings);
+}
+function renderStorageDeptBreakdown(uploads,total) {
+  var el=document.getElementById('storage-dept-breakdown'); if(!el)return;
+  var groups={}; uploads.forEach(function(u){var d=u.department||'unassigned';groups[d]=(groups[d]||0)+Number(u.sizeBytes||u.fileSize||0);});
+  var rows=Object.keys(groups).sort(function(a,b){return groups[b]-groups[a];});
+  if(!rows.length){el.innerHTML='<div class="storage-empty">No uploaded images yet.</div>';return;}
+  el.innerHTML=rows.map(function(d){var dept=getDeptList().find(function(x){return x.id===d;});var pct=total?groups[d]/total*100:0;return '<div class="storage-list-row"><div><div style="font-weight:700;">'+esc(dept?dept.label:d)+'</div><div class="storage-bar"><span style="width:'+pct.toFixed(1)+'%"></span></div></div><div class="text-mono text-small text-gold">'+formatBytes(groups[d])+'</div></div>';}).join('');
+}
+function renderStorageAttention(uploads,settings) {
+  var el=document.getElementById('storage-attention-list'); if(!el)return;
+  var now=Date.now(), items=[];
+  uploads.forEach(function(u){var d=expiryDateMs(u,settings), days=d?Math.ceil((d-now)/86400000):null;if(days!==null&&days<=14)items.push({u:u,days:days});});
+  items.sort(function(a,b){return a.days-b.days;});
+  if(!items.length){el.innerHTML='<div class="storage-empty">Nothing currently needs attention.</div>';return;}
+  el.innerHTML=items.slice(0,8).map(function(x){var title=x.u.taskTitle||x.u.fileName||'Task upload';var msg=x.days<0?'Expired':x.days===0?'Expires today':'Expires in '+x.days+' days';return '<div class="storage-list-row"><div><div style="font-weight:700;">'+esc(title)+'</div><div style="font-size:10px;color:var(--grey-2);">'+esc(x.u.department||'Unassigned')+' · '+(x.u.archivedExternally?'Archived externally':'Needs archive review')+'</div></div><div class="text-small '+(x.days<=3?'text-red':'text-gold')+'">'+msg+'</div></div>';}).join('');
+}
+function renderStorageSettings() {
+  var s=getStorageSettings();
+  var map={
+    'storage-set-max-file':s.maxFileMb,'storage-set-retention':s.retentionDays,'storage-set-free-gb':s.freeAllowanceGb,
+    'storage-set-warning':s.warningGb,'storage-set-restrict':s.restrictGb,'storage-set-lock':s.lockGb,
+    'storage-set-progress-limit':s.progressLimit,'storage-set-feedback-limit':s.feedbackLimit,
+    'storage-set-reminders':(s.reminderDays||[]).join(', ')
+  };
+  Object.keys(map).forEach(function(id){var el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=map[id];});
+  var wrap=document.getElementById('storage-drive-links'); if(!wrap)return;
+  wrap.innerHTML=getDeptList().map(function(d){var c=DEPT_COLORS[d.id]||d.color||'#888';return '<div class="storage-drive-row"><div><span class="dept-tag" style="color:'+c+';border-color:'+c+'">'+esc(d.label)+'</span></div><input class="inp storage-drive-input" data-dept="'+esc(d.id)+'" value="'+escAttr((s.departmentDriveLinks||{})[d.id]||'')+'" placeholder="Google Drive folder URL"></div>';}).join('');
+  var sel=document.getElementById('storage-image-dept'); if(sel){var old=sel.value;sel.innerHTML='<option value="">All departments</option>'+getDeptList().map(function(d){return '<option value="'+escAttr(d.id)+'">'+esc(d.label)+'</option>';}).join('');sel.value=old;}
+}
+async function saveStorageSettings() {
+  if(!isAdmin()){toast('Admin access required','err');return;}
+  var btn=document.getElementById('storage-save-settings-btn'); if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  try {
+    var maxFile=Number(document.getElementById('storage-set-max-file').value), retention=45, free=Number(document.getElementById('storage-set-free-gb').value), warning=Number(document.getElementById('storage-set-warning').value), restrict=Number(document.getElementById('storage-set-restrict').value), lock=Number(document.getElementById('storage-set-lock').value);
+    if(!isFinite(maxFile)||maxFile<=0||maxFile>3.5) throw new Error('Maximum image size must be between 0 and 3.5 MB to match Firebase rules.');
+    if(!isFinite(retention)||retention<1) throw new Error('Retention must be at least one day.');
+    if(!(warning<restrict&&restrict<lock&&lock<free)) throw new Error('Thresholds must increase in order: warning < restriction < lock < free allowance.');
+    var reminders=String(document.getElementById('storage-set-reminders').value||'').split(',').map(function(v){return Number(v.trim());}).filter(function(v){return isFinite(v)&&v>0;}).sort(function(a,b){return b-a;});
+    var drives={}; document.querySelectorAll('.storage-drive-input').forEach(function(inp){if(inp.value.trim())drives[inp.dataset.dept]=inp.value.trim();});
+    var data={maxFileMb:maxFile,retentionDays:retention,freeAllowanceGb:free,warningGb:warning,restrictGb:restrict,lockGb:lock,progressLimit:Number(document.getElementById('storage-set-progress-limit').value)||3,feedbackLimit:Number(document.getElementById('storage-set-feedback-limit').value)||3,reminderDays:reminders,departmentDriveLinks:drives,updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};
+    await db.collection('config').doc('storage_settings').set(data,{merge:true}); liveData.storageSettings=Object.assign({},liveData.storageSettings,data); toast('Storage settings saved','ok'); renderStorageManagement();
+  } catch(e) { toast(e.message||'Could not save storage settings','err'); }
+  finally {if(btn){btn.disabled=false;btn.textContent='Save Storage Settings';}}
+}
+function clearStorageImageFilters(){var a=document.getElementById('storage-image-search'),b=document.getElementById('storage-image-dept'),c=document.getElementById('storage-image-status');if(a)a.value='';if(b)b.value='';if(c)c.value='';renderStorageImageManager();}
+function renderStorageImageManager() {
+  var body=document.getElementById('storage-image-table'); if(!body)return;
+  var settings=getStorageSettings(), now=Date.now(), q=(document.getElementById('storage-image-search')?.value||'').toLowerCase().trim(), dept=document.getElementById('storage-image-dept')?.value||'', status=document.getElementById('storage-image-status')?.value||'';
+  var rows=(liveData.storageUploads||[]).filter(function(u){return u.deleted!==true;});
+  rows=rows.filter(function(u){if(dept&&u.department!==dept)return false;var hay=[u.fileName,u.taskTitle,u.uploaderName,u.department].join(' ').toLowerCase();if(q&&!hay.includes(q))return false;var exp=expiryDateMs(u,settings);if(status==='expiring'&&!(exp>now&&exp-now<=14*86400000))return false;if(status==='unarchived'&&u.archivedExternally)return false;if(status==='archived'&&!u.archivedExternally)return false;return true;});
+  if(status==='largest')rows.sort(function(a,b){return Number(b.sizeBytes||0)-Number(a.sizeBytes||0);});else rows.sort(function(a,b){return uploadDateMs(b)-uploadDateMs(a);});
+  if(!rows.length){body.innerHTML='<tr><td colspan="8"><div class="storage-empty">No images match these filters.</div></td></tr>';return;}
+  body.innerHTML=rows.map(function(u){var exp=expiryDateMs(u,settings),days=exp?Math.ceil((exp-now)/86400000):null,deptObj=getDeptList().find(function(d){return d.id===u.department;});return '<tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="storage-thumb-placeholder">◇</div><div><div style="font-weight:700;">'+esc(u.fileName||'Image')+'</div><div style="font-size:10px;color:var(--grey-2);">'+esc(u.uploadType||u.type||'upload')+'</div></div></div></td><td>'+esc(u.taskTitle||u.taskId||'—')+'</td><td>'+(deptObj?esc(deptObj.label):esc(u.department||'—'))+'</td><td>'+esc(u.uploaderName||u.uploaderUid||'—')+'</td><td class="text-mono">'+formatBytes(u.sizeBytes||u.fileSize||0)+'</td><td class="'+(days!==null&&days<=3?'text-red':days!==null&&days<=14?'text-gold':'')+'">'+(days===null?'—':days<0?'Expired':days===0?'Today':days+' days')+'</td><td>'+(u.archivedExternally?'<span class="text-gold">Archived</span>':'<span class="text-grey">Not confirmed</span>')+'</td><td><div style="display:flex;gap:5px;flex-wrap:wrap;"><button class="btn btn-ghost btn-xs" onclick="downloadStorageUpload(\''+escJs(u.id)+'\')">Download</button><button class="btn btn-ghost btn-xs" onclick="toggleStorageArchived(\''+escJs(u.id)+'\','+(!u.archivedExternally)+')">'+(u.archivedExternally?'Unmark':'Mark archived')+'</button><button class="btn btn-danger btn-xs" onclick="deleteStorageUpload(\''+escJs(u.id)+'\')">Delete</button></div></td></tr>';}).join('');
+}
+async function downloadStorageUpload(id) {
+  if(!isAdmin())return;var u=(liveData.storageUploads||[]).find(function(x){return x.id===id;});if(!u||!u.storagePath){toast('Storage path is missing','err');return;}
+  try {var token=await currentUser.getIdToken();var cfg=getStoredConfig()||{};var bucket=cfg.storageBucket||'cosmic-vessel-project.firebasestorage.app';var url='https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(bucket)+'/o/'+encodeURIComponent(u.storagePath)+'?alt=media';var res=await fetch(url,{headers:{Authorization:'Bearer '+token}});if(!res.ok)throw new Error('Download failed ('+res.status+')');var blob=await res.blob();var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=u.fileName||'task-image';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);var monthKey=new Date().toISOString().slice(0,7);var updates={downloadCount:firebase.firestore.FieldValue.increment(1),downloadBytesTotal:firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0)),lastDownloadedAt:new Date().toISOString()};updates['downloadsByMonth.'+monthKey]=firebase.firestore.FieldValue.increment(1);updates['downloadBytesByMonth.'+monthKey]=firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0));await db.collection('task_uploads').doc(id).update(updates);}
+  catch(e){toast(e.message||'Could not download image','err');}
+}
+async function toggleStorageArchived(id,value){if(!isAdmin())return;try{await db.collection('task_uploads').doc(id).set({archivedExternally:!!value,archivedAt:value?new Date().toISOString():null,archivedBy:value?currentUser.uid:null},{merge:true});toast(value?'Marked as archived externally':'Archive mark removed','ok');}catch(e){toast('Could not update archive status','err');}}
+async function deleteStorageUpload(id){if(!isAdmin())return;var u=(liveData.storageUploads||[]).find(function(x){return x.id===id;});if(!u)return;if(!confirm('Delete this image from temporary Hub storage? It may remain recoverable through the 7-day soft-delete window.'))return;try{if(u.storagePath&&storage)await storage.ref(u.storagePath).delete();await db.collection('task_uploads').doc(id).delete();toast('Image deleted','ok');}catch(e){toast(e.message||'Could not delete image','err');}}
+function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escJs(v){return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,' ');}
 
 // ─── CONFIG ───────────────────────────────────────────────
 async function loadConfig() {
@@ -3198,6 +3541,7 @@ function _renderView(view) {
   if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
   if (view === 'profile')    renderProfile();
   if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); }
+  if (view === 'storage')    { renderStorageManagement(); }
   if (view === 'my-tasks')   renderMyTasks();
   if (view === 'crew')       renderCrew();
   if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
