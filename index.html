@@ -168,7 +168,9 @@ html, body {
 }
 .u-role.admin { background:rgba(201,168,76,.15); color:var(--gold); border:1px solid var(--gold-dim); }
 .u-role.lead  { background:rgba(200,16,46,.15);  color:var(--crimson-hi); border:1px solid rgba(200,16,46,.3); }
-.u-role.crew  { background:rgba(74,79,104,.15);  color:var(--grey); border:1px solid var(--border); }
+.u-role.crew,.u-role.member { background:rgba(74,79,104,.15); color:var(--grey); border:1px solid var(--border); }
+.u-role.director { background:rgba(155,108,240,.15); color:var(--purple); border:1px solid rgba(155,108,240,.35); }
+.u-role.project_manager { background:rgba(74,144,217,.15); color:var(--blue); border:1px solid rgba(74,144,217,.35); }
 
 /* status dot */
 .status-dot {
@@ -1700,7 +1702,7 @@ body { font-size:15px; }
           <div class="status-dot s-online" id="hdr-status-dot"></div>
           <div class="u-avatar" id="hdr-avatar">?</div>
           <div class="u-name" id="hdr-name">...</div>
-          <div class="u-role crew" id="hdr-role">CREW</div>
+          <div class="u-role member" id="hdr-role">MEMBER</div>
         </div>
         <div class="status-menu" id="status-menu">
           <div class="sm-item" onclick="setStatus('online')"><div class="status-dot s-online"></div> Online</div>
@@ -2443,7 +2445,7 @@ body { font-size:15px; }
       <div class="field"><span class="field-label">Email</span><input class="inp" id="am-email" type="email" placeholder="member@email.com"></div>
       <div class="field"><span class="field-label">Temporary Password</span><input class="inp" id="am-pass" type="password" placeholder="Min 6 characters — share with them"></div>
       <div class="field"><span class="field-label">Role</span>
-        <select class="inp" id="am-role"><option value="crew">Member</option><option value="lead">Department Lead</option><option value="admin">Admin</option></select>
+        <select class="inp" id="am-role"><option value="member">Member</option><option value="lead">Lead</option><option value="director">Director</option><option value="project_manager">Project Manager</option><option value="admin">Admin</option></select>
       </div>
       <div class="field"><span class="field-label">Departments</span>
         <div style="display:flex;flex-wrap:wrap;gap:6px;" id="am-dept-checks"></div>
@@ -2564,8 +2566,10 @@ body { font-size:15px; }
       <div class="grid-2">
         <div class="field"><span class="field-label">Role</span>
           <select class="inp" id="em-role">
-            <option value="crew">Member</option>
+            <option value="member">Member</option>
             <option value="lead">Lead</option>
+            <option value="director">Director</option>
+            <option value="project_manager">Project Manager</option>
             <option value="admin">Admin</option>
           </select>
         </div>
@@ -2651,6 +2655,35 @@ const DEPT_COLORS = {
 const STATUS_CLASS = { online:'s-online', working:'s-working', gaming:'s-gaming', offline:'s-offline' };
 const STATUS_LABEL = { online:'Online', working:'Working', gaming:'Gaming', offline:'Offline' };
 
+const ROLE_LABELS = { admin:'Admin', project_manager:'Project Manager', director:'Director', lead:'Lead', member:'Member' };
+function normaliseRole(role) { return role === 'crew' || !role ? 'member' : role; }
+function roleLabel(role) { role = normaliseRole(role); return ROLE_LABELS[role] || role.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}); }
+function roleRank(role) { return ({member:1,lead:2,director:2,project_manager:3,admin:4})[normaliseRole(role)] || 1; }
+function isAdmin() { return !!(currentProfile && normaliseRole(currentProfile.role)==='admin'); }
+function isProjectManager() { return !!(currentProfile && normaliseRole(currentProfile.role)==='project_manager'); }
+function isDeptManagerRole() { var r=normaliseRole(currentProfile&&currentProfile.role); return r==='lead'||r==='director'; }
+function managedDepartments(profile) { profile=profile||currentProfile||{}; return normaliseDepts(profile.managedDepts||profile.leadDepts||profile.depts||[]); }
+function canManageDepartment(dept) { return isAdmin() || isProjectManager() || (isDeptManagerRole() && managedDepartments().includes(dept)); }
+function canManageAnyMeeting() { return isAdmin() || isProjectManager(); }
+function canManageMeetingRecord(m) { if(!m||!currentProfile)return false; if(isAdmin()||isProjectManager()||m.ownerId===currentUser.uid||m.createdBy===currentUser.uid)return true; var ds=m.departments||[]; return isDeptManagerRole() && ds.length && ds.every(function(d){return managedDepartments().includes(d);}); }
+function getPresenceState(member) {
+  if (!member || !member.lastSeen) return 'offline';
+  var age=Date.now()-new Date(member.lastSeen).getTime();
+  if (!isFinite(age) || age > 15*60*1000) return 'offline';
+  if (age > 5*60*1000) return 'away';
+  return 'online';
+}
+function formatLastActive(member) {
+  if(!member||!member.lastSeen)return 'Never active';
+  var ms=Date.now()-new Date(member.lastSeen).getTime();
+  if(ms<60000)return 'Active now';
+  if(ms<3600000)return 'Last active '+Math.floor(ms/60000)+'m ago';
+  if(ms<86400000)return 'Last active '+Math.floor(ms/3600000)+'h ago';
+  return 'Last active '+new Date(member.lastSeen).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+STATUS_CLASS.away='s-working'; STATUS_LABEL.away='Away';
+
+
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, currentUser, currentProfile;
 let listeners = [];
@@ -2723,7 +2756,7 @@ async function onAuthChange(user) {
       currentProfile = {
         uid: user.uid, email: user.email,
         name: user.displayName || user.email.split('@')[0],
-        role: 'crew', depts: [], tz: 'Europe/London',
+        role: 'member', depts: [], tz: 'Europe/London',
         status: 'online', createdAt: new Date().toISOString()
       };
       await db.collection('users').doc(user.uid).set(currentProfile);
@@ -2809,7 +2842,7 @@ async function doRegister() {
     var regTz = document.getElementById('reg-tz') ? document.getElementById('reg-tz').value : 'UTC';
     const profile = {
       uid: cred.user.uid, email: email, name: name,
-      role: 'crew', depts: regDepts, tz: regTz,
+      role: 'member', depts: regDepts, tz: regTz,
       status: 'offline', createdAt: new Date().toISOString()
     };
     await db.collection('users').doc(cred.user.uid).set(profile);
@@ -2894,8 +2927,8 @@ function updateHeaderUI() {
   document.getElementById('hdr-avatar').textContent = initials(currentProfile.name);
   document.getElementById('hdr-name').textContent   = currentProfile.name;
   const roleEl = document.getElementById('hdr-role');
-  roleEl.textContent = currentProfile.role.toUpperCase();
-  roleEl.className = 'u-role ' + currentProfile.role;
+  roleEl.textContent = roleLabel(currentProfile.role).toUpperCase();
+  roleEl.className = 'u-role ' + normaliseRole(currentProfile.role);
   updateStatusDot(currentProfile.status || 'online');
 }
 
@@ -2906,7 +2939,7 @@ function startListeners() {
     liveData.members = {};
     snap.forEach(d => { liveData.members[d.id] = { uid:d.id, ...d.data() }; });
     document.getElementById('nb-crew').textContent = Object.keys(liveData.members).length;
-    document.getElementById('s-crew').textContent  = Object.values(liveData.members).filter(m=>m.status!=='offline').length;
+    document.getElementById('s-crew').textContent  = Object.values(liveData.members).filter(function(m){return getPresenceState(m)!=='offline';}).length;
     renderCrew(); renderTzTable(); renderDashCrewStrip(); renderAdminRoster(); renderSchedulerFilters();
   });
 
@@ -2974,6 +3007,7 @@ function startListeners() {
     liveData.customDepts = doc.exists ? (doc.data().depts || []) : [];
     renderDeptNav();
     renderAdminDepts();
+    renderRegistrationDepartments();
     var profileView = document.getElementById('view-profile');
     if (profileView && profileView.classList.contains('active')) {
       // Don't re-render profile form if user is actively editing it
@@ -3204,7 +3238,8 @@ function updateStatusDot(s) {
 function canSetState(state, task) {
   var role = currentProfile ? currentProfile.role : '';
   var uid  = currentUser ? currentUser.uid : '';
-  if (role === 'admin' || role === 'lead') return true;
+  if (role === 'admin' || role === 'project_manager') return true;
+  if ((role === 'lead' || role === 'director') && task && canManageDepartment(task.dept)) return true;
   var assignee = task ? task.assignee : null;
   if (state === 'accepted'    && assignee === uid) return true;
   if (state === 'in-progress' && assignee === uid) return true;
@@ -3264,7 +3299,7 @@ async function deleteTask(taskId) {
   var task = liveData.tasks[taskId] || Object.values(liveData.tasks).find(function(t){ return t.id === taskId; });
   if (!task) { toast('Task not found','err'); return; }
   var role = currentProfile ? currentProfile.role : '';
-  if (role !== 'admin' && role !== 'lead' && task.createdBy !== currentUser.uid) {
+  if (!(role === 'admin' || role === 'project_manager' || ((role === 'lead' || role === 'director') && canManageDepartment(task.dept))) && task.createdBy !== currentUser.uid) {
     toast('Only admins, leads or the creator can delete tasks','err'); return;
   }
   if (!confirm('Delete this task?')) return;
@@ -3321,7 +3356,7 @@ function openNewTaskForMe() {
 function populateAssignSelect(dept) {
   var sel = document.getElementById('t-assign');
   var role = currentProfile ? currentProfile.role : '';
-  var canAssignAll = role === 'admin' || role === 'lead';
+  var canAssignAll = role === 'admin' || role === 'project_manager' || role === 'lead' || role === 'director';
   // Crew can only create tasks for themselves
   if (!canAssignAll) {
     sel.innerHTML = '';
@@ -3469,7 +3504,7 @@ async function submitOverdueReport() {
 
 async function clearDeptCompleted(dept) {
   var role = currentProfile ? currentProfile.role : '';
-  if (role !== 'admin' && role !== 'lead') { toast('No permission','err'); return; }
+  if (!(role === 'admin' || role === 'project_manager' || ((role === 'lead' || role === 'director') && canManageDepartment(dept)))) { toast('No permission','err'); return; }
   var completed = Object.values(liveData.tasks).filter(function(t){ return t.state === 'completed' && t.dept === dept; });
   if (!completed.length) { toast('No completed tasks in this dept','inf'); return; }
   if (!confirm('Delete ' + completed.length + ' completed task(s) from this board? Cannot be undone.')) return;
@@ -3482,7 +3517,7 @@ async function clearDeptCompleted(dept) {
 async function clearCompleted() {
   var uid = currentUser ? currentUser.uid : '';
   var role = currentProfile ? currentProfile.role : '';
-  if (role !== 'admin' && role !== 'lead') { toast('No permission','err'); return; }
+  if (role !== 'admin' && role !== 'project_manager' && role !== 'lead' && role !== 'director') { toast('No permission','err'); return; }
   var completed = Object.values(liveData.tasks).filter(function(t){ return t.state === 'completed' && t.assignee === uid; });
   if (!completed.length) { toast('No completed tasks to clear','inf'); return; }
   if (!confirm('Delete ' + completed.length + ' completed task(s)? This cannot be undone.')) return;
@@ -3522,7 +3557,7 @@ function renderMyTasks() {
     colHtml += '<div class="my-task-col-hdr">';
     colHtml += '<span style="font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:' + col.color + ';text-transform:uppercase;">' + col.icon + ' ' + col.label + '</span>';
     var hdrRight = '<span style="font-size:11px;color:var(--grey-2);">' + tasks.length + '</span>';
-    var adminLead2 = currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'lead');
+    var adminLead2 = currentProfile && (normaliseRole(currentProfile.role) === 'admin' || normaliseRole(currentProfile.role) === 'project_manager' || normaliseRole(currentProfile.role) === 'lead' || normaliseRole(currentProfile.role) === 'director');
     if (col.id === 'completed' && tasks.length > 0 && adminLead2) {
       hdrRight += '<button class="tc-btn" style="margin-left:6px;font-size:9px;" onclick="clearCompleted()">Clear All</button>';
     }
@@ -3569,7 +3604,7 @@ async function dropMyTask(e, newState) {
   var task = liveData.tasks[dragMyTaskId] || Object.values(liveData.tasks).find(function(t){ return t.id === dragMyTaskId; });
 
   // Admin/lead can move to any state including completed
-  var adminLead = role === 'admin' || role === 'lead';
+  var adminLead = role === 'admin' || role === 'project_manager' || role === 'lead' || role === 'director';
 
   // Members can only move their own tasks between accepted/in-progress/review
   if (!adminLead) {
@@ -3768,7 +3803,7 @@ function renderDeptBoard(dept) {
   if (!container) return;
   const color = DEPT_COLORS[dept] || '#fff';
   const deptTasks = Object.values(liveData.tasks).filter(t => t.dept === dept);
-  var canManage = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  var canManage = normaliseRole(currentProfile.role) === 'admin' || normaliseRole(currentProfile.role) === 'project_manager' || normaliseRole(currentProfile.role) === 'lead' || normaliseRole(currentProfile.role) === 'director';
   var canCreate = true; // any member can create their own tasks
 
   // Get dept members
@@ -3880,7 +3915,7 @@ function toggleBoardSide(dept, side) {
 function taskCardHTML(t) {
   var role = currentProfile ? currentProfile.role : '';
   var uid  = currentUser ? currentUser.uid : '';
-  var canAdminLead = role === 'admin' || role === 'lead';
+  var canAdminLead = role === 'admin' || role === 'project_manager' || role === 'lead' || role === 'director';
   var isAssignee   = t.assignee === uid;
   var assigneeName = t.assignee ? ((liveData.members[t.assignee] ? liveData.members[t.assignee].name : '') || 'Unknown') : '';
   var chipClass = {'unassigned':'chip-unassigned','pending-accept':'chip-pending-accept','accepted':'chip-accepted','in-progress':'chip-progress','review':'chip-review','completed':'chip-done'}[t.state] || 'chip-unassigned';
@@ -3937,7 +3972,7 @@ async function onDrop(e, dept, memberId) {
   var task = liveData.tasks[dragTask] || Object.values(liveData.tasks).find(function(t){ return t.id === dragTask; });
   if (!task) return;
   var role = currentProfile ? currentProfile.role : '';
-  var adminLead = role === 'admin' || role === 'lead';
+  var adminLead = role === 'admin' || role === 'project_manager' || role === 'lead' || role === 'director';
   var taskId = dragTask;
   dragTask = null;
 
@@ -4093,7 +4128,7 @@ async function cancelMeeting(meetingId) {
   var meeting = liveData.meetings.find(function(m){ return m.id === meetingId; });
   if (!meeting) return;
   var isCreator = meeting.createdBy === currentUser.uid;
-  var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  var isAdminLead = normaliseRole(currentProfile.role) === 'admin' || normaliseRole(currentProfile.role) === 'project_manager' || normaliseRole(currentProfile.role) === 'lead' || normaliseRole(currentProfile.role) === 'director';
   if (!isCreator && !isAdminLead) { toast('No permission to cancel this meeting','err'); return; }
   if (!confirm('Cancel this meeting? All attendees will be notified.')) return;
   await db.collection('meetings').doc(meetingId).update({
@@ -4107,7 +4142,7 @@ async function cancelMeeting(meetingId) {
 async function deleteMeeting(id) {
   const meeting = liveData.meetings.find(m => m.id === id);
   const isCreator = meeting && meeting.createdBy === currentUser.uid;
-  const isAdminOrLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+  const isAdminOrLead = normaliseRole(currentProfile.role) === 'admin' || normaliseRole(currentProfile.role) === 'project_manager' || normaliseRole(currentProfile.role) === 'lead' || normaliseRole(currentProfile.role) === 'director';
   if (!isAdminOrLead && !isCreator) { toast('Only leads, admins or the meeting creator can delete','err'); return; }
   if (!confirm('Delete this meeting?')) return;
   try {
@@ -4178,7 +4213,7 @@ function renderMeetings() {
     var durStr   = durMins >= 60 ? Math.floor(durMins/60) + 'hr' + (durMins%60 ? ' ' + (durMins%60) + 'min' : '') : durMins + 'min';
     var isAttendee  = (m.attendees||[]).includes(uid);
     var isCreator   = m.createdBy === uid;
-    var isAdminLead = currentProfile.role === 'admin' || currentProfile.role === 'lead';
+    var isAdminLead = normaliseRole(currentProfile.role) === 'admin' || normaliseRole(currentProfile.role) === 'project_manager' || normaliseRole(currentProfile.role) === 'lead' || normaliseRole(currentProfile.role) === 'director';
     var canCancel   = isCreator || isAdminLead;
     var myRsvp      = m.rsvp ? m.rsvp[uid] : undefined;
     var isCancelled = !!m.cancelled;
@@ -4370,7 +4405,7 @@ function openEditMember(uid) {
   if (!member) { toast('Member not found','err'); return; }
   document.getElementById('em-uid').value  = uid;
   document.getElementById('em-name').value = member.name || '';
-  document.getElementById('em-role').value = member.role || 'crew';
+  document.getElementById('em-role').value = normaliseRole(member.role);
   document.getElementById('em-tz').value   = member.tz || 'UTC';
   var depts = getDeptList();
   var memberDepts = member.depts || [];
@@ -4418,10 +4453,10 @@ function openMemberProfile(uid) {
   var m = liveData.members[uid];
   if (!m) { toast('Member not found','err'); return; }
   var role = currentProfile ? currentProfile.role : '';
-  var canSeeOverrides = role === 'admin' || role === 'lead' || uid === (currentUser && currentUser.uid);
+  var canSeeOverrides = role === 'admin' || role === 'project_manager' || role === 'lead' || role === 'director' || uid === (currentUser && currentUser.uid);
 
-  var statusCls = STATUS_CLASS[m.status||'offline'];
-  var statusLabel = STATUS_LABEL[m.status||'offline'];
+  var statusCls = STATUS_CLASS[getPresenceState(m)];
+  var statusLabel = STATUS_LABEL[getPresenceState(m)] + ' · ' + formatLastActive(m);
   var localTime = getLocalTime(m.tz||'UTC');
   var normD = normaliseDepts(m.depts);
   var LABEL_MAP = {programming:'Programming','2d-art':'2D Art','3d-art':'3D Art',marketing:'Marketing',sound:'Sound Design',vfx:'Visual Effects',narrative:'Narrative'};
@@ -4529,7 +4564,7 @@ function renderCrew() {
   if (!members.length) { el.innerHTML='<div class="no-data">No members</div>'; return; }
 
   el.innerHTML = members.map(m => {
-    const statusCls = STATUS_CLASS[m.status||'offline'];
+    const statusCls = STATUS_CLASS[getPresenceState(m)];
     const localTime = getLocalTime(m.tz||'UTC');
     var _nd = normaliseDepts(m.depts); var depts = _nd.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+lbl+'</span>'; }).join('');
     return `<div class="roster-card">
@@ -4547,7 +4582,7 @@ function renderCrew() {
         <div style="font-size:10px;color:var(--grey);margin-top:2px;">${getTzOffset(m.tz||'UTC')}</div>
       </div>
       <div>
-        <span class="u-role ${m.role||'crew'}">${(m.role||'crew').toUpperCase()}</span>
+        <span class="u-role ${normaliseRole(m.role)}">${(normaliseRole(m.role)).toUpperCase()}</span>
       </div>
       <div style="display:flex;gap:4px;">
         ${currentProfile.role==='admin'?`<button class="icon-btn" onclick="openEditMember('${m.uid}')" title="Edit">✎</button><button class="icon-btn danger" onclick="removeMember('${m.uid}')" title="Remove">✕</button>`:''}
@@ -4570,8 +4605,8 @@ function renderTzTable() {
   tbody.innerHTML = sortedMembers.map(m => {
     var _ndd = normaliseDepts(m.depts); var depts = _ndd.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+lbl+'</span>'; }).join('');
     // Only show as active if status is explicitly set to an active state
-    const status = (m.status && m.status !== 'offline') ? m.status : 'offline';
-    const hasLoggedIn = !!m.status; // if no status field, they haven't logged in yet
+    const status = getPresenceState(m);
+    const hasLoggedIn = !!m.lastSeen; // if no status field, they haven't logged in yet
     const statusColors = { online:'var(--green)', working:'var(--amber)', gaming:'var(--purple)', offline:'var(--grey-2)' };
     const statusLabels = { online:'ONLINE', working:'WORKING', gaming:'GAMING', offline: hasLoggedIn ? 'OFFLINE' : 'NOT LOGGED IN' };
     const statusCls = status === 'offline' ? 'tz-sleep' : 'tz-awake';
@@ -4599,7 +4634,7 @@ function renderDashCrewStrip() {
   if (!el) return;
   const members = Object.values(liveData.members);
   el.innerHTML = members.map(m => {
-    const statusCls = STATUS_CLASS[m.status||'offline'];
+    const statusCls = STATUS_CLASS[getPresenceState(m)];
     const time = getLocalTime(m.tz||'UTC');
     return `<div style="display:flex;align-items:center;gap:8px;background:rgba(17,19,32,.8);border:1px solid var(--border);border-radius:6px;padding:7px 12px;min-width:150px;">
       <div style="position:relative;">
@@ -4863,6 +4898,13 @@ function renderDeptNav() {
     }
   });
 }
+
+function renderRegistrationDepartments() {
+  var el=document.getElementById('reg-dept-checks'); if(!el)return;
+  var selected=new Set(Array.from(el.querySelectorAll('input:checked')).map(function(x){return x.value;}));
+  el.innerHTML=getDeptList().map(function(d){var c=DEPT_COLORS[d.id]||d.color||'#888';return '<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid '+c+'44;color:'+c+';"><input type="checkbox" value="'+esc(d.id)+'" '+(selected.has(d.id)?'checked':'')+' style="accent-color:'+c+';"> '+esc(d.label)+'</label>';}).join('');
+}
+
 // ─── DEPARTMENT MANAGEMENT ────────────────────────────────
 function renderAdminDepts() {
   var el = document.getElementById('admin-depts-list');
@@ -4998,10 +5040,8 @@ function renderAdminRoster() {
       <td style="padding:10px 16px;font-weight:600;">${esc(m.name)}</td>
       <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${esc(m.email||'')}</td>
       <td style="padding:10px 16px;">
-        <select class="u-role ${m.role||'crew'}" onchange="updateMemberRole('${m.uid}',this.value)" style="background:transparent;border:none;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;appearance:none;outline:none;padding:2px 6px;border-radius:3px;">
-          <option value="crew"  ${m.role==='crew'?'selected':''}>CREW</option>
-          <option value="lead"  ${m.role==='lead'?'selected':''}>LEAD</option>
-          <option value="admin" ${m.role==='admin'?'selected':''}>ADMIN</option>
+        <select class="u-role ${normaliseRole(m.role)}" onchange="updateMemberRole('${m.uid}',this.value)" style="background:transparent;border:none;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;appearance:none;outline:none;padding:2px 6px;border-radius:3px;">
+          <option value="member">MEMBER</option><option value="lead">LEAD</option><option value="director">DIRECTOR</option><option value="project_manager">PROJECT MANAGER</option><option value="admin">ADMIN</option>
         </select>
       </td>
       <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${getTzOffset(m.tz||'UTC')}</td>
@@ -5032,20 +5072,21 @@ async function updateMemberRole(uid, role) {
 // ─── PROFILE ──────────────────────────────────────────────
 function renderProfile() {
   if (!currentProfile) return;
+  var profileFormActive = !!document.querySelector('#view-profile.active #edit-name:focus, #view-profile.active #edit-tz:focus, #view-profile.active #edit-email:focus, #view-profile.active #edit-pass:focus, #view-profile.active #profile-dept-checks input:focus');
+  var profileDirty = document.getElementById('view-profile') && document.getElementById('view-profile').dataset.profileDirty === '1';
   document.getElementById('prof-av').textContent = initials(currentProfile.name);
   document.getElementById('prof-name').textContent = currentProfile.name;
   document.getElementById('prof-email').textContent = currentProfile.email || '';
-  const statusCls = STATUS_CLASS[currentProfile.status||'offline'];
+  const statusCls = STATUS_CLASS[getPresenceState(currentProfile)];
   document.getElementById('prof-status-dot').className = 'profile-status-dot ' + statusCls;
   document.getElementById('prof-time').textContent = getLocalTime(currentProfile.tz||'UTC');
   document.getElementById('prof-tz').textContent = (currentProfile.tz||'UTC') + ' · ' + getTzOffset(currentProfile.tz||'UTC');
-  document.getElementById('edit-name').value = currentProfile.name;
-  document.getElementById('edit-tz').value = currentProfile.tz || 'Europe/London';
+  if (!profileFormActive && !profileDirty) { document.getElementById('edit-name').value = currentProfile.name; document.getElementById('edit-tz').value = currentProfile.tz || 'Europe/London'; }
   var remEl = document.getElementById('edit-reminders');
   if (remEl) remEl.checked = (currentProfile.meetingReminders !== false);
   // Populate dept checkboxes
   var deptChecksEl = document.getElementById('profile-dept-checks');
-  if (deptChecksEl) {
+  if (deptChecksEl && !profileDirty && !profileFormActive) {
     var myDepts = currentProfile.depts || [];
     var legacyMap2 = {'Programming':'programming','2D Art':'2d-art','3D Art':'3d-art','Marketing':'marketing','Sound Design':'sound','Visual Effects':'vfx','Narrative':'narrative'};
     var normMyDepts = myDepts.map(function(d){ return legacyMap2[d] || d; });
@@ -5059,7 +5100,7 @@ function renderProfile() {
   }
   // Email field — leave blank, user types new email if they want to change
   var emailEl = document.getElementById('edit-email');
-  if (emailEl) emailEl.value = '';
+  if (emailEl && !profileFormActive && !profileDirty) emailEl.value = '';
   const deptsEl = document.getElementById('prof-depts');
   var normPD = normaliseDepts(currentProfile.depts); deptsEl.innerHTML = normPD.map(function(d){ var dc=DEPT_COLORS[d]||'#888'; var lbl=DEPT_NAMES[d]||d; return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(lbl)+'</span>'; }).join('');
 }
@@ -5098,6 +5139,8 @@ async function saveProfile() {
     }
   }
   if (name) await currentUser.updateProfile({ displayName: name });
+  var pv=document.getElementById('view-profile'); if(pv) pv.dataset.profileDirty='0';
+  var pe=document.getElementById('edit-pass'); if(pe) pe.value=''; var ee=document.getElementById('edit-email'); if(ee) ee.value='';
   updateHeaderUI(); renderProfile();
   toast('Profile saved!','ok');
 }
@@ -5106,35 +5149,15 @@ async function saveProfile() {
 // ─── PRESENCE: set offline when tab closes/hides ─────────
 function setupPresenceHandlers() {
   var heartbeatInterval = null;
-  var HEARTBEAT_MS = 45000; // ping every 45s
-  var OFFLINE_THRESHOLD_MS = 120000; // 2min without heartbeat = offline
+  var HEARTBEAT_MS = 120000; // low-cost heartbeat every 2 minutes
+  var OFFLINE_THRESHOLD_MS = 15 * 60 * 1000; // offline after 15 minutes
 
   function writeHeartbeat() {
     if (!currentUser || !db) return;
-    db.collection('users').doc(currentUser.uid).update({
-      lastSeen: new Date().toISOString(),
-      status: currentProfile.status || 'online'
-    }).catch(function(){});
+    db.collection('users').doc(currentUser.uid).set({ lastSeen: new Date().toISOString() }, { merge:true }).catch(function(){});
   }
 
-  function goOffline() {
-    if (!currentUser || !db) return;
-    // Use fetch with keepalive so it survives page unload
-    var projId = db.app.options.projectId;
-    var url = 'https://firestore.googleapis.com/v1/projects/' + projId +
-      '/databases/(default)/documents/users/' + currentUser.uid +
-      '?updateMask.fieldPaths=status&updateMask.fieldPaths=lastSeen';
-    var now = new Date().toISOString();
-    fetch(url, {
-      method: 'PATCH', keepalive: true,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: {
-        status:   { stringValue: 'offline' },
-        lastSeen: { stringValue: now }
-      }})
-    }).catch(function(){});
-    db.collection('users').doc(currentUser.uid).update({ status:'offline', lastSeen: now }).catch(function(){});
-  }
+  function goOffline() { /* Presence expires from lastSeen; no unload write to avoid flicker. */ }
 
   // Start heartbeat
   writeHeartbeat();
@@ -5257,7 +5280,7 @@ function showReminderToast(m, minsLeft) {
   // Stale user cleanup: every 3 min check if any members have stale lastSeen
   // Only mark offline if lastSeen exists AND is older than threshold
   // Never mark offline if lastSeen is within the last 3 minutes (grace period for new logins)
-  var GRACE_MS = 3 * 60 * 1000;
+  var GRACE_MS = 60 * 1000;
   setInterval(function() {
     var now = Date.now();
     var threshold = now - OFFLINE_THRESHOLD_MS;
@@ -5280,7 +5303,7 @@ function startClock() {
     const now = new Date();
     const el = document.getElementById('utc-clock');
     if (el) el.textContent = now.toUTCString().slice(5,22) + ' UTC';
-    renderProfile();
+    var pt=document.getElementById('prof-time'); if(pt&&currentProfile) pt.textContent=getLocalTime(currentProfile.tz||'UTC');
   }
   tick();
   setInterval(tick, 1000);
@@ -5992,7 +6015,7 @@ function arcParse(text) {
 
 // ── Render all (called on snapshot + nav) ─────────────────
 function arcRenderAll() {
-  var admin = currentProfile && (currentProfile.role==='admin'||currentProfile.role==='lead');
+  var admin = currentProfile && (['admin','project_manager','lead','director'].includes(normaliseRole(currentProfile.role)));
   var btnWrap = document.getElementById('arcAdminBtn');
   if (btnWrap) btnWrap.innerHTML = admin
     ? '<button class="btn btn-primary fw" style="font-size:11px;" onclick="arcOpenAdd()">+ Add Meeting</button>'
@@ -6262,7 +6285,7 @@ function arcShowLines(lines) {
 function arcInfoBar(m) {
   var el = document.getElementById('arcInfoBar');
   if (!el) return;
-  var admin = currentProfile && (currentProfile.role==='admin'||currentProfile.role==='lead');
+  var admin = currentProfile && (['admin','project_manager','lead','director'].includes(normaliseRole(currentProfile.role)));
   var dept  = ARC_DEPT[m.dept||'general'] || ARC_DEPT.general;
   var dateStr = m.date ? new Date(m.date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '';
   el.innerHTML =
@@ -7234,7 +7257,7 @@ function cvpGetDeptMembers(depts){var set=new Set();Object.values(liveData.membe
 function cvpShowRecurrenceOptions(){var r=document.getElementById('mt-recurrence'),o=document.getElementById('mt-recur-options');if(o)o.classList.toggle('show',r&&r.value!=='none');}
 function cvpGenerateCalendarRevision(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);}
 function cvpMeetingExpiry(m){var end=new Date(m.dateUtc).getTime()+(m.duration||60)*60000;return end+86400000;}
-async function cvpCleanupMeetings(){if(!currentUser||!db)return;var now=Date.now(),canAdmin=currentProfile&&(currentProfile.role==='admin'||currentProfile.role==='lead');var old=(liveData.meetings||[]).filter(function(m){return m.dateUtc&&cvpMeetingExpiry(m)<now&&(canAdmin||m.ownerId===currentUser.uid||m.createdBy===currentUser.uid);});for(var i=0;i<old.length;i++){try{await db.collection('meetings').doc(old[i].id).delete();}catch(e){console.warn('Meeting cleanup skipped',old[i].id,e);}}}
+async function cvpCleanupMeetings(){if(!currentUser||!db)return;var now=Date.now();var old=(liveData.meetings||[]).filter(function(m){return m.dateUtc&&cvpMeetingExpiry(m)<now&&canManageMeetingRecord(m);});for(var i=0;i<old.length;i++){try{await db.collection('meetings').doc(old[i].id).delete();}catch(e){console.warn('Meeting cleanup skipped',old[i].id,e);}}}
 
 var _cvpOriginalResetMeetingPlanner=resetMeetingPlanner;
 resetMeetingPlanner=function(){_cvpOriginalResetMeetingPlanner();var until=document.getElementById('mt-recur-until'),count=document.getElementById('mt-recur-count'),mem=document.getElementById('mt-recur-membership');if(until)until.value='';if(count)count.value='6';if(mem)mem.value='fixed';cvpShowRecurrenceOptions();};
@@ -7267,7 +7290,7 @@ saveEditMeeting=async function(){
   closeModal('m-edit-meeting');toast(targets.length>1?'Meeting series updated ('+targets.length+')':'Meeting updated and attendees notified','ok');
 };
 
-cancelMeeting=async function(meetingId){var m=(liveData.meetings||[]).find(function(x){return x.id===meetingId;});if(!m)return;var allowed=m.ownerId===currentUser.uid||m.createdBy===currentUser.uid||(currentProfile&&(currentProfile.role==='admin'||currentProfile.role==='lead'));if(!allowed){toast('No permission to cancel this meeting','err');return;}var scope='one';if(m.seriesId){var ans=prompt('Cancel which meetings? Type ONE, FOLLOWING, or ALL','ONE');if(!ans)return;scope=ans.trim().toLowerCase();if(!['one','following','all'].includes(scope)){toast('Cancellation not recognised','err');return;}}else if(!confirm('Cancel this meeting? All attendees will be notified.'))return;var targets=[m];if(m.seriesId&&scope!=='one'){var docs=cvpSeriesDocs(m.seriesId);targets=scope==='all'?docs:docs.filter(function(x){return new Date(x.dateUtc)>=new Date(m.dateUtc);});}for(var i=0;i<targets.length;i++){var t=targets[i];await db.collection('meetings').doc(t.id).update({cancelled:true,cancelledBy:currentUser.uid,cancelledAt:new Date().toISOString(),updatedAt:new Date().toISOString(),calendarRevision:cvpGenerateCalendarRevision()});await Promise.all((t.attendees||[]).map(function(uid){return createUserNotification(uid,'meeting_cancelled','Meeting cancelled: '+t.name,formatMeetingRangeForTz(t.dateUtc,t.duration||60,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC'),t.id);}));}toast(targets.length>1?'Meeting series cancelled ('+targets.length+')':'Meeting cancelled','inf');};
+cancelMeeting=async function(meetingId){var m=(liveData.meetings||[]).find(function(x){return x.id===meetingId;});if(!m)return;var allowed=canManageMeetingRecord(m);if(!allowed){toast('No permission to cancel this meeting','err');return;}var scope='one';if(m.seriesId){var ans=prompt('Cancel which meetings? Type ONE, FOLLOWING, or ALL','ONE');if(!ans)return;scope=ans.trim().toLowerCase();if(!['one','following','all'].includes(scope)){toast('Cancellation not recognised','err');return;}}else if(!confirm('Cancel this meeting? All attendees will be notified.'))return;var targets=[m];if(m.seriesId&&scope!=='one'){var docs=cvpSeriesDocs(m.seriesId);targets=scope==='all'?docs:docs.filter(function(x){return new Date(x.dateUtc)>=new Date(m.dateUtc);});}for(var i=0;i<targets.length;i++){var t=targets[i];await db.collection('meetings').doc(t.id).update({cancelled:true,cancelledBy:currentUser.uid,cancelledAt:new Date().toISOString(),updatedAt:new Date().toISOString(),calendarRevision:cvpGenerateCalendarRevision()});await Promise.all((t.attendees||[]).map(function(uid){return createUserNotification(uid,'meeting_cancelled','Meeting cancelled: '+t.name,formatMeetingRangeForTz(t.dateUtc,t.duration||60,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC'),t.id);}));}toast(targets.length>1?'Meeting series cancelled ('+targets.length+')':'Meeting cancelled','inf');};
 
 var _cvpOriginalRenderMeetings=renderMeetings;
 renderMeetings=function(){_cvpOriginalRenderMeetings();document.querySelectorAll('.meeting-card').forEach(function(card){var id=(card.querySelector('[data-mid]')||{}).dataset&&card.querySelector('[data-mid]').dataset.mid,m=(liveData.meetings||[]).find(function(x){return x.id===id;});if(m&&m.seriesId&&!card.querySelector('.series-badge')){var b=document.createElement('span');b.className='series-badge';b.textContent='↻ '+(m.recurrence||'recurring');card.insertBefore(b,card.firstChild);}});};
@@ -7275,6 +7298,16 @@ renderMeetings=function(){_cvpOriginalRenderMeetings();document.querySelectorAll
 (function cvpInitCalendarPatch(){var r=document.getElementById('mt-recurrence');if(r){r.addEventListener('change',cvpShowRecurrenceOptions);cvpShowRecurrenceOptions();}setTimeout(cvpCleanupMeetings,8000);setInterval(cvpCleanupMeetings,60*60*1000);})();
 
 })();
+
+function renderAdminRoster() {
+  var el=document.getElementById('admin-roster'); if(!el)return;
+  var members=Object.values(liveData.members||{}); if(!members.length){el.innerHTML='<div class="no-data">No members</div>';return;}
+  el.innerHTML='<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="padding:8px 16px;text-align:left;">NAME</th><th style="padding:8px 16px;text-align:left;">EMAIL</th><th style="padding:8px 16px;text-align:left;">ROLE</th><th style="padding:8px 16px;text-align:left;">PRESENCE</th><th style="padding:8px 16px;text-align:left;">ACTIONS</th></tr></thead><tbody>'+members.map(function(m){var r=normaliseRole(m.role),p=getPresenceState(m);return '<tr style="border-top:1px solid var(--border);"><td style="padding:10px 16px;font-weight:600;">'+esc(m.name)+'</td><td style="padding:10px 16px;color:var(--grey);">'+esc(m.email||'')+'</td><td style="padding:10px 16px;"><select class="u-role '+r+'" onchange="updateMemberRole(\''+m.uid+'\',this.value)" '+(m.uid===currentUser.uid?'disabled':'')+' style="background:var(--panel);cursor:pointer;padding:4px 7px;"><option value="member" '+(r==='member'?'selected':'')+'>MEMBER</option><option value="lead" '+(r==='lead'?'selected':'')+'>LEAD</option><option value="director" '+(r==='director'?'selected':'')+'>DIRECTOR</option><option value="project_manager" '+(r==='project_manager'?'selected':'')+'>PROJECT MANAGER</option><option value="admin" '+(r==='admin'?'selected':'')+'>ADMIN</option></select></td><td style="padding:10px 16px;"><span class="status-dot '+STATUS_CLASS[p]+'" style="display:inline-block;margin-right:7px;"></span>'+esc(STATUS_LABEL[p])+'<div style="font-size:11px;color:var(--grey-2);margin-top:3px;">'+esc(formatLastActive(m))+'</div></td><td style="padding:10px 16px;">'+(m.uid!==currentUser.uid?'<button class="btn btn-ghost btn-xs" onclick="openEditMember(\''+m.uid+'\')">Edit</button>':'You')+'</td></tr>';}).join('')+'</tbody></table>';
+}
+
+document.addEventListener('input',function(e){if(e.target&&e.target.closest&&e.target.closest('#view-profile')){var v=document.getElementById('view-profile');if(v)v.dataset.profileDirty='1';}});
+document.addEventListener('change',function(e){if(e.target&&e.target.closest&&e.target.closest('#view-profile')){var v=document.getElementById('view-profile');if(v)v.dataset.profileDirty='1';}});
+setTimeout(renderRegistrationDepartments,500);
 </script>
 </body>
 </html>
