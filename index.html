@@ -1009,6 +1009,17 @@ textarea.inp { resize:vertical; }
 .meeting-availability-bad { color:var(--crimson-hi); font-weight:700; }
 .meeting-availability-good { color:var(--green); font-weight:700; }
 
+
+/* ── TASK IMAGE COLLABORATION — PATCH 8B ─────────────── */
+.task-img-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding:9px 10px;border:1px dashed var(--border-2);border-radius:5px;background:rgba(255,255,255,.015)}
+.task-img-picker input[type=file]{display:none}.task-img-picked{font-size:11px;color:var(--grey);flex:1;min-width:140px}.task-img-note{font-size:10px;color:var(--grey-2);line-height:1.4;width:100%}
+.task-img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:12px}.task-img-card{background:rgba(8,10,18,.78);border:1px solid var(--border);border-radius:6px;overflow:hidden}.task-img-preview{height:132px;display:flex;align-items:center;justify-content:center;background:#080a10;cursor:pointer;position:relative}.task-img-preview img{width:100%;height:100%;object-fit:contain}.task-img-preview.loading::after{content:'LOADING';font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2)}
+.task-img-meta{padding:9px}.task-img-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-img-sub{font-size:10px;color:var(--grey);margin-top:3px;line-height:1.35}.task-img-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.task-img-expiry{font-size:9px;font-family:'Share Tech Mono',monospace;margin-top:5px}.task-img-expiry.warn{color:var(--gold)}.task-img-expiry.danger{color:var(--crimson-hi)}
+.task-img-upload-progress{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px;display:none}.task-img-upload-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--crimson-hi),var(--gold));transition:width .12s}
+.image-lightbox{position:fixed;inset:0;z-index:12000;background:rgba(2,3,6,.95);display:none;align-items:center;justify-content:center;padding:28px}.image-lightbox.open{display:flex}.image-lightbox img{max-width:92vw;max-height:86vh;object-fit:contain;box-shadow:0 0 50px rgba(0,0,0,.8)}.image-lightbox-close{position:absolute;top:18px;right:22px;border:1px solid var(--border-2);background:rgba(10,12,20,.9);color:var(--white);font-size:20px;width:38px;height:38px;border-radius:50%;cursor:pointer}.image-lightbox-foot{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(10,12,20,.92);border:1px solid var(--border);border-radius:6px;padding:8px 12px;max-width:90vw}.image-lightbox-name{font-size:12px;max-width:50vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.temp-upload-warning{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.35);border-left:3px solid var(--amber);padding:12px 14px;border-radius:5px;font-size:12px;line-height:1.55}.temp-upload-check{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--white);cursor:pointer}.temp-upload-check input{margin-top:3px}
+@media(max-width:700px){.task-img-grid{grid-template-columns:1fr 1fr}.task-img-preview{height:110px}}@media(max-width:460px){.task-img-grid{grid-template-columns:1fr}}
+
 /* ── MISC UTIL ───────────────────────────── */
 .flex { display:flex; }
 .flex-col { flex-direction:column; }
@@ -1627,6 +1638,75 @@ body { font-size:15px; }
 @media (max-width:650px) {
   .storage-stat-grid,.storage-settings-grid,.storage-filter-row { grid-template-columns:1fr; }
   .storage-drive-row { grid-template-columns:1fr; }
+}
+
+
+/* ═══════════════════════════════════════════════
+   TASK MANAGEMENT 2.0 — PATCH 8A
+═══════════════════════════════════════════════ */
+.task2-modal { width:900px; max-width:96vw; }
+.task2-shell { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:14px; padding:16px; }
+.task2-main { min-width:0; display:flex; flex-direction:column; gap:12px; }
+.task2-side { min-width:0; display:flex; flex-direction:column; gap:12px; }
+.task2-card { background:rgba(8,10,18,.64); border:1px solid var(--border); border-radius:7px; overflow:hidden; }
+.task2-card-hdr { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; background:rgba(8,10,18,.72); border-bottom:1px solid var(--border); }
+.task2-card-title { font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; }
+.task2-card-body { padding:12px; }
+.task2-meta-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.task2-meta { background:rgba(255,255,255,.018); border:1px solid rgba(30,33,56,.62); border-radius:5px; padding:8px 10px; min-width:0; }
+.task2-meta-label { font-size:10px; letter-spacing:1.5px; color:var(--grey-2); text-transform:uppercase; }
+.task2-meta-value { margin-top:3px; font-size:13px; color:var(--white); overflow-wrap:anywhere; }
+.task2-description { white-space:pre-wrap; overflow-wrap:anywhere; color:var(--grey); font-size:13px; line-height:1.58; }
+.task2-tabs { display:flex; gap:4px; padding:0 16px; border-bottom:1px solid var(--border); overflow-x:auto; }
+.task2-tab { border:0; border-bottom:2px solid transparent; background:transparent; color:var(--grey); padding:10px 12px 8px; font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; cursor:pointer; white-space:nowrap; }
+.task2-tab:hover { color:var(--white); }
+.task2-tab.active { color:var(--crimson-hi); border-bottom-color:var(--crimson-hi); }
+.task2-pane { display:none; padding:14px 16px 18px; min-height:180px; }
+.task2-pane.active { display:block; }
+.task2-composer { display:flex; flex-direction:column; gap:8px; margin-bottom:13px; padding:10px; border:1px solid var(--border); border-radius:6px; background:rgba(255,255,255,.018); }
+.task2-composer-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+.task2-entry { border:1px solid var(--border); border-radius:6px; padding:11px 12px; background:rgba(8,10,18,.55); margin-bottom:8px; }
+.task2-entry:last-child { margin-bottom:0; }
+.task2-entry-hdr { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px; }
+.task2-entry-author { font-size:12px; font-weight:700; color:var(--gold); }
+.task2-entry-time { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--grey-2); }
+.task2-entry-text { font-size:13px; line-height:1.55; color:var(--white); white-space:pre-wrap; overflow-wrap:anywhere; }
+.task2-empty { padding:22px 12px; text-align:center; color:var(--grey-2); font-size:12px; }
+.task2-ref { display:flex; align-items:flex-start; gap:10px; }
+.task2-ref-main { flex:1; min-width:0; }
+.task2-ref a { color:var(--blue); text-decoration:none; overflow-wrap:anywhere; }
+.task2-ref a:hover { text-decoration:underline; }
+.task2-activity { position:relative; padding-left:20px; }
+.task2-activity::before { content:''; position:absolute; left:5px; top:4px; bottom:4px; width:1px; background:var(--border-2); }
+.task2-activity-item { position:relative; padding:0 0 13px 7px; }
+.task2-activity-item::before { content:''; position:absolute; left:-18px; top:4px; width:7px; height:7px; border-radius:50%; background:var(--crimson-hi); box-shadow:0 0 7px var(--crimson-glow); }
+.task2-activity-msg { font-size:12px; color:var(--white); line-height:1.4; }
+.task2-activity-meta { margin-top:3px; font-size:10px; color:var(--grey-2); font-family:'Share Tech Mono',monospace; }
+.task2-heartbeat { border:1px solid var(--border); border-left:3px solid var(--green); border-radius:6px; padding:11px 12px; background:rgba(8,10,18,.62); }
+.task2-heartbeat.warn { border-left-color:var(--amber); }
+.task2-heartbeat.stale { border-left-color:var(--crimson-hi); }
+.task2-heartbeat-title { font-family:'Orbitron',sans-serif; font-size:9px; letter-spacing:1.8px; color:var(--grey); text-transform:uppercase; }
+.task2-heartbeat-value { margin-top:5px; font-size:14px; font-weight:700; }
+.task2-review-actions { display:flex; flex-direction:column; gap:7px; }
+.task2-review-note { font-size:11px; color:var(--grey); line-height:1.45; }
+.task2-badge { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--border); border-radius:4px; padding:3px 7px; font-size:10px; letter-spacing:.7px; color:var(--grey); }
+.task2-badge.good { color:var(--green); border-color:rgba(46,204,138,.35); background:rgba(46,204,138,.07); }
+.task2-badge.warn { color:var(--amber); border-color:rgba(232,160,32,.35); background:rgba(232,160,32,.07); }
+.task2-badge.bad { color:var(--crimson-hi); border-color:rgba(200,16,46,.35); background:rgba(200,16,46,.07); }
+.task2-count { font-family:'Share Tech Mono',monospace; color:var(--grey-2); font-size:10px; }
+.task2-link-grid { display:grid; grid-template-columns:minmax(120px,.65fr) minmax(180px,1.35fr); gap:8px; }
+.task2-busy { opacity:.55; pointer-events:none; }
+.task-heartbeat-mini { margin-left:5px; font-size:9px; border-radius:3px; padding:1px 5px; border:1px solid; }
+@media (max-width:780px) {
+  .task2-shell { grid-template-columns:1fr; }
+  .task2-side { display:grid; grid-template-columns:1fr 1fr; }
+  .task2-modal { width:96vw; }
+}
+@media (max-width:560px) {
+  .task2-side { display:flex; }
+  .task2-meta-grid,.task2-link-grid { grid-template-columns:1fr; }
+  .task2-tabs { padding:0 8px; }
+  .task2-tab { padding-left:8px; padding-right:8px; font-size:11px; }
 }
 
 </style>
@@ -2683,22 +2763,90 @@ body { font-size:15px; }
   </div>
 </div>
 
-<!-- Task Detail / Comments Modal -->
+<!-- Task Detail / Collaboration Modal — Task Management 2.0 -->
 <div class="modal-bg" id="m-task-detail">
-  <div class="modal" style="width:600px;">
-    <div class="modal-hdr"><span class="modal-title" id="td-title">&#9658; TASK DETAIL</span><button class="modal-x" onclick="closeModal('m-task-detail')">&#x2715;</button></div>
-    <div style="padding:18px;display:flex;flex-direction:column;gap:12px;" id="td-body"></div>
-    <div class="comment-section">
-      <div style="font-family:'Share Tech Mono',sans-serif;font-size:9px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:10px;">Comments</div>
-      <div id="td-comments"></div>
-      <div class="comment-input-row">
-        <input class="inp" id="td-comment-input" placeholder="Add a comment..." style="flex:1;" onkeydown="if(event.key==='Enter')submitComment()">
-        <button class="btn btn-gold btn-sm" onclick="submitComment()">Post</button>
-      </div>
+  <div class="modal task2-modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="td-title">&#9658; TASK DETAIL</span>
+      <button class="modal-x" onclick="closeTaskDetail()">&#x2715;</button>
     </div>
-    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-task-detail')">Close</button></div>
+    <div class="task2-shell">
+      <div class="task2-main">
+        <div class="task2-card">
+          <div class="task2-card-hdr"><span class="task2-card-title">Task Information</span><span id="td-state-badge"></span></div>
+          <div class="task2-card-body" id="td-body"></div>
+        </div>
+        <div class="task2-card">
+          <div class="task2-tabs" role="tablist">
+            <button class="task2-tab active" data-task-tab="comments" onclick="switchTaskTab('comments')">Comments <span class="task2-count" id="td-count-comments"></span></button>
+            <button class="task2-tab" data-task-tab="progress" onclick="switchTaskTab('progress')">Progress <span class="task2-count" id="td-count-progress"></span></button>
+            <button class="task2-tab" data-task-tab="feedback" onclick="switchTaskTab('feedback')">Feedback <span class="task2-count" id="td-count-feedback"></span></button>
+            <button class="task2-tab" data-task-tab="references" onclick="switchTaskTab('references')">References <span class="task2-count" id="td-count-references"></span></button>
+            <button class="task2-tab" data-task-tab="activity" onclick="switchTaskTab('activity')">Activity <span class="task2-count" id="td-count-activity"></span></button>
+          </div>
+          <div class="task2-pane active" id="td-pane-comments">
+            <div id="td-comments"></div>
+            <div class="comment-input-row" style="margin-top:12px;">
+              <input class="inp" id="td-comment-input" placeholder="Add a comment..." style="flex:1;" onkeydown="if(event.key==='Enter')submitComment()">
+              <button class="btn btn-gold btn-sm" id="td-comment-submit" onclick="submitComment()">Post</button>
+            </div>
+          </div>
+          <div class="task2-pane" id="td-pane-progress">
+            <div class="task2-composer" id="td-progress-composer">
+              <textarea class="inp" id="td-progress-input" rows="3" placeholder="What has changed? What are you working on next? Any blockers?"></textarea>
+              <div class="task-img-picker"><input type="file" id="td-progress-image" accept="image/jpeg,image/png,image/webp" onchange="taskImagePicked('progress')"><button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('td-progress-image').click()">Attach Image</button><span class="task-img-picked" id="td-progress-image-name">No image selected</span><button class="btn btn-ghost btn-xs hidden" id="td-progress-image-clear" type="button" onclick="clearTaskImagePicker('progress')">Clear</button><div class="task-img-note">Optional. JPEG, PNG or WebP, maximum 3.5 MB. Hub images are temporary and expire after 45 days.</div><div class="task-img-upload-progress" id="td-progress-upload-progress"><span></span></div></div>
+              <div class="task2-composer-actions"><button class="btn btn-gold btn-sm" id="td-progress-submit" onclick="submitProgressUpdate()">Post Progress Update</button></div>
+            </div>
+            <div id="td-progress-list"></div>
+          </div>
+          <div class="task2-pane" id="td-pane-feedback">
+            <div class="task2-composer" id="td-feedback-composer">
+              <textarea class="inp" id="td-feedback-input" rows="3" placeholder="Leave clear feedback, approval notes, or requested changes..."></textarea>
+              <div class="task-img-picker"><input type="file" id="td-feedback-image" accept="image/jpeg,image/png,image/webp" onchange="taskImagePicked('feedback')"><button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('td-feedback-image').click()">Attach Image</button><span class="task-img-picked" id="td-feedback-image-name">No image selected</span><button class="btn btn-ghost btn-xs hidden" id="td-feedback-image-clear" type="button" onclick="clearTaskImagePicker('feedback')">Clear</button><div class="task-img-note">Optional feedback or markup image. Temporary Hub storage; automatic deletion after 45 days.</div><div class="task-img-upload-progress" id="td-feedback-upload-progress"><span></span></div></div>
+              <div class="task2-composer-actions"><button class="btn btn-gold btn-sm" id="td-feedback-submit" onclick="submitTaskFeedback(false)">Post Feedback</button></div>
+            </div>
+            <div id="td-feedback-list"></div>
+          </div>
+          <div class="task2-pane" id="td-pane-references">
+            <div class="task2-composer" id="td-reference-composer">
+              <div class="task2-link-grid"><input class="inp" id="td-ref-label" placeholder="Reference label"><input class="inp" id="td-ref-url" type="url" placeholder="https://..."></div>
+              <div class="task2-composer-actions"><button class="btn btn-gold btn-sm" id="td-reference-submit" onclick="submitTaskReference()">Add Reference</button></div>
+            </div>
+            <div id="td-reference-list"></div>
+          </div>
+          <div class="task2-pane" id="td-pane-activity"><div id="td-activity-list"></div></div>
+        </div>
+      </div>
+      <aside class="task2-side">
+        <div class="task2-heartbeat" id="td-heartbeat"></div>
+        <div class="task2-card">
+          <div class="task2-card-hdr"><span class="task2-card-title">Review Workflow</span></div>
+          <div class="task2-card-body task2-review-actions" id="td-review-actions"></div>
+        </div>
+        <div class="task2-card">
+          <div class="task2-card-hdr"><span class="task2-card-title">Task Controls</span></div>
+          <div class="task2-card-body" id="td-management-actions" style="display:flex;flex-direction:column;gap:7px;"></div>
+        </div>
+      </aside>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeTaskDetail()">Close</button></div>
   </div>
 </div>
+
+
+<!-- Temporary Image Upload Confirmation -->
+<div class="modal-bg" id="m-task-image-warning">
+  <div class="modal" style="width:500px;">
+    <div class="modal-hdr"><span class="modal-title">TEMPORARY HUB STORAGE</span><button class="modal-x" onclick="cancelPendingTaskImageUpload()">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="temp-upload-warning"><strong>This image is not a permanent project archive.</strong><br>It will be automatically deleted from Hub storage after <strong id="task-image-warning-days">45 days</strong>. Keep your own copy and place finished or important work into the project Google Drive or approved archive location.</div>
+      <div class="task2-card" style="margin:0"><div class="task2-card-body" id="task-image-warning-summary"></div></div>
+      <label class="temp-upload-check"><input type="checkbox" id="task-image-warning-confirm" onchange="document.getElementById('task-image-warning-upload').disabled=!this.checked"><span>I understand this copy is temporary and that I am responsible for preserving important artwork elsewhere.</span></label>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="cancelPendingTaskImageUpload()">Cancel</button><button class="btn btn-primary" id="task-image-warning-upload" disabled onclick="confirmPendingTaskImageUpload()">Upload Image</button></div>
+  </div>
+</div>
+<div class="image-lightbox" id="task-image-lightbox" onclick="if(event.target===this)closeTaskImageLightbox()"><button class="image-lightbox-close" onclick="closeTaskImageLightbox()">&#x2715;</button><img id="task-image-lightbox-img" alt="Task image"><div class="image-lightbox-foot"><span class="image-lightbox-name" id="task-image-lightbox-name"></span><button class="btn btn-gold btn-sm" onclick="downloadCurrentLightboxImage()">Download Original</button></div></div>
 
 <!-- Overdue Prompt Modal -->
 <div class="modal-bg" id="m-overdue">
@@ -3204,6 +3352,7 @@ function startListeners() {
       liveData.storageUploads = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       var storageView = document.getElementById('view-storage');
       if (storageView && storageView.classList.contains('active')) renderStorageManagement();
+      runImageExpiryNotificationSweep().catch(function(e){console.warn('Expiry sweep',e);});
     }, function(err) { console.warn('Storage metadata listener:', err); });
     var uStorageSettings = db.collection('config').doc('storage_settings').onSnapshot(function(doc) {
       liveData.storageSettings = doc.exists ? doc.data() : {};
@@ -3367,6 +3516,13 @@ async function toggleStorageArchived(id,value){if(!isAdmin())return;try{await db
 async function deleteStorageUpload(id){if(!isAdmin())return;var u=(liveData.storageUploads||[]).find(function(x){return x.id===id;});if(!u)return;if(!confirm('Delete this image from temporary Hub storage? It may remain recoverable through the 7-day soft-delete window.'))return;try{if(u.storagePath&&storage)await storage.ref(u.storagePath).delete();await db.collection('task_uploads').doc(id).delete();toast('Image deleted','ok');}catch(e){toast(e.message||'Could not delete image','err');}}
 function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function escJs(v){return String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,' ');}
+
+
+async function runImageExpiryNotificationSweep(){
+  if(!isAdmin()||!liveData.storageUploads||!liveData.storageUploads.length)return;var settings=getStorageSettings(),daysList=settings.reminderDays||[14,7,3,1],today=new Date().toISOString().slice(0,10),writes=[];
+  liveData.storageUploads.forEach(function(u){if(u.deleted===true)return;var left=taskImageDaysLeft(u);if(!daysList.includes(left))return;var key='expiry_'+u.id+'_'+left+'_'+today,recips=[u.uploaderUid];Object.keys(liveData.members||{}).forEach(function(uid){var m=liveData.members[uid],r=normaliseRole(m.role),ds=normaliseDepts(m.managedDepts||m.leadDepts||m.depts||[]);if(r==='admin'||r==='project_manager'||((r==='lead'||r==='director')&&ds.includes(u.department)))recips.push(uid);});Array.from(new Set(recips.filter(Boolean))).forEach(function(uid){var ref=db.collection('notification_dedupe').doc(key+'_'+uid);writes.push(db.runTransaction(async function(tx){var d=await tx.get(ref);if(d.exists)return;tx.set(ref,{createdAt:new Date().toISOString(),uploadId:u.id,recipientId:uid});var n=db.collection('notifications').doc();tx.set(n,{recipientId:uid,type:'image_expiry',title:'Task image expires in '+left+' day'+(left===1?'':'s'),body:(u.fileName||'An image')+' on '+(u.taskTitle||'a task')+' will be deleted soon. Download and archive it if it must be kept.',meetingId:u.taskId||'',read:false,createdAt:new Date().toISOString()});}));});});
+  await Promise.all(writes);
+}
 
 // ─── CONFIG ───────────────────────────────────────────────
 async function loadConfig() {
@@ -3617,10 +3773,13 @@ async function submitTask() {
     updatedAt:    new Date().toISOString()
   };
   if (editId) {
-    await db.collection('tasks').doc(editId).update(data);
+    await db.collection('tasks').doc(editId).set(data,{merge:true});
+    await recordTaskActivity(editId,'task_edited',currentProfile.name+' edited the task details.');
     toast('Task updated','ok');
   } else {
-    await db.collection('tasks').add(data);
+    data.lastActivityAt = Date.now();
+    var createdRef = await db.collection('tasks').add(data);
+    await recordTaskActivity(createdRef.id,'task_created',currentProfile.name+' created the task.');
     toast('Task created!','ok');
   }
   closeModal('m-task');
@@ -3635,7 +3794,9 @@ function clearTaskForm() {
 async function setTaskState(taskId, newState) {
   var task = liveData.tasks[taskId] || Object.values(liveData.tasks).find(function(t){ return t.id === taskId; });
   if (!canSetState(newState, task)) { toast('No permission to change this task state','err'); return; }
-  await db.collection('tasks').doc(taskId).update({ state: newState, updatedAt: new Date().toISOString() });
+  var oldState = task ? task.state : '';
+  await db.collection('tasks').doc(taskId).set({ state: newState, updatedAt: new Date().toISOString(), lastActivityAt: Date.now() },{merge:true});
+  if (oldState !== newState) await recordTaskActivity(taskId,'state_changed',currentProfile.name+' moved the task from '+(oldState||'unknown').replace(/-/g,' ')+' to '+newState.replace(/-/g,' ')+'.');
   toast('Task updated','ok');
 
 }
@@ -3738,86 +3899,288 @@ function renderAllDeptBoards() {
 
 // ─── ACCEPT TASK ──────────────────────────────────────────
 async function acceptTask(id) {
-  await db.collection('tasks').doc(id).update({ state: 'accepted' });
+  var t=getTaskById(id);
+  await db.collection('tasks').doc(id).set({ state:'accepted', updatedAt:new Date().toISOString(), lastActivityAt:Date.now() },{merge:true});
+  await recordTaskActivity(id,'accepted',currentProfile.name+' accepted the task.');
+  if(t)t.state='accepted';
   toast('Task accepted!', 'ok');
 }
 
-// ─── TASK DETAIL / COMMENTS ───────────────────────────────
+// ─── TASK DETAIL / COLLABORATION — TASK MANAGEMENT 2.0 ────
 let currentTaskId = null;
+let currentTaskTab = 'comments';
+let taskDetailData = { progress:[], feedback:[], references:[], activity:[], images:[] };
+let pendingTaskImageUpload = null;
+let taskImageObjectUrls = {};
+let currentLightboxUploadId = null;
+let taskDetailLoadToken = 0;
 
-function openTaskDetail(id) {
-  currentTaskId = id;
-  const t = Object.values(liveData.tasks).find(t => t.id === id);
-  if (!t) return;
-  
-  document.getElementById('td-title').textContent = '▸ ' + (t.name || 'Task Detail');
-  
-  const assigneeName = t.assignee ? (liveData.members[t.assignee]?.name || 'Unknown') : 'Unassigned';
-  const due = t.dueDate ? new Date(t.dueDate).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}) : 'No due date';
-  const now = new Date(); now.setHours(0,0,0,0);
-  const isOverdue = t.dueDate && new Date(t.dueDate) < now && t.state !== 'completed';
-  
-  document.getElementById('td-body').innerHTML = 
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
-      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Assigned To</div>' +
-        '<div style="font-size:13px;color:var(--white);">' + esc(assigneeName) + '</div></div>' +
-      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Due Date</div>' +
-        '<div style="font-size:13px;color:' + (isOverdue?'var(--crimson-hi)':'var(--white)') + ';">' + due + (isOverdue?' (OVERDUE)':'') + '</div></div>' +
-      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Status</div>' +
-        '<div style="font-size:13px;color:var(--white);">' + ({'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted ✓','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'}[t.state]||t.state) + '</div></div>' +
-      '<div><div style="font-size:10px;letter-spacing:2px;color:var(--grey-2);text-transform:uppercase;margin-bottom:4px;">Priority</div>' +
-        '<div style="font-size:13px;color:var(--white);">' + (t.priority||'medium').charAt(0).toUpperCase()+(t.priority||'medium').slice(1) + '</div></div>' +
-    '</div>' +
-    (t.description ? '<div style="padding:12px;background:rgba(8,10,18,.5);border-radius:4px;border:1px solid var(--border);font-size:12px;color:var(--grey);line-height:1.6;">' + esc(t.description) + '</div>' : '');
+function getTaskById(id) {
+  return liveData.tasks[id] || Object.values(liveData.tasks).find(function(t){ return t.id === id; });
+}
+function taskManagerCanManage(t) {
+  if (!t || !currentProfile) return false;
+  var role = normaliseRole(currentProfile.role || 'member');
+  return role === 'admin' || role === 'project_manager' || ((role === 'lead' || role === 'director') && canManageDepartment(t.dept));
+}
+function taskCanPostProgress(t) {
+  return !!t && !!currentUser && (t.assignee === currentUser.uid || taskManagerCanManage(t));
+}
+function taskCanPostFeedback(t) { return taskManagerCanManage(t); }
+function taskCanAddReference(t) {
+  return !!t && !!currentUser && (t.assignee === currentUser.uid || t.createdBy === currentUser.uid || taskManagerCanManage(t));
+}
+function taskTimestampMs(v) {
+  if (!v) return 0;
+  if (typeof v === 'number') return v;
+  if (v.toMillis) return v.toMillis();
+  var n = new Date(v).getTime();
+  return isNaN(n) ? 0 : n;
+}
+function taskLastActivityMs(t) {
+  return Math.max(taskTimestampMs(t && t.lastActivityAt), taskTimestampMs(t && t.updatedAt), taskTimestampMs(t && t.createdAt));
+}
+function taskRelativeAge(ms) {
+  if (!ms) return 'No activity recorded';
+  var diff = Math.max(0, Date.now() - ms), mins = Math.floor(diff/60000);
+  if (mins < 1) return 'Active just now';
+  if (mins < 60) return 'Active ' + mins + 'm ago';
+  var hrs=Math.floor(mins/60); if(hrs<24) return 'Active ' + hrs + 'h ago';
+  var days=Math.floor(hrs/24); return 'Active ' + days + ' day' + (days===1?'':'s') + ' ago';
+}
+function taskHeartbeatInfo(t) {
+  var ms = taskLastActivityMs(t), days = ms ? Math.floor((Date.now()-ms)/86400000) : 999;
+  if (t && t.state === 'completed') return { cls:'', label:'Completed task', value:taskRelativeAge(ms), days:days };
+  if (days >= 14) return { cls:'stale', label:'Needs attention', value:taskRelativeAge(ms), days:days };
+  if (days >= 7) return { cls:'warn', label:'Activity slowing', value:taskRelativeAge(ms), days:days };
+  return { cls:'', label:'Healthy activity', value:taskRelativeAge(ms), days:days };
+}
+function taskHeartbeatMini(t) {
+  var h=taskHeartbeatInfo(t); if(t.state==='completed'||h.days<7)return '';
+  var c=h.days>=14?'var(--crimson-hi)':'var(--amber)';
+  return '<span class="task-heartbeat-mini" style="color:'+c+';border-color:'+c+'66;">'+(h.days>=14?'INACTIVE':'QUIET')+'</span>';
+}
+function formatTaskEntryTime(v) {
+  var ms=taskTimestampMs(v); if(!ms)return '';
+  return new Date(ms).toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function safeExternalUrl(value) {
+  try { var u=new URL(value); return (u.protocol==='http:'||u.protocol==='https:') ? u.href : ''; } catch(e){ return ''; }
+}
+async function fetchTaskSubcollection(taskId, name) {
+  try {
+    var snap = await db.collection('tasks').doc(taskId).collection(name).get();
+    var rows=[]; snap.forEach(function(doc){ rows.push(Object.assign({id:doc.id},doc.data())); });
+    rows.sort(function(a,b){ return taskTimestampMs(b.createdAt)-taskTimestampMs(a.createdAt); });
+    return rows;
+  } catch(e) { console.warn('Could not load task '+name,e); return []; }
+}
+async function recordTaskActivity(taskId, type, message, extra) {
+  if (!taskId || !db || !currentUser) return;
+  var now=Date.now();
+  var data=Object.assign({ type:type||'update', message:message||'Task updated', uid:currentUser.uid, authorName:(currentProfile&&currentProfile.name)||'Team member', createdAt:now }, extra||{});
+  try {
+    await Promise.all([
+      db.collection('tasks').doc(taskId).collection('activity').add(data),
+      db.collection('tasks').doc(taskId).set({lastActivityAt:now},{merge:true})
+    ]);
+  } catch(e) { console.warn('Task activity could not be recorded',e); }
+}
+async function ensureTaskActivityStart(t) {
+  if (!t || taskDetailData.activity.length) return;
+  taskDetailData.activity=[{id:'activity-start',type:'tracking',message:'Activity tracking begins with Task Management 2.0. Earlier task history has been preserved but was not reconstructed.',uid:'',authorName:'Mission Hub',createdAt:Date.now()}];
+}
 
-  renderComments(t.comments || []);
-  
-  // Show overdue prompt button if applicable
-  if (isOverdue && t.assignee === currentUser?.uid && t.state !== 'completed') {
-    const obtn = document.createElement('button');
-    obtn.className = 'btn btn-danger btn-sm';
-    obtn.textContent = 'Report Timeline to Lead';
-    obtn.onclick = function() { openOverduePrompt(id, t.name||''); };
-    document.getElementById('td-body').appendChild(obtn);
-  }
+async function openTaskDetail(id) {
+  currentTaskId=id; currentTaskTab='comments'; taskDetailData={progress:[],feedback:[],references:[],activity:[],images:[]};
+  var token=++taskDetailLoadToken, t=getTaskById(id); if(!t)return;
+  document.getElementById('td-title').textContent='▸ '+(t.name||t.title||'Task Detail');
+  renderTaskDetailBase(t); renderComments(t.comments||[]); renderTaskDetailLoading(); switchTaskTab('comments');
   openModal('m-task-detail');
+  var rows=await Promise.all(['progressUpdates','feedback','references','activity'].map(function(n){return fetchTaskSubcollection(id,n);}));
+  if(token!==taskDetailLoadToken||currentTaskId!==id)return;
+  taskDetailData={progress:rows[0],feedback:rows[1],references:rows[2],activity:rows[3],images:await fetchTaskImages(id)};
+  await ensureTaskActivityStart(t); renderTaskDetailCollections(t);
+}
+function closeTaskDetail() {
+  taskDetailLoadToken++; currentTaskId=null; taskDetailData={progress:[],feedback:[],references:[],activity:[],images:[]};
+  closeModal('m-task-detail');
+}
+function renderTaskDetailLoading() {
+  ['progress-list','feedback-list','reference-list','activity-list'].forEach(function(s){var e=document.getElementById('td-'+s);if(e)e.innerHTML='<div class="task2-empty">Loading...</div>';});
+}
+function renderTaskDetailBase(t) {
+  var assignee=t.assignee?((liveData.members[t.assignee]&&liveData.members[t.assignee].name)||'Unknown'):'Unassigned';
+  var dept=(getDeptList().find(function(d){return d.id===t.dept;})||{}).label||t.dept||'None';
+  var due=t.dueDate?new Date(t.dueDate+'T00:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):'No due date';
+  var now=new Date();now.setHours(0,0,0,0);var dueObj=t.dueDate?new Date(t.dueDate+'T00:00:00'):null;var overdue=dueObj&&dueObj<now&&t.state!=='completed';
+  var stateLabels={'unassigned':'Unassigned','pending-accept':'Pending Accept','accepted':'Accepted','in-progress':'In Progress','review':'Ready for Review','completed':'Completed'};
+  var state=stateLabels[t.state]||t.state||'Unassigned';
+  var badgeClass=t.state==='completed'?'good':t.state==='review'?'warn':'';
+  document.getElementById('td-state-badge').innerHTML='<span class="task2-badge '+badgeClass+'">'+esc(state)+'</span>';
+  document.getElementById('td-body').innerHTML='<div class="task2-meta-grid">'+
+    '<div class="task2-meta"><div class="task2-meta-label">Assigned To</div><div class="task2-meta-value">'+esc(assignee)+'</div></div>'+
+    '<div class="task2-meta"><div class="task2-meta-label">Department</div><div class="task2-meta-value">'+esc(dept)+'</div></div>'+
+    '<div class="task2-meta"><div class="task2-meta-label">Due Date</div><div class="task2-meta-value" style="color:'+(overdue?'var(--crimson-hi)':'var(--white)')+'">'+esc(due)+(overdue?' · OVERDUE':'')+'</div></div>'+
+    '<div class="task2-meta"><div class="task2-meta-label">Priority</div><div class="task2-meta-value">'+esc((t.priority||'medium').replace(/^./,function(c){return c.toUpperCase();}))+'</div></div></div>'+
+    '<div style="margin-top:11px"><div class="task2-meta-label" style="margin-bottom:5px">Description</div><div class="task2-description">'+(t.description?esc(t.description):'<span style="color:var(--grey-2)">No description provided.</span>')+'</div></div>';
+  renderTaskHeartbeat(t); renderTaskReviewActions(t); renderTaskManagementActions(t);
+  var pc=document.getElementById('td-progress-composer'); if(pc)pc.style.display=taskCanPostProgress(t)?'flex':'none';
+  var fc=document.getElementById('td-feedback-composer'); if(fc)fc.style.display=taskCanPostFeedback(t)?'flex':'none';
+  var rc=document.getElementById('td-reference-composer'); if(rc)rc.style.display=taskCanAddReference(t)?'flex':'none';
+}
+function renderTaskHeartbeat(t) {
+  var h=taskHeartbeatInfo(t), el=document.getElementById('td-heartbeat'); if(!el)return;
+  el.className='task2-heartbeat '+h.cls;
+  el.innerHTML='<div class="task2-heartbeat-title">'+esc(h.label)+'</div><div class="task2-heartbeat-value">'+esc(h.value)+'</div><div class="task2-review-note" style="margin-top:5px">Meaningful updates, comments, feedback and state changes refresh this indicator.</div>';
+}
+function renderTaskReviewActions(t) {
+  var el=document.getElementById('td-review-actions'); if(!el)return; var html='';
+  var isAssignee=currentUser&&t.assignee===currentUser.uid, canManage=taskManagerCanManage(t);
+  if(t.state==='pending-accept'&&isAssignee)html+='<button class="btn btn-gold btn-sm" onclick="acceptTaskFromDetail()">Accept Task</button>';
+  if((t.state==='accepted'||t.state==='in-progress')&&isAssignee)html+='<button class="btn btn-primary btn-sm" onclick="submitTaskForReview()">Submit for Review</button>';
+  if(t.state==='review'&&canManage){
+    html+='<button class="btn btn-gold btn-sm" onclick="approveTaskFromDetail()">Approve & Complete</button>';
+    html+='<button class="btn btn-danger btn-sm" onclick="requestTaskChanges()">Request Changes</button>';
+    html+='<div class="task2-review-note">Request Changes uses the text in the Feedback tab. Enter feedback there first.</div>';
+  }
+  if(t.state==='completed'&&canManage)html+='<button class="btn btn-ghost btn-sm" onclick="reinstateTaskFromDetail()">Reinstate Task</button>';
+  if(!html)html='<div class="task2-review-note">No review action is currently required.</div>';
+  el.innerHTML=html;
+}
+function renderTaskManagementActions(t) {
+  var el=document.getElementById('td-management-actions'); if(!el)return; var html='';
+  if(taskManagerCanManage(t)||t.createdBy===(currentUser&&currentUser.uid))html+='<button class="btn btn-ghost btn-sm" onclick="openEditTaskFromDetail()">Edit Task</button>';
+  var now=new Date();now.setHours(0,0,0,0);var overdue=t.dueDate&&new Date(t.dueDate+'T00:00:00')<now&&t.state!=='completed';
+  if(overdue&&t.assignee===(currentUser&&currentUser.uid))html+='<button class="btn btn-danger btn-sm" onclick="openOverduePromptFromDetail()">Report Timeline to Lead</button>';
+  if(!html)html='<div class="task2-review-note">Task controls are available to its creator or department management.</div>';
+  el.innerHTML=html;
+}
+function switchTaskTab(tab) {
+  currentTaskTab=tab;
+  document.querySelectorAll('[data-task-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.taskTab===tab);});
+  document.querySelectorAll('.task2-pane').forEach(function(p){p.classList.toggle('active',p.id==='td-pane-'+tab);});
+}
+function renderTaskDetailCollections(t) {
+  renderTaskImages('progress'); renderTaskImages('feedback'); renderTaskReferences(); renderTaskActivity();
+  var counts={comments:(t.comments||[]).length,progress:taskDetailData.progress.length,feedback:taskDetailData.feedback.length,references:taskDetailData.references.length,activity:taskDetailData.activity.length};
+  Object.keys(counts).forEach(function(k){var e=document.getElementById('td-count-'+k);if(e)e.textContent=counts[k]?'('+counts[k]+')':'';});
+  renderTaskHeartbeat(t);
+}
+function renderComments(comments) {
+  var el=document.getElementById('td-comments'); if(!el)return;
+  var c=document.getElementById('td-count-comments');if(c)c.textContent=comments&&comments.length?'('+comments.length+')':'';
+  if(!comments||!comments.length){el.innerHTML='<div class="task2-empty">No comments yet.</div>';return;}
+  el.innerHTML=comments.slice().reverse().map(function(x){var m=liveData.members[x.uid],name=(m&&m.name)||x.authorName||'Unknown';return '<div class="comment-item"><div class="comment-av">'+initials(name)+'</div><div class="comment-body"><div><span class="comment-author">'+esc(name)+'</span><span class="comment-time">'+formatTaskEntryTime(x.ts||x.createdAt)+'</span></div><div class="comment-text">'+esc(x.text||'')+'</div></div></div>';}).join('');
+}
+function renderProgressUpdates() {
+  var el=document.getElementById('td-progress-list');if(!el)return;
+  if(!taskDetailData.progress.length){el.innerHTML='<div class="task2-empty">No progress updates yet.</div>';return;}
+  el.innerHTML=taskDetailData.progress.map(function(x){return '<div class="task2-entry"><div class="task2-entry-hdr"><span class="task2-entry-author">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Team member')+'</span><span class="task2-entry-time">'+formatTaskEntryTime(x.createdAt)+'</span></div><div class="task2-entry-text">'+esc(x.text||'')+'</div></div>';}).join('');
+}
+function renderTaskFeedback() {
+  var el=document.getElementById('td-feedback-list');if(!el)return;
+  if(!taskDetailData.feedback.length){el.innerHTML='<div class="task2-empty">No formal feedback yet.</div>';return;}
+  el.innerHTML=taskDetailData.feedback.map(function(x){var tag=x.requestChanges?'<span class="task2-badge bad">Changes requested</span>':'';return '<div class="task2-entry"><div class="task2-entry-hdr"><span class="task2-entry-author">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Lead')+'</span><span class="task2-entry-time">'+formatTaskEntryTime(x.createdAt)+'</span></div>'+tag+'<div class="task2-entry-text" style="margin-top:'+(tag?'7':'0')+'px">'+esc(x.text||'')+'</div></div>';}).join('');
+}
+function renderTaskReferences() {
+  var el=document.getElementById('td-reference-list');if(!el)return;
+  if(!taskDetailData.references.length){el.innerHTML='<div class="task2-empty">No reference links added.</div>';return;}
+  var t=getTaskById(currentTaskId),canManage=taskManagerCanManage(t);
+  el.innerHTML=taskDetailData.references.map(function(x){var url=safeExternalUrl(x.url||'');var canDelete=currentUser&&(x.uid===currentUser.uid||canManage);return '<div class="task2-entry task2-ref"><div class="task2-ref-main"><div class="task2-entry-author">'+esc(x.label||'Reference')+'</div><div style="margin-top:4px"><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(url||x.url||'')+'</a></div><div class="task2-entry-time" style="margin-top:4px">Added by '+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Team member')+' · '+formatTaskEntryTime(x.createdAt)+'</div></div>'+(canDelete?'<button class="icon-btn danger" onclick="deleteTaskReference(\''+x.id+'\')" title="Remove reference">✕</button>':'')+'</div>';}).join('');
+}
+function renderTaskActivity() {
+  var el=document.getElementById('td-activity-list');if(!el)return;
+  if(!taskDetailData.activity.length){el.innerHTML='<div class="task2-empty">No tracked activity yet.</div>';return;}
+  el.innerHTML='<div class="task2-activity">'+taskDetailData.activity.map(function(x){return '<div class="task2-activity-item"><div class="task2-activity-msg">'+esc(x.message||'Task updated')+'</div><div class="task2-activity-meta">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Mission Hub')+' · '+formatTaskEntryTime(x.createdAt)+'</div></div>';}).join('')+'</div>';
+}
+async function withTaskButtonBusy(id, fn) {
+  var b=document.getElementById(id);if(b)b.disabled=true;try{return await fn();}finally{if(b)b.disabled=false;}
 }
 
-function renderComments(comments) {
-  const el = document.getElementById('td-comments');
-  if (!comments || comments.length === 0) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--grey-2);margin-bottom:8px;">No comments yet.</div>';
-    return;
-  }
-  el.innerHTML = comments.map(c => {
-    const member = liveData.members[c.uid];
-    const name = member?.name || 'Unknown';
-    const time = c.ts ? new Date(c.ts).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-    return '<div class="comment-item">' +
-      '<div class="comment-av">' + initials(name) + '</div>' +
-      '<div class="comment-body">' +
-        '<div><span class="comment-author">' + esc(name) + '</span><span class="comment-time">' + time + '</span></div>' +
-        '<div class="comment-text">' + esc(c.text) + '</div>' +
-      '</div></div>';
-  }).join('');
+function taskImagePicked(type){
+  var input=document.getElementById('td-'+type+'-image'),name=document.getElementById('td-'+type+'-image-name'),clear=document.getElementById('td-'+type+'-image-clear');
+  var file=input&&input.files&&input.files[0]; if(name)name.textContent=file?file.name:'No image selected'; if(clear)clear.classList.toggle('hidden',!file);
 }
+function clearTaskImagePicker(type){var input=document.getElementById('td-'+type+'-image');if(input)input.value='';taskImagePicked(type);}
+async function fetchTaskImages(taskId){
+  try{var snap=await db.collection('task_uploads').where('taskId','==',taskId).get(),rows=[];snap.forEach(function(d){var x=Object.assign({id:d.id},d.data());if(x.deleted!==true)rows.push(x);});rows.sort(function(a,b){return uploadDateMs(b)-uploadDateMs(a);});return rows;}catch(e){console.warn('Could not load task images',e);return [];}
+}
+function taskImageDaysLeft(u){var ms=expiryDateMs(u,getStorageSettings());return ms?Math.ceil((ms-Date.now())/86400000):null;}
+function taskImageCanDelete(u,t){return !!currentUser&&(u.uploaderUid===currentUser.uid||taskManagerCanManage(t));}
+function taskImageCanArchive(t){return taskManagerCanManage(t);}
+function imageCardsFor(type){return (taskDetailData.images||[]).filter(function(x){return (x.uploadType||x.type)===type;});}
+function renderTaskImages(type){
+  var list=document.getElementById('td-'+type+'-list');if(!list)return;var entries=type==='progress'?taskDetailData.progress:taskDetailData.feedback,t=getTaskById(currentTaskId),imgs=imageCardsFor(type);
+  var entryHtml='';
+  if(entries.length){entryHtml=entries.map(function(x){var tag=x.requestChanges?'<span class="task2-badge bad">Changes requested</span>':'';return '<div class="task2-entry"><div class="task2-entry-hdr"><span class="task2-entry-author">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Team member')+'</span><span class="task2-entry-time">'+formatTaskEntryTime(x.createdAt)+'</span></div>'+tag+'<div class="task2-entry-text" style="margin-top:'+(tag?'7':'0')+'px">'+esc(x.text||'')+'</div></div>';}).join('');}
+  else entryHtml='<div class="task2-empty">No '+(type==='progress'?'progress updates':'formal feedback')+' yet.</div>';
+  var imgHtml=imgs.length?'<div class="task-img-grid">'+imgs.map(function(u){var days=taskImageDaysLeft(u),cls=days!==null&&days<=3?'danger':days!==null&&days<=14?'warn':'',canDel=taskImageCanDelete(u,t),canArc=taskImageCanArchive(t);return '<div class="task-img-card"><div class="task-img-preview loading" id="task-img-preview-'+escAttr(u.id)+'" onclick="openTaskImageLightbox(\''+escJs(u.id)+'\')"></div><div class="task-img-meta"><div class="task-img-name" title="'+escAttr(u.fileName||'Image')+'">'+esc(u.fileName||'Image')+'</div><div class="task-img-sub">'+esc(u.uploaderName||'Team member')+' · '+formatBytes(u.sizeBytes||0)+(u.caption?' · '+esc(u.caption):'')+'</div><div class="task-img-expiry '+cls+'">'+(days===null?'Expiry unavailable':days<0?'Expired':days===0?'Expires today':'Expires in '+days+' days')+(u.archivedExternally?' · Archived externally':'')+'</div><div class="task-img-actions"><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();downloadTaskImage(\''+escJs(u.id)+'\')">Download</button>'+(canArc?'<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();toggleTaskImageArchived(\''+escJs(u.id)+'\','+(!u.archivedExternally)+')">'+(u.archivedExternally?'Unmark archive':'Mark archived')+'</button>':'')+(canDel?'<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTaskImage(\''+escJs(u.id)+'\')">Delete</button>':'')+'</div></div></div>';}).join('')+'</div>':'';
+  list.innerHTML=entryHtml+imgHtml;imgs.forEach(function(u){loadTaskImagePreview(u);});
+}
+async function privateStorageBlob(u){
+  if(taskImageObjectUrls[u.id])return taskImageObjectUrls[u.id];var token=await currentUser.getIdToken(),cfg=getStoredConfig()||{},bucket=cfg.storageBucket||'cosmic-vessel-project.firebasestorage.app',url='https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(bucket)+'/o/'+encodeURIComponent(u.storagePath)+'?alt=media';var res=await fetch(url,{headers:{Authorization:'Bearer '+token}});if(!res.ok)throw new Error('Image could not be loaded ('+res.status+')');var blob=await res.blob(),obj=URL.createObjectURL(blob);taskImageObjectUrls[u.id]=obj;return obj;
+}
+async function loadTaskImagePreview(u){var el=document.getElementById('task-img-preview-'+u.id);if(!el)return;try{var url=await privateStorageBlob(u);el.classList.remove('loading');el.innerHTML='<img src="'+url+'" alt="'+escAttr(u.fileName||'Task image')+'">';}catch(e){el.classList.remove('loading');el.innerHTML='<span class="text-red text-small">Unable to load</span>';}}
+async function openTaskImageLightbox(id){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;});if(!u)return;try{var url=await privateStorageBlob(u);document.getElementById('task-image-lightbox-img').src=url;document.getElementById('task-image-lightbox-name').textContent=u.fileName||'Task image';currentLightboxUploadId=id;document.getElementById('task-image-lightbox').classList.add('open');}catch(e){toast(e.message||'Could not open image','err');}}
+function closeTaskImageLightbox(){document.getElementById('task-image-lightbox').classList.remove('open');currentLightboxUploadId=null;}
+function downloadCurrentLightboxImage(){if(currentLightboxUploadId)downloadTaskImage(currentLightboxUploadId);}
+async function downloadTaskImage(id){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;})||(liveData.storageUploads||[]).find(function(x){return x.id===id;});if(!u)return;try{var url=await privateStorageBlob(u),a=document.createElement('a');a.href=url;a.download=u.fileName||'task-image';document.body.appendChild(a);a.click();a.remove();await incrementTaskImageDownload(u);}catch(e){toast(e.message||'Could not download image','err');}}
+async function incrementTaskImageDownload(u){try{var month=new Date().toISOString().slice(0,7),up={downloadCount:firebase.firestore.FieldValue.increment(1),downloadBytesTotal:firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0)),lastDownloadedAt:new Date().toISOString()};up['downloadsByMonth.'+month]=firebase.firestore.FieldValue.increment(1);up['downloadBytesByMonth.'+month]=firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0));await db.collection('task_uploads').doc(u.id).update(up);}catch(e){console.warn('Download tracking failed',e);}}
+function requestTaskImageUpload(type,recordId){
+  var t=getTaskById(currentTaskId),input=document.getElementById('td-'+type+'-image'),file=input&&input.files&&input.files[0];if(!file)return Promise.resolve(null);
+  return new Promise(function(resolve,reject){pendingTaskImageUpload={type:type,recordId:recordId,file:file,task:t,resolve:resolve,reject:reject};var settings=getStorageSettings(),exp=new Date(Date.now()+Number(settings.retentionDays||45)*86400000);document.getElementById('task-image-warning-days').textContent=(settings.retentionDays||45)+' days';document.getElementById('task-image-warning-summary').innerHTML='<div><strong>'+esc(file.name)+'</strong></div><div class="text-grey text-small" style="margin-top:5px">'+formatBytes(file.size)+' · '+esc(t.name||'Task')+' · Deletes '+exp.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'</div>';document.getElementById('task-image-warning-confirm').checked=false;document.getElementById('task-image-warning-upload').disabled=true;openModal('m-task-image-warning');});
+}
+function cancelPendingTaskImageUpload(){closeModal('m-task-image-warning');if(pendingTaskImageUpload){pendingTaskImageUpload.resolve(null);pendingTaskImageUpload=null;}}
+async function confirmPendingTaskImageUpload(){var p=pendingTaskImageUpload;if(!p)return;closeModal('m-task-image-warning');pendingTaskImageUpload=null;try{var u=await performTaskImageUpload(p);p.resolve(u);}catch(e){p.reject(e);}}
+async function performTaskImageUpload(p){
+  var file=p.file,t=p.task,type=p.type,settings=getStorageSettings(),max=Number(settings.maxFileMb||3.5)*1024*1024;if(!file||!t)throw new Error('Upload information is missing.');if(file.size>max)throw new Error('Image exceeds the '+settings.maxFileMb+' MB limit.');if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error('Only JPEG, PNG and WebP images are allowed.');
+  if(type==='progress'&&!taskCanPostProgress(t))throw new Error('You cannot upload progress images to this task.');if(type==='feedback'&&!taskCanPostFeedback(t))throw new Error('Only department management can upload feedback images.');
+  var current=imageCardsFor(type).length,limit=Number(type==='progress'?settings.progressLimit:settings.feedbackLimit)||3;if(current>=limit)throw new Error('This task already has the maximum of '+limit+' '+type+' images.');
+  var snap=await db.collection('task_uploads').get(),total=0;snap.forEach(function(d){var x=d.data();if(x.deleted!==true)total+=Number(x.sizeBytes||0);});var role=normaliseRole(currentProfile.role),hard=storageGbBytes(settings.lockGb),restrict=storageGbBytes(settings.restrictGb);if(total+file.size>hard)throw new Error('Uploads are locked because the Hub storage safety limit would be exceeded.');if(role==='member'&&total+file.size>restrict)throw new Error('Member uploads are temporarily restricted while storage is near its safety limit.');
+  var safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_'),id=db.collection('task_uploads').doc().id,path='task-uploads/'+t.dept+'/'+currentTaskId+'/'+type+'/'+id+'_'+safe,ref=storage.ref(path),prog=document.getElementById('td-'+type+'-upload-progress');if(prog){prog.style.display='block';prog.querySelector('span').style.width='2%';}
+  var meta={customMetadata:{uploaderUid:currentUser.uid,department:t.dept,taskId:currentTaskId,uploadType:type}};
+  await new Promise(function(resolve,reject){var task=ref.put(file,meta);task.on('state_changed',function(s){if(prog)prog.querySelector('span').style.width=Math.round(s.bytesTransferred/s.totalBytes*100)+'%';},reject,resolve);});
+  var now=Date.now(),data={storagePath:path,fileName:file.name,contentType:file.type,sizeBytes:file.size,taskId:currentTaskId,taskTitle:t.name||'',department:t.dept,uploadType:type,parentRecordId:p.recordId||'',uploaderUid:currentUser.uid,uploaderName:currentProfile.name||'Team member',uploadedAt:new Date(now).toISOString(),expiresAt:new Date(now+Number(settings.retentionDays||45)*86400000).toISOString(),archivedExternally:false,downloadCount:0};
+  try{await db.collection('task_uploads').doc(id).set(data);}catch(e){try{await ref.delete();}catch(_){}throw e;}
+  data.id=id;taskDetailData.images.unshift(data);if(prog){setTimeout(function(){prog.style.display='none';prog.querySelector('span').style.width='0';},500);}clearTaskImagePicker(type);await recordTaskActivity(currentTaskId,type+'_image',currentProfile.name+' uploaded a '+type+' image.');await notifyDepartmentImageUpload(data,t);return data;
+}
+async function notifyDepartmentImageUpload(u,t){var ids=[];Object.keys(liveData.members||{}).forEach(function(uid){var m=liveData.members[uid],r=normaliseRole(m.role),ds=normaliseDepts(m.managedDepts||m.leadDepts||m.depts||[]);if(r==='admin'||r==='project_manager'||((r==='lead'||r==='director')&&ds.includes(t.dept)))ids.push(uid);});await Promise.all(Array.from(new Set(ids)).map(function(uid){return createUserNotification(uid,'task_image_uploaded','New task image uploaded',(u.uploaderName||'A team member')+' uploaded '+(u.fileName||'an image')+' to '+(t.name||'a task')+'. Review and archive important work before it expires.',currentTaskId);}));}
+async function toggleTaskImageArchived(id,value){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;});if(!u)return;try{await db.collection('task_uploads').doc(id).set({archivedExternally:!!value,archivedAt:value?new Date().toISOString():null,archivedBy:value?currentUser.uid:null},{merge:true});u.archivedExternally=!!value;renderTaskImages(u.uploadType);toast(value?'Marked as archived externally':'Archive mark removed','ok');}catch(e){toast('Could not update archive status','err');}}
+async function deleteTaskImage(id){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;}),t=getTaskById(currentTaskId);if(!u||!taskImageCanDelete(u,t))return;if(!confirm('Delete this temporary image? It may remain recoverable for seven days through soft delete.'))return;try{await storage.ref(u.storagePath).delete();await db.collection('task_uploads').doc(id).delete();if(taskImageObjectUrls[id]){URL.revokeObjectURL(taskImageObjectUrls[id]);delete taskImageObjectUrls[id];}taskDetailData.images=taskDetailData.images.filter(function(x){return x.id!==id;});renderTaskImages(u.uploadType);await recordTaskActivity(currentTaskId,'image_deleted',currentProfile.name+' deleted a temporary task image.');toast('Image deleted','ok');}catch(e){toast(e.message||'Could not delete image','err');}}
 
 async function submitComment() {
-  const input = document.getElementById('td-comment-input');
-  const text = input.value.trim();
-  if (!text || !currentTaskId) return;
-  
-  const t = Object.values(liveData.tasks).find(t => t.id === currentTaskId);
-  if (!t) return;
-  
-  const comments = t.comments || [];
-  comments.push({ uid: currentUser.uid, text, ts: Date.now() });
-  
-  await db.collection('tasks').doc(currentTaskId).update({ comments });
-  input.value = '';
-  renderComments(comments);
-  toast('Comment posted', 'ok');
+  var input=document.getElementById('td-comment-input'),text=input.value.trim();if(!text||!currentTaskId)return;
+  var t=getTaskById(currentTaskId);if(!t)return;
+  await withTaskButtonBusy('td-comment-submit',async function(){var comments=(t.comments||[]).slice();comments.push({uid:currentUser.uid,authorName:currentProfile.name,text:text,ts:Date.now()});await db.collection('tasks').doc(currentTaskId).set({comments:comments,lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'comment',currentProfile.name+' added a comment.');t.comments=comments;input.value='';renderComments(comments);renderTaskHeartbeat(t);toast('Comment posted','ok');});
 }
+async function submitProgressUpdate() {
+  var t=getTaskById(currentTaskId),input=document.getElementById('td-progress-input'),text=input.value.trim(),file=document.getElementById('td-progress-image')?.files?.[0];if(!t||(!text&&!file))return;
+  if(!taskCanPostProgress(t)){toast('You cannot post progress to this task','err');return;}
+  await withTaskButtonBusy('td-progress-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image progress update',createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('progressUpdates').add(data);taskDetailData.progress.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('progress',r.id);input.value='';await recordTaskActivity(currentTaskId,'progress',currentProfile.name+' posted a progress update.');renderTaskDetailCollections(t);toast('Progress update posted','ok');}catch(e){toast(e.message||'Could not post progress update','err');}});
+}
+async function submitTaskFeedback(requestChanges) {
+  var t=getTaskById(currentTaskId),input=document.getElementById('td-feedback-input'),text=input.value.trim(),file=document.getElementById('td-feedback-image')?.files?.[0];if(!t||(!text&&!file)){toast('Enter feedback or attach an image first','err');return false;}
+  if(!taskCanPostFeedback(t)){toast('Only authorised department management can post formal feedback','err');return false;}
+  return await withTaskButtonBusy('td-feedback-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image feedback',requestChanges:!!requestChanges,createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('feedback').add(data);taskDetailData.feedback.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('feedback',r.id);input.value='';await recordTaskActivity(currentTaskId,requestChanges?'changes_requested':'feedback',currentProfile.name+(requestChanges?' requested changes.':' posted formal feedback.'));renderTaskDetailCollections(t);toast(requestChanges?'Changes requested':'Feedback posted','ok');return true;}catch(e){toast(e.message||'Could not post feedback','err');return false;}});
+}
+async function submitTaskReference() {
+  var t=getTaskById(currentTaskId),label=document.getElementById('td-ref-label').value.trim(),raw=document.getElementById('td-ref-url').value.trim(),url=safeExternalUrl(raw);if(!t)return;
+  if(!taskCanAddReference(t)){toast('You cannot add references to this task','err');return;}
+  if(!url){toast('Enter a valid http or https link','err');return;}
+  await withTaskButtonBusy('td-reference-submit',async function(){var data={uid:currentUser.uid,authorName:currentProfile.name,label:label||'Reference',url:url,createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('references').add(data);taskDetailData.references.unshift(Object.assign({id:r.id},data));document.getElementById('td-ref-label').value='';document.getElementById('td-ref-url').value='';await recordTaskActivity(currentTaskId,'reference',currentProfile.name+' added a reference link.');renderTaskDetailCollections(t);toast('Reference added','ok');});
+}
+async function deleteTaskReference(id) {
+  if(!currentTaskId||!confirm('Remove this reference link?'))return;var x=taskDetailData.references.find(function(r){return r.id===id;});
+  await db.collection('tasks').doc(currentTaskId).collection('references').doc(id).delete();taskDetailData.references=taskDetailData.references.filter(function(r){return r.id!==id;});await recordTaskActivity(currentTaskId,'reference_removed',currentProfile.name+' removed reference "'+((x&&x.label)||'Reference')+'".');renderTaskReferences();toast('Reference removed','inf');
+}
+async function acceptTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t)return;await setTaskState(currentTaskId,'accepted');t.state='accepted';renderTaskDetailBase(t);}
+async function submitTaskForReview(){var t=getTaskById(currentTaskId);if(!t)return;if(t.assignee!==currentUser.uid){toast('Only the assignee can submit this task','err');return;}await db.collection('tasks').doc(currentTaskId).set({state:'review',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'review_submitted',currentProfile.name+' submitted the task for review.');t.state='review';renderTaskDetailBase(t);toast('Submitted for review','ok');}
+async function approveTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t)){toast('No permission','err');return;}await db.collection('tasks').doc(currentTaskId).set({state:'completed',updatedAt:new Date().toISOString(),completedAt:Date.now(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'approved',currentProfile.name+' approved and completed the task.');if(t.assignee)await createUserNotification(t.assignee,'task_approved','Task approved',(t.name||'Your task')+' has been approved and completed.',currentTaskId);t.state='completed';renderTaskDetailBase(t);toast('Task approved','ok');}
+async function requestTaskChanges(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t)){toast('No permission','err');return;}var input=document.getElementById('td-feedback-input');if(!input.value.trim()){switchTaskTab('feedback');input.focus();toast('Enter the requested changes in Feedback first','inf');return;}var ok=await submitTaskFeedback(true);if(!ok)return;await db.collection('tasks').doc(currentTaskId).set({state:'in-progress',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});if(t.assignee)await createUserNotification(t.assignee,'task_changes','Changes requested','Changes have been requested on '+(t.name||'your task')+'.',currentTaskId);t.state='in-progress';renderTaskDetailBase(t);}
+async function reinstateTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t))return;await db.collection('tasks').doc(currentTaskId).set({state:'in-progress',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'reinstated',currentProfile.name+' reinstated the task.');t.state='in-progress';renderTaskDetailBase(t);toast('Task reinstated','ok');}
+function openEditTaskFromDetail(){var id=currentTaskId;closeTaskDetail();setTimeout(function(){openEditTask(id);},80);}
+function openOverduePromptFromDetail(){var t=getTaskById(currentTaskId);if(!t)return;var id=currentTaskId,name=t.name||'';closeTaskDetail();setTimeout(function(){openOverduePrompt(id,name);},80);}
 
 // ─── OVERDUE PROMPT ───────────────────────────────────────
 function openOverduePrompt(id, name) {
@@ -3837,7 +4200,8 @@ async function submitOverdueReport() {
   const msg = currentProfile.name + ' reports needing ' + time + ' more for task "' + (t.name||'') + '".' + (notes ? ' Notes: ' + notes : '');
   const comments = t.comments || [];
   comments.push({ uid: currentUser.uid, text: msg, ts: Date.now(), system: true });
-  await db.collection('tasks').doc(id).update({ comments });
+  await db.collection('tasks').doc(id).set({comments:comments,lastActivityAt:Date.now()},{merge:true});
+  await recordTaskActivity(id,'timeline_report',currentProfile.name+' submitted an updated timeline estimate.');
   
   closeModal('m-overdue');
   toast('Lead notified via task comments', 'ok');
@@ -3957,7 +4321,8 @@ async function dropMyTask(e, newState) {
     if (task && task.assignee !== uid) { toast('You can only move your own tasks','err'); dragMyTaskId = null; return; }
   }
 
-  await db.collection('tasks').doc(dragMyTaskId).update({ state: newState, updatedAt: new Date().toISOString() });
+  await db.collection('tasks').doc(dragMyTaskId).set({ state:newState, updatedAt:new Date().toISOString(), lastActivityAt:Date.now() },{merge:true});
+  await recordTaskActivity(dragMyTaskId,'state_changed',currentProfile.name+' moved the task to '+newState.replace(/-/g,' ')+'.');
   dragMyTaskId = null;
   toast('Task moved to ' + newState.replace('-',' '),'ok');
   renderMyTasks(); // re-render immediately without waiting for snapshot
@@ -4289,7 +4654,7 @@ function taskCardHTML(t) {
     html += '</div>';
   }
   html += '</div>';
-  html += '<div class="tc-title">' + esc(t.name || t.title || '') + '</div>';
+  html += '<div class="tc-title">' + esc(t.name || t.title || '') + taskHeartbeatMini(t) + '</div>';
   if (assigneeName) html += '<div class="tc-assign">' + esc(assigneeName) + '</div>';
   if (dueDateStr) html += '<div style="font-family:Share Tech Mono,monospace;font-size:10px;color:' + (isOverdue?'var(--crimson-hi)':'var(--grey-2)') + ';margin-top:4px;">' + (isOverdue?'OVERDUE: ':'Due: ') + dueDateStr + '</div>';
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">';
@@ -4324,7 +4689,8 @@ async function onDrop(e, dept, memberId) {
   if (memberId === '__completed__') {
     if (!adminLead) { toast('Only leads and admins can mark tasks complete','err'); return; }
     try {
-      await db.collection('tasks').doc(taskId).update({ state: 'completed', updatedAt: new Date().toISOString() });
+      await db.collection('tasks').doc(taskId).set({ state:'completed', updatedAt:new Date().toISOString(), completedAt:Date.now(), lastActivityAt:Date.now() },{merge:true});
+      await recordTaskActivity(taskId,'approved',currentProfile.name+' marked the task complete.');
       toast('Task marked complete','ok');
     } catch(e) {
       toast('Could not update task: ' + e.message, 'err');
@@ -4332,7 +4698,7 @@ async function onDrop(e, dept, memberId) {
     return;
   }
 
-  var update = { updatedAt: new Date().toISOString() };
+  var update = { updatedAt:new Date().toISOString(), lastActivityAt:Date.now() };
   if (memberId) {
     update.assignee = memberId;
     if (task.state === 'unassigned' || task.state === 'pending-accept') update.state = 'in-progress';
@@ -4341,7 +4707,8 @@ async function onDrop(e, dept, memberId) {
     update.state = 'unassigned';
   }
   try {
-    await db.collection('tasks').doc(taskId).update(update);
+    await db.collection('tasks').doc(taskId).set(update,{merge:true});
+    await recordTaskActivity(taskId,'assignment_changed',memberId ? currentProfile.name+' assigned or moved the task.' : currentProfile.name+' returned the task to unassigned.');
   } catch(e) {
     toast('Could not update task: ' + e.message, 'err');
   }
