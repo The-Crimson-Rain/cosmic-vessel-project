@@ -6,7 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cosmic Vessel Project — Mission Hub</title>
+<title>Cosmic Vessel Project — Mission Hub v10B.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
@@ -1830,9 +1830,257 @@ body.ms2-detail-open{overflow:hidden}
 @media(max-width:700px){.ms2-grid{grid-template-columns:1fr}.ms2-card.ms2-summary-card{height:225px}.ms2-detail-bg{padding:0}.ms2-detail-shell{width:100vw;height:100vh;max-height:none;border-radius:0}.ms2-detail-content{padding:10px}.ms2-detail-card .ms2-title{font-size:18px}}
 
 
+
+/* ═══════════════════════════════════════════════
+   HOME DASHBOARD 2.0
+═══════════════════════════════════════════════ */
+.home-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:5px 2px 18px}
+.home-eyebrow{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.home-greeting{font-family:'Orbitron',sans-serif;font-size:23px;font-weight:700;letter-spacing:2px;margin-top:5px}
+.home-subline{font-size:14px;color:var(--grey);margin-top:5px}
+.home-hero-actions,.home-card-head-actions{display:flex;align-items:center;gap:7px}
+.home-focus-card{display:flex;align-items:center;gap:16px;background:linear-gradient(110deg,rgba(200,16,46,.13),rgba(17,19,32,.94) 48%,rgba(201,168,76,.07));border:1px solid rgba(200,16,46,.32);border-radius:10px;padding:17px 19px;margin-bottom:14px;box-shadow:0 12px 35px rgba(0,0,0,.18)}
+.home-focus-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--crimson-dim);border:1px solid rgba(200,16,46,.42);font-size:21px;color:var(--crimson-hi);flex-shrink:0}
+.home-focus-copy{flex:1;min-width:0}
+.home-focus-title{font-size:18px;font-weight:700;margin-top:3px}
+.home-focus-detail{font-size:13px;color:var(--grey);margin-top:3px}
+.home-card-kicker{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.home-alert-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.home-alert{background:rgba(17,19,32,.88);border:1px solid var(--border);border-left:3px solid var(--alert-color,var(--gold));border-radius:7px;padding:11px 13px;cursor:pointer;min-height:66px}
+.home-alert-value{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700}
+.home-alert-label{font-size:11px;color:var(--grey);margin-top:4px;letter-spacing:.5px}
+.home-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.home-card{background:rgba(17,19,32,.88);border:1px solid var(--border);border-radius:9px;overflow:hidden;min-width:0}
+.home-span-2{grid-column:span 2}.home-span-3{grid-column:span 3}
+.home-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;background:rgba(8,10,18,.48);border-bottom:1px solid var(--border)}
+.home-card-title{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;margin-top:3px}
+.home-card-body{padding:10px 13px;max-height:330px;overflow:auto}
+.home-card.collapsed .home-card-body{display:none}.home-card.collapsed .home-card-head{border-bottom:none}
+.home-collapse-btn{width:25px;height:25px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--grey);cursor:pointer;font-size:15px;line-height:1}
+.home-collapse-btn:hover{color:var(--white);border-color:var(--border-2)}
+.home-list-item{display:flex;align-items:center;gap:10px;padding:9px 5px;border-bottom:1px solid rgba(30,33,56,.48);cursor:pointer}
+.home-list-item:last-child{border-bottom:none}.home-list-item:hover{background:rgba(255,255,255,.025)}
+.home-list-main{flex:1;min-width:0}.home-list-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-list-meta{font-size:11px;color:var(--grey);margin-top:2px}
+.home-mini-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;border:1px solid var(--border-2);border-radius:3px;color:var(--grey);white-space:nowrap}
+.home-progress-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:7px}.home-progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#77e8b6);border-radius:3px}
+.home-metric-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.home-metric{background:rgba(8,10,18,.48);border:1px solid var(--border);border-radius:6px;padding:10px}
+.home-metric strong{font-family:'Orbitron',sans-serif;font-size:17px}.home-metric span{display:block;color:var(--grey);font-size:10px;margin-top:3px}
+.home-positive-card{border-color:rgba(46,204,138,.27);background:linear-gradient(100deg,rgba(46,204,138,.055),rgba(17,19,32,.9))}
+.home-celebration{position:relative;overflow:hidden;border:1px solid rgba(46,204,138,.38);background:linear-gradient(110deg,rgba(46,204,138,.13),rgba(201,168,76,.07));border-radius:9px;padding:14px 18px;margin-bottom:14px}
+.home-celebration-title{font-size:16px;font-weight:700;color:var(--green)}.home-celebration-copy{font-size:12px;color:var(--grey);margin-top:3px}
+.home-empty{padding:20px 8px;text-align:center;color:var(--grey-2);font-size:12px}
+.home-notif-unread{border-left:2px solid var(--crimson-hi);padding-left:8px}
+.home-theme-preview{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.theme-row{border:1px solid var(--border);border-radius:6px;padding:11px;background:rgba(8,10,18,.5)}
+.theme-row .grid-2{margin-top:8px}
+/* Seasonal theme framework — deliberately lightweight */
+body.theme-halloween{--season-accent:#d67425;--season-glow:rgba(214,116,37,.15)}
+body.theme-winter{--season-accent:#8fc9e8;--season-glow:rgba(143,201,232,.13)}
+body.theme-anniversary{--season-accent:var(--gold-hi);--season-glow:rgba(201,168,76,.15)}
+body[class*="theme-"] #header{box-shadow:0 2px 40px var(--season-glow)}
+body[class*="theme-"] .home-hero{border-top:1px solid color-mix(in srgb,var(--season-accent) 35%,transparent)}
+body[class*="theme-"] .home-greeting::after{content:' ✦';color:var(--season-accent);font-size:.7em}
+body.theme-halloween #cvp-bg-canvas{filter:hue-rotate(305deg) saturate(1.12)}
+body.theme-winter #cvp-bg-canvas{filter:hue-rotate(150deg) saturate(.72) brightness(1.18)}
+
+/* Dashboard 10A.1 — visible lightweight seasonal effects */
+#seasonal-effects{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#app,#login-screen,#setup-banner{position:relative;z-index:1}
+.seasonal-preview-badge{position:fixed;right:18px;bottom:18px;z-index:8800;padding:7px 11px;border:1px solid var(--gold-dim);border-radius:5px;background:rgba(8,10,18,.94);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.season-snow{position:absolute;top:-7vh;color:rgba(235,248,255,.86);text-shadow:0 0 7px rgba(160,215,255,.75);animation:seasonSnowFall linear infinite;opacity:.9}
+@keyframes seasonSnowFall{0%{transform:translate3d(0,-8vh,0) rotate(0);opacity:0}10%{opacity:.9}85%{opacity:.75}100%{transform:translate3d(55px,110vh,0) rotate(300deg);opacity:0}}
+body.theme-winter .panel,body.theme-winter .home-card,body.theme-winter .board-col{position:relative}
+body.theme-winter .panel::before,body.theme-winter .home-card::before{content:'';position:absolute;left:6px;right:9px;top:-3px;height:7px;border-radius:60% 35% 55% 30%;background:linear-gradient(180deg,rgba(248,253,255,.82),rgba(190,225,245,.34) 72%,transparent);pointer-events:none;z-index:3}
+.season-leaf{position:absolute;top:-8vh;color:rgba(218,112,32,.72);font-size:15px;animation:seasonLeafFall linear infinite;text-shadow:0 0 5px rgba(112,35,15,.65)}
+@keyframes seasonLeafFall{0%{transform:translate3d(0,-8vh,0) rotate(0);opacity:0}8%{opacity:.8}50%{transform:translate3d(55px,52vh,0) rotate(240deg)}100%{transform:translate3d(-25px,108vh,0) rotate(600deg);opacity:0}}
+.season-ghost{position:absolute;top:15%;width:22px;height:25px;border-radius:50% 50% 38% 38%;background:rgba(228,218,245,.18);border:1px solid rgba(240,232,255,.28);filter:drop-shadow(0 0 8px rgba(170,125,225,.24));animation:seasonGhostFloat ease-in-out infinite}
+.season-ghost::before,.season-ghost::after{content:'';position:absolute;top:8px;width:3px;height:4px;border-radius:50%;background:rgba(15,10,25,.65)}
+.season-ghost::before{left:6px}.season-ghost::after{right:6px}.season-ghost i{position:absolute;left:2px;right:2px;bottom:-4px;height:8px;background:inherit;clip-path:polygon(0 0,20% 55%,40% 0,60% 55%,80% 0,100% 55%,100% 0)}
+@keyframes seasonGhostFloat{0%{transform:translate3d(-30px,0,0);opacity:0}12%{opacity:.55}50%{transform:translate3d(45vw,18px,0)}88%{opacity:.45}100%{transform:translate3d(105vw,-8px,0);opacity:0}}
+body.theme-halloween #sidebar::after{content:'◉  ◉';position:fixed;left:8px;bottom:8px;font-size:18px;letter-spacing:3px;color:#d67425;opacity:.42;text-shadow:0 0 8px #8c3a12;pointer-events:none}
+.season-star,.season-flare{position:absolute;color:rgba(232,197,106,.72);animation:seasonStarPulse ease-in-out infinite;text-shadow:0 0 8px rgba(155,108,240,.65)}
+.season-star{font-size:20px}.season-flare{font-size:17px;color:rgba(232,21,58,.75)}
+@keyframes seasonStarPulse{0%,100%{opacity:.15;transform:scale(.65)}50%{opacity:.95;transform:scale(1.25)}}
+body.theme-anniversary #seasonal-effects::before{content:'';position:absolute;inset:-20%;background:radial-gradient(circle at 25% 30%,rgba(155,108,240,.12),transparent 25%),radial-gradient(circle at 72% 68%,rgba(200,16,46,.1),transparent 28%),radial-gradient(circle at 58% 20%,rgba(201,168,76,.08),transparent 20%);animation:seasonNebula 16s ease-in-out infinite alternate}
+@keyframes seasonNebula{from{transform:scale(1) rotate(-1deg);opacity:.7}to{transform:scale(1.08) rotate(2deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.season-snow,.season-leaf,.season-ghost,.season-star,.season-flare,body.theme-anniversary #seasonal-effects::before{animation:none!important}.season-snow,.season-leaf{top:8%;opacity:.32}.season-ghost{opacity:.25}}
+
+@media(max-width:1000px){.home-grid{grid-template-columns:1fr 1fr}.home-span-3{grid-column:span 2}.home-alert-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.home-hero{align-items:flex-start;flex-direction:column}.home-grid{grid-template-columns:1fr}.home-span-2,.home-span-3{grid-column:span 1}.home-alert-grid{grid-template-columns:1fr 1fr}.home-focus-card{align-items:flex-start;flex-wrap:wrap}.home-focus-card .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){body[class*="theme-"] #cvp-bg-canvas{filter:none}}
+
+
+/* ═══════════════════════════════════════════════
+   JOURNEY SYSTEM v10B
+═══════════════════════════════════════════════ */
+.journey-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(17,19,32,.96),rgba(10,12,24,.9));}
+.journey-card::after{content:'';position:absolute;inset:auto -20% -55% 30%;height:150px;background:radial-gradient(ellipse,rgba(155,108,240,.13),transparent 70%);pointer-events:none}
+.journey-head{display:flex;align-items:center;gap:13px}.journey-crest{width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:27px;border:1px solid rgba(155,108,240,.4);background:radial-gradient(circle at 35% 30%,rgba(155,108,240,.28),rgba(8,10,18,.88));box-shadow:0 0 18px rgba(155,108,240,.14);flex-shrink:0}
+.journey-level{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700}.journey-path{font-size:12px;color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;margin-top:2px}.journey-title{font-size:12px;color:var(--grey);margin-top:2px}
+.journey-xp-track{height:7px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:13px}.journey-xp-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--purple),var(--blue),var(--gold));box-shadow:0 0 10px rgba(155,108,240,.4);transition:width .45s ease}.journey-xp-meta{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--grey);margin-top:5px}
+.journey-badge{display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding:4px 8px;border-radius:4px;border:1px solid var(--border-2);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--white)}
+.path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.path-choice{border:1px solid var(--border);background:rgba(8,10,18,.75);border-radius:7px;padding:12px 7px;color:var(--grey);cursor:pointer;text-align:center;transition:.16s}.path-choice:hover,.path-choice.selected{border-color:var(--purple);color:var(--white);background:rgba(155,108,240,.12);box-shadow:0 0 14px rgba(155,108,240,.13)}.path-choice-icon{font-size:23px;display:block;margin-bottom:5px}.path-choice-name{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.journey-admin-member{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(30,33,56,.45)}.journey-admin-member:last-child{border-bottom:none}.journey-admin-name{font-size:14px;font-weight:700}.journey-admin-meta{font-size:11px;color:var(--grey)}
+.journey-celebration{position:fixed;inset:0;z-index:10050;background:rgba(4,5,8,.86);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:20px}.journey-celebration.hidden{display:none}.journey-celebration-card{width:min(540px,94vw);text-align:center;padding:38px 28px;border-radius:14px;border:1px solid rgba(155,108,240,.5);background:radial-gradient(circle at 50% 0,rgba(155,108,240,.2),transparent 40%),var(--panel);box-shadow:0 0 70px rgba(155,108,240,.25),0 30px 80px rgba(0,0,0,.8)}.journey-celebration-symbol{font-size:54px;filter:drop-shadow(0 0 16px rgba(155,108,240,.8))}.journey-celebration-title{font-family:'Orbitron',sans-serif;font-size:20px;letter-spacing:2px;margin:14px 0 8px}.journey-celebration-msg{font-size:15px;color:var(--grey);line-height:1.55}
+/* Halloween premium refinement */
+body.theme-halloween{--season-accent:#d6812f;--season-glow:rgba(165,78,190,.17)}
+.season-ghost{border:none!important;background:radial-gradient(ellipse at 50% 38%,rgba(239,230,255,.25),rgba(198,160,230,.10) 55%,transparent 74%)!important;filter:blur(.15px) drop-shadow(0 0 15px rgba(185,125,225,.26))!important;opacity:.42}
+.season-ghost::before,.season-ghost::after{background:rgba(35,20,48,.45)!important;filter:blur(.4px)}
+.season-leaf{width:14px;height:8px;border-radius:85% 12% 85% 12%;background:linear-gradient(135deg,#d96d25,#9f3e28 58%,#e6a53a);color:transparent!important;box-shadow:0 0 6px rgba(211,93,28,.22);transform-origin:center}
+body.theme-halloween #sidebar::after{content:'🎃';font-size:18px;opacity:.32;filter:saturate(.8)}
+/* Anniversary premium cosmic treatment */
+body.theme-anniversary{--season-accent:#d18cff;--season-glow:rgba(188,93,255,.24)}
+body.theme-anniversary #header,body.theme-anniversary .panel,body.theme-anniversary .home-card,body.theme-anniversary .home-focus-card{border-color:rgba(170,104,255,.24);box-shadow:0 0 14px rgba(138,93,255,.08),0 0 28px rgba(240,75,196,.04)}
+body.theme-anniversary .panel::after,body.theme-anniversary .home-card::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,rgba(108,128,255,.0),rgba(108,128,255,.19),rgba(239,91,209,.14),rgba(143,79,255,.0));background-size:230% 100%;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;animation:annivBorderWave 8s ease-in-out infinite alternate}
+@keyframes annivBorderWave{0%{background-position:0% 50%;opacity:.45}50%{background-position:100% 50%;opacity:.9}100%{background-position:35% 50%;opacity:.58}}
+.season-nebula{position:absolute;width:48vw;height:38vw;min-width:340px;min-height:260px;border-radius:50%;filter:blur(52px);opacity:.16;background:radial-gradient(circle at 35% 40%,rgba(236,76,211,.72),rgba(109,94,255,.5) 40%,rgba(62,154,255,.22) 62%,transparent 75%);animation:nebulaDrift 18s ease-in-out infinite alternate}
+@keyframes nebulaDrift{0%{transform:translate3d(-4vw,-2vh,0) scale(.92);opacity:.10}55%{opacity:.22}100%{transform:translate3d(8vw,7vh,0) scale(1.12);opacity:.13}}
+.season-shooting-star{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 9px #fff,0 0 18px #c68cff;opacity:0;animation:shootingStar 7s linear infinite}.season-shooting-star::after{content:'';position:absolute;right:2px;top:1px;width:100px;height:2px;transform-origin:right center;background:linear-gradient(90deg,transparent,rgba(92,145,255,.2),rgba(240,92,210,.72),#fff);filter:blur(.25px)}
+@keyframes shootingStar{0%,72%{opacity:0;transform:translate3d(0,0,0) rotate(-24deg)}75%{opacity:1}88%{opacity:.85}100%{opacity:0;transform:translate3d(48vw,22vh,0) rotate(-24deg)}}
+@media(max-width:760px){.path-grid{grid-template-columns:repeat(3,1fr)}.journey-admin-member{grid-template-columns:1fr auto}}
+@media(prefers-reduced-motion:reduce){body.theme-anniversary .panel::after,body.theme-anniversary .home-card::after,.season-nebula,.season-shooting-star{animation:none!important}.season-shooting-star{display:none}}
+
+
+/* Journey Admin v10B.2 */
+.journey-admin-preview{padding:12px;border:1px solid var(--border);border-radius:7px;background:rgba(8,10,18,.72)}
+.journey-admin-preview .journey-xp-track{margin-top:8px}.journey-admin-preview strong{font-family:'Orbitron',sans-serif;font-size:13px}
+.cosmic-choice-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cosmic-choice-card{display:flex;gap:9px;align-items:flex-start;padding:12px;border:1px solid var(--border);border-radius:7px;background:rgba(8,10,18,.72);cursor:pointer}.cosmic-choice-card:has(input:checked){border-color:var(--purple);background:rgba(155,108,240,.12)}.cosmic-choice-card small{display:block;color:var(--grey);margin-top:3px}.cosmic-choice-card input{margin-top:3px}
+.personal-theme-settings{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:14px;border:1px solid var(--border);border-radius:7px;background:rgba(155,108,240,.06)}.switch-row{display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:12px}
+/* Personal Cosmic Vessel theming */
+body.personal-cosmic-theme{--personal-cosmic-a:#9b6cf0;--personal-cosmic-b:#e843c8;--personal-cosmic-c:#4a90d9}
+body.personal-cosmic-theme #header,body.personal-cosmic-theme .panel,body.personal-cosmic-theme .home-card{box-shadow:0 0 15px rgba(155,108,240,.08),0 0 30px rgba(232,67,200,.035);border-color:rgba(155,108,240,.2)}
+body.personal-cosmic-essence{--personal-cosmic-a:#e84393;--personal-cosmic-b:#c8102e;--personal-cosmic-c:#c9a84c}
+body.personal-cosmic-chronographer{--personal-cosmic-a:#4a90d9;--personal-cosmic-b:#9b6cf0;--personal-cosmic-c:#c9a84c}
+body.personal-cosmic-astral-archivist{--personal-cosmic-a:#9b6cf0;--personal-cosmic-b:#4a90d9;--personal-cosmic-c:#efefef}
+body.personal-cosmic-starcaller{--personal-cosmic-a:#c9a84c;--personal-cosmic-b:#e84393;--personal-cosmic-c:#9b6cf0}
+body.personal-cosmic-theme .journey-crest{border-color:var(--personal-cosmic-a);box-shadow:0 0 20px color-mix(in srgb,var(--personal-cosmic-a) 45%,transparent)}
+/* Halloween v10B.2: pumpkins and free-flight bats */
+.season-pumpkin{position:absolute;width:var(--pumpkin-size,42px);height:var(--pumpkin-size,42px);opacity:0;filter:drop-shadow(0 0 14px rgba(232,112,25,.35));animation:pumpkinAppear var(--pumpkin-duration,13s) ease-in-out infinite;animation-delay:var(--pumpkin-delay,0s)}
+.season-pumpkin svg{width:100%;height:100%;overflow:visible}.season-pumpkin .pumpkin-body{fill:url(#pumpkinGradient)}
+@keyframes pumpkinAppear{0%,12%,88%,100%{opacity:0;transform:scale(.75)}30%,68%{opacity:.72;transform:scale(1)}}
+.season-bat{position:absolute;width:var(--bat-size,34px);height:var(--bat-size,20px);left:0;top:0;opacity:0;animation:batFlight var(--bat-duration,12s) linear infinite;animation-delay:var(--bat-delay,0s);will-change:transform,opacity}
+.season-bat svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 5px rgba(15,9,24,.65))}.season-bat .bat-wing{transform-box:fill-box;transform-origin:center;animation:batFlap .34s ease-in-out infinite alternate}.season-bat .wing-r{animation-delay:-.17s}
+@keyframes batFlap{from{transform:scaleY(.45) rotate(-7deg)}to{transform:scaleY(1.08) rotate(5deg)}}
+@keyframes batFlight{0%{opacity:0;transform:translate3d(var(--x0),var(--y0),0) rotate(var(--r0)) scale(.8)}8%{opacity:.65}55%{transform:translate3d(var(--xm),var(--ym),0) rotate(var(--rm)) scale(1)}92%{opacity:.6}100%{opacity:0;transform:translate3d(var(--x1),var(--y1),0) rotate(var(--r1)) scale(.88)}}
+/* Direction-correct anniversary shooting stars */
+.season-shooting-star{left:0!important;top:0!important;width:5px;height:5px;transform-origin:center;animation:shootingStarVector var(--shoot-duration,6s) linear infinite;animation-delay:var(--shoot-delay,0s)}
+.season-shooting-star::after{right:3px!important;left:auto!important;top:1px!important;width:var(--trail-length,110px)!important;transform:none!important;background:linear-gradient(90deg,transparent,rgba(70,140,255,.2),rgba(235,86,214,.72),#fff)!important}
+@keyframes shootingStarVector{0%,65%{opacity:0;transform:translate3d(var(--sx),var(--sy),0) rotate(var(--angle))}70%{opacity:1}94%{opacity:.88}100%{opacity:0;transform:translate3d(var(--ex),var(--ey),0) rotate(var(--angle))}}
+@media(max-width:700px){.cosmic-choice-row{grid-template-columns:1fr}.personal-theme-settings{align-items:flex-start;flex-direction:column}.switch-row{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.season-bat{display:none}.season-pumpkin{animation:none;opacity:.28}.season-shooting-star{display:none}}
+
+
+/* v10B.3 — saved motion preferences and premium Cosmic Vessel themes */
+body.motion-off *,body.motion-off *::before,body.motion-off *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+body.motion-reduced .season-bat,body.motion-reduced .season-shooting-star,body.motion-reduced .cosmic-mote{display:none!important}
+body.motion-reduced .season-snow,body.motion-reduced .season-leaf,body.motion-reduced .season-pumpkin,body.motion-reduced .cosmic-nebula{animation:none!important;opacity:.25!important}
+#personal-cosmic-effects{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .7s ease}
+body.personal-cosmic-theme #personal-cosmic-effects{opacity:1}
+.cosmic-nebula{position:absolute;width:42vw;height:42vw;min-width:380px;min-height:380px;border-radius:50%;filter:blur(58px);opacity:.14;mix-blend-mode:screen;background:radial-gradient(circle at 38% 38%,var(--personal-cosmic-a),transparent 64%);animation:personalNebulaDrift 18s ease-in-out infinite alternate;will-change:transform,opacity}
+.cosmic-nebula:nth-child(2){background:radial-gradient(circle,var(--personal-cosmic-b),transparent 66%);animation-duration:23s;animation-delay:-8s}.cosmic-nebula:nth-child(3){background:radial-gradient(circle,var(--personal-cosmic-c),transparent 68%);animation-duration:27s;animation-delay:-14s}
+@keyframes personalNebulaDrift{0%{transform:translate3d(-4%,-2%,0) scale(.88);opacity:.08}50%{opacity:.18}100%{transform:translate3d(9%,7%,0) scale(1.12);opacity:.1}}
+.cosmic-mote{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--personal-cosmic-a);box-shadow:0 0 7px var(--personal-cosmic-a),0 0 15px var(--personal-cosmic-b);opacity:.12;animation:personalMoteFloat var(--mote-duration,10s) ease-in-out infinite alternate;animation-delay:var(--mote-delay,0s)}
+@keyframes personalMoteFloat{from{transform:translate3d(0,8px,0) scale(.7);opacity:.08}to{transform:translate3d(18px,-24px,0) scale(1.3);opacity:.5}}
+body.personal-cosmic-theme #header,body.personal-cosmic-theme .panel,body.personal-cosmic-theme .home-card,body.personal-cosmic-theme .home-focus-card{position:relative;border-color:color-mix(in srgb,var(--personal-cosmic-a) 38%,var(--border));box-shadow:0 0 14px color-mix(in srgb,var(--personal-cosmic-a) 16%,transparent),0 0 34px color-mix(in srgb,var(--personal-cosmic-b) 8%,transparent)}
+body.personal-cosmic-theme .panel::after,body.personal-cosmic-theme .home-card::after,body.personal-cosmic-theme .home-focus-card::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;padding:1px;background:linear-gradient(115deg,transparent 4%,color-mix(in srgb,var(--personal-cosmic-a) 58%,transparent),color-mix(in srgb,var(--personal-cosmic-b) 46%,transparent),color-mix(in srgb,var(--personal-cosmic-c) 42%,transparent),transparent 96%);background-size:260% 100%;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:personalCosmicBorder 9s ease-in-out infinite alternate;opacity:.7}
+@keyframes personalCosmicBorder{0%{background-position:0% 50%;opacity:.38}45%{opacity:.82}100%{background-position:100% 50%;opacity:.48}}
+body.personal-cosmic-essence{--personal-cosmic-a:#ff416f;--personal-cosmic-b:#a60638;--personal-cosmic-c:#ffc96b}
+body.personal-cosmic-chronographer{--personal-cosmic-a:#54c9ff;--personal-cosmic-b:#796cff;--personal-cosmic-c:#f5cb68}
+body.personal-cosmic-astral-archivist{--personal-cosmic-a:#b17aff;--personal-cosmic-b:#4a9fff;--personal-cosmic-c:#eef5ff}
+body.personal-cosmic-starcaller{--personal-cosmic-a:#ffd56a;--personal-cosmic-b:#ff5cb8;--personal-cosmic-c:#886cff}
+body.motion-off #personal-cosmic-effects{display:none!important}
+body.motion-off.personal-cosmic-theme .panel::after,body.motion-off.personal-cosmic-theme .home-card::after,body.motion-off.personal-cosmic-theme .home-focus-card::after{animation:none!important;background-position:50% 50%;opacity:.45}
+
+</style>
+
+<style id="v11-design-system">
+/* Mission Hub v11 — UX & Workflow Refresh */
+:root{
+  --text-primary:#f4f5f8;--text-secondary:#a8adc2;--text-muted:#737991;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;
+  --radius-sm:5px;--radius-md:8px;--radius-lg:12px;
+  --shadow-soft:0 8px 24px rgba(0,0,0,.22);--shadow-lift:0 14px 38px rgba(0,0,0,.42)
+}
+body{font-size:16px;color:var(--text-primary)}
+.text-grey,.ph-sub,.home-list-meta,.task2-review-note,.task2-entry-time,.comment-time,.tc-due,.tc-assignee{color:var(--text-secondary)!important}
+.text-small{font-size:13px}.field-label,.panel-title,.nav-section-label{font-size:11px}.btn{font-size:13px}.btn-sm{font-size:11px}.btn-xs,.tc-btn{font-size:10px}
+.nav-item{font-size:14px}.u-name{font-size:14px}.u-role{font-size:10px}.inp{font-size:15px}.tc-title{font-size:15px}.tc-assign{font-size:12px;color:var(--text-secondary)}
+.modal{border-radius:var(--radius-lg)}.modal-hdr{padding:17px 22px}.modal-body{gap:17px}.panel,.home-card,.board-member-row,.board-side,.my-task-col{border-radius:var(--radius-md)}
+.task-card.v11-task-card{padding:0;overflow:hidden;background:linear-gradient(150deg,rgba(17,20,34,.97),rgba(7,9,16,.96));border:1px solid #2a2e47;border-left:1px solid #2a2e47;border-radius:9px;box-shadow:0 5px 16px rgba(0,0,0,.24);min-height:150px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.task-card.v11-task-card:hover{transform:translateY(-2px);border-color:#444b70;box-shadow:var(--shadow-lift)}
+.task-card.v11-task-card.dragging{opacity:.56;transform:scale(.975) rotate(.25deg)}
+.v11-priority-stripe{height:3px;background:var(--priority,var(--amber));box-shadow:0 0 10px color-mix(in srgb,var(--priority) 45%,transparent)}
+.v11-task-inner{padding:12px 13px 11px}.v11-task-head{display:flex;gap:9px;align-items:flex-start}.v11-dept-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:7px;border:1px solid color-mix(in srgb,var(--dept-color,var(--grey)) 48%,transparent);background:color-mix(in srgb,var(--dept-color,var(--grey)) 10%,transparent);color:var(--dept-color,var(--grey));flex:0 0 auto}.v11-dept-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.v11-task-title-wrap{min-width:0;flex:1}.v11-task-title{font-size:15px;font-weight:700;line-height:1.22;color:var(--white);overflow-wrap:anywhere}.v11-task-sub{font-size:11px;color:var(--text-secondary);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v11-card-actions{display:flex;gap:3px;opacity:.55;transition:opacity .15s}.v11-task-card:hover .v11-card-actions{opacity:1}
+.v11-task-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.v11-pill{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.65px;text-transform:uppercase;padding:3px 6px;border-radius:4px;border:1px solid var(--border-2);color:var(--text-secondary);background:rgba(255,255,255,.025)}.v11-pill.milestone{color:var(--gold-hi);border-color:rgba(201,168,76,.38);background:rgba(201,168,76,.08);cursor:pointer}.v11-pill.overdue{color:var(--crimson-hi);border-color:rgba(232,21,58,.42);background:rgba(232,21,58,.09)}
+.v11-task-meta{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:10px;font-size:11px;color:var(--text-secondary)}.v11-task-meta strong{color:var(--text-primary);font-weight:600}.v11-task-progress{height:4px;border-radius:4px;background:#20243a;overflow:hidden;margin-top:10px}.v11-task-progress>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--dept-color,var(--blue)),var(--green));box-shadow:0 0 8px color-mix(in srgb,var(--dept-color,var(--blue)) 35%,transparent)}
+.v11-task-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;min-height:24px}.v11-comments{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:4px}.v11-comments svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7}
+.v11-milestone-links{margin-top:13px;padding:12px;border:1px solid rgba(201,168,76,.24);background:rgba(201,168,76,.045);border-radius:7px}.v11-link-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.045)}.v11-link-row:last-child{border-bottom:0}.v11-link-name{font-size:13px;font-weight:700}.v11-link-meta{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.v11-link-picker{max-height:360px;overflow:auto;border:1px solid var(--border);border-radius:7px}.v11-link-option{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.045);cursor:pointer}.v11-link-option:hover{background:rgba(255,255,255,.035)}.v11-link-option:last-child{border-bottom:0}.v11-link-option input{margin-top:3px}.v11-link-ms{font-size:12px;font-weight:700}.v11-link-del{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.v11-confirm-summary{padding:14px;border:1px solid var(--border);border-radius:7px;background:rgba(8,10,18,.62);line-height:1.55}.v11-confirm-title{font-size:16px;font-weight:700;margin-bottom:6px}.v11-confirm-change{font-size:13px;color:var(--text-secondary)}
+/* Cosmic seasonal environments */
+body.theme-spring{--season-a:#76e0bd;--season-b:#d6a7ff;--season-c:#ffd58b;--season-bg:rgba(74,190,147,.12)}
+body.theme-summer{--season-a:#ffd36a;--season-b:#54c9ff;--season-c:#ff8f7f;--season-bg:rgba(255,186,70,.11)}
+body.theme-autumn{--season-a:#dc7b32;--season-b:#a34fd1;--season-c:#f0b54c;--season-bg:rgba(164,72,39,.12)}
+body.theme-winter{--season-a:#a9ddff;--season-b:#d9c6ff;--season-c:#f7fcff;--season-bg:rgba(140,205,240,.11)}
+body.theme-anniversary{--season-a:#cf74ff;--season-b:#ff5fbd;--season-c:#54aaff;--season-bg:rgba(129,70,223,.13)}
+body.theme-spring #main,body.theme-summer #main,body.theme-autumn #main,body.theme-winter #main,body.theme-anniversary #main{background:radial-gradient(circle at 22% 15%,var(--season-bg),transparent 34%),rgba(4,5,8,.4)}
+body.theme-spring .panel,body.theme-summer .panel,body.theme-autumn .panel,body.theme-winter .panel,body.theme-anniversary .panel{border-color:color-mix(in srgb,var(--season-a) 24%,var(--border))}
+.season-cosmic-mote{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--season-a);box-shadow:0 0 9px var(--season-a);opacity:0;animation:v11Mote var(--dur,12s) ease-in-out infinite var(--delay,0s)}
+.season-petal{position:absolute;width:9px;height:5px;border-radius:80% 20% 80% 20%;background:linear-gradient(90deg,var(--season-a),var(--season-b));opacity:0;animation:v11Fall var(--dur,15s) linear infinite var(--delay,0s)}
+.season-solar{position:absolute;width:3px;height:38px;border-radius:50%;background:linear-gradient(180deg,transparent,var(--season-a),transparent);filter:blur(.3px);opacity:0;animation:v11Solar var(--dur,12s) ease-in-out infinite var(--delay,0s)}
+@keyframes v11Mote{0%,100%{opacity:0;transform:translate(0,12px) scale(.6)}35%,70%{opacity:.65;transform:translate(var(--dx,20px),var(--dy,-35px)) scale(1)}}
+@keyframes v11Fall{0%{opacity:0;transform:translate3d(0,-8vh,0) rotate(0)}12%{opacity:.55}88%{opacity:.4}100%{opacity:0;transform:translate3d(var(--drift,35px),108vh,0) rotate(540deg)}}
+@keyframes v11Solar{0%,100%{opacity:0;transform:translateY(15vh) rotate(var(--rot,25deg))}40%,65%{opacity:.45}80%{transform:translateY(-50vh) rotate(var(--rot,25deg))}}
+/* Prestige overlays: surfaces only */
+body.prestige-overlay{--prestige-a:#9b6cf0;--prestige-b:#e843c8;--prestige-c:#4a90d9}
+body.prestige-essence{--prestige-a:#e71b4b;--prestige-b:#ff75b8;--prestige-c:#e5b85e}
+body.prestige-chronographer{--prestige-a:#4fa8ff;--prestige-b:#9f75ff;--prestige-c:#e6c76c}
+body.prestige-astral-archivist{--prestige-a:#c8a5ff;--prestige-b:#72a5ff;--prestige-c:#f2f3ff}
+body.prestige-starcaller{--prestige-a:#f4cf69;--prestige-b:#f26fc2;--prestige-c:#9168ff}
+body.prestige-overlay .panel,body.prestige-overlay .home-card,body.prestige-overlay .task-card,body.prestige-overlay .modal,body.prestige-overlay .board-member-row{border-color:color-mix(in srgb,var(--prestige-a) 34%,var(--border));box-shadow:0 0 14px color-mix(in srgb,var(--prestige-a) 10%,transparent),inset 0 0 18px color-mix(in srgb,var(--prestige-b) 3%,transparent)}
+body.prestige-overlay .btn-primary{background:linear-gradient(135deg,color-mix(in srgb,var(--prestige-a) 78%,#111),color-mix(in srgb,var(--prestige-b) 58%,#111));border-color:var(--prestige-a)}
+#prestige-effects{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}.prestige-particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--prestige-a);box-shadow:0 0 8px var(--prestige-a),0 0 16px color-mix(in srgb,var(--prestige-b) 60%,transparent);opacity:0;animation:v11Prestige var(--dur,8s) ease-in-out infinite var(--delay,0s)}@keyframes v11Prestige{0%,100%{opacity:0;transform:translateY(8px) scale(.5)}35%,70%{opacity:.6;transform:translate(var(--dx,18px),var(--dy,-30px)) scale(1)}}
+body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-particle{display:none!important}body.motion-off *{scroll-behavior:auto!important}
+
+/* v11.1 task-card layout stabilisation */
+.v11-task-card{box-sizing:border-box!important;width:100%;max-width:100%;min-width:0}
+.board-member-tasks .v11-task-card{width:236px!important;min-width:236px;max-width:236px}
+.my-task-col .v11-task-card,.task-drop-zone:not(.board-member-tasks) .v11-task-card{width:100%!important;min-width:0;max-width:none}
+.v11-task-inner{display:flex;flex-direction:column;min-width:0;height:100%}
+.v11-task-head{display:grid;grid-template-columns:29px minmax(0,1fr) auto;align-items:start;width:100%;min-width:0}
+.v11-task-title-wrap{width:100%;min-width:0;overflow:hidden}
+.v11-task-title{display:block;min-width:0;max-width:100%;white-space:normal;word-break:break-word}
+.v11-card-actions{align-self:start;white-space:nowrap}
+.v11-task-pills{min-width:0}
+.v11-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v11-pill.milestone{max-width:165px}
+.v11-task-meta{width:100%;align-items:start}
+.v11-task-progress{position:relative;cursor:help}
+.v11-task-progress::after{content:attr(data-stage);position:absolute;right:0;top:-18px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.5px;color:var(--text-muted);opacity:0;transition:opacity .15s;pointer-events:none}
+.v11-task-progress:hover::after{opacity:1}
+@media(max-width:720px){.v11-task-meta{grid-template-columns:1fr}.v11-card-actions{opacity:1}.v11-link-row{align-items:flex-start;flex-direction:column}.board-member-tasks .v11-task-card{width:100%!important;min-width:0;max-width:none}.v11-task-head{grid-template-columns:29px minmax(0,1fr) auto}}
+</style>
+
+<style>
+/* v11.2 testing fixes — compact cards and explicit workflow stages */
+.board-member-tasks .v11-task-card{width:260px!important;min-width:260px;max-width:260px}
+.v11-task-card{min-height:164px}
+.v11-task-pills{align-items:center}.v11-pill.needs-update{color:var(--amber);border-color:rgba(226,176,66,.45);background:rgba(226,176,66,.08)}
+.v11-task-progress-wrap{position:relative;margin-top:12px;padding-top:2px;cursor:help}
+.v11-task-progress-wrap .v11-task-progress{margin-top:0;height:5px}
+.v11-workflow-markers{position:absolute;inset:0 1px auto 1px;height:5px;display:flex;justify-content:space-between;pointer-events:none}
+.v11-workflow-markers i{width:7px;height:7px;border:1px solid rgba(214,219,238,.55);background:#111426;border-radius:50%;transform:translateY(-1px);box-shadow:0 0 0 2px rgba(8,10,18,.55)}
+.v11-workflow-markers i.done{background:var(--green);border-color:var(--green);box-shadow:0 0 6px rgba(46,204,138,.45)}
+.v11-workflow-key{display:flex;justify-content:space-between;margin-top:5px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.3px;color:var(--text-muted)}
+@media(max-width:720px){.board-member-tasks .v11-task-card{width:100%!important;min-width:0;max-width:none}}
 </style>
 </head>
 <body>
+<div id="seasonal-effects" aria-hidden="true"></div>
+<div id="seasonal-preview-badge" class="seasonal-preview-badge hidden"></div>
 <canvas id="cvp-bg-canvas"></canvas>
 <!-- ═══════════════════ SETUP BANNER ═══════════════════ -->
 <div id="setup-banner">
@@ -2001,7 +2249,7 @@ body.ms2-detail-open{overflow:hidden}
   <!-- SIDEBAR -->
   <nav id="sidebar">
     <div class="nav-section-label">Mission</div>
-    <div class="nav-item active" data-view="dashboard" onclick="nav(this)"><span class="ni-icon">⬡</span> Dashboard</div>
+    <div class="nav-item active" data-view="dashboard" onclick="nav(this)"><span class="ni-icon">⌂</span> Home</div>
     <div class="nav-item" data-view="my-tasks" onclick="nav(this)"><span class="ni-icon">◈</span> My Tasks<div class="nav-notif" id="notif-tasks"></div></div>
     <div class="nav-item" data-view="crew" onclick="nav(this)"><span class="ni-icon">◉</span> Members<span class="ni-badge" id="nb-crew">0</span></div>
     <div class="nav-item" data-view="scheduler" onclick="nav(this)"><span class="ni-icon">◎</span> Scheduler<div class="nav-notif" id="notif-meetings"></div></div>
@@ -2048,38 +2296,104 @@ body.ms2-detail-open{overflow:hidden}
   <!-- MAIN CONTENT -->
   <main id="main">
 
-    <!-- ── DASHBOARD ── -->
+    <!-- ── HOME DASHBOARD 2.0 ── -->
     <div class="view active" id="view-dashboard">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="ph-title">MISSION CONTROL</div>
-          <div class="ph-sub">Overview · All systems status</div>
+      <div class="home-hero">
+        <div>
+          <div class="home-eyebrow" id="home-date-line"></div>
+          <div class="home-greeting" id="home-greeting">Welcome back</div>
+          <div class="home-subline" id="home-subline">Your Mission Hub is loading.</div>
         </div>
+        <div class="home-hero-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openInstallModal()">Install App</button>
+          <button class="btn btn-gold btn-sm hidden" id="home-settings-btn" onclick="openDashboardSettings()">Home Settings</button>
+        </div>
+      </div>
 
-      </div>
-      <div style="text-align:right;margin-bottom:12px;">
-        <button class="btn btn-gold" onclick="openInstallModal()">&#x2B07; Install as App</button>
-      </div>
-      <div class="stats-row">
-        <div class="stat-card c-red"><div class="stat-icon">⬡</div><div><div class="stat-val" id="s-tasks">0</div><div class="stat-lbl">Active Tasks</div></div></div>
-        <div class="stat-card c-gold"><div class="stat-icon">◎</div><div><div class="stat-val" id="s-meetings">0</div><div class="stat-lbl">Meetings</div></div></div>
-        <div class="stat-card c-green"><div class="stat-icon">◈</div><div><div class="stat-val" id="s-logs">0</div><div class="stat-lbl">Mission Logs</div></div></div>
-        <div class="stat-card c-blue"><div class="stat-icon">◉</div><div><div class="stat-val" id="s-crew">0</div><div class="stat-lbl">Members Online</div></div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Recent Tasks</span><button class="btn btn-ghost btn-sm" onclick="navToMyDept()">View Boards</button></div>
-          <div id="dash-tasks" style="max-height:280px;overflow-y:auto;"></div>
+      <div id="home-celebration"></div>
+
+      <section class="home-focus-card" id="home-focus-card">
+        <div class="home-focus-icon" id="home-focus-icon">◇</div>
+        <div class="home-focus-copy">
+          <div class="home-card-kicker">TODAY'S FOCUS</div>
+          <div class="home-focus-title" id="home-focus-title">Checking what needs your attention…</div>
+          <div class="home-focus-detail" id="home-focus-detail"></div>
         </div>
-        <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Upcoming Meetings</span><button class="btn btn-ghost btn-sm" onclick="navTo('scheduler')">View All</button></div>
-          <div id="dash-meetings" style="max-height:280px;overflow-y:auto;padding:10px;"></div>
-        </div>
+        <button class="btn btn-primary" id="home-focus-action" style="display:none"></button>
+      </section>
+
+      <div class="home-alert-grid" id="home-alert-grid"></div>
+
+      <div class="home-grid">
+        <section class="home-card home-span-2" data-home-card="tasks">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">MY WORK</div><div class="home-card-title">Tasks</div></div>
+            <div class="home-card-head-actions"><button class="home-collapse-btn" onclick="toggleHomeCard('tasks')" aria-label="Collapse tasks">−</button><button class="btn btn-ghost btn-xs" onclick="navTo('my-tasks')">View all</button></div>
+          </div>
+          <div class="home-card-body" id="home-tasks"></div>
+        </section>
+
+        <section class="home-card" data-home-card="meetings">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">SCHEDULE</div><div class="home-card-title">Meetings</div></div>
+            <div class="home-card-head-actions"><button class="home-collapse-btn" onclick="toggleHomeCard('meetings')">−</button><button class="btn btn-ghost btn-xs" onclick="navTo('scheduler')">View all</button></div>
+          </div>
+          <div class="home-card-body" id="home-meetings"></div>
+        </section>
+
+        <section class="home-card" data-home-card="notifications">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">UPDATES</div><div class="home-card-title">Notifications</div></div>
+            <div class="home-card-head-actions"><button class="home-collapse-btn" onclick="toggleHomeCard('notifications')">−</button><button class="btn btn-ghost btn-xs" onclick="openNotificationCentre()">View all</button></div>
+          </div>
+          <div class="home-card-body" id="home-notifications"></div>
+        </section>
+
+        <section class="home-card home-span-2" data-home-card="milestones">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">ROADMAP</div><div class="home-card-title">Relevant Milestones</div></div>
+            <div class="home-card-head-actions"><button class="home-collapse-btn" onclick="toggleHomeCard('milestones')">−</button><button class="btn btn-ghost btn-xs" onclick="navTo('milestones')">View all</button></div>
+          </div>
+          <div class="home-card-body" id="home-milestones"></div>
+        </section>
+
+        <section class="home-card" data-home-card="overview" id="home-role-overview-card">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker" id="home-overview-kicker">TEAM</div><div class="home-card-title" id="home-overview-title">Overview</div></div>
+            <button class="home-collapse-btn" onclick="toggleHomeCard('overview')">−</button>
+          </div>
+          <div class="home-card-body" id="home-role-overview"></div>
+        </section>
+
+
+        <section class="home-card journey-card" data-home-card="journey" id="home-journey-card">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">YOUR JOURNEY</div><div class="home-card-title">Path & Progress</div></div>
+            <div class="home-card-head-actions"><button class="home-collapse-btn" onclick="toggleHomeCard('journey')">−</button><button class="btn btn-ghost btn-xs" onclick="openJourneyProfile()">Open</button></div>
+          </div>
+          <div class="home-card-body" id="home-journey"></div>
+        </section>
+
+        <section class="home-card" data-home-card="weekly" id="home-weekly-card">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">WEEKLY DIGEST</div><div class="home-card-title">This Week</div></div>
+            <button class="home-collapse-btn" onclick="toggleHomeCard('weekly')">−</button>
+          </div>
+          <div class="home-card-body" id="home-weekly"></div>
+        </section>
+
+        <section class="home-card home-span-3 home-positive-card" data-home-card="completed">
+          <div class="home-card-head">
+            <div><div class="home-card-kicker">PROJECT MOMENTUM</div><div class="home-card-title">Recently Completed</div></div>
+            <button class="home-collapse-btn" onclick="toggleHomeCard('completed')">−</button>
+          </div>
+          <div class="home-card-body" id="home-completed"></div>
+        </section>
       </div>
-      <div class="panel mt-12">
-        <div class="panel-hdr"><span class="panel-title">Member Status · Live</span><span class="text-mono text-small text-grey" id="dash-tz-time"></span></div>
-        <div id="dash-crew-strip" style="display:flex;flex-wrap:wrap;gap:8px;padding:14px;"></div>
-      </div>
+
+      <!-- Existing listener targets kept hidden for backward compatibility -->
+      <span id="s-tasks" class="hidden">0</span><span id="s-meetings" class="hidden">0</span><span id="s-logs" class="hidden">0</span><span id="s-crew" class="hidden">0</span>
+      <span id="dash-tz-time" class="hidden"></span><div id="dash-tasks" class="hidden"></div><div id="dash-meetings" class="hidden"></div><div id="dash-crew-strip" class="hidden"></div>
     </div>
 
     <!-- ── MY TASKS ── -->
@@ -2094,7 +2408,7 @@ body.ms2-detail-open{overflow:hidden}
     <!-- ── MILESTONES 2.0 ── -->
     <div class="view" id="view-milestones">
       <div class="page-hdr">
-        <div class="page-hdr-left"><div class="ph-title">PROJECT MILESTONES</div><div class="ph-sub">Objectives · deliverables · project completion</div></div>
+        <div class="page-hdr-left"><div class="ph-title">PROJECT MILESTONES</div><div class="ph-sub">Objectives · deliverables · active milestone progression</div></div>
         <div class="ph-actions" id="milestone-actions"></div>
       </div>
       <div class="ms2-project-card" id="ms2-project-summary"></div>
@@ -2463,6 +2777,19 @@ body.ms2-detail-open{overflow:hidden}
           </div>
           <div id="admin-depts-list" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
+
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Journey Administration</span>
+            <button class="btn btn-gold btn-xs" onclick="renderJourneyAdmin()">Refresh</button>
+          </div>
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input class="inp" id="journey-admin-search" style="max-width:280px" placeholder="Search members..." oninput="renderJourneyAdmin()">
+            <span style="font-size:11px;color:var(--grey);">Adjust XP, paths, titles, badges and next-login celebrations.</span>
+          </div>
+          <div id="journey-admin-list" style="max-height:430px;overflow-y:auto;"><div class="no-data">Journey data will appear here.</div></div>
+        </div>
+
         <div class="panel" style="grid-column:1/-1;">
           <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
             <span class="panel-title">Pending Milestone Deletions</span>
@@ -3144,6 +3471,89 @@ body.ms2-detail-open{overflow:hidden}
   </div>
 </div>
 
+
+<div class="modal-bg" id="m-dashboard-settings">
+  <div class="modal" style="width:780px">
+    <div class="modal-hdr"><span class="modal-title">HOME APPEARANCE</span><button class="modal-x" onclick="closeModal('m-dashboard-settings')">✕</button></div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Home theme</label><select class="inp" id="home-theme-preference" onchange="previewSavedHomeThemeChoice()"><option value="automatic">Automatic · follow project schedule</option><option value="default">Default</option><option value="winter">Winter</option><option value="halloween">Halloween</option><option value="cosmic">Cosmic</option></select></div>
+        <div class="field"><label class="field-label">Animations</label><select class="inp" id="home-animation-mode" onchange="previewMotionPreference()"><option value="full">Full effects</option><option value="reduced">Reduced effects</option><option value="off">Animations off</option></select></div>
+      </div>
+      <div class="text-small text-grey">Your choices are saved to your account and follow you between devices. A personal theme overrides the Admin seasonal schedule.</div>
+      <div class="personal-theme-settings" id="cosmic-personal-settings">
+        <div style="flex:1"><strong>Cosmic Vessel subclass styling</strong><div class="text-small text-grey">Available after becoming a Cosmic Vessel. Adds your chosen subclass's premium cosmic colour, nebula and border treatment across the Hub.</div>
+          <div class="grid-2 mt-12"><select class="inp" id="cosmic-style-preview-subclass"><option>Essence</option><option>Chronographer</option><option>Astral Archivist</option><option>Starcaller</option></select><div style="display:flex;gap:8px"><button class="btn btn-gold btn-sm" type="button" onclick="previewPersonalCosmicStyle()">Preview</button><button class="btn btn-ghost btn-sm" type="button" onclick="clearPersonalCosmicPreview()">Clear</button></div></div>
+        </div>
+        <label class="switch-row"><input type="checkbox" id="personal-cosmic-theme" onchange="previewPersonalCosmicToggle()"> Enable my subclass styling</label>
+      </div>
+      <div id="admin-seasonal-settings-wrap">
+        <div class="gold-rule"></div><div class="field-label" style="margin-bottom:10px">Admin seasonal schedule</div>
+        <div class="text-small text-grey" style="margin-bottom:12px">These date ranges apply automatically only to members whose Home theme is set to Automatic.</div>
+        <div class="home-theme-preview" id="dashboard-theme-settings"></div>
+        <div class="field"><label class="field-label">Cosmic reference date (optional)</label><input class="inp" type="date" id="dash-anniversary-date"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="previewDashboardTheme('')">Clear Admin Preview</button><button class="btn btn-ghost" onclick="closeDashboardSettingsWithoutSaving()">Cancel</button><button class="btn btn-primary" onclick="saveDashboardSettings()">Save Preferences</button></div>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="m-journey-path">
+  <div class="modal" style="width:720px">
+    <div class="modal-hdr"><span class="modal-title">CHOOSE YOUR PATH</span><button class="modal-x" onclick="closeModal('m-journey-path')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:14px;color:var(--grey);line-height:1.55;">Choose the adventuring path that will shape your cosmetic badge, profile accents and future unlocks. It does not change permissions or work capabilities.</div>
+      <div class="path-grid" id="journey-path-grid"></div><div class="field"><label class="field-label">Active Title</label><select class="inp" id="journey-title-select"></select></div>
+      <div id="journey-cosmic-choice" class="hidden"><div class="gold-rule"></div>
+        <div class="field-label" style="margin-bottom:8px">Cosmic Vessel Prestige</div>
+        <div class="cosmic-choice-row">
+          <label class="cosmic-choice-card"><input type="radio" name="journey-cosmic-choice-radio" id="journey-cosmic-no" value="no" onchange="renderJourneyPathGrid()"><span><strong>Remain on my Path</strong><small>Keep your chosen class and its cosmetics.</small></span></label>
+          <label class="cosmic-choice-card"><input type="radio" name="journey-cosmic-choice-radio" id="journey-cosmic-yes" value="yes" onchange="renderJourneyPathGrid()"><span><strong>Become a Cosmic Vessel</strong><small>Choose one of the four Cosmic Vessel subclasses.</small></span></label>
+        </div>
+        <div id="journey-subclass-choice-wrap"><div class="field-label" style="margin:12px 0 8px">Choose Your Subclass</div><div class="path-grid" id="journey-subclass-grid"></div></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-journey-path')">Not now</button><button class="btn btn-primary" onclick="saveJourneyPath()">Confirm Path</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-journey-admin-edit">
+  <div class="modal" style="width:660px">
+    <div class="modal-hdr"><span class="modal-title">EDIT MEMBER JOURNEY</span><button class="modal-x" onclick="closeModal('m-journey-admin-edit')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ja-uid">
+      <div style="font-size:16px;font-weight:700" id="ja-member-name">Member</div>
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Total XP</label><input class="inp" id="ja-total-xp" type="number" min="0" step="1"></div>
+        <div class="field"><label class="field-label">Quick XP adjustment</label><input class="inp" id="ja-xp-delta" type="number" step="1" value="0" placeholder="e.g. 25 or -10"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Path</label><select class="inp" id="ja-path"></select></div>
+        <div class="field"><label class="field-label">Cosmic subclass</label><select class="inp" id="ja-subclass"><option value="">Not unlocked / none</option><option>Essence</option><option>Chronographer</option><option>Astral Archivist</option><option>Starcaller</option></select></div>
+      </div>
+      <div id="ja-xp-preview" class="journey-admin-preview"></div>
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Active title</label><select class="inp" id="ja-active-title-select"></select></div>
+        <div class="field"><label class="field-label">Custom title override</label><input class="inp" id="ja-active-title-custom" placeholder="Optional custom displayed title"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label class="field-label">Badge</label><select class="inp" id="ja-badge-select"></select></div>
+        <div class="field"><label class="field-label">Custom badge override</label><input class="inp" id="ja-badge-custom" placeholder="Optional custom badge name"></div>
+      </div>
+      <div class="field"><label class="field-label">Add new unlocked title</label><input class="inp" id="ja-new-title" placeholder="e.g. Painter of Worlds"></div>
+      <div class="field"><label class="field-label">Next-login celebration message</label><textarea class="inp" id="ja-celebration" rows="3" placeholder="A custom message shown when this member next logs in"></textarea></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--grey)"><input type="checkbox" id="ja-celebrate" checked> Trigger a celebration on their next login</label>
+      <div style="font-size:11px;color:var(--grey-2)">Changes are recorded as an Admin adjustment. Negative XP adjustments cannot take a member below zero.</div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-journey-admin-edit')">Cancel</button><button class="btn btn-primary" onclick="saveJourneyAdminEdit()">Save Journey</button></div>
+  </div>
+</div>
+
+<div id="journey-celebration-overlay" class="journey-celebration hidden">
+  <div class="journey-celebration-card"><div class="journey-celebration-symbol" id="jc-symbol">✦</div><div class="journey-celebration-title" id="jc-title">Journey Updated</div><div class="journey-celebration-msg" id="jc-message"></div><button class="btn btn-primary mt-16" onclick="dismissJourneyCelebration()">Continue</button></div>
+</div>
+
 <div id="toasts"></div>
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -3216,7 +3626,7 @@ STATUS_CLASS.away='s-working'; STATUS_LABEL.away='Away';
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, storage, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], milestoneDeliverables:[], milestoneActivity:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[], storageUploads:[], storageSettings:{} };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], milestoneDeliverables:[], milestoneActivity:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[], storageUploads:[], storageSettings:{}, dashboardSettings:{}, xpEvents:[], journeySettings:{} };
 let crewSearch = '';
 let dragTask = null;
 
@@ -3471,16 +3881,18 @@ function startListeners() {
   const u1 = db.collection('users').onSnapshot(snap => {
     liveData.members = {};
     snap.forEach(d => { liveData.members[d.id] = { uid:d.id, ...d.data() }; });
+    if(currentUser&&liveData.members[currentUser.uid]){currentProfile=Object.assign({},currentProfile||{},liveData.members[currentUser.uid]);}
     document.getElementById('nb-crew').textContent = Object.keys(liveData.members).length;
     document.getElementById('s-crew').textContent  = Object.values(liveData.members).filter(function(m){return getPresenceState(m)!=='offline';}).length;
-    renderCrew(); renderTzTable(); renderDashCrewStrip(); renderAdminRoster(); renderSchedulerFilters();
+    renderCrew(); renderTzTable(); renderDashCrewStrip(); renderAdminRoster(); renderSchedulerFilters(); renderHomeDashboard();
+    try { renderHomeJourney(); maybePromptJourney(); } catch (journeyErr) { console.error('Journey render failed without interrupting core member rendering', journeyErr); }
   });
 
   // Tasks
   const u2 = db.collection('tasks').orderBy('createdAt','desc').onSnapshot(snap => {
     liveData.tasks = {}; snap.docs.forEach(d => { liveData.tasks[d.id] = {id:d.id,...d.data()}; });
     document.getElementById('s-tasks').textContent = Object.values(liveData.tasks).filter(t=>t.state!=='completed').length;
-    renderDashTasks(); renderAllDeptBoards();
+    renderDashTasks(); renderAllDeptBoards(); renderHomeDashboard();
     var myTasksView = document.getElementById('view-my-tasks');
     if (myTasksView && myTasksView.classList.contains('active')) renderMyTasks();
     updateNotifications();
@@ -3491,7 +3903,7 @@ function startListeners() {
     liveData.meetings = snap.docs.map(d=>({id:d.id,...d.data()}));
     var activeMtgs = liveData.meetings.filter(function(m){ return !m.cancelled; });
     document.getElementById('s-meetings').textContent = activeMtgs.length;
-    renderMeetings(); renderDashMeetings(); updateNotifications();
+    renderMeetings(); renderDashMeetings(); updateNotifications(); renderHomeDashboard();
     // Auto-delete cancelled meetings older than 24h
     var now = Date.now();
     liveData.meetings.forEach(function(m) {
@@ -3533,6 +3945,7 @@ function startListeners() {
     liveData.notifications = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }).sort(function(a,b){ return String(b.createdAt||'').localeCompare(String(a.createdAt||'')); });
     renderNotificationBadge();
     if(document.getElementById('m-notifications').classList.contains('open')) renderNotificationCentre();
+    renderHomeDashboard();
   });
   listeners.push(uNotif);
 
@@ -3555,20 +3968,39 @@ function startListeners() {
     });
   });
 
+  var uDashboardSettings = db.collection('config').doc('dashboard_settings').onSnapshot(function(doc) {
+    liveData.dashboardSettings = doc.exists ? doc.data() : {};
+    applyScheduledTheme();
+    renderHomeDashboard();
+  }, function(err) { console.warn('Dashboard settings listener', err); });
+
   // Milestones 2.0
   var uMilestones = db.collection('milestones').onSnapshot(function(snap) {
     liveData.milestones = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
+    renderHomeDashboard();
     if(document.getElementById('view-admin') && document.getElementById('view-admin').classList.contains('active')) renderPendingMilestoneDeletions();
   },function(err){console.warn('Milestone listener',err);});
   var uMilestoneDeliverables = db.collection('milestone_deliverables').onSnapshot(function(snap) {
     liveData.milestoneDeliverables = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
+    renderHomeDashboard();
   },function(err){console.warn('Deliverable listener',err);});
   var uMilestoneActivity = db.collection('milestone_activity').onSnapshot(function(snap) {
     liveData.milestoneActivity = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
     if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
   },function(err){console.warn('Milestone activity listener',err);});
+
+
+  var uXpEvents = db.collection('xp_events').where('userId','==',currentUser.uid).onSnapshot(function(snap){
+    liveData.xpEvents=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    try { renderHomeJourney(); } catch(e) { console.error('Journey XP render failed',e); }
+  },function(err){console.warn('XP listener',err);});
+  var uJourneySettings = db.collection('config').doc('journey_settings').onSnapshot(function(doc){
+    liveData.journeySettings=doc.exists?doc.data():{};
+    try { renderHomeJourney(); } catch(e) { console.error('Journey settings render failed',e); }
+    if(document.getElementById('view-admin')&&document.getElementById('view-admin').classList.contains('active')){ try { renderJourneyAdmin(); } catch(e) { console.error('Journey Admin settings render failed',e); } }
+  },function(err){console.warn('Journey settings listener',err);});
 
   var storageListeners = [];
   if (isAdmin()) {
@@ -3586,7 +4018,7 @@ function startListeners() {
     storageListeners.push(uStorageFiles, uStorageSettings);
   }
 
-  listeners = [u1,u2,u3,u4,u5,u6,u7,uNotif,uMilestones,uMilestoneDeliverables,uMilestoneActivity].concat(storageListeners);
+  listeners = [u1,u2,u3,u4,u5,u6,u7,uNotif,uDashboardSettings,uMilestones,uMilestoneDeliverables,uMilestoneActivity,uXpEvents,uJourneySettings].concat(storageListeners);
 }
 
 
@@ -3919,9 +4351,10 @@ function navTo(view) {
 
 function _renderView(view) {
   try {
+    if (view === 'dashboard') renderHomeDashboard();
     if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
     if (view === 'profile')    renderProfile();
-    if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); renderPendingMilestoneDeletions(); }
+    if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); renderPendingMilestoneDeletions(); try { renderJourneyAdmin(); } catch(e) { console.error('Journey Admin render failed',e); } }
     if (view === 'storage')    { renderStorageManagement(); }
     if (view === 'my-tasks')   renderMyTasks();
     if (view === 'crew')       renderCrew();
@@ -4194,9 +4627,9 @@ function taskHeartbeatInfo(t) {
   return { cls:'', label:'Healthy activity', value:taskRelativeAge(ms), days:days };
 }
 function taskHeartbeatMini(t) {
-  var h=taskHeartbeatInfo(t); if(t.state==='completed'||h.days<7)return '';
-  var c=h.days>=14?'var(--crimson-hi)':'var(--amber)';
-  return '<span class="task-heartbeat-mini" style="color:'+c+';border-color:'+c+'66;">'+(h.days>=14?'INACTIVE':'QUIET')+'</span>';
+  // Do not label ordinary tasks as inactive/quiet on compact cards. The task
+  // heartbeat remains available in the full task view, where its context is clear.
+  return '';
 }
 function formatTaskEntryTime(v) {
   var ms=taskTimestampMs(v); if(!ms)return '';
@@ -4357,18 +4790,99 @@ function renderTaskImages(type){
   list.innerHTML=entryHtml+imgHtml;imgs.forEach(function(u){loadTaskImagePreview(u);});
 }
 async function privateStorageBlob(u){
-  if(taskImageObjectUrls[u.id])return taskImageObjectUrls[u.id];var token=await currentUser.getIdToken(),cfg=getStoredConfig()||{},bucket=cfg.storageBucket||'cosmic-vessel-project.firebasestorage.app',url='https://firebasestorage.googleapis.com/v0/b/'+encodeURIComponent(bucket)+'/o/'+encodeURIComponent(u.storagePath)+'?alt=media';var res=await fetch(url,{headers:{Authorization:'Bearer '+token}});if(!res.ok)throw new Error('Image could not be loaded ('+res.status+')');var blob=await res.blob(),obj=URL.createObjectURL(blob);taskImageObjectUrls[u.id]=obj;return obj;
+  if(!u||!u.storagePath)throw new Error('Image storage path is missing.');
+  if(taskImageObjectUrls[u.id])return taskImageObjectUrls[u.id];
+  if(!storage)throw new Error('Firebase Storage is not available.');
+  try{
+    // Use the authenticated Firebase Storage SDK rather than a hand-built REST
+    // request. The previous REST request could be blocked by CORS and produced
+    // the browser's generic “Failed to fetch” error.
+    var url=await storage.ref().child(u.storagePath).getDownloadURL();
+    taskImageObjectUrls[u.id]=url;
+    return url;
+  }catch(e){
+    console.error('Task image retrieval failed',u.storagePath,e);
+    var msg=(e&&e.code==='storage/object-not-found')?'The stored image could not be found.':
+      (e&&e.code==='storage/unauthorized')?'You do not have permission to view this image.':
+      (e&&e.message)||'Image could not be loaded.';
+    throw new Error(msg);
+  }
 }
 async function loadTaskImagePreview(u){var el=document.getElementById('task-img-preview-'+u.id);if(!el)return;try{var url=await privateStorageBlob(u);el.classList.remove('loading');el.innerHTML='<img src="'+url+'" alt="'+escAttr(u.fileName||'Task image')+'">';}catch(e){el.classList.remove('loading');el.innerHTML='<span class="text-red text-small">Unable to load</span>';}}
 async function openTaskImageLightbox(id){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;});if(!u)return;try{var url=await privateStorageBlob(u);document.getElementById('task-image-lightbox-img').src=url;document.getElementById('task-image-lightbox-name').textContent=u.fileName||'Task image';currentLightboxUploadId=id;document.getElementById('task-image-lightbox').classList.add('open');}catch(e){toast(e.message||'Could not open image','err');}}
 function closeTaskImageLightbox(){document.getElementById('task-image-lightbox').classList.remove('open');currentLightboxUploadId=null;}
 function downloadCurrentLightboxImage(){if(currentLightboxUploadId)downloadTaskImage(currentLightboxUploadId);}
-async function downloadTaskImage(id){var u=(taskDetailData.images||[]).find(function(x){return x.id===id;})||(liveData.storageUploads||[]).find(function(x){return x.id===id;});if(!u)return;try{var url=await privateStorageBlob(u),a=document.createElement('a');a.href=url;a.download=u.fileName||'task-image';document.body.appendChild(a);a.click();a.remove();await incrementTaskImageDownload(u);}catch(e){toast(e.message||'Could not download image','err');}}
-async function incrementTaskImageDownload(u){try{var month=new Date().toISOString().slice(0,7),up={downloadCount:firebase.firestore.FieldValue.increment(1),downloadBytesTotal:firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0)),lastDownloadedAt:new Date().toISOString()};up['downloadsByMonth.'+month]=firebase.firestore.FieldValue.increment(1);up['downloadBytesByMonth.'+month]=firebase.firestore.FieldValue.increment(Number(u.sizeBytes||0));await db.collection('task_uploads').doc(u.id).update(up);}catch(e){console.warn('Download tracking failed',e);}}
-function requestTaskImageUpload(type,recordId){
-  var t=getTaskById(currentTaskId),input=document.getElementById('td-'+type+'-image'),file=input&&input.files&&input.files[0];if(!file)return Promise.resolve(null);
-  return new Promise(function(resolve,reject){pendingTaskImageUpload={type:type,recordId:recordId,file:file,task:t,resolve:resolve,reject:reject};var settings=getStorageSettings(),exp=new Date(Date.now()+Number(settings.retentionDays||45)*86400000);document.getElementById('task-image-warning-days').textContent=(settings.retentionDays||45)+' days';document.getElementById('task-image-warning-summary').innerHTML='<div><strong>'+esc(file.name)+'</strong></div><div class="text-grey text-small" style="margin-top:5px">'+formatBytes(file.size)+' · '+esc(t.name||'Task')+' · Deletes '+exp.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'</div>';document.getElementById('task-image-warning-confirm').checked=false;document.getElementById('task-image-warning-upload').disabled=true;openModal('m-task-image-warning');});
+async function downloadTaskImage(id){
+  var u=(taskDetailData.images||[]).find(function(x){return x.id===id;})||(liveData.storageUploads||[]).find(function(x){return x.id===id;});
+  if(!u)return;
+  try{
+    var url=await privateStorageBlob(u),href=url;
+    // Download a local blob when CORS allows it. If the provider declines the
+    // blob request, open the authenticated Firebase URL instead of failing.
+    try{
+      var res=await fetch(url);
+      if(res.ok){var blob=await res.blob();href=URL.createObjectURL(blob);setTimeout(function(){URL.revokeObjectURL(href);},60000);}
+    }catch(fetchErr){console.warn('Direct image blob download unavailable; using Storage URL',fetchErr);}
+    var a=document.createElement('a');a.href=href;a.download=u.fileName||'task-image';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+    await incrementTaskImageDownload(u);
+  }catch(e){toast(e.message||'Could not download image','err');}
 }
+function requestTaskImageUpload(type, recordId) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var task = getTaskById(currentTaskId);
+      var input = document.getElementById(type === 'feedback' ? 'td-feedback-image' : 'td-progress-image');
+      var file = input && input.files && input.files[0];
+      if (!task) { reject(new Error('The task could not be found.')); return; }
+      if (!file) { resolve(null); return; }
+
+      var settings = getStorageSettings();
+      var maxMb = Number(settings.maxFileMb || 3.5);
+      var maxBytes = maxMb * 1024 * 1024;
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type || '')) {
+        reject(new Error('Only JPEG, PNG and WebP images are allowed.'));
+        return;
+      }
+      if (file.size > maxBytes) {
+        reject(new Error('Image exceeds the ' + maxMb + ' MB limit.'));
+        return;
+      }
+
+      // A pending request should never be silently replaced by another upload.
+      if (pendingTaskImageUpload && pendingTaskImageUpload.reject) {
+        pendingTaskImageUpload.reject(new Error('A newer image upload replaced the previous request.'));
+      }
+      pendingTaskImageUpload = {
+        type: type,
+        recordId: recordId || '',
+        file: file,
+        task: task,
+        resolve: resolve,
+        reject: reject
+      };
+
+      var retention = Number(settings.retentionDays || 45);
+      var expiry = new Date(Date.now() + retention * 86400000);
+      var daysEl = document.getElementById('task-image-warning-days');
+      var summaryEl = document.getElementById('task-image-warning-summary');
+      var confirmEl = document.getElementById('task-image-warning-confirm');
+      var uploadEl = document.getElementById('task-image-warning-upload');
+      if (daysEl) daysEl.textContent = retention + ' days';
+      if (summaryEl) summaryEl.innerHTML =
+        '<div class="task2-meta-label">Task</div><div class="task2-meta-value" style="margin-bottom:9px">' + esc(task.name || task.title || 'Task') + '</div>' +
+        '<div class="task2-meta-label">File</div><div class="task2-meta-value" style="margin-bottom:9px">' + esc(file.name) + ' · ' + formatBytes(file.size) + '</div>' +
+        '<div class="task2-meta-label">Upload type</div><div class="task2-meta-value" style="margin-bottom:9px">' + (type === 'feedback' ? 'Lead feedback image' : 'Progress image') + '</div>' +
+        '<div class="task2-meta-label">Scheduled deletion</div><div class="task2-meta-value">' + expiry.toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}) + '</div>';
+      if (confirmEl) confirmEl.checked = false;
+      if (uploadEl) uploadEl.disabled = true;
+      openModal('m-task-image-warning');
+    } catch (e) {
+      pendingTaskImageUpload = null;
+      reject(e);
+    }
+  });
+}
+
 function cancelPendingTaskImageUpload(){closeModal('m-task-image-warning');if(pendingTaskImageUpload){pendingTaskImageUpload.resolve(null);pendingTaskImageUpload=null;}}
 async function confirmPendingTaskImageUpload(){var p=pendingTaskImageUpload;if(!p)return;closeModal('m-task-image-warning');pendingTaskImageUpload=null;try{var u=await performTaskImageUpload(p);p.resolve(u);}catch(e){p.reject(e);}}
 async function performTaskImageUpload(p){
@@ -4395,12 +4909,12 @@ async function submitComment() {
 async function submitProgressUpdate() {
   var t=getTaskById(currentTaskId),input=document.getElementById('td-progress-input'),text=input.value.trim(),file=document.getElementById('td-progress-image')?.files?.[0];if(!t||(!text&&!file))return;
   if(!taskCanPostProgress(t)){toast('You cannot post progress to this task','err');return;}
-  await withTaskButtonBusy('td-progress-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image progress update',createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('progressUpdates').add(data);taskDetailData.progress.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('progress',r.id);input.value='';await recordTaskActivity(currentTaskId,'progress',currentProfile.name+' posted a progress update.');renderTaskDetailCollections(t);toast('Progress update posted','ok');}catch(e){toast(e.message||'Could not post progress update','err');}});
+  await withTaskButtonBusy('td-progress-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image progress update',createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('progressUpdates').add(data);taskDetailData.progress.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('progress',r.id);input.value='';await recordTaskActivity(currentTaskId,'progress',currentProfile.name+' posted a progress update.');renderTaskDetailCollections(t);await awardCurrentUserXP(5,'progress_update',currentTaskId,'Progress update','progress_'+currentTaskId+'_'+new Date().toISOString().slice(0,10));toast('Progress update posted','ok');}catch(e){toast(e.message||'Could not post progress update','err');}});
 }
 async function submitTaskFeedback(requestChanges) {
   var t=getTaskById(currentTaskId),input=document.getElementById('td-feedback-input'),text=input.value.trim(),file=document.getElementById('td-feedback-image')?.files?.[0];if(!t||(!text&&!file)){toast('Enter feedback or attach an image first','err');return false;}
   if(!taskCanPostFeedback(t)){toast('Only authorised department management can post formal feedback','err');return false;}
-  return await withTaskButtonBusy('td-feedback-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image feedback',requestChanges:!!requestChanges,createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('feedback').add(data);taskDetailData.feedback.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('feedback',r.id);input.value='';await recordTaskActivity(currentTaskId,requestChanges?'changes_requested':'feedback',currentProfile.name+(requestChanges?' requested changes.':' posted formal feedback.'));renderTaskDetailCollections(t);toast(requestChanges?'Changes requested':'Feedback posted','ok');return true;}catch(e){toast(e.message||'Could not post feedback','err');return false;}});
+  return await withTaskButtonBusy('td-feedback-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image feedback',requestChanges:!!requestChanges,createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('feedback').add(data);taskDetailData.feedback.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('feedback',r.id);input.value='';await recordTaskActivity(currentTaskId,requestChanges?'changes_requested':'feedback',currentProfile.name+(requestChanges?' requested changes.':' posted formal feedback.'));renderTaskDetailCollections(t);await awardCurrentUserXP(15,'formal_feedback',currentTaskId,'Formal feedback','feedback_'+currentTaskId+'_'+new Date().toISOString().slice(0,10));toast(requestChanges?'Changes requested':'Feedback posted','ok');return true;}catch(e){toast(e.message||'Could not post feedback','err');return false;}});
 }
 async function submitTaskReference() {
   var t=getTaskById(currentTaskId),label=document.getElementById('td-ref-label').value.trim(),raw=document.getElementById('td-ref-url').value.trim(),url=safeExternalUrl(raw);if(!t)return;
@@ -4414,7 +4928,7 @@ async function deleteTaskReference(id) {
 }
 async function acceptTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t)return;await setTaskState(currentTaskId,'accepted');t.state='accepted';renderTaskDetailBase(t);}
 async function submitTaskForReview(){var t=getTaskById(currentTaskId);if(!t)return;if(t.assignee!==currentUser.uid){toast('Only the assignee can submit this task','err');return;}await db.collection('tasks').doc(currentTaskId).set({state:'review',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'review_submitted',currentProfile.name+' submitted the task for review.');t.state='review';renderTaskDetailBase(t);toast('Submitted for review','ok');}
-async function approveTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t)){toast('No permission','err');return;}await db.collection('tasks').doc(currentTaskId).set({state:'completed',updatedAt:new Date().toISOString(),completedAt:Date.now(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'approved',currentProfile.name+' approved and completed the task.');if(t.assignee)await createUserNotification(t.assignee,'task_approved','Task approved',(t.name||'Your task')+' has been approved and completed.',currentTaskId);t.state='completed';renderTaskDetailBase(t);toast('Task approved','ok');}
+async function approveTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t)){toast('No permission','err');return;}await db.collection('tasks').doc(currentTaskId).set({state:'completed',updatedAt:new Date().toISOString(),completedAt:Date.now(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'approved',currentProfile.name+' approved and completed the task.');if(t.assignee)await createUserNotification(t.assignee,'task_approved','Task approved',(t.name||'Your task')+' has been approved and completed.',currentTaskId);t.state='completed';renderTaskDetailBase(t);await awardXPToUser(t.assignee,40,'task_approved',currentTaskId,'Task approved','task_approved_'+currentTaskId+'_'+t.assignee);for(var xi=0;xi<(t.contributors||[]).length;xi++)await awardXPToUser(t.contributors[xi],20,'task_contributor',currentTaskId,'Shared task completed','task_contributor_'+currentTaskId+'_'+t.contributors[xi]);toast('Task approved','ok');}
 async function requestTaskChanges(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t)){toast('No permission','err');return;}var input=document.getElementById('td-feedback-input');if(!input.value.trim()){switchTaskTab('feedback');input.focus();toast('Enter the requested changes in Feedback first','inf');return;}var ok=await submitTaskFeedback(true);if(!ok)return;await db.collection('tasks').doc(currentTaskId).set({state:'in-progress',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});if(t.assignee)await createUserNotification(t.assignee,'task_changes','Changes requested','Changes have been requested on '+(t.name||'your task')+'.',currentTaskId);t.state='in-progress';renderTaskDetailBase(t);}
 async function reinstateTaskFromDetail(){var t=getTaskById(currentTaskId);if(!t||!taskManagerCanManage(t))return;await db.collection('tasks').doc(currentTaskId).set({state:'in-progress',updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},{merge:true});await recordTaskActivity(currentTaskId,'reinstated',currentProfile.name+' reinstated the task.');t.state='in-progress';renderTaskDetailBase(t);toast('Task reinstated','ok');}
 function openEditTaskFromDetail(){var id=currentTaskId;closeTaskDetail();setTimeout(function(){openEditTask(id);},80);}
@@ -4968,13 +5482,13 @@ async function toggleDeliverable(id){
       await db.collection('milestone_deliverables').doc(d.id).set({completed:nextComplete,completedAt:nextComplete?Date.now():null,updatedAt:Date.now()},{merge:true});
       await recordMilestoneActivity(d.milestoneId,nextComplete?'deliverable_completed':'deliverable_reopened',currentProfile.name+' '+(nextComplete?'completed ':'reopened ')+(d.name||'a deliverable')+'.',d.id);
     }
-    toast(nextComplete?'Marked complete':'Reopened','ok');
+    if(nextComplete)await awardCurrentUserXP(15,'deliverable_completed',id,'Milestone deliverable completed','deliverable_'+id);toast(nextComplete?'Marked complete':'Reopened','ok');
   }catch(e){toast(e.message||'Could not update deliverable','err');}
 }
 
 function toggleMilestoneActivity(id){var e=document.getElementById('ms2-activity-'+id);if(!e)return;e.classList.toggle('open');var card=e.closest('.ms2-card'),btn=card&&Array.from(card.querySelectorAll('button')).find(function(b){return /Activity Log/.test(b.textContent);});if(btn)btn.textContent=e.classList.contains('open')?'Hide Activity Log':'Show Activity Log';}
 function activityHtml(msId){var rows=(liveData.milestoneActivity||[]).filter(function(x){return x.milestoneId===msId;}).sort(function(a,b){return Number(b.createdAt||0)-Number(a.createdAt||0);}).slice(0,80);if(!rows.length)return '<div class="ms2-empty">No activity recorded yet.</div>';return rows.map(function(x){return '<div class="ms2-activity-item"><strong style="color:var(--white)">'+esc(x.authorName||'Mission Hub')+'</strong> · '+esc(x.message||'Updated milestone')+'<div style="font-size:10px;margin-top:2px">'+formatTaskEntryTime(x.createdAt)+'</div></div>';}).join('');}
-function renderProjectSummary(all){var active=all.filter(function(m){return !m.archived;}),pct=active.length?Math.round(active.reduce(function(n,m){return n+milestoneProgress(m);},0)/active.length):0,done=active.filter(function(m){return m.status==='completed';}).length,ready=active.filter(function(m){return milestoneAllPartsDone(m)&&m.status!=='completed';}).length,el=document.getElementById('ms2-project-summary');if(!el)return;el.innerHTML='<div class="ms2-project-top"><div><div class="ms2-project-title">COSMIC VESSEL · PROJECT COMPLETION</div><div class="ms2-summary"><span>'+active.length+' milestone'+(active.length===1?'':'s')+'</span><span>'+done+' completed</span><span>'+ready+' ready to confirm</span></div></div><div class="ms2-project-pct">'+pct+'%</div></div><div class="ms2-bar"><div class="ms2-bar-fill" style="width:'+pct+'%"></div></div>'+(active.length?'<div style="font-size:10px;color:var(--grey-2);margin-top:7px">Calculated equally from current milestone deliverables. It will refine as the roadmap is defined.</div>':'<div style="font-size:11px;color:var(--grey);margin-top:8px">Add milestones to begin calculating project completion.</div>');}
+function renderProjectSummary(all){var active=all.filter(function(m){return !m.archived;}),pct=active.length?Math.round(active.reduce(function(n,m){return n+milestoneProgress(m);},0)/active.length):0,done=active.filter(function(m){return m.status==='completed';}).length,ready=active.filter(function(m){return milestoneAllPartsDone(m)&&m.status!=='completed';}).length,el=document.getElementById('ms2-project-summary');if(!el)return;el.innerHTML='<div class="ms2-project-top"><div><div class="ms2-project-title">COSMIC VESSEL · ACTIVE MILESTONE PROGRESSION</div><div class="ms2-summary"><span>'+active.length+' milestone'+(active.length===1?'':'s')+'</span><span>'+done+' completed</span><span>'+ready+' ready to confirm</span></div></div><div class="ms2-project-pct">'+pct+'%</div></div><div class="ms2-bar"><div class="ms2-bar-fill" style="width:'+pct+'%"></div></div>'+(active.length?'<div style="font-size:10px;color:var(--grey-2);margin-top:7px">Calculated equally from current milestone deliverables. It will refine as the roadmap is defined.</div>':'<div style="font-size:11px;color:var(--grey);margin-top:8px">Add milestones to begin calculating active milestone progression.</div>');}
 function milestoneDeliverableCounts(ms){var roots=childrenFor(ms.id,''),done=roots.filter(function(d){return deliverableProgress(ms.id,d)>=100;}).length;return {total:roots.length,done:done};}
 function renderMilestoneSummaryCard(ms,isCompleted){
   var pct=Math.round(milestoneProgress(ms)),ready=milestoneAllPartsDone(ms)&&ms.status!=='completed',blocked=milestoneBlocked(ms),status=ms.status||'planned',counts=milestoneDeliverableCounts(ms);
@@ -6664,8 +7178,8 @@ function renderSuggestedTimes(columns,displayHours,selectedUids){
 
 function checkAvailPrompt(){checkWeeklyAvailabilityConfirmation();}
 function dismissAvailPrompt(){availPromptDismissed=true;var el=document.getElementById('avail-prompt');if(el)el.style.display='none';}
-function checkWeeklyAvailabilityConfirmation(){if(!currentUser||!liveData.weeklyAvail)return;var snooze=localStorage.getItem('cvp_avail_snooze_'+currentUser.uid);if(snooze&&Date.now()<Number(snooze))return;var f=getAvailabilityFreshness(currentUser.uid);var has=liveData.weeklyAvail[currentUser.uid]&&liveData.weeklyAvail[currentUser.uid].slots;if(!has||f.state==='stale'||f.state==='missing')openModal('m-avail-confirm');}
-async function confirmAvailabilityWeek(choice){var uid=currentUser.uid,now=new Date().toISOString();if(choice==='update'){closeModal('m-avail-confirm');openAvailEditor();return;}await db.collection('avail_weekly').doc(uid).set({confirmedAt:now,weekStatus:choice==='flexible'?'flexible':'confirmed',updatedAt:firebase.firestore.FieldValue.serverTimestamp?now:now},{merge:true});await db.collection('users').doc(uid).set({availabilityConfirmedAt:now,availabilityWeekStatus:choice==='flexible'?'flexible':'confirmed'},{merge:true});closeModal('m-avail-confirm');toast(choice==='flexible'?'Marked flexible for this week':'Availability confirmed','ok');}
+/* Availability confirmation handled by v10B guarded implementation below. */
+async function confirmAvailabilityWeek(choice){var uid=currentUser.uid,now=new Date().toISOString();if(choice==='update'){closeModal('m-avail-confirm');openAvailEditor();return;}await db.collection('avail_weekly').doc(uid).set({confirmedAt:now,weekStatus:choice==='flexible'?'flexible':'confirmed',updatedAt:firebase.firestore.FieldValue.serverTimestamp?now:now},{merge:true});await db.collection('users').doc(uid).set({availabilityConfirmedAt:now,availabilityWeekStatus:choice==='flexible'?'flexible':'confirmed'},{merge:true});await awardCurrentUserXP(5,'availability_confirmed',now.slice(0,10),'Weekly availability confirmed','availability_'+uid+'_'+now.slice(0,10));closeModal('m-avail-confirm');toast(choice==='flexible'?'Marked flexible for this week':'Availability confirmed','ok');}
 function remindAvailabilityTomorrow(){localStorage.setItem('cvp_avail_snooze_'+currentUser.uid,String(Date.now()+86400000));closeModal('m-avail-confirm');toast('I’ll ask again tomorrow','inf');}
 async function createUserNotification(uid,type,title,body,meetingId){if(!uid||uid===currentUser.uid)return;try{await db.collection('notifications').add({recipientId:uid,type:type,title:title,body:body,meetingId:meetingId||'',read:false,createdAt:new Date().toISOString()});}catch(e){console.warn('Notification failed',e);}}
 function renderNotificationBadge(){var n=(liveData.notifications||[]).filter(function(x){return !x.read;}).length,el=document.getElementById('notif-count');if(!el)return;el.textContent=n;el.style.display=n?'inline-block':'none';}
@@ -6876,7 +7390,7 @@ document.addEventListener('mouseup',function(){_dragPainting=false;_dragTouched.
 
 
 function clearAvailEditor(){if(!confirm('Clear all slots in the current view?'))return;Object.keys(editorSlots).forEach(function(k){editorSlots[k]=makeEditorBucket(null);});renderEditorGrid();}
-async function saveAvailability(){var uid=currentUser?currentUser.uid:'';if(!uid)return;var now=new Date().toISOString();if(editorMode==='weekly'){var slotsObj={};WEEK_DAYS.forEach(function(d){var b=editorSlots[d]||makeEditorBucket(null);slotsObj[d]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};});await db.collection('avail_weekly').doc(uid).set({uid:uid,tz:(currentProfile&&currentProfile.tz)||'UTC',slots:slotsObj,updatedAt:now,confirmedAt:now,weekStatus:'confirmed'},{merge:true});await db.collection('users').doc(uid).set({weeklyAvail:slotsObj,availabilityConfirmedAt:now,availabilityWeekStatus:'confirmed'},{merge:true});toast('Regular hours saved and confirmed!','ok');}else{var datesObj={};Object.keys(editorSlots).forEach(function(ds){if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){var b=editorSlots[ds];datesObj[ds]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};}});var existing=(liveData.overrideAvail[uid]&&liveData.overrideAvail[uid].dates)||{};await db.collection('avail_override').doc(uid).set({uid:uid,dates:Object.assign({},existing,datesObj),updatedAt:now},{merge:true});toast('Specific-date availability saved!','ok');}closeModal('m-avail-editor');dismissAvailPrompt();renderAvailHeatmap();}
+async function saveAvailability(){var uid=currentUser?currentUser.uid:'';if(!uid)return;var now=new Date().toISOString();if(editorMode==='weekly'){var slotsObj={};WEEK_DAYS.forEach(function(d){var b=editorSlots[d]||makeEditorBucket(null);slotsObj[d]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};});await db.collection('avail_weekly').doc(uid).set({uid:uid,tz:(currentProfile&&currentProfile.tz)||'UTC',slots:slotsObj,updatedAt:now,confirmedAt:now,weekStatus:'confirmed'},{merge:true});await db.collection('users').doc(uid).set({weeklyAvail:slotsObj,availabilityConfirmedAt:now,availabilityWeekStatus:'confirmed'},{merge:true});await awardCurrentUserXP(5,'availability_confirmed',new Date().toISOString().slice(0,10),'Weekly availability confirmed','availability_'+currentUser.uid+'_'+new Date().toISOString().slice(0,10));toast('Regular hours saved and confirmed!','ok');}else{var datesObj={};Object.keys(editorSlots).forEach(function(ds){if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){var b=editorSlots[ds];datesObj[ds]={available:Array.from(b.available).sort(),unavailable:Array.from(b.unavailable).sort()};}});var existing=(liveData.overrideAvail[uid]&&liveData.overrideAvail[uid].dates)||{};await db.collection('avail_override').doc(uid).set({uid:uid,dates:Object.assign({},existing,datesObj),updatedAt:now},{merge:true});toast('Specific-date availability saved!','ok');}closeModal('m-avail-editor');dismissAvailPrompt();renderAvailHeatmap();}
 
 // ── Update openMemberProfile to show weekly avail from avail_weekly ──
 // (already reads m.weeklyAvail from the user doc via the users snapshot)
@@ -8337,6 +8851,540 @@ taskCanAddReference=function(t){return !!t&&!!currentUser&&(taskIsCollaborator(t
 var _msOldRenderTaskDetailBase=renderTaskDetailBase;
 renderTaskDetailBase=function(t){_msOldRenderTaskDetailBase(t);var body=document.getElementById('td-body');if(body&&t&&t.contributors&&t.contributors.length){var names=t.contributors.map(function(uid){return (liveData.members[uid]||{}).name||'Unknown';}).join(', ');var grid=body.querySelector('.task2-meta-grid');if(grid)grid.insertAdjacentHTML('beforeend','<div class="task2-meta"><div class="task2-meta-label">Contributors</div><div class="task2-meta-value">'+esc(names)+'</div></div>');}};
 
+
+// ══════════════════════════════════════════════════════════
+// HOME DASHBOARD 2.0
+// ══════════════════════════════════════════════════════════
+var DASHBOARD_THEME_DEFAULTS = {
+  themes: {
+    halloween:{enabled:true,start:'10-20',end:'11-02',priority:20},
+    winter:{enabled:true,start:'12-01',end:'01-05',priority:10},
+    anniversary:{enabled:false,start:'06-01',end:'06-03',priority:30}
+  },
+  anniversaryDate:''
+};
+
+function dashboardCfg(){
+  var raw=liveData.dashboardSettings||{}, themes=Object.assign({},DASHBOARD_THEME_DEFAULTS.themes,raw.themes||{});
+  return Object.assign({},DASHBOARD_THEME_DEFAULTS,raw,{themes:themes});
+}
+function currentRole(){return normaliseRole((currentProfile||{}).role||'member');}
+function currentDeptIds(){return normaliseDepts((currentProfile||{}).managedDepts||(currentProfile||{}).leadDepts||(currentProfile||{}).depts||[]);}
+function homeNow(){return new Date();}
+function homeDueDate(t){var v=t.dueDate||t.due||'';if(!v)return null;var d=new Date(v);return isNaN(d)?null:d;}
+function homeIsOverdue(t){var d=homeDueDate(t);return !!(d&&d.getTime()<Date.now()&&t.state!=='completed');}
+function homeTaskPeople(t){return [t.assignee].concat(t.contributors||[]).filter(Boolean);}
+function homeRelevantTasks(){
+  var uid=currentUser&&currentUser.uid, role=currentRole(), depts=currentDeptIds();
+  var all=Object.values(liveData.tasks||{}).filter(Boolean);
+  // Use the same ownership rule as My Tasks: the assigned owner always sees the task,
+  // with contributors included for Task Management 2.0 collaboration.
+  var personal=all.filter(function(t){
+    return t.assignee===uid || (Array.isArray(t.contributors)&&t.contributors.includes(uid));
+  });
+  if(role==='admin'||role==='project_manager')return all;
+  if(role==='lead'||role==='director'){
+    return all.filter(function(t){
+      return t.assignee===uid || (Array.isArray(t.contributors)&&t.contributors.includes(uid)) || depts.includes(t.dept);
+    });
+  }
+  return personal;
+}
+function homeRelevantMilestones(){
+  var role=currentRole(), depts=currentDeptIds(), uid=currentUser&&currentUser.uid;
+  return (liveData.milestones||[]).filter(function(ms){
+    if(ms.archived||ms.deletionRequested)return false;
+    if(role==='admin'||role==='project_manager')return true;
+    var msDepts=normaliseDepts(ms.departments||ms.depts||ms.department||[]);
+    var deliverables=(liveData.milestoneDeliverables||[]).filter(function(d){return d.milestoneId===ms.id&&!d.archived;});
+    var dmatch=deliverables.some(function(d){
+      var dd=normaliseDepts(d.departments||d.depts||d.department||[]);
+      var linked=(d.linkedTaskIds||[]).some(function(id){var t=(liveData.tasks||{})[id];return t&&homeTaskPeople(t).includes(uid);});
+      return linked||dd.some(function(x){return depts.includes(x);});
+    });
+    return msDepts.some(function(x){return depts.includes(x);})||dmatch;
+  });
+}
+function homeMeetings(){
+  var uid=currentUser&&currentUser.uid, now=Date.now();
+  return (liveData.meetings||[]).filter(function(m){
+    if(m.cancelled)return false;
+    var dt=new Date(m.dateUtc||m.date||0).getTime();
+    return dt>=now-3600000&&((m.attendees||[]).includes(uid)||m.createdBy===uid||m.ownerId===uid);
+  }).sort(function(a,b){return new Date(a.dateUtc||a.date)-new Date(b.dateUtc||b.date);});
+}
+function homeTodayKey(d){return d.toISOString().slice(0,10);}
+function homeStartOfWeek(){
+  var d=new Date(), day=(d.getDay()+6)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-day);return d;
+}
+function homeEndOfWeek(){var d=homeStartOfWeek();d.setDate(d.getDate()+7);return d;}
+function homeFormatDue(t){var d=homeDueDate(t);if(!d)return 'No due date';return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+function homeTaskState(t){return ({'pending-accept':'Pending acceptance','accepted':'Accepted','in-progress':'In progress','review':'Awaiting review','completed':'Completed','unassigned':'Unassigned'})[t.state]||t.state||'Task';}
+function homeCardPrefsKey(){return 'cvp_home_cards_'+((currentUser&&currentUser.uid)||'guest');}
+function restoreHomeCardPrefs(){
+  var prefs={};try{prefs=JSON.parse(localStorage.getItem(homeCardPrefsKey())||'{}');}catch(e){}
+  document.querySelectorAll('[data-home-card]').forEach(function(card){var key=card.dataset.homeCard;if(prefs[key])card.classList.add('collapsed');var b=card.querySelector('.home-collapse-btn');if(b)b.textContent=card.classList.contains('collapsed')?'+':'−';});
+}
+function toggleHomeCard(key){
+  var card=document.querySelector('[data-home-card="'+key+'"]');if(!card)return;card.classList.toggle('collapsed');
+  var prefs={};try{prefs=JSON.parse(localStorage.getItem(homeCardPrefsKey())||'{}');}catch(e){}
+  prefs[key]=card.classList.contains('collapsed');localStorage.setItem(homeCardPrefsKey(),JSON.stringify(prefs));
+  var b=card.querySelector('.home-collapse-btn');if(b)b.textContent=card.classList.contains('collapsed')?'+':'−';
+}
+function homeActionButton(el,label,fn){
+  el.textContent=label;el.style.display='inline-flex';el.onclick=fn;
+}
+function chooseHomeFocus(){
+  var tasks=homeRelevantTasks().filter(function(t){return t.state!=='completed';});
+  var overdue=tasks.filter(homeIsOverdue).sort(function(a,b){return homeDueDate(a)-homeDueDate(b);});
+  var awaitingAcceptance=tasks.filter(function(t){return t.state==='pending-accept';});
+  var acceptedNotStarted=tasks.filter(function(t){return t.state==='accepted';});
+  var underway=tasks.filter(function(t){return t.state==='in-progress';});
+  var review=tasks.filter(function(t){return t.state==='review';});
+  var meetings=homeMeetings(),now=Date.now(),next=meetings[0],nextMs=next?new Date(next.dateUtc||next.date).getTime()-now:Infinity;
+  var unread=(liveData.notifications||[]).filter(function(n){return !n.read;});
+  var avail=currentProfile&&currentProfile.availabilityConfirmedAt?new Date(currentProfile.availabilityConfirmedAt).getTime():0;
+  var availStale=!avail||(now-avail>7*86400000);
+  var ready=homeRelevantMilestones().filter(function(m){return m.status!=='completed'&&milestoneAllPartsDone(m);});
+  if(next&&nextMs>=0&&nextMs<60*60*1000)return {icon:'◎',title:'Your next meeting starts soon',detail:(next.name||'Meeting')+' begins in '+Math.max(1,Math.round(nextMs/60000))+' minutes.',label:'Open scheduler',action:function(){navTo('scheduler');}};
+  if(overdue.length)return {icon:'!',title:overdue.length+' overdue task'+(overdue.length===1?' needs':'s need')+' attention',detail:'Your task section lists the overdue work and anything else currently assigned to you.',label:'View tasks',action:function(){navTo('my-tasks');}};
+  if(awaitingAcceptance.length)return {icon:'◇',title:awaitingAcceptance.length+' task'+(awaitingAcceptance.length===1?' is':'s are')+' waiting for your response',detail:'Open your task list to accept or review the new assignment'+(awaitingAcceptance.length===1?'':'s')+'.',label:'View tasks',action:function(){navTo('my-tasks');}};
+  if(acceptedNotStarted.length)return {icon:'◆',title:acceptedNotStarted.length+' accepted task'+(acceptedNotStarted.length===1?' has':'s have')+' not been started',detail:'Your task section shows which accepted work is ready to move into progress.',label:'View tasks',action:function(){navTo('my-tasks');}};
+  if(underway.length)return {icon:'◆',title:underway.length+' task'+(underway.length===1?' is':'s are')+' currently in progress',detail:'Check your task section for due dates, feedback and the next useful update.',label:'View tasks',action:function(){navTo('my-tasks');}};
+  if(ready.length&&(currentRole()==='admin'||currentRole()==='project_manager'||currentRole()==='director'))return {icon:'✓',title:ready.length+' milestone'+(ready.length===1?' is':'s are')+' ready to confirm',detail:'All deliverables are complete and waiting for final sign-off.',label:'Review milestones',action:function(){navTo('milestones');}};
+  if(review.length&&currentRole()!=='member')return {icon:'◇',title:review.length+' task review'+(review.length===1?' is':'s are')+' waiting',detail:'A contributor is ready for feedback or approval.',label:'Open reviews',action:function(){navToMyDept();}};
+  if(availStale)return {icon:'◷',title:'Confirm your availability',detail:'Keeping this current helps the team find meeting times quickly.',label:'Update availability',action:function(){navTo('scheduler');setTimeout(function(){if(typeof openAvailabilityEditor==='function')openAvailabilityEditor();},500);}};
+  if(unread.length)return {icon:'◉',title:unread.length+' unread notification'+(unread.length===1?'':'s'),detail:'Catch up on changes since your last visit.',label:'Open notifications',action:openNotificationCentre};
+  if(tasks.length)return {icon:'◆',title:tasks.length+' active task'+(tasks.length===1?' is':'s are')+' assigned to you',detail:'The task section below contains the current details and next actions.',label:'View tasks',action:function(){navTo('my-tasks');}};
+  return {icon:'✦',title:'Nothing urgent needs your attention',detail:'You are caught up. Have a look at the roadmap or help another team member.',label:'View milestones',action:function(){navTo('milestones');}};
+}
+function renderHomeFocus(){
+  var f=chooseHomeFocus(),b=document.getElementById('home-focus-action');if(!b)return;
+  document.getElementById('home-focus-icon').textContent=f.icon;document.getElementById('home-focus-title').textContent=f.title;document.getElementById('home-focus-detail').textContent=f.detail;homeActionButton(b,f.label,f.action);
+}
+function renderHomeGreeting(){
+  var d=new Date(),h=d.getHours(),g=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  document.getElementById('home-greeting').textContent=g+', '+((currentProfile&&currentProfile.name)||'Adventurer');
+  document.getElementById('home-date-line').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  var tasks=homeRelevantTasks().filter(function(t){return t.state!=='completed';}), meetings=homeMeetings().filter(function(m){return homeTodayKey(new Date(m.dateUtc||m.date))===homeTodayKey(d);});
+  document.getElementById('home-subline').textContent=(meetings.length?meetings.length+' meeting'+(meetings.length===1?'':'s')+' today · ':'')+(tasks.length?tasks.length+' active task'+(tasks.length===1?'':'s'):'Your work is up to date');
+  var sb=document.getElementById('home-settings-btn');if(sb)sb.classList.remove('hidden');
+}
+function renderHomeAlerts(){
+  var tasks=homeRelevantTasks(), overdue=tasks.filter(homeIsOverdue).length, review=tasks.filter(function(t){return t.state==='review';}).length;
+  var unread=(liveData.notifications||[]).filter(function(n){return !n.read;}).length;
+  var ready=homeRelevantMilestones().filter(function(m){return m.status!=='completed'&&milestoneAllPartsDone(m);}).length;
+  var arr=[
+    {v:overdue,l:'Overdue tasks',c:'var(--crimson-hi)',a:function(){navTo('my-tasks');}},
+    {v:review,l:'Awaiting review',c:'var(--blue)',a:function(){navToMyDept();}},
+    {v:ready,l:'Milestones ready',c:'var(--green)',a:function(){navTo('milestones');}},
+    {v:unread,l:'Unread notifications',c:'var(--gold)',a:openNotificationCentre}
+  ].filter(function(x){return x.v>0;});
+  var el=document.getElementById('home-alert-grid');if(!el)return;
+  if(!arr.length){el.innerHTML='';el.style.display='none';return;}el.style.display='grid';
+  el.innerHTML=arr.map(function(x,i){return '<div class="home-alert" style="--alert-color:'+x.c+'" onclick="homeAlertAction('+i+')"><div class="home-alert-value">'+x.v+'</div><div class="home-alert-label">'+x.l+'</div></div>';}).join('');
+  window._homeAlertActions=arr.map(function(x){return x.a;});
+}
+function homeAlertAction(i){if(window._homeAlertActions&&window._homeAlertActions[i])window._homeAlertActions[i]();}
+function renderHomeTasks(){
+  var el=document.getElementById('home-tasks');if(!el)return;
+  var arr=homeRelevantTasks().filter(function(t){return t.state!=='completed';}).sort(function(a,b){
+    var ao=homeIsOverdue(a)?0:1,bo=homeIsOverdue(b)?0:1;if(ao!==bo)return ao-bo;
+    var ad=homeDueDate(a),bd=homeDueDate(b);return (ad?ad.getTime():Infinity)-(bd?bd.getTime():Infinity);
+  }).slice(0,6);
+  if(!arr.length){el.innerHTML='<div class="home-empty">No active tasks assigned to you.</div>';return;}
+  el.innerHTML=arr.map(function(t){return '<div class="home-list-item" onclick="openTaskDetail(\''+t.id+'\')"><span style="width:7px;height:7px;border-radius:50%;background:'+(homeIsOverdue(t)?'var(--crimson-hi)':t.state==='review'?'var(--blue)':'var(--amber)')+'"></span><div class="home-list-main"><div class="home-list-title">'+esc(t.name||t.title||'Untitled task')+'</div><div class="home-list-meta">'+esc(DEPT_NAMES[t.dept]||t.dept||'General')+' · '+homeFormatDue(t)+'</div></div><span class="home-mini-badge">'+esc(homeTaskState(t))+'</span></div>';}).join('');
+}
+function renderHomeMeetings(){
+  var el=document.getElementById('home-meetings');if(!el)return;var arr=homeMeetings().slice(0,4),tz=(currentProfile&&currentProfile.tz)||'UTC';
+  if(!arr.length){el.innerHTML='<div class="home-empty">No upcoming meetings.</div>';return;}
+  el.innerHTML=arr.map(function(m){var d=new Date(m.dateUtc||m.date),required=(m.requiredAttendees||[]).includes(currentUser.uid);return '<div class="home-list-item" onclick="navTo(\'scheduler\')"><div class="home-list-main"><div class="home-list-title">'+esc(m.name||'Meeting')+'</div><div class="home-list-meta">'+d.toLocaleString('en-GB',{timeZone:tz,weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</div></div><span class="home-mini-badge">'+(required?'Required':'Optional')+'</span></div>';}).join('');
+}
+function renderHomeNotifications(){
+  var el=document.getElementById('home-notifications');if(!el)return;var arr=(liveData.notifications||[]).slice(0,5);
+  if(!arr.length){el.innerHTML='<div class="home-empty">No notifications.</div>';return;}
+  el.innerHTML=arr.map(function(n){return '<div class="home-list-item '+(!n.read?'home-notif-unread':'')+'" onclick="markNotificationRead(\''+n.id+'\')"><div class="home-list-main"><div class="home-list-title">'+esc(n.title||'Notification')+'</div><div class="home-list-meta">'+esc((n.body||'').slice(0,95))+'</div></div></div>';}).join('');
+}
+function renderHomeMilestones(){
+  var el=document.getElementById('home-milestones');if(!el)return;
+  var arr=homeRelevantMilestones().filter(function(m){return m.status!=='completed';}).sort(function(a,b){var ar=milestoneAllPartsDone(a)?0:1,br=milestoneAllPartsDone(b)?0:1;if(ar!==br)return ar-br;return (a.targetDate||'9999').localeCompare(b.targetDate||'9999');}).slice(0,5);
+  if(!arr.length){el.innerHTML='<div class="home-empty">No relevant active milestones.</div>';return;}
+  el.innerHTML=arr.map(function(m){var p=Math.round(milestoneProgress(m)),c=milestoneDeliverableCounts(m);return '<div class="home-list-item" onclick="openMilestoneDetail(\''+m.id+'\')"><div class="home-list-main"><div class="home-list-title">'+esc(m.title||m.name||'Milestone')+'</div><div class="home-list-meta">'+c.done+' / '+c.total+' deliverables'+(milestoneAllPartsDone(m)?' · Ready to confirm':'')+'</div><div class="home-progress-track"><div class="home-progress-fill" style="width:'+p+'%"></div></div></div><strong style="font-family:Orbitron,sans-serif;font-size:12px;color:var(--green)">'+p+'%</strong></div>';}).join('');
+}
+function renderHomeRoleOverview(){
+  var el=document.getElementById('home-role-overview'),title=document.getElementById('home-overview-title'),kick=document.getElementById('home-overview-kicker');if(!el)return;
+  var role=currentRole(),tasks=homeRelevantTasks(),depts=currentDeptIds();
+  if(role==='member'){title.textContent='My Contribution';kick.textContent='PERSONAL';var completed=tasks.filter(function(t){return t.state==='completed';}).length,progress=tasks.filter(function(t){return t.state==='in-progress'||t.state==='accepted';}).length;el.innerHTML='<div class="home-metric-row"><div class="home-metric"><strong>'+progress+'</strong><span>Tasks underway</span></div><div class="home-metric"><strong>'+completed+'</strong><span>Tasks completed</span></div></div>';return;}
+  if(role==='lead'||role==='director'){title.textContent=role==='director'?'Departments I Oversee':'Department Overview';kick.textContent='MANAGEMENT';var rows=depts.map(function(d){var dt=Object.values(liveData.tasks||{}).filter(function(t){return t.dept===d&&t.state!=='completed';}),ov=dt.filter(homeIsOverdue).length;return '<div class="home-list-item" onclick="navTo(\'dept-'+d+'\')"><div class="home-list-main"><div class="home-list-title">'+esc(DEPT_NAMES[d]||d)+'</div><div class="home-list-meta">'+dt.length+' active · '+ov+' overdue</div></div></div>';});el.innerHTML=rows.join('')||'<div class="home-empty">No managed departments assigned.</div>';return;}
+  title.textContent='Project Overview';kick.textContent='PROJECT';var all=Object.values(liveData.tasks||{}),active=all.filter(function(t){return t.state!=='completed';}).length,quiet=all.filter(function(t){return t.state!=='completed'&&taskHeartbeatInfo(t).days>=14;}).length;el.innerHTML='<div class="home-metric-row"><div class="home-metric"><strong>'+active+'</strong><span>Active project tasks</span></div><div class="home-metric"><strong>'+quiet+'</strong><span>Quiet tasks</span></div><div class="home-metric"><strong>'+homeRelevantMilestones().filter(function(m){return m.status==='active';}).length+'</strong><span>Active milestones</span></div><div class="home-metric"><strong>'+Object.keys(liveData.members||{}).length+'</strong><span>Team members</span></div></div>';
+}
+function renderHomeWeekly(){
+  var el=document.getElementById('home-weekly');if(!el)return;var s=homeStartOfWeek(),e=homeEndOfWeek(),tasks=homeRelevantTasks();
+  var completed=tasks.filter(function(t){var x=new Date(t.completedAt||t.updatedAt||0);return t.state==='completed'&&x>=s&&x<e;}).length;
+  var due=tasks.filter(function(t){var d=homeDueDate(t);return d&&d>=s&&d<e&&t.state!=='completed';}).length;
+  var meetings=homeMeetings().filter(function(m){var d=new Date(m.dateUtc||m.date);return d>=s&&d<e;}).length;
+  var advanced=homeRelevantMilestones().filter(function(m){var d=new Date(m.updatedAt||m.completedAt||0);return d>=s&&d<e;}).length;
+  el.innerHTML='<div class="home-metric-row"><div class="home-metric"><strong>'+due+'</strong><span>Tasks due</span></div><div class="home-metric"><strong>'+meetings+'</strong><span>Meetings</span></div><div class="home-metric"><strong>'+completed+'</strong><span>Tasks completed</span></div><div class="home-metric"><strong>'+advanced+'</strong><span>Milestones changed</span></div></div>';
+}
+function renderHomeCompleted(){
+  var el=document.getElementById('home-completed');if(!el)return;var cutoff=Date.now()-14*86400000,items=[];
+  Object.values(liveData.tasks||{}).forEach(function(t){var d=new Date(t.completedAt||t.updatedAt||0).getTime();if(t.state==='completed'&&d>=cutoff)items.push({d:d,title:t.name||t.title||'Task completed',meta:'Task · '+(DEPT_NAMES[t.dept]||t.dept||'General'),act:function(){openTaskDetail(t.id);}});});
+  (liveData.milestones||[]).forEach(function(m){var d=new Date(m.completedAt||m.updatedAt||0).getTime();if(m.status==='completed'&&d>=cutoff)items.push({d:d,title:m.title||m.name||'Milestone completed',meta:'Milestone completed',act:function(){openMilestoneDetail(m.id);}});});
+  items.sort(function(a,b){return b.d-a.d;});window._homeCompletedActions=items.slice(0,6).map(function(x){return x.act;});
+  if(!items.length){el.innerHTML='<div class="home-empty">Recent completions will appear here as the team advances.</div>';return;}
+  el.innerHTML=items.slice(0,6).map(function(x,i){return '<div class="home-list-item" onclick="_homeCompletedActions['+i+']()"><span style="color:var(--green)">✓</span><div class="home-list-main"><div class="home-list-title">'+esc(x.title)+'</div><div class="home-list-meta">'+esc(x.meta)+' · '+new Date(x.d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+'</div></div></div>';}).join('');
+}
+function renderHomeCelebration(){
+  var el=document.getElementById('home-celebration');if(!el)return;var cutoff=Date.now()-72*3600000;
+  var ms=(liveData.milestones||[]).filter(function(m){return m.status==='completed'&&new Date(m.completedAt||m.updatedAt||0).getTime()>=cutoff;}).sort(function(a,b){return new Date(b.completedAt||b.updatedAt)-new Date(a.completedAt||a.updatedAt);})[0];
+  if(ms){el.innerHTML='<div class="home-celebration"><div class="home-celebration-title">Milestone completed: '+esc(ms.title||ms.name||'Project milestone')+'</div><div class="home-celebration-copy">A meaningful piece of the Cosmic Vessel project is now complete. Thank you to everyone who helped move it forward.</div></div>';return;}
+  el.innerHTML='';
+}
+function renderHomeDashboard(){
+  var view=document.getElementById('view-dashboard');if(!view||!currentProfile||!currentUser)return;
+  var renders=[
+    ['greeting',renderHomeGreeting],['celebration',renderHomeCelebration],['focus',renderHomeFocus],
+    ['alerts',renderHomeAlerts],['tasks',renderHomeTasks],['meetings',renderHomeMeetings],
+    ['notifications',renderHomeNotifications],['milestones',renderHomeMilestones],
+    ['role overview',renderHomeRoleOverview],['journey',renderHomeJourney],['weekly digest',renderHomeWeekly],['recent completions',renderHomeCompleted]
+  ];
+  renders.forEach(function(pair){try{pair[1]();}catch(err){console.error('Home '+pair[0]+' render failed',err);}});
+  try{restoreHomeCardPrefs();}catch(err){console.warn('Home card preferences',err);}
+  try{applyScheduledTheme();}catch(err){console.warn('Seasonal theme',err);}
+}
+function monthDayWithin(md,start,end){
+  if(!md||!start||!end)return false;if(start<=end)return md>=start&&md<=end;return md>=start||md<=end;
+}
+function activeScheduledTheme(){
+  var cfg=dashboardCfg(),md=('0'+(new Date().getMonth()+1)).slice(-2)+'-'+('0'+new Date().getDate()).slice(-2),found=[];
+  Object.keys(cfg.themes||{}).forEach(function(k){var t=cfg.themes[k];if(t&&t.enabled&&monthDayWithin(md,t.start,t.end))found.push({key:k,priority:Number(t.priority||0)});});
+  found.sort(function(a,b){return b.priority-a.priority;});return found.length?found[0].key:'';
+}
+function buildSeasonalEffects(theme){
+  var layer=document.getElementById('seasonal-effects');if(!layer)return;layer.innerHTML='';
+  if(!theme)return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(theme==='winter'){
+    var count=reduce?8:36;
+    for(var i=0;i<count;i++){var el=document.createElement('span');el.className='season-snow';el.textContent=['❄','❅','✦'][i%3];el.style.left=((i*37)%100)+'%';el.style.fontSize=(8+(i%5)*3)+'px';el.style.animationDuration=(9+(i%7)*1.7)+'s';el.style.animationDelay=(-i*.73)+'s';layer.appendChild(el);}
+  }else if(theme==='halloween'){
+    var leaves=reduce?5:18,ghosts=reduce?2:7;
+    for(var j=0;j<leaves;j++){var l=document.createElement('span');l.className='season-leaf';l.style.left=((j*53+7)%100)+'%';l.style.animationDuration=(10+(j%6)*2)+'s';l.style.animationDelay=(-j*1.15)+'s';layer.appendChild(l);}
+    for(var g=0;g<ghosts;g++){var gh=document.createElement('span');gh.className='season-ghost';gh.innerHTML='<i></i>';gh.style.left=(-12-(g*8))+'vw';gh.style.top=(8+((g*19)%76))+'%';gh.style.width=(20+(g%3)*9)+'px';gh.style.height=(24+(g%3)*10)+'px';gh.style.animationDuration=(16+(g%5)*4)+'s';gh.style.animationDelay=(-g*3.8)+'s';layer.appendChild(gh);}
+  }else if(theme==='anniversary'){
+    var nebCount=reduce?2:5;
+    for(var n=0;n<nebCount;n++){var nb=document.createElement('span');nb.className='season-nebula';nb.style.left=(-12+((n*29)%95))+'%';nb.style.top=(-10+((n*31)%85))+'%';nb.style.animationDuration=(16+n*4)+'s';nb.style.animationDelay=(-n*4)+'s';layer.appendChild(nb);}
+    var stars=reduce?10:32;
+    for(var st=0;st<stars;st++){var se=document.createElement('span');se.className=st%8===0?'season-flare':'season-star';se.textContent=st%8===0?'✦':'·';se.style.left=((st*41)%100)+'%';se.style.top=((st*67)%100)+'%';se.style.animationDuration=(3+(st%6))+'s';se.style.animationDelay=(-st*.37)+'s';layer.appendChild(se);}
+    if(!reduce){for(var sh=0;sh<5;sh++){var ss=document.createElement('span');ss.className='season-shooting-star';ss.style.left=(-12+((sh*23)%80))+'%';ss.style.top=(8+((sh*17)%58))+'%';ss.style.animationDuration=(7+sh*2.1)+'s';ss.style.animationDelay=(sh*3.4)+'s';layer.appendChild(ss);}}
+  }
+}
+function applyScheduledTheme(){
+  var preview=sessionStorage.getItem('cvp_theme_preview')||'',theme=preview||activeScheduledTheme();
+  document.body.classList.remove('theme-halloween','theme-winter','theme-anniversary');
+  if(theme)document.body.classList.add('theme-'+theme);
+  buildSeasonalEffects(theme);
+  var badge=document.getElementById('seasonal-preview-badge');
+  if(badge){
+    if(preview){badge.textContent='Previewing '+(preview==='anniversary'?'Project Anniversary':preview.charAt(0).toUpperCase()+preview.slice(1))+' theme';badge.classList.remove('hidden');}
+    else badge.classList.add('hidden');
+  }
+}
+function previewDashboardTheme(theme){
+  if(theme)sessionStorage.setItem('cvp_theme_preview',theme);else sessionStorage.removeItem('cvp_theme_preview');
+  applyScheduledTheme();
+  if(theme)toast('Theme preview active','inf');else toast('Theme preview cleared','inf');
+}
+function openDashboardSettings(){
+  if(currentRole()!=='admin')return;var cfg=dashboardCfg(),box=document.getElementById('dashboard-theme-settings'),names={halloween:'Halloween',winter:'Winter',anniversary:'Project Anniversary'};
+  box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'" placeholder="10-20"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'" placeholder="11-02"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');
+  document.getElementById('dash-anniversary-date').value=cfg.anniversaryDate||'';openModal('m-dashboard-settings');
+}
+async function saveDashboardSettings(){
+  if(currentRole()!=='admin')return;var themes={};
+  ['halloween','winter','anniversary'].forEach(function(k){themes[k]={enabled:document.getElementById('theme-'+k+'-enabled').checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:k==='halloween'?20:10};});
+  var data={themes:themes,anniversaryDate:document.getElementById('dash-anniversary-date').value||'',updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};
+  try{await db.collection('config').doc('dashboard_settings').set(data,{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,data);sessionStorage.removeItem('cvp_theme_preview');closeModal('m-dashboard-settings');applyScheduledTheme();toast('Home settings saved','ok');}catch(e){toast(e.message||'Could not save Home settings','err');}
+}
+
 </script>
+
+<script>
+// ═══════════════════════════════════════════════
+// JOURNEY, XP, PATHS & TITLES — v10B
+// ═══════════════════════════════════════════════
+const JOURNEY_PATHS=[
+  {id:'barbarian',name:'Barbarian',icon:'◆'},{id:'bard',name:'Bard',icon:'♪'},{id:'cleric',name:'Cleric',icon:'✥'},{id:'druid',name:'Druid',icon:'❧'},
+  {id:'fighter',name:'Fighter',icon:'⚔'},{id:'monk',name:'Monk',icon:'◉'},{id:'paladin',name:'Paladin',icon:'⛨'},{id:'ranger',name:'Ranger',icon:'➶'},
+  {id:'rogue',name:'Rogue',icon:'◇'},{id:'sorcerer',name:'Sorcerer',icon:'✦'},{id:'warlock',name:'Warlock',icon:'◈'},{id:'wizard',name:'Wizard',icon:'▣'}
+];
+const COSMIC_SUBCLASSES=['Essence','Chronographer','Astral Archivist','Starcaller'];
+const JOURNEY_BADGES=['Initiate','Pathfinder','Vanguard','Luminary','Astral','Exalted','Mythic','Paragon','Transcendent','Cosmic Aspirant','Cosmic Vessel'];
+let selectedJourneyPath='',selectedJourneySubclass='';
+function journeyXp(m){return Math.max(0,Number((m||{}).journeyXp||0));}
+function journeyLevel(m){return Math.floor(journeyXp(m)/100)+1;}
+function journeyXpIntoLevel(m){return journeyXp(m)%100;}
+function journeyPathObj(id){return JOURNEY_PATHS.find(function(p){return p.id===id;})||{id:'adventurer',name:'Adventurer',icon:'✧'};}
+function journeyBadge(m){if((m||{}).journeyBadgeOverride)return m.journeyBadgeOverride;var lvl=journeyLevel(m),idx=Math.min(JOURNEY_BADGES.length-1,Math.floor((lvl-1)/5));return JOURNEY_BADGES[idx];}
+function renderHomeJourney(){
+  var el=document.getElementById('home-journey');if(!el||!currentProfile)return;
+  var p=journeyPathObj(currentProfile.journeyPath),lvl=journeyLevel(currentProfile),within=journeyXpIntoLevel(currentProfile),title=currentProfile.journeyActiveTitle||'No title selected',badge=journeyBadge(currentProfile),cosmic=currentProfile.journeySubclass;
+  el.innerHTML='<div class="journey-head"><div class="journey-crest">'+esc(cosmic?'✦':p.icon)+'</div><div><div class="journey-level">Level '+lvl+'</div><div class="journey-path">'+esc(cosmic?'Cosmic Vessel · '+cosmic:p.name)+'</div><div class="journey-title">'+esc(title)+'</div></div></div><div class="journey-xp-track"><div class="journey-xp-fill" style="width:'+within+'%"></div></div><div class="journey-xp-meta"><span>'+within+' / 100 XP</span><span>'+esc(badge)+'</span></div><div class="journey-badge">✦ '+esc(badge)+'</div>';
+}
+function renderJourneyPathGrid(){
+  var box=document.getElementById('journey-path-grid');if(!box)return;selectedJourneyPath=(currentProfile&&currentProfile.journeyPath)||selectedJourneyPath||'';var titleSel=document.getElementById('journey-title-select'),titles=(currentProfile&&currentProfile.journeyUnlockedTitles)||[];if(titleSel){titleSel.innerHTML='<option value="">No active title</option>'+titles.map(function(t){return '<option>'+esc(t)+'</option>';}).join('');titleSel.value=(currentProfile&&currentProfile.journeyActiveTitle)||'';}
+  box.innerHTML=JOURNEY_PATHS.map(function(p){return '<button type="button" class="path-choice '+(selectedJourneyPath===p.id?'selected':'')+'" onclick="selectJourneyPath(\''+p.id+'\')"><span class="path-choice-icon">'+p.icon+'</span><span class="path-choice-name">'+p.name+'</span></button>';}).join('');
+  var cosmic=document.getElementById('journey-cosmic-choice'),sub=document.getElementById('journey-subclass-grid');if(journeyLevel(currentProfile)>=50){cosmic.classList.remove('hidden');selectedJourneySubclass=(currentProfile&&currentProfile.journeySubclass)||selectedJourneySubclass||'';sub.innerHTML=COSMIC_SUBCLASSES.map(function(x){return '<button type="button" class="path-choice '+(selectedJourneySubclass===x?'selected':'')+'" onclick="selectJourneySubclass(\''+x+'\')"><span class="path-choice-icon">✦</span><span class="path-choice-name">'+x+'</span></button>';}).join('');}else cosmic.classList.add('hidden');
+}
+function selectJourneyPath(id){selectedJourneyPath=id;renderJourneyPathGrid();}
+function selectJourneySubclass(id){selectedJourneySubclass=id;renderJourneyPathGrid();}
+function openJourneyProfile(){renderJourneyPathGrid();openModal('m-journey-path');}
+async function saveJourneyPath(){if(!selectedJourneyPath){toast('Choose a path first','err');return;}var data={journeyPath:selectedJourneyPath,journeyPathChosenAt:new Date().toISOString(),journeyActiveTitle:(document.getElementById('journey-title-select')||{}).value||''};if(journeyLevel(currentProfile)>=50&&selectedJourneySubclass)data.journeySubclass=selectedJourneySubclass;await db.collection('users').doc(currentUser.uid).set(data,{merge:true});Object.assign(currentProfile,data);closeModal('m-journey-path');renderHomeJourney();toast('Your path has been chosen','ok');}
+async function awardXPToUser(uid,amount,type,sourceId,label,dedupe){
+  amount=Number(amount)||0;if(!uid||!amount)return false;var key=dedupe||[uid,type,sourceId].join('_'),ref=db.collection('xp_events').doc(key.replace(/[^a-zA-Z0-9_-]/g,'_'));
+  try{return await db.runTransaction(async function(tx){var existing=await tx.get(ref);if(existing.exists)return false;var uref=db.collection('users').doc(uid),ud=await tx.get(uref);if(!ud.exists)return false;var before=journeyXp(ud.data()),after=Math.max(0,before+amount),oldLvl=Math.floor(before/100)+1,newLvl=Math.floor(after/100)+1;tx.set(ref,{userId:uid,amount:amount,type:type,sourceId:sourceId||'',label:label||type,createdAt:new Date().toISOString(),awardedBy:currentUser?currentUser.uid:'system'});var upd={journeyXp:after,journeyUpdatedAt:new Date().toISOString()};if(newLvl>oldLvl)upd.pendingJourneyCelebration={title:'Level '+newLvl+' Reached',message:'Your contributions have carried you further along your chosen path.',symbol:'✦',createdAt:new Date().toISOString()};tx.set(uref,upd,{merge:true});return true;});}catch(e){console.warn('XP award failed',e);return false;}
+}
+async function awardCurrentUserXP(amount,type,sourceId,label,dedupe){var ok=await awardXPToUser(currentUser&&currentUser.uid,amount,type,sourceId,label,dedupe);if(ok)toast('+'+amount+' XP · '+label,'inf');return ok;}
+function maybePromptJourney(){if(!currentProfile||!currentUser)return;if(!currentProfile.journeyPath&&!sessionStorage.getItem('cvp_journey_prompt_'+currentUser.uid)){sessionStorage.setItem('cvp_journey_prompt_'+currentUser.uid,'1');setTimeout(openJourneyProfile,650);}if(currentProfile.pendingJourneyCelebration)setTimeout(showPendingJourneyCelebration,350);}
+function showPendingJourneyCelebration(){var c=currentProfile&&currentProfile.pendingJourneyCelebration;if(!c)return;document.getElementById('jc-symbol').textContent=c.symbol||'✦';document.getElementById('jc-title').textContent=c.title||'Journey Updated';document.getElementById('jc-message').textContent=c.message||'Your contribution has been recognised.';document.getElementById('journey-celebration-overlay').classList.remove('hidden');}
+async function dismissJourneyCelebration(){document.getElementById('journey-celebration-overlay').classList.add('hidden');if(currentUser){await db.collection('users').doc(currentUser.uid).set({pendingJourneyCelebration:firebase.firestore.FieldValue.delete()},{merge:true}).catch(function(){});if(currentProfile)delete currentProfile.pendingJourneyCelebration;}}
+function renderJourneyAdmin(){
+  var el=document.getElementById('journey-admin-list');if(!el||currentRole()!=='admin')return;var q=((document.getElementById('journey-admin-search')||{}).value||'').toLowerCase();var members=Object.values(liveData.members||{}).filter(function(m){return !q||String(m.name||'').toLowerCase().includes(q);}).sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''));});
+  el.innerHTML=members.length?members.map(function(m){var p=journeyPathObj(m.journeyPath);return '<div class="journey-admin-member"><div><div class="journey-admin-name">'+esc(m.name||'Member')+'</div><div class="journey-admin-meta">Level '+journeyLevel(m)+' · '+esc(m.journeySubclass?'Cosmic Vessel · '+m.journeySubclass:p.name)+' · '+journeyXp(m)+' XP · '+esc(m.journeyActiveTitle||journeyBadge(m))+'</div></div><span class="journey-badge">'+esc(journeyBadge(m))+'</span><button class="btn btn-gold btn-xs" onclick="openJourneyAdminEdit(\''+m.uid+'\')">Edit</button></div>';}).join(''):'<div class="no-data">No matching members.</div>';
+}
+function openJourneyAdminEdit(uid){var m=liveData.members[uid];if(!m)return;document.getElementById('ja-uid').value=uid;document.getElementById('ja-member-name').textContent=m.name||'Member';document.getElementById('ja-total-xp').value=journeyXp(m);document.getElementById('ja-xp-delta').value=0;var psel=document.getElementById('ja-path');psel.innerHTML='<option value="">Adventurer / not chosen</option>'+JOURNEY_PATHS.map(function(p){return '<option value="'+p.id+'">'+p.name+'</option>';}).join('');psel.value=m.journeyPath||'';document.getElementById('ja-subclass').value=m.journeySubclass||'';document.getElementById('ja-active-title').value=m.journeyActiveTitle||'';document.getElementById('ja-badge').value=m.journeyBadgeOverride||'';document.getElementById('ja-new-title').value='';document.getElementById('ja-celebration').value='';document.getElementById('ja-celebrate').checked=true;openModal('m-journey-admin-edit');}
+async function saveJourneyAdminEdit(){
+  var uid=document.getElementById('ja-uid').value,m=liveData.members[uid];if(!uid||!m)return;var base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);var active=document.getElementById('ja-active-title').value.trim()||newTitle||m.journeyActiveTitle||'';var msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked;var data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:document.getElementById('ja-badge').value.trim(),journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};if(celebrate&&(msg||delta||newTitle))data.pendingJourneyCelebration={title:newTitle?'New Title Unlocked':delta>0?'A Special Recognition':'Journey Updated',message:msg||((delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.')),symbol:'✦',createdAt:new Date().toISOString()};await db.collection('users').doc(uid).set(data,{merge:true});await db.collection('xp_events').add({userId:uid,amount:total-journeyXp(m),type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});closeModal('m-journey-admin-edit');toast('Member Journey updated','ok');}
+// Availability prompt: at most once per session, only after seven full days or first setup.
+function checkWeeklyAvailabilityConfirmation(){
+  if(!currentUser||!liveData.weeklyAvail)return;var uid=currentUser.uid,sessionKey='cvp_avail_prompt_shown_'+uid;if(sessionStorage.getItem(sessionKey))return;var snooze=Number(localStorage.getItem('cvp_avail_snooze_'+uid)||0);if(snooze&&Date.now()<snooze)return;var doc=liveData.weeklyAvail[uid]||{},raw=(currentProfile&&currentProfile.availabilityConfirmedAt)||doc.confirmedAt||doc.updatedAt||'',confirmed=raw?new Date(raw).getTime():0,has=!!doc.slots,stale=!confirmed||(Date.now()-confirmed>=7*86400000);if(!has||stale){sessionStorage.setItem(sessionKey,'1');openModal('m-avail-confirm');}}
+// Hook profile refresh into Journey prompt and celebration.
+const _journeyOriginalRenderProfile=typeof renderProfile==='function'?renderProfile:null;
+if(_journeyOriginalRenderProfile){renderProfile=function(){var r=_journeyOriginalRenderProfile.apply(this,arguments);renderHomeJourney();maybePromptJourney();return r;};}
+</script>
+
+<script>
+// Journey and seasonal refinements — v10B.2
+const JOURNEY_CLASS_CONTENT={
+ barbarian:{titles:['Wildheart','Unbroken','Rageforged','Primal Champion','Titan of Resolve'],badges:['Barbarian Initiate','Ironhide','Berserker Crest','Primal Vanguard','Legendary Wildheart']},
+ bard:{titles:['Storyteller','Silver Tongue','College Virtuoso','Voice of Inspiration','Legend of the Stage'],badges:['Bard Initiate','Silver Lyre','Virtuoso Seal','Inspiration Crest','Legendary Maestro']},
+ cleric:{titles:['Acolyte','Guiding Light','Divine Hand','Beacon of Hope','Chosen Herald'],badges:['Cleric Initiate','Sacred Flame','Blessed Emblem','Radiant Crest','Divine Herald']},
+ druid:{titles:['Seedkeeper','Wildspeaker','Circle Guardian','Verdant Sage','Archdruid'],badges:['Druid Initiate','Oak Sigil','Wildshape Crest','Verdant Guardian','Archdruid Emblem']},
+ fighter:{titles:['Weapon Adept','Battle Tested','Tactical Vanguard','Master-at-Arms','Legendary Champion'],badges:['Fighter Initiate','Steel Mark','Veteran Crest','Champion Standard','Legendary Arms']},
+ monk:{titles:['Disciple','Still Mind','Open Hand','Perfect Focus','Enlightened Master'],badges:['Monk Initiate','Balanced Seal','Ki Crest','Perfect Form','Enlightened Emblem']},
+ paladin:{titles:['Oathbound','Shield of the Team','Radiant Guardian','Exemplar','Legendary Justicar'],badges:['Paladin Initiate','Bronze Oath','Silver Oath','Golden Oath','Radiant Oath']},
+ ranger:{titles:['Trailfinder','Keen Eye','Wilderness Guardian','Master Hunter','Legendary Pathfinder'],badges:['Ranger Initiate','Hunter Mark','Wild Crest','Pathfinder Emblem','Legendary Tracker']},
+ rogue:{titles:['Quick Hand','Shadowstep','Master of Opportunity','Unseen Expert','Legendary Phantom'],badges:['Rogue Initiate','Hidden Blade','Shadow Crest','Phantom Mark','Legendary Shade']},
+ sorcerer:{titles:['Sparkborn','Innate Adept','Spellfire','Arcane Prodigy','Living Magic'],badges:['Sorcerer Initiate','Arcane Spark','Spellfire Crest','Prodigy Seal','Living Magic Emblem']},
+ warlock:{titles:['Pactbound','Keeper of Secrets','Eldritch Adept','Voice Beyond','Master of the Pact'],badges:['Warlock Initiate','Pact Mark','Eldritch Eye','Beyond Crest','Master Pact Seal']},
+ wizard:{titles:['Apprentice Arcanist','Arcane Researcher','Learned Magus','Master of the Weave','Archmage'],badges:['Wizard Initiate','Silver Grimoire','Floating Tome','Arcane Sigil','Archmage Circle']}
+};
+const JOURNEY_GENERAL_TITLES=['Adventurer','Helping Hand','Reliable Companion','Steady Contributor','Always Prepared','Guiding Hand','Creative Mind','Problem Solver','Project Luminary','Painter of Worlds','Arcane Engineer','System Architect','Master Coordinator'];
+const JOURNEY_GENERAL_BADGES=['Initiate','Pathfinder','Vanguard','Luminary','Astral','Exalted','Mythic','Paragon','Transcendent','Cosmic Aspirant','Cosmic Vessel'];
+function journeyGroupedOptions(kind,pathId,current){
+ var own=(JOURNEY_CLASS_CONTENT[pathId]||{})[kind]||[],groups=[],seen={};
+ function clean(arr){return arr.filter(function(x){if(!x||seen[x])return false;seen[x]=1;return true;});}
+ groups.push({label:(journeyPathObj(pathId).name||'Chosen Path')+' '+(kind==='titles'?'Titles':'Badges'),items:clean(own)});
+ var others=[];Object.keys(JOURNEY_CLASS_CONTENT).forEach(function(k){if(k!==pathId)others=others.concat(JOURNEY_CLASS_CONTENT[k][kind]||[]);});
+ others=others.concat(kind==='titles'?JOURNEY_GENERAL_TITLES:JOURNEY_GENERAL_BADGES);
+ groups.push({label:'All Other '+(kind==='titles'?'Titles':'Badges'),items:clean(others)});
+ if(current&&!seen[current])groups.unshift({label:'Current / Custom',items:[current]});
+ return groups;
+}
+function fillJourneyGroupedSelect(el,kind,pathId,current,automaticLabel){
+ if(!el)return;var html='<option value="">'+esc(automaticLabel||'None')+'</option>';
+ journeyGroupedOptions(kind,pathId,current).forEach(function(g){if(!g.items.length)return;html+='<optgroup label="'+esc(g.label)+'">'+g.items.map(function(x){return '<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')+'</optgroup>';});
+ el.innerHTML=html;el.value=current||'';
+}
+function adminJourneyPreview(){
+ var uid=(document.getElementById('ja-uid')||{}).value,m=(liveData.members||{})[uid]||{},base=Math.max(0,Number((document.getElementById('ja-total-xp')||{}).value)||0),delta=Number((document.getElementById('ja-xp-delta')||{}).value)||0,total=Math.max(0,base+delta),lvl=Math.floor(total/100)+1,within=total%100,oldLvl=journeyLevel(m),el=document.getElementById('ja-xp-preview');if(!el)return;
+ var change=lvl===oldLvl?'remains Level '+lvl:(lvl>oldLvl?'reaches Level '+lvl:'moves to Level '+lvl);
+ el.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px"><strong>'+total+' total XP</strong><span class="text-small text-gold">'+esc(change)+'</span></div><div class="journey-xp-track"><div class="journey-xp-fill" style="width:'+within+'%"></div></div><div class="journey-xp-meta"><span>'+within+' / 100 XP in Level '+lvl+'</span><span>'+(delta>=0?'+':'')+delta+' XP adjustment</span></div>';
+}
+function refreshJourneyAdminContent(){
+ var uid=(document.getElementById('ja-uid')||{}).value,m=(liveData.members||{})[uid]||{},path=(document.getElementById('ja-path')||{}).value||m.journeyPath||'';
+ fillJourneyGroupedSelect(document.getElementById('ja-active-title-select'),'titles',path,m.journeyActiveTitle||'','No selected title');
+ var titleSelect=document.getElementById('ja-active-title-select'),customTitles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles:[];
+ if(titleSelect&&customTitles.length){var existing=Array.from(titleSelect.options).map(function(o){return o.value;}),group=document.createElement('optgroup');group.label='Member Custom Titles';customTitles.forEach(function(t){if(t&&!existing.includes(t)){var o=document.createElement('option');o.value=t;o.textContent=t;group.appendChild(o);}});if(group.children.length)titleSelect.appendChild(group);titleSelect.value=m.journeyActiveTitle||'';}
+ fillJourneyGroupedSelect(document.getElementById('ja-badge-select'),'badges',path,m.journeyBadgeOverride||journeyBadge(m),'Automatic level badge');
+ adminJourneyPreview();
+}
+openJourneyAdminEdit=function(uid){
+ var m=(liveData.members||{})[uid];if(!m)return;document.getElementById('ja-uid').value=uid;document.getElementById('ja-member-name').textContent=m.name||'Member';document.getElementById('ja-total-xp').value=journeyXp(m);document.getElementById('ja-xp-delta').value=0;
+ var psel=document.getElementById('ja-path');psel.innerHTML='<option value="">Adventurer / not chosen</option>'+JOURNEY_PATHS.map(function(p){return '<option value="'+p.id+'">'+p.name+'</option>';}).join('');psel.value=m.journeyPath||'';document.getElementById('ja-subclass').value=m.journeySubclass||'';
+ document.getElementById('ja-active-title-custom').value='';document.getElementById('ja-badge-custom').value='';document.getElementById('ja-new-title').value='';document.getElementById('ja-celebration').value='';document.getElementById('ja-celebrate').checked=true;
+ refreshJourneyAdminContent();
+ ['ja-total-xp','ja-xp-delta'].forEach(function(id){document.getElementById(id).oninput=adminJourneyPreview;});psel.onchange=refreshJourneyAdminContent;openModal('m-journey-admin-edit');
+};
+saveJourneyAdminEdit=async function(){
+ var uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;var base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
+ var customTitle=document.getElementById('ja-active-title-custom').value.trim(),active=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
+ var customBadge=document.getElementById('ja-badge-custom').value.trim(),badge=customBadge||document.getElementById('ja-badge-select').value||'';
+ var msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:badge,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
+ if(celebrate&&(msg||delta||newTitle||customTitle||customBadge))data.pendingJourneyCelebration={title:newTitle||customTitle?'New Title Unlocked':customBadge?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||((delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.')),symbol:'✦',createdAt:new Date().toISOString()};
+ try{await db.collection('users').doc(uid).set(data,{merge:true});var diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();toast('Member Journey updated','ok');}catch(e){toast(e.message||'Could not update Journey','err');}
+};
+function cosmicDecision(){var yes=document.getElementById('journey-cosmic-yes'),no=document.getElementById('journey-cosmic-no');return yes&&yes.checked?'yes':no&&no.checked?'no':'';}
+renderJourneyPathGrid=function(){
+ var box=document.getElementById('journey-path-grid');if(!box)return;selectedJourneyPath=(currentProfile&&currentProfile.journeyPath)||selectedJourneyPath||'';var titleSel=document.getElementById('journey-title-select'),titles=(currentProfile&&currentProfile.journeyUnlockedTitles)||[];if(titleSel){titleSel.innerHTML='<option value="">No active title</option>'+titles.map(function(t){return '<option>'+esc(t)+'</option>';}).join('');titleSel.value=(currentProfile&&currentProfile.journeyActiveTitle)||'';}
+ box.innerHTML=JOURNEY_PATHS.map(function(p){return '<button type="button" class="path-choice '+(selectedJourneyPath===p.id?'selected':'')+'" onclick="selectJourneyPath(\''+p.id+'\')"><span class="path-choice-icon">'+p.icon+'</span><span class="path-choice-name">'+p.name+'</span></button>';}).join('');
+ var cosmic=document.getElementById('journey-cosmic-choice'),sub=document.getElementById('journey-subclass-grid'),wrap=document.getElementById('journey-subclass-choice-wrap');if(journeyLevel(currentProfile)>=50){cosmic.classList.remove('hidden');var accepted=currentProfile&&currentProfile.journeyCosmicAccepted;if(accepted===true)document.getElementById('journey-cosmic-yes').checked=true;else if(accepted===false)document.getElementById('journey-cosmic-no').checked=true;selectedJourneySubclass=(currentProfile&&currentProfile.journeySubclass)||selectedJourneySubclass||'';sub.innerHTML=COSMIC_SUBCLASSES.map(function(x){return '<button type="button" class="path-choice '+(selectedJourneySubclass===x?'selected':'')+'" onclick="selectJourneySubclass(\''+x+'\')"><span class="path-choice-icon">✦</span><span class="path-choice-name">'+x+'</span></button>';}).join('');if(wrap)wrap.classList.toggle('hidden',cosmicDecision()!=='yes');}else cosmic.classList.add('hidden');
+};
+saveJourneyPath=async function(){
+ if(!selectedJourneyPath){toast('Choose a path first','err');return;}var data={journeyPath:selectedJourneyPath,journeyPathChosenAt:new Date().toISOString(),journeyActiveTitle:(document.getElementById('journey-title-select')||{}).value||''};if(journeyLevel(currentProfile)>=50){var d=cosmicDecision();if(!d){toast('Choose whether to remain on your Path or become a Cosmic Vessel','err');return;}data.journeyCosmicAccepted=d==='yes';if(d==='yes'){if(!selectedJourneySubclass){toast('Choose a Cosmic Vessel subclass','err');return;}data.journeySubclass=selectedJourneySubclass;}else{data.journeySubclass='';data.journeyCosmicThemeEnabled=false;}}
+ try{await db.collection('users').doc(currentUser.uid).set(data,{merge:true});Object.assign(currentProfile,data);closeModal('m-journey-path');applyPersonalCosmicTheme();renderHomeJourney();toast(data.journeyCosmicAccepted?'Your Cosmic Vessel path is chosen':'Your path has been saved','ok');}catch(e){toast(e.message||'Could not save your Path','err');}
+};
+function maybePromptCosmicPrestige(){if(!currentProfile||journeyLevel(currentProfile)<50||typeof currentProfile.journeyCosmicAccepted==='boolean')return;var k='cvp_cosmic_prompt_'+currentUser.uid;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');setTimeout(function(){openJourneyProfile();toast('You may now choose whether to become a Cosmic Vessel','inf');},800);}
+function applyPersonalCosmicTheme(){
+ var classes=['personal-cosmic-theme','personal-cosmic-essence','personal-cosmic-chronographer','personal-cosmic-astral-archivist','personal-cosmic-starcaller'];document.body.classList.remove.apply(document.body.classList,classes);if(!currentProfile||!currentProfile.journeyCosmicAccepted||!currentProfile.journeyCosmicThemeEnabled||!currentProfile.journeySubclass)return;document.body.classList.add('personal-cosmic-theme','personal-cosmic-'+currentProfile.journeySubclass.toLowerCase().replace(/\s+/g,'-'));
+}
+openDashboardSettings=function(){
+ var admin=currentRole()==='admin',cfg=dashboardCfg(),box=document.getElementById('dashboard-theme-settings'),names={halloween:'Halloween',winter:'Winter',anniversary:'Project Anniversary'};document.getElementById('personal-cosmic-theme').checked=!!(currentProfile&&currentProfile.journeyCosmicThemeEnabled);document.getElementById('personal-cosmic-theme').disabled=!(currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass);
+ if(admin){box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');document.getElementById('dash-anniversary-date').value=cfg.anniversaryDate||'';document.getElementById('dash-anniversary-date').closest('.field').classList.remove('hidden');}else{box.innerHTML='<div class="text-small text-grey">Seasonal schedules are managed by the Project Admin. You can still use your personal Cosmic Vessel styling above.</div>';document.getElementById('dash-anniversary-date').closest('.field').classList.add('hidden');}
+ openModal('m-dashboard-settings');
+};
+saveDashboardSettings=async function(){
+ try{var personal=!!document.getElementById('personal-cosmic-theme').checked;await db.collection('users').doc(currentUser.uid).set({journeyCosmicThemeEnabled:personal},{merge:true});currentProfile.journeyCosmicThemeEnabled=personal;applyPersonalCosmicTheme();if(currentRole()==='admin'){var themes={};['halloween','winter','anniversary'].forEach(function(k){themes[k]={enabled:document.getElementById('theme-'+k+'-enabled').checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:k==='halloween'?20:10};});var data={themes:themes,anniversaryDate:document.getElementById('dash-anniversary-date').value||'',updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};await db.collection('config').doc('dashboard_settings').set(data,{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,data);sessionStorage.removeItem('cvp_theme_preview');applyScheduledTheme();}closeModal('m-dashboard-settings');toast('Home settings saved','ok');}catch(e){toast(e.message||'Could not save Home settings','err');}
+};
+function randomEdgePoint(pad){var side=Math.floor(Math.random()*4),x,y;if(side===0){x=-pad;y=Math.random()*innerHeight;}else if(side===1){x=innerWidth+pad;y=Math.random()*innerHeight;}else if(side===2){x=Math.random()*innerWidth;y=-pad;}else{x=Math.random()*innerWidth;y=innerHeight+pad;}return{x:x,y:y};}
+function pumpkinSvg(id){return '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="pg'+id+'" cx="38%" cy="30%"><stop offset="0" stop-color="#ffb14c"/><stop offset=".62" stop-color="#e36f22"/><stop offset="1" stop-color="#8f351c"/></radialGradient></defs><path d="M29 13c1-6 7-8 11-5-4 1-6 4-6 8" fill="#557b37"/><ellipse cx="32" cy="38" rx="23" ry="19" fill="url(#pg'+id+')"/><path d="M21 32l6 5-8 2zM43 32l-6 5 8 2zM23 47c7 5 13 5 19 0-6 2-13 2-19 0z" fill="#26120d" opacity=".9"/><path d="M24 20c-5 8-5 27 0 35M40 20c5 8 5 27 0 35M32 19v38" stroke="#a3451e" stroke-width="2" opacity=".55" fill="none"/></svg>';}
+function batSvg(){return '<svg viewBox="0 0 80 40" aria-hidden="true"><path class="bat-wing wing-l" d="M38 21C28 7 12 4 1 10c9 2 8 9 3 15 10-4 15 4 20 9 2-8 8-10 14-13z" fill="#171020"/><path class="bat-wing wing-r" d="M42 21C52 7 68 4 79 10c-9 2-8 9-3 15-10-4-15 4-20 9-2-8-8-10-14-13z" fill="#171020"/><ellipse cx="40" cy="22" rx="6" ry="10" fill="#21152e"/><circle cx="37" cy="19" r="1" fill="#d05cff"/><circle cx="43" cy="19" r="1" fill="#d05cff"/></svg>';}
+buildSeasonalEffects=function(theme){
+ var layer=document.getElementById('seasonal-effects');if(!layer)return;layer.innerHTML='';if(!theme)return;var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(theme==='winter'){var count=reduce?8:36;for(var i=0;i<count;i++){var el=document.createElement('span');el.className='season-snow';el.textContent=['❄','❅','✦'][i%3];el.style.left=((i*37)%100)+'%';el.style.fontSize=(8+(i%5)*3)+'px';el.style.animationDuration=(9+(i%7)*1.7)+'s';el.style.animationDelay=(-i*.73)+'s';layer.appendChild(el);}}
+ else if(theme==='halloween'){var leaves=reduce?5:15;for(var j=0;j<leaves;j++){var l=document.createElement('span');l.className='season-leaf';l.style.left=((j*53+7)%100)+'%';l.style.animationDuration=(10+(j%6)*2)+'s';l.style.animationDelay=(-j*1.15)+'s';layer.appendChild(l);}var pumpkins=reduce?3:9;for(var p=0;p<pumpkins;p++){var pu=document.createElement('span');pu.className='season-pumpkin';pu.innerHTML=pumpkinSvg(p);pu.style.left=(3+Math.random()*90)+'%';pu.style.top=(5+Math.random()*83)+'%';pu.style.setProperty('--pumpkin-size',(28+Math.random()*42)+'px');pu.style.setProperty('--pumpkin-duration',(10+Math.random()*12)+'s');pu.style.setProperty('--pumpkin-delay',(-Math.random()*18)+'s');layer.appendChild(pu);}if(!reduce){for(var b=0;b<8;b++){var bat=document.createElement('span'),a=randomEdgePoint(70),z=randomEdgePoint(70),m={x:(a.x+z.x)/2+(Math.random()-.5)*innerWidth*.45,y:(a.y+z.y)/2+(Math.random()-.5)*innerHeight*.35};bat.className='season-bat';bat.innerHTML=batSvg();bat.style.setProperty('--bat-size',(24+Math.random()*34)+'px');bat.style.setProperty('--x0',a.x+'px');bat.style.setProperty('--y0',a.y+'px');bat.style.setProperty('--xm',m.x+'px');bat.style.setProperty('--ym',m.y+'px');bat.style.setProperty('--x1',z.x+'px');bat.style.setProperty('--y1',z.y+'px');bat.style.setProperty('--r0',(-20+Math.random()*40)+'deg');bat.style.setProperty('--rm',(-25+Math.random()*50)+'deg');bat.style.setProperty('--r1',(-20+Math.random()*40)+'deg');bat.style.setProperty('--bat-duration',(9+Math.random()*12)+'s');bat.style.setProperty('--bat-delay',(-Math.random()*18)+'s');layer.appendChild(bat);}}}
+ else if(theme==='anniversary'){var nebCount=reduce?2:5;for(var n=0;n<nebCount;n++){var nb=document.createElement('span');nb.className='season-nebula';nb.style.left=(-12+((n*29)%95))+'%';nb.style.top=(-10+((n*31)%85))+'%';nb.style.animationDuration=(16+n*4)+'s';nb.style.animationDelay=(-n*4)+'s';layer.appendChild(nb);}var stars=reduce?10:32;for(var st=0;st<stars;st++){var se=document.createElement('span');se.className=st%8===0?'season-flare':'season-star';se.textContent=st%8===0?'✦':'·';se.style.left=((st*41)%100)+'%';se.style.top=((st*67)%100)+'%';se.style.animationDuration=(3+(st%6))+'s';se.style.animationDelay=(-st*.37)+'s';layer.appendChild(se);}if(!reduce){for(var sh=0;sh<7;sh++){var ss=document.createElement('span'),start=randomEdgePoint(130),end=randomEdgePoint(130);while(Math.hypot(end.x-start.x,end.y-start.y)<Math.min(innerWidth,innerHeight)*.55)end=randomEdgePoint(130);var ang=Math.atan2(end.y-start.y,end.x-start.x)*180/Math.PI;ss.className='season-shooting-star';ss.style.setProperty('--sx',start.x+'px');ss.style.setProperty('--sy',start.y+'px');ss.style.setProperty('--ex',end.x+'px');ss.style.setProperty('--ey',end.y+'px');ss.style.setProperty('--angle',ang+'deg');ss.style.setProperty('--trail-length',(75+Math.random()*105)+'px');ss.style.setProperty('--shoot-duration',(5+Math.random()*4)+'s');ss.style.setProperty('--shoot-delay',(-Math.random()*22)+'s');layer.appendChild(ss);}}}
+};
+var _v10b2MaybePromptJourney=maybePromptJourney;maybePromptJourney=function(){_v10b2MaybePromptJourney();maybePromptCosmicPrestige();applyPersonalCosmicTheme();};
+</script>
+
+<script>
+// v10B.3 — Cosmic Vessel identity, personal Home themes and saved animation preferences.
+function hubMotionMode(){return (currentProfile&&currentProfile.homeAnimationMode)||'full';}
+function applyUserMotionPreference(){var mode=hubMotionMode();document.body.classList.remove('motion-full','motion-reduced','motion-off');document.body.classList.add('motion-'+mode);}
+function userHomeThemePreference(){return (currentProfile&&currentProfile.homeThemePreference)||'automatic';}
+function internalThemeKey(v){return v==='cosmic'?'anniversary':v;}
+function publicThemeName(v){return v==='anniversary'||v==='cosmic'?'Cosmic':v?String(v).charAt(0).toUpperCase()+String(v).slice(1):'Default';}
+function effectiveHomeTheme(){var preview=sessionStorage.getItem('cvp_theme_preview')||'';if(preview)return preview;var pref=userHomeThemePreference();if(pref==='default')return '';if(pref==='winter'||pref==='halloween')return pref;if(pref==='cosmic')return 'anniversary';return activeScheduledTheme();}
+applyScheduledTheme=function(){applyUserMotionPreference();var preview=sessionStorage.getItem('cvp_theme_preview')||'',theme=effectiveHomeTheme();document.body.classList.remove('theme-halloween','theme-winter','theme-anniversary');if(theme)document.body.classList.add('theme-'+theme);buildSeasonalEffects(theme);var badge=document.getElementById('seasonal-preview-badge');if(badge){if(preview){badge.textContent='Previewing '+publicThemeName(preview)+' theme';badge.classList.remove('hidden');}else badge.classList.add('hidden');}};
+function ensurePersonalCosmicLayer(){var layer=document.getElementById('personal-cosmic-effects');if(!layer){layer=document.createElement('div');layer.id='personal-cosmic-effects';document.body.insertBefore(layer,document.body.firstChild);}return layer;}
+function buildPersonalCosmicEffects(subclass){var layer=ensurePersonalCosmicLayer();layer.innerHTML='';if(!subclass||hubMotionMode()==='off')return;for(var i=0;i<3;i++){var n=document.createElement('span');n.className='cosmic-nebula';n.style.left=[-12,42,14][i]+'%';n.style.top=[-16,34,56][i]+'%';layer.appendChild(n);}if(hubMotionMode()==='full'){for(var j=0;j<22;j++){var m=document.createElement('span');m.className='cosmic-mote';m.style.left=((j*47+9)%100)+'%';m.style.top=((j*71+4)%100)+'%';m.style.setProperty('--mote-duration',(6+(j%8)*1.4)+'s');m.style.setProperty('--mote-delay',(-j*.61)+'s');layer.appendChild(m);}}}
+function currentCosmicPreviewSubclass(){return sessionStorage.getItem('cvp_cosmic_style_preview')||'';}
+applyPersonalCosmicTheme=function(){var classes=['personal-cosmic-theme','personal-cosmic-essence','personal-cosmic-chronographer','personal-cosmic-astral-archivist','personal-cosmic-starcaller'];document.body.classList.remove.apply(document.body.classList,classes);var preview=currentCosmicPreviewSubclass();var enabled=!!(currentProfile&&currentProfile.journeyCosmicThemeEnabled);var subclass=preview||(enabled&&currentProfile&&currentProfile.journeyCosmicAccepted?currentProfile.journeySubclass:'');if(!subclass){buildPersonalCosmicEffects('');return;}document.body.classList.add('personal-cosmic-theme','personal-cosmic-'+subclass.toLowerCase().replace(/\s+/g,'-'));buildPersonalCosmicEffects(subclass);};
+function previewPersonalCosmicStyle(){var sel=document.getElementById('cosmic-style-preview-subclass');if(!sel)return;sessionStorage.setItem('cvp_cosmic_style_preview',sel.value);applyPersonalCosmicTheme();toast('Previewing '+sel.value+' styling','inf');}
+function clearPersonalCosmicPreview(){sessionStorage.removeItem('cvp_cosmic_style_preview');applyPersonalCosmicTheme();toast('Cosmic Vessel preview cleared','inf');}
+function previewPersonalCosmicToggle(){var c=document.getElementById('personal-cosmic-theme');if(!c)return;if(c.checked&&currentProfile&&currentProfile.journeySubclass){sessionStorage.setItem('cvp_cosmic_style_preview',currentProfile.journeySubclass);}else sessionStorage.removeItem('cvp_cosmic_style_preview');applyPersonalCosmicTheme();}
+function previewSavedHomeThemeChoice(){var sel=document.getElementById('home-theme-preference');if(!sel)return;var v=sel.value;if(v==='automatic'||v==='default')sessionStorage.removeItem('cvp_theme_preview');else sessionStorage.setItem('cvp_theme_preview',internalThemeKey(v));applyScheduledTheme();}
+function previewMotionPreference(){var sel=document.getElementById('home-animation-mode');if(!sel)return;document.body.classList.remove('motion-full','motion-reduced','motion-off');document.body.classList.add('motion-'+sel.value);buildSeasonalEffects(effectiveHomeTheme());applyPersonalCosmicTheme();}
+function closeDashboardSettingsWithoutSaving(){sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_cosmic_style_preview');applyScheduledTheme();applyPersonalCosmicTheme();closeModal('m-dashboard-settings');}
+journeyPathObj=function(id){if(id==='cosmic-vessel')return{id:'cosmic-vessel',name:'Cosmic Vessel',icon:'✦'};return JOURNEY_PATHS.find(function(p){return p.id===id;})||{id:'adventurer',name:'Adventurer',icon:'✧'};};
+var _v10b3RenderJourneyPathGrid=renderJourneyPathGrid;
+renderJourneyPathGrid=function(){if(currentProfile&&currentProfile.journeyPath==='cosmic-vessel'){selectedJourneyPath=currentProfile.journeyPreviousPath||selectedJourneyPath||'';} _v10b3RenderJourneyPathGrid();};
+saveJourneyPath=async function(){if(!selectedJourneyPath){toast('Choose a path first','err');return;}var data={journeyActiveTitle:(document.getElementById('journey-title-select')||{}).value||'',journeyPathChosenAt:new Date().toISOString()};if(journeyLevel(currentProfile)>=50){var d=cosmicDecision();if(!d){toast('Choose whether to remain on your Path or become a Cosmic Vessel','err');return;}data.journeyCosmicAccepted=d==='yes';if(d==='yes'){if(!selectedJourneySubclass){toast('Choose a Cosmic Vessel subclass','err');return;}data.journeyPreviousPath=currentProfile.journeyPath==='cosmic-vessel'?(currentProfile.journeyPreviousPath||selectedJourneyPath):selectedJourneyPath;data.journeyPath='cosmic-vessel';data.journeySubclass=selectedJourneySubclass;}else{data.journeyPath=selectedJourneyPath||currentProfile.journeyPreviousPath||'';data.journeySubclass='';data.journeyCosmicThemeEnabled=false;}}else data.journeyPath=selectedJourneyPath;try{await db.collection('users').doc(currentUser.uid).set(data,{merge:true});Object.assign(currentProfile,data);closeModal('m-journey-path');applyPersonalCosmicTheme();renderHomeJourney();toast(data.journeyCosmicAccepted?'You are now a Cosmic Vessel · '+data.journeySubclass:'Your Path has been saved','ok');}catch(e){toast(e.message||'Could not save your Path','err');}};
+openDashboardSettings=function(){var admin=currentRole()==='admin',cfg=dashboardCfg(),box=document.getElementById('dashboard-theme-settings'),names={halloween:'Halloween',winter:'Winter',anniversary:'Cosmic'};var pref=document.getElementById('home-theme-preference'),motion=document.getElementById('home-animation-mode');pref.value=userHomeThemePreference();motion.value=hubMotionMode();var cv=!!(currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass),cbox=document.getElementById('personal-cosmic-theme'),csel=document.getElementById('cosmic-style-preview-subclass');cbox.checked=!!(currentProfile&&currentProfile.journeyCosmicThemeEnabled);cbox.disabled=!cv;csel.value=(currentProfile&&currentProfile.journeySubclass)||'Essence';document.getElementById('cosmic-personal-settings').classList.toggle('hidden',!cv);var wrap=document.getElementById('admin-seasonal-settings-wrap');wrap.classList.toggle('hidden',!admin);if(admin){box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');document.getElementById('dash-anniversary-date').value=cfg.anniversaryDate||'';}openModal('m-dashboard-settings');};
+saveDashboardSettings=async function(){try{var pref=document.getElementById('home-theme-preference').value||'automatic',motion=document.getElementById('home-animation-mode').value||'full',cv=document.getElementById('personal-cosmic-theme'),personal=!!(cv&&!cv.disabled&&cv.checked);var userData={homeThemePreference:pref,homeAnimationMode:motion,journeyCosmicThemeEnabled:personal};await db.collection('users').doc(currentUser.uid).set(userData,{merge:true});Object.assign(currentProfile,userData);if(currentRole()==='admin'){var themes={};['halloween','winter','anniversary'].forEach(function(k){themes[k]={enabled:document.getElementById('theme-'+k+'-enabled').checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:k==='halloween'?20:10};});var data={themes:themes,anniversaryDate:document.getElementById('dash-anniversary-date').value||'',updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};await db.collection('config').doc('dashboard_settings').set(data,{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,data);}sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_cosmic_style_preview');applyUserMotionPreference();applyScheduledTheme();applyPersonalCosmicTheme();closeModal('m-dashboard-settings');toast('Home preferences saved','ok');}catch(e){toast(e.message||'Could not save Home preferences','err');}};
+var _v10b3BuildSeasonalEffects=buildSeasonalEffects;
+buildSeasonalEffects=function(theme){if(hubMotionMode()==='off'){var layer=document.getElementById('seasonal-effects');if(layer)layer.innerHTML='';return;} _v10b3BuildSeasonalEffects(theme);if(hubMotionMode()==='reduced'){document.querySelectorAll('#seasonal-effects .season-bat,#seasonal-effects .season-shooting-star').forEach(function(x){x.remove();});}};
+var _v10b3MaybePromptJourney=maybePromptJourney;maybePromptJourney=function(){_v10b3MaybePromptJourney();applyUserMotionPreference();applyScheduledTheme();applyPersonalCosmicTheme();};
+</script>
+
+
+<div class="modal-bg" id="m-task-reassign-confirm">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-hdr"><span class="modal-title">CONFIRM TASK CHANGE</span><button class="modal-x" onclick="cancelTaskDropConfirm()">×</button></div>
+    <div class="modal-body"><div class="v11-confirm-summary" id="v11-reassign-summary"></div><div class="field"><label class="field-label">Reason (optional)</label><textarea class="inp" id="v11-reassign-reason" rows="3" placeholder="Add a short note for the activity log..."></textarea></div></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="cancelTaskDropConfirm()">Cancel</button><button class="btn btn-primary" onclick="confirmTaskDropChange()">Confirm Change</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="m-task-milestone-links">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-hdr"><span class="modal-title">LINK TASK TO MILESTONES</span><button class="modal-x" onclick="closeModal('m-task-milestone-links')">×</button></div>
+    <div class="modal-body"><div class="text-small text-grey">Only milestones and deliverables matching this task's department are shown. A task may link to more than one deliverable.</div><input class="inp" id="v11-link-search" placeholder="Search milestones or deliverables..." oninput="renderTaskMilestoneLinkPicker()"><div class="v11-link-picker" id="v11-link-picker"></div><input type="hidden" id="v11-link-task-id"></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-task-milestone-links')">Cancel</button><button class="btn btn-gold" onclick="saveTaskMilestoneLinks()">Save Links</button></div>
+  </div>
+</div>
+<div id="prestige-effects"></div>
+
+
+<script id="v11-workflow-refresh">
+(function(){
+'use strict';
+var V11={pendingDrop:null,linkSelection:new Set(),previewPrestige:''};
+function v11Role(){return normaliseRole(currentProfile&&currentProfile.role);}
+function v11CanManageTask(t){try{return !!taskManagerCanManage(t);}catch(e){var r=v11Role();return r==='admin'||r==='project_manager'||((r==='lead'||r==='director')&&canManageDepartment(t.dept));}}
+function v11EscAttr(v){return esc(String(v==null?'':v)).replace(/'/g,'&#39;');}
+function v11DeptInfo(id){var d=getDeptList().find(function(x){return x.id===id;});return{label:d?d.label:(DEPT_NAMES[id]||id||'General'),color:(d&&d.color)||DEPT_COLORS[id]||'var(--grey)'};}
+function v11DeptIcon(id){var x=String(id||'').toLowerCase(),path;if(/program|code|tech/.test(x))path='<path d="M7 7l-4 5 4 5M17 7l4 5-4 5M14 4l-4 16"/>';else if(/audio|sound|music/.test(x))path='<path d="M9 18V6l10-2v12M9 10l10-2"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>';else if(/narr|writ|story/.test(x))path='<path d="M4 5h7a3 3 0 013 3v11a3 3 0 00-3-3H4zM20 5h-3a3 3 0 00-3 3v11a3 3 0 013-3h3z"/>';else if(/art|vfx|ui|environment|model/.test(x))path='<path d="M12 3a9 9 0 100 18c1.5 0 2-1 1.2-2.1-.7-1 .1-2.2 1.4-2.2H17a4 4 0 004-4C21 7.4 17 3 12 3z"/><circle cx="7.5" cy="10" r=".8"/><circle cx="10" cy="6.8" r=".8"/><circle cx="14" cy="6.5" r=".8"/><circle cx="17" cy="9.2" r=".8"/>';else if(/market|social|press/.test(x))path='<path d="M4 13V8l13-4v13L4 13zM8 14l1 6h4l-1-5"/><path d="M19 8a4 4 0 010 5"/>';else path='<path d="M12 3l7 4v10l-7 4-7-4V7zM5 7l7 4 7-4M12 11v10"/>';return '<svg viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';}
+function taskMilestoneLinks(taskId){var out=[];(liveData.milestoneDeliverables||[]).forEach(function(d){if(d.archived||!linkedTaskIds(d).includes(taskId))return;var ms=milestoneById(d.milestoneId);if(!ms||ms.archived||ms.deletionStatus==='pending')return;out.push({milestone:ms,deliverable:d});});return out;}
+window.taskMilestoneLinks=taskMilestoneLinks;
+function v11StatePercent(t){return {'unassigned':5,'pending-accept':12,'accepted':28,'in-progress':58,'review':88,'completed':100}[t.state]||8;}
+function v11StateLabel(s){return {'unassigned':'Unassigned','pending-accept':'Pending','accepted':'Accepted','in-progress':'In Progress','review':'Review','completed':'Complete'}[s]||'Unassigned';}
+function v11TaskCard(t,mode){var dept=v11DeptInfo(t.dept),links=taskMilestoneLinks(t.id),owner=t.assignee&&liveData.members[t.assignee]?liveData.members[t.assignee].name:'Unassigned',contributors=(t.contributors||[]).map(function(id){return liveData.members[id]&&liveData.members[id].name;}).filter(Boolean),due=t.dueDate?new Date(t.dueDate+'T00:00:00'):null,now=new Date();now.setHours(0,0,0,0);var overdue=due&&due<now&&t.state!=='completed',priority=t.priority||'medium',pcol={high:'var(--crimson-hi)',medium:'var(--amber)',low:'var(--green)'}[priority],can=v11CanManageTask(t),comments=(t.comments||[]).length,drag=mode==='my'?'true':String(can);var dragFn=mode==='my'?'dragMyTask(event)':'onDragStart(event)';var dragEnd=mode==='my'?'onDragEnd(event);dragMyTaskId=null':'onDragEnd(event)';var link=links[0];var html='<div class="task-card v11-task-card'+(overdue?' overdue':'')+'" data-state="'+v11EscAttr(t.state||'unassigned')+'" data-id="'+v11EscAttr(t.id)+'" draggable="'+drag+'" ondragstart="'+dragFn+'" ondragend="'+dragEnd+'" onclick="openTaskDetail(\''+v11EscAttr(t.id)+'\')" style="--priority:'+pcol+';--dept-color:'+dept.color+'">';html+='<div class="v11-priority-stripe"></div><div class="v11-task-inner"><div class="v11-task-head"><span class="v11-dept-icon" title="'+v11EscAttr(dept.label)+'">'+v11DeptIcon(t.dept)+'</span><div class="v11-task-title-wrap"><div class="v11-task-title">'+esc(t.name||t.title||'Untitled Task')+taskHeartbeatMini(t)+'</div><div class="v11-task-sub">'+esc((t.description||t.desc||dept.label).substring(0,74))+'</div></div>';
+if(can){html+='<div class="v11-card-actions" onclick="event.stopPropagation()"><button class="icon-btn" title="Edit" onclick="openEditTask(\''+v11EscAttr(t.id)+'\')">✎</button><button class="icon-btn danger" title="Delete" onclick="deleteTask(\''+v11EscAttr(t.id)+'\')">×</button></div>';}
+html+='</div><div class="v11-task-pills"><span class="v11-pill">'+esc(v11StateLabel(t.state))+'</span><span class="v11-pill">'+esc(priority)+'</span>'+(overdue?'<span class="v11-pill overdue">Overdue</span>':'')+((!overdue&&taskHeartbeatInfo(t).days>=14)?'<span class="v11-pill needs-update" title="No recent Hub update has been recorded for this task">Needs update</span>':'');if(link)html+='<span class="v11-pill milestone" onclick="event.stopPropagation();openMilestoneDetail(\''+v11EscAttr(link.milestone.id)+'\')" title="'+v11EscAttr(link.milestone.title+' → '+link.deliverable.name)+'">◇ '+esc(link.milestone.title)+'</span>';if(links.length>1)html+='<span class="v11-pill milestone" title="Linked to '+links.length+' deliverables">+'+(links.length-1)+'</span>';html+='</div><div class="v11-task-meta"><span>Owner: <strong>'+esc(owner)+'</strong></span><span>'+(due?(overdue?'Overdue ':'Due ')+due.toLocaleDateString(undefined,{month:'short',day:'numeric'}):'No due date')+'</span></div>';if(contributors.length)html+='<div class="v11-task-sub" style="margin-top:6px">Contributors: '+esc(contributors.join(', '))+'</div>';var stageOrder=['accepted','in-progress','review','completed'],stageIndex=stageOrder.indexOf(t.state);html+='<div class="v11-task-progress-wrap" title="Workflow stage: '+v11EscAttr(v11StateLabel(t.state))+'. The bar and dots advance only when the task state changes."><div class="v11-task-progress" data-stage="Workflow: '+v11EscAttr(v11StateLabel(t.state))+'"><span style="width:'+v11StatePercent(t)+'%"></span></div><div class="v11-workflow-markers">'+stageOrder.map(function(x,i){return '<i class="'+(stageIndex>=i||t.state==='completed'?'done':'')+'"></i>';}).join('')+'</div><div class="v11-workflow-key"><span>Accepted</span><span>Progress</span><span>Review</span><span>Done</span></div></div><div class="v11-task-foot">';if(t.state==='pending-accept'&&t.assignee===(currentUser&&currentUser.uid))html+='<button class="accept-btn" onclick="event.stopPropagation();acceptTask(\''+v11EscAttr(t.id)+'\')">Accept</button>';else if(t.state==='review'&&can)html+='<button class="tc-btn" style="color:var(--green)" onclick="event.stopPropagation();setTaskState(\''+v11EscAttr(t.id)+'\',\'completed\',this)">Approve</button>';else html+='<span></span>';html+='<span class="v11-comments"><svg viewBox="0 0 24 24"><path d="M5 18l-1 4 5-3h9a4 4 0 004-4V7a4 4 0 00-4-4H6a4 4 0 00-4 4v8a4 4 0 003 3z"/></svg>'+comments+'</span></div></div></div>';return html;}
+window.taskCardHTML=function(t){return v11TaskCard(t,'dept');};
+window.renderMyTasks=function(){var el=document.getElementById('my-tasks-board');if(!el)return;var uid=currentUser&&currentUser.uid,my=Object.values(liveData.tasks||{}).filter(function(t){return t.assignee===uid;});var cols=[['pending-accept','Pending Accept','#ff6b35'],['accepted','Accepted','var(--gold)'],['in-progress','In Progress','var(--amber)'],['review','Ready for Review','var(--blue)'],['completed','Completed','var(--green)']];el.innerHTML=cols.map(function(c){var tasks=my.filter(function(t){return t.state===c[0];}).sort(taskUrgencySort);return '<div class="my-task-col" ondragover="event.preventDefault()" ondrop="dropMyTask(event,\''+c[0]+'\')"><div class="my-task-col-hdr"><span style="font-family:Share Tech Mono,monospace;font-size:11px;letter-spacing:1.5px;color:'+c[2]+';text-transform:uppercase">'+c[1]+'</span><span class="col-count">'+tasks.length+'</span></div><div style="padding:9px;display:flex;flex-direction:column;gap:9px">'+(tasks.length?tasks.map(function(t){return v11TaskCard(t,'my');}).join(''):'<div class="no-data">No tasks</div>')+'</div></div>';}).join('');};
+var oldRenderBase=window.renderTaskDetailBase;window.renderTaskDetailBase=function(t){oldRenderBase(t);renderTaskMilestoneSection(t);};
+function renderTaskMilestoneSection(t){var body=document.getElementById('td-body');if(!body)return;var old=document.getElementById('v11-task-milestone-section');if(old)old.remove();var links=taskMilestoneLinks(t.id),can=v11CanManageTask(t),sec=document.createElement('div');sec.id='v11-task-milestone-section';sec.className='v11-milestone-links';var rows=links.map(function(x){return '<div class="v11-link-row"><div><div class="v11-link-name">'+esc(x.milestone.title||'Milestone')+'</div><div class="v11-link-meta">'+esc(x.deliverable.name||'Deliverable')+'</div></div><button class="btn btn-ghost btn-xs" onclick="closeTaskDetail();openMilestoneDetail(\''+v11EscAttr(x.milestone.id)+'\')">Open</button></div>';}).join('');sec.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div class="task2-meta-label">Milestone Links</div><div class="text-small text-grey">'+(links.length?links.length+' linked deliverable'+(links.length===1?'':'s'):'This task is not linked to a milestone.')+'</div></div>'+(can?'<button class="btn btn-gold btn-xs" onclick="openTaskMilestoneLinker(\''+v11EscAttr(t.id)+'\')">Manage Links</button>':'')+'</div>'+rows;body.appendChild(sec);}
+window.openTaskMilestoneLinker=function(taskId){var t=getTaskById(taskId);if(!t||!v11CanManageTask(t)){toast('Only relevant Leads, Directors, Project Managers and Admin can link tasks.','err');return;}V11.linkSelection=new Set(taskMilestoneLinks(taskId).map(function(x){return x.deliverable.id;}));document.getElementById('v11-link-task-id').value=taskId;document.getElementById('v11-link-search').value='';renderTaskMilestoneLinkPicker();openModal('m-task-milestone-links');};
+window.renderTaskMilestoneLinkPicker=function(){var task=getTaskById(document.getElementById('v11-link-task-id').value),el=document.getElementById('v11-link-picker');if(!task||!el)return;var q=(document.getElementById('v11-link-search').value||'').toLowerCase();var rows=[];(liveData.milestoneDeliverables||[]).forEach(function(d){if(d.archived)return;var ms=milestoneById(d.milestoneId);if(!ms||ms.archived||ms.deletionStatus==='pending')return;var depts=effectiveDeliverableDepartments(ms,d),matches=depts.includes(task.dept)||milestoneDepartmentIds(ms).includes(task.dept);if(!matches)return;var txt=((ms.title||'')+' '+(d.name||'')).toLowerCase();if(q&&!txt.includes(q))return;rows.push({ms:ms,d:d});});rows.sort(function(a,b){return String(a.ms.title).localeCompare(String(b.ms.title))||String(a.d.name).localeCompare(String(b.d.name));});el.innerHTML=rows.length?rows.map(function(x){return '<label class="v11-link-option"><input type="checkbox" value="'+v11EscAttr(x.d.id)+'" '+(V11.linkSelection.has(x.d.id)?'checked':'')+' onchange="toggleTaskMilestoneChoice(this)"><span><div class="v11-link-ms">'+esc(x.ms.title||'Milestone')+'</div><div class="v11-link-del">'+esc(x.d.name||'Deliverable')+' · '+esc((effectiveDeliverableDepartments(x.ms,x.d).map(deptLabel).join(', ')||'No department'))+'</div></span></label>';}).join(''):'<div class="no-data">No matching deliverables for this task department.</div>';};
+window.toggleTaskMilestoneChoice=function(cb){if(cb.checked)V11.linkSelection.add(cb.value);else V11.linkSelection.delete(cb.value);};
+window.saveTaskMilestoneLinks=async function(){var taskId=document.getElementById('v11-link-task-id').value,t=getTaskById(taskId);if(!t||!v11CanManageTask(t))return;var batch=db.batch(),changed=[];(liveData.milestoneDeliverables||[]).forEach(function(d){var ids=linkedTaskIds(d),had=ids.includes(taskId),want=V11.linkSelection.has(d.id);if(had===want)return;var next=want?Array.from(new Set(ids.concat([taskId]))):ids.filter(function(id){return id!==taskId;});batch.set(db.collection('milestone_deliverables').doc(d.id),{linkedTaskIds:next,updatedAt:Date.now()},{merge:true});changed.push({d:d,want:want});});try{await batch.commit();for(var c of changed){await recordMilestoneActivity(c.d.milestoneId,c.want?'task_linked':'task_unlinked',currentProfile.name+(c.want?' linked ':' unlinked ')+(t.name||t.title||'a task')+(c.want?' to ':' from ')+(c.d.name||'a deliverable')+'.',c.d.id);}closeModal('m-task-milestone-links');toast('Milestone links updated','ok');renderTaskMilestoneSection(t);renderDeptBoard(t.dept);}catch(e){toast(e.message||'Could not update milestone links','err');}};
+window.onDrop=function(e,dept,memberId){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!dragTask)return;var t=getTaskById(dragTask),id=dragTask;dragTask=null;if(!t)return;if(!v11CanManageTask(t)){toast('You do not manage this task department.','err');return;}var target=memberId==='__completed__'?'completed':memberId||'',from=t.assignee||'';if(target!=='completed'&&target===from)return;V11.pendingDrop={taskId:id,dept:dept,target:target};var fromName=from&&liveData.members[from]?liveData.members[from].name:'Unassigned',toName=target==='completed'?'Completed':target&&liveData.members[target]?liveData.members[target].name:'Unassigned';document.getElementById('v11-reassign-summary').innerHTML='<div class="v11-confirm-title">'+esc(t.name||t.title||'Task')+'</div><div class="v11-confirm-change">'+esc(fromName)+' → <strong style="color:var(--white)">'+esc(toName)+'</strong></div>';document.getElementById('v11-reassign-reason').value='';openModal('m-task-reassign-confirm');};
+window.cancelTaskDropConfirm=function(){V11.pendingDrop=null;closeModal('m-task-reassign-confirm');};
+window.confirmTaskDropChange=async function(){var p=V11.pendingDrop;if(!p)return;var t=getTaskById(p.taskId);if(!t)return;var reason=(document.getElementById('v11-reassign-reason').value||'').trim(),update={updatedAt:new Date().toISOString(),lastActivityAt:Date.now()},msg='';if(p.target==='completed'){update.state='completed';update.completedAt=Date.now();msg=currentProfile.name+' marked the task complete.';}else if(p.target){update.assignee=p.target;if(t.state==='unassigned'||t.state==='pending-accept')update.state='pending-accept';var nm=(liveData.members[p.target]||{}).name||'another member';msg=currentProfile.name+' reassigned the task to '+nm+'.';}else{update.assignee='';update.state='unassigned';msg=currentProfile.name+' returned the task to unassigned.';}if(reason)msg+=' Reason: '+reason;try{await db.collection('tasks').doc(p.taskId).set(update,{merge:true});await recordTaskActivity(p.taskId,p.target==='completed'?'approved':'assignment_changed',msg);closeModal('m-task-reassign-confirm');V11.pendingDrop=null;toast('Task updated','ok');renderDeptBoard(p.dept);}catch(e){toast(e.message||'Could not update task','err');}};
+// Seasonal base themes
+DASHBOARD_THEME_DEFAULTS.themes={spring:{enabled:true,start:'03-01',end:'05-31',priority:10},summer:{enabled:true,start:'06-01',end:'08-31',priority:10},autumn:{enabled:true,start:'09-01',end:'11-30',priority:10},winter:{enabled:true,start:'12-01',end:'02-28',priority:10},anniversary:{enabled:false,start:'06-01',end:'06-03',priority:30}};
+window.publicThemeName=function(v){var m={spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter',anniversary:'Cosmic',cosmic:'Cosmic'};return m[v]||'Default';};
+window.internalThemeKey=function(v){return v==='cosmic'?'anniversary':v==='halloween'?'autumn':v;};
+window.effectiveHomeTheme=function(){var preview=sessionStorage.getItem('cvp_theme_preview')||'';if(preview)return preview;var pref=userHomeThemePreference();if(pref==='default')return '';if(['spring','summer','autumn','winter'].includes(pref))return pref;if(pref==='cosmic')return'anniversary';return activeScheduledTheme();};
+window.userHomeThemePreference=function(){var v=(currentProfile&&currentProfile.homeThemePreference)||'automatic';return v==='halloween'?'autumn':v;};
+window.activeScheduledTheme=function(){var cfg=dashboardCfg(),d=new Date(),md=('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),found=[];['spring','summer','autumn','winter','anniversary'].forEach(function(k){var t=cfg.themes&&cfg.themes[k];if(t&&t.enabled&&monthDayWithin(md,t.start,t.end))found.push({key:k,priority:Number(t.priority||0)});});found.sort(function(a,b){return b.priority-a.priority;});return found.length?found[0].key:'';};
+window.buildSeasonalEffects=function(theme){var layer=document.getElementById('seasonal-effects');if(!layer)return;layer.innerHTML='';if(!theme||hubMotionMode()==='off')return;var reduced=hubMotionMode()==='reduced'||(matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches),count=reduced?7:20;for(var i=0;i<count;i++){var e=document.createElement('span');if(theme==='spring'||theme==='autumn'){e.className='season-petal';e.style.left=((i*43+9)%100)+'%';e.style.setProperty('--dur',(12+i%7*1.4)+'s');e.style.setProperty('--delay',(-i*.9)+'s');e.style.setProperty('--drift',((i%2?1:-1)*(18+i%5*8))+'px');if(theme==='autumn')e.style.filter='hue-rotate(-35deg) saturate(1.4)';}else if(theme==='summer'){e.className=i%4===0?'season-solar':'season-cosmic-mote';e.style.left=((i*47+4)%100)+'%';e.style.top=((i*61+8)%100)+'%';e.style.setProperty('--dur',(9+i%8)+'s');e.style.setProperty('--delay',(-i*.7)+'s');e.style.setProperty('--rot',(-55+i%7*18)+'deg');}else if(theme==='winter'){e.className='season-snow';e.textContent=['✦','❄','·'][i%3];e.style.left=((i*37)%100)+'%';e.style.fontSize=(8+i%5*3)+'px';e.style.animationDuration=(10+i%6*1.8)+'s';e.style.animationDelay=(-i*.8)+'s';}else{e.className=i%6===0?'season-shooting-star':'season-cosmic-mote';e.style.left=((i*41)%100)+'%';e.style.top=((i*67)%100)+'%';e.style.setProperty('--dur',(8+i%7)+'s');e.style.setProperty('--delay',(-i*.65)+'s');e.style.setProperty('--dx',((i%2?1:-1)*(25+i%5*12))+'px');e.style.setProperty('--dy',(-20-i%6*8)+'px');}layer.appendChild(e);}};
+window.applyScheduledTheme=function(){applyUserMotionPreference();var preview=sessionStorage.getItem('cvp_theme_preview')||'',theme=effectiveHomeTheme();document.body.classList.remove('theme-spring','theme-summer','theme-autumn','theme-halloween','theme-winter','theme-anniversary');if(theme)document.body.classList.add('theme-'+theme);buildSeasonalEffects(theme);var badge=document.getElementById('seasonal-preview-badge');if(badge){if(preview){badge.textContent='Previewing '+publicThemeName(preview)+' theme';badge.classList.remove('hidden');}else badge.classList.add('hidden');}};
+function v11PrestigeUnlocked(){return currentProfile&&journeyLevel(currentProfile)>=50;}
+function v11PrestigeChoice(){return sessionStorage.getItem('cvp_prestige_preview')||(currentProfile&&currentProfile.journeyPrestigeTheme)||((currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass)||'');}
+function buildPrestigeEffects(kind){var layer=document.getElementById('prestige-effects');if(!layer)return;layer.innerHTML='';if(!kind||hubMotionMode()==='off')return;var n=hubMotionMode()==='reduced'?6:18;for(var i=0;i<n;i++){var p=document.createElement('span');p.className='prestige-particle';p.style.left=((i*53+5)%100)+'%';p.style.top=((i*37+13)%100)+'%';p.style.setProperty('--dur',(6+i%7*1.3)+'s');p.style.setProperty('--delay',(-i*.5)+'s');p.style.setProperty('--dx',((i%2?1:-1)*(10+i%5*6))+'px');p.style.setProperty('--dy',(-16-i%6*5)+'px');layer.appendChild(p);}}
+window.applyPersonalCosmicTheme=function(){var all=['prestige-overlay','prestige-essence','prestige-chronographer','prestige-astral-archivist','prestige-starcaller','personal-cosmic-theme','personal-cosmic-essence','personal-cosmic-chronographer','personal-cosmic-astral-archivist','personal-cosmic-starcaller'];document.body.classList.remove.apply(document.body.classList,all);var kind=v11PrestigeChoice();if(!kind){buildPrestigeEffects('');return;}var slug=String(kind).toLowerCase().replace(/\s+/g,'-');document.body.classList.add('prestige-overlay','prestige-'+slug);buildPrestigeEffects(kind);};
+var oldOpenSettings=window.openDashboardSettings;window.openDashboardSettings=function(){oldOpenSettings();var pref=document.getElementById('home-theme-preference');if(pref){pref.innerHTML='<option value="automatic">Automatic · follow project schedule</option><option value="default">Default</option><option value="spring">Spring</option><option value="summer">Summer</option><option value="autumn">Autumn</option><option value="winter">Winter</option><option value="cosmic">Cosmic</option>';pref.value=userHomeThemePreference();}var panel=document.getElementById('cosmic-personal-settings');if(panel){panel.classList.remove('hidden');panel.innerHTML='<div><div class="field-label">Prestige Overlay</div><div class="text-small text-grey">Unlocked at Level 50. Changes cards, borders and interface particles without replacing your chosen background theme.</div></div><div style="min-width:230px"><select class="inp" id="v11-prestige-select" '+(v11PrestigeUnlocked()||v11Role()==='admin'?'':'disabled')+' onchange="previewV11Prestige()"><option value="">None</option><option value="Essence">Essence</option><option value="Chronographer">Chronographer</option><option value="Astral Archivist">Astral Archivist</option><option value="Starcaller">Starcaller</option></select></div>';document.getElementById('v11-prestige-select').value=(currentProfile&&currentProfile.journeyPrestigeTheme)||((currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass)||'');}var box=document.getElementById('dashboard-theme-settings');if(v11Role()==='admin'&&box){var cfg=dashboardCfg(),names={spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter',anniversary:'Cosmic'};box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');}};
+window.previewV11Prestige=function(){var sel=document.getElementById('v11-prestige-select');if(!sel)return;if(sel.value)sessionStorage.setItem('cvp_prestige_preview',sel.value);else sessionStorage.removeItem('cvp_prestige_preview');applyPersonalCosmicTheme();};
+var oldSaveSettings=window.saveDashboardSettings;window.saveDashboardSettings=async function(){var pref=document.getElementById('home-theme-preference'),motion=document.getElementById('home-animation-mode'),ps=document.getElementById('v11-prestige-select');try{var userData={homeThemePreference:pref?pref.value:'automatic',homeAnimationMode:motion?motion.value:'full'};if(v11PrestigeUnlocked()||v11Role()==='admin')userData.journeyPrestigeTheme=ps?ps.value:'';await db.collection('users').doc(currentUser.uid).set(userData,{merge:true});Object.assign(currentProfile,userData);if(v11Role()==='admin'){var themes={};['spring','summer','autumn','winter','anniversary'].forEach(function(k){var e=document.getElementById('theme-'+k+'-enabled');if(e)themes[k]={enabled:e.checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:10};});await db.collection('config').doc('dashboard_settings').set({themes:themes,updatedAt:new Date().toISOString(),updatedBy:currentUser.uid},{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,{themes:themes});}sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_prestige_preview');applyUserMotionPreference();applyScheduledTheme();applyPersonalCosmicTheme();closeModal('m-dashboard-settings');toast('Home preferences saved','ok');}catch(e){toast(e.message||'Could not save Home preferences','err');}};
+var oldCloseSettings=window.closeDashboardSettingsWithoutSaving;window.closeDashboardSettingsWithoutSaving=function(){sessionStorage.removeItem('cvp_prestige_preview');oldCloseSettings();applyPersonalCosmicTheme();};
+
+// v11.1 — standalone Home Settings implementation. Do not call older overwritten versions.
+window.openDashboardSettings=function(){
+  try{
+    var admin=v11Role()==='admin',cfg=dashboardCfg();
+    var pref=document.getElementById('home-theme-preference');
+    if(pref){
+      pref.innerHTML='<option value="automatic">Automatic · follow project schedule</option><option value="default">Default</option><option value="spring">Spring</option><option value="summer">Summer</option><option value="autumn">Autumn</option><option value="winter">Winter</option><option value="cosmic">Cosmic</option>';
+      pref.value=userHomeThemePreference();
+    }
+    var motion=document.getElementById('home-animation-mode');if(motion)motion.value=hubMotionMode();
+    var panel=document.getElementById('cosmic-personal-settings');
+    if(panel){
+      panel.classList.remove('hidden');
+      panel.innerHTML='<div><div class="field-label">Prestige Overlay</div><div class="text-small text-grey">Unlocked at Level 50. Changes cards, borders and interface particles without replacing your chosen background theme.</div></div><div style="min-width:230px"><select class="inp" id="v11-prestige-select" '+(v11PrestigeUnlocked()||admin?'':'disabled')+' onchange="previewV11Prestige()"><option value="">None</option><option value="Essence">Essence</option><option value="Chronographer">Chronographer</option><option value="Astral Archivist">Astral Archivist</option><option value="Starcaller">Starcaller</option></select></div>';
+      var ps=document.getElementById('v11-prestige-select');if(ps)ps.value=(currentProfile&&currentProfile.journeyPrestigeTheme)||((currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass)||'');
+    }
+    var wrap=document.getElementById('admin-seasonal-settings-wrap');if(wrap)wrap.classList.toggle('hidden',!admin);
+    var box=document.getElementById('dashboard-theme-settings');
+    if(admin&&box){
+      var names={spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter',anniversary:'Cosmic'};
+      box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes&&cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');
+    }
+    openModal('m-dashboard-settings');
+  }catch(e){console.error('Home Settings open failed',e);toast('Could not open Home Settings: '+(e.message||e),'err');}
+};
+window.closeDashboardSettingsWithoutSaving=function(){
+  sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_prestige_preview');
+  closeModal('m-dashboard-settings');applyScheduledTheme();applyPersonalCosmicTheme();
+};
+var _dashBg=document.getElementById('m-dashboard-settings');
+if(_dashBg&&!_dashBg.dataset.v11CloseBound){_dashBg.dataset.v11CloseBound='1';_dashBg.addEventListener('click',function(e){if(e.target===_dashBg){sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_prestige_preview');applyScheduledTheme();applyPersonalCosmicTheme();}});}
+window.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('m-task-reassign-confirm').classList.contains('open'))cancelTaskDropConfirm();}});
+})();
+</script>
+
 </body>
 </html>
