@@ -1697,6 +1697,13 @@ body { font-size:15px; }
 .task2-tab.active { color:var(--crimson-hi); border-bottom-color:var(--crimson-hi); }
 .task2-pane { display:none; padding:14px 16px 18px; min-height:180px; }
 .task2-pane.active { display:block; }
+.task2-subtabs{display:flex;gap:5px;margin:0 0 12px;padding:4px;background:rgba(255,255,255,.018);border:1px solid var(--border);border-radius:6px;width:max-content;max-width:100%;}
+.task2-subtab{border:0;background:transparent;color:var(--grey);padding:7px 11px;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
+.task2-subtab:hover{color:var(--white);background:rgba(255,255,255,.025);}
+.task2-subtab.active{color:var(--gold);background:rgba(215,176,74,.09);box-shadow:inset 0 0 0 1px rgba(215,176,74,.22);}
+.task2-subpane{display:none;}
+.task2-subpane.active{display:block;}
+.task2-history-note{font-size:11px;color:var(--grey-2);margin:0 0 10px;line-height:1.45;}
 .task2-composer { display:flex; flex-direction:column; gap:8px; margin-bottom:13px; padding:10px; border:1px solid var(--border); border-radius:6px; background:rgba(255,255,255,.018); }
 .task2-composer-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
 .task2-entry { border:1px solid var(--border); border-radius:6px; padding:11px 12px; background:rgba(8,10,18,.55); margin-bottom:8px; }
@@ -3333,7 +3340,12 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
               <div class="task-img-picker"><input type="file" id="td-progress-image" accept="image/jpeg,image/png,image/webp" onchange="taskImagePicked('progress')"><button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('td-progress-image').click()">Attach Image</button><span class="task-img-picked" id="td-progress-image-name">No image selected</span><button class="btn btn-ghost btn-xs hidden" id="td-progress-image-clear" type="button" onclick="clearTaskImagePicker('progress')">Clear</button><div class="task-img-note">Optional. JPEG, PNG or WebP, maximum 3.5 MB. Hub images are temporary and expire after 45 days.</div><div class="task-img-upload-progress" id="td-progress-upload-progress"><span></span></div></div>
               <div class="task2-composer-actions"><button class="btn btn-gold btn-sm" id="td-progress-submit" onclick="submitProgressUpdate()">Post Progress Update</button></div>
             </div>
-            <div id="td-progress-list"></div>
+            <div class="task2-subtabs" role="tablist" aria-label="Progress content">
+              <button class="task2-subtab active" data-progress-subtab="uploads" onclick="switchProgressSubtab('uploads')">Uploads <span class="task2-count" id="td-count-progress-uploads"></span></button>
+              <button class="task2-subtab" data-progress-subtab="history" onclick="switchProgressSubtab('history')">Update History <span class="task2-count" id="td-count-progress-history"></span></button>
+            </div>
+            <div class="task2-subpane active" id="td-progress-subpane-uploads"><div id="td-progress-uploads"></div></div>
+            <div class="task2-subpane" id="td-progress-subpane-history"><div class="task2-history-note">A chronological record of written progress updates and image-upload entries. This history is kept for reference but hidden from the default view.</div><div id="td-progress-history"></div></div>
           </div>
           <div class="task2-pane" id="td-pane-feedback">
             <div class="task2-composer" id="td-feedback-composer">
@@ -4580,6 +4592,7 @@ async function acceptTask(id) {
 // ─── TASK DETAIL / COLLABORATION — TASK MANAGEMENT 2.0 ────
 let currentTaskId = null;
 let currentTaskTab = 'comments';
+let currentProgressSubtab = 'uploads';
 let taskDetailData = { progress:[], feedback:[], references:[], activity:[], images:[] };
 let pendingTaskImageUpload = null;
 let taskImageObjectUrls = {};
@@ -4663,7 +4676,7 @@ async function ensureTaskActivityStart(t) {
 }
 
 async function openTaskDetail(id) {
-  currentTaskId=id; currentTaskTab='comments'; taskDetailData={progress:[],feedback:[],references:[],activity:[],images:[]};
+  currentTaskId=id; currentTaskTab='comments'; currentProgressSubtab='uploads'; taskDetailData={progress:[],feedback:[],references:[],activity:[],images:[]};
   var token=++taskDetailLoadToken, t=getTaskById(id); if(!t)return;
   document.getElementById('td-title').textContent='▸ '+(t.name||t.title||'Task Detail');
   renderTaskDetailBase(t); renderComments(t.comments||[]); renderTaskDetailLoading(); switchTaskTab('comments');
@@ -4678,7 +4691,7 @@ function closeTaskDetail() {
   closeModal('m-task-detail');
 }
 function renderTaskDetailLoading() {
-  ['progress-list','feedback-list','reference-list','activity-list'].forEach(function(s){var e=document.getElementById('td-'+s);if(e)e.innerHTML='<div class="task2-empty">Loading...</div>';});
+  ['progress-uploads','progress-history','feedback-list','reference-list','activity-list'].forEach(function(s){var e=document.getElementById('td-'+s);if(e)e.innerHTML='<div class="task2-empty">Loading...</div>';});
 }
 function renderTaskDetailBase(t) {
   var assignee=t.assignee?((liveData.members[t.assignee]&&liveData.members[t.assignee].name)||'Unknown'):'Unassigned';
@@ -4732,6 +4745,11 @@ function switchTaskTab(tab) {
   document.querySelectorAll('[data-task-tab]').forEach(function(b){b.classList.toggle('active',b.dataset.taskTab===tab);});
   document.querySelectorAll('.task2-pane').forEach(function(p){p.classList.toggle('active',p.id==='td-pane-'+tab);});
 }
+function switchProgressSubtab(tab) {
+  currentProgressSubtab=(tab==='history')?'history':'uploads';
+  document.querySelectorAll('[data-progress-subtab]').forEach(function(b){b.classList.toggle('active',b.dataset.progressSubtab===currentProgressSubtab);});
+  document.querySelectorAll('#td-pane-progress .task2-subpane').forEach(function(p){p.classList.toggle('active',p.id==='td-progress-subpane-'+currentProgressSubtab);});
+}
 function renderTaskDetailCollections(t) {
   renderTaskImages('progress'); renderTaskImages('feedback'); renderTaskReferences(); renderTaskActivity();
   var counts={comments:(t.comments||[]).length,progress:taskDetailData.progress.length,feedback:taskDetailData.feedback.length,references:taskDetailData.references.length,activity:taskDetailData.activity.length};
@@ -4782,12 +4800,34 @@ function taskImageCanDelete(u,t){return !!currentUser&&(u.uploaderUid===currentU
 function taskImageCanArchive(t){return taskManagerCanManage(t);}
 function imageCardsFor(type){return (taskDetailData.images||[]).filter(function(x){return (x.uploadType||x.type)===type;});}
 function renderTaskImages(type){
-  var list=document.getElementById('td-'+type+'-list');if(!list)return;var entries=type==='progress'?taskDetailData.progress:taskDetailData.feedback,t=getTaskById(currentTaskId),imgs=imageCardsFor(type);
+  var t=getTaskById(currentTaskId),imgs=imageCardsFor(type),entries=type==='progress'?taskDetailData.progress:taskDetailData.feedback;
   var entryHtml='';
-  if(entries.length){entryHtml=entries.map(function(x){var tag=x.requestChanges?'<span class="task2-badge bad">Changes requested</span>':'';return '<div class="task2-entry"><div class="task2-entry-hdr"><span class="task2-entry-author">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Team member')+'</span><span class="task2-entry-time">'+formatTaskEntryTime(x.createdAt)+'</span></div>'+tag+'<div class="task2-entry-text" style="margin-top:'+(tag?'7':'0')+'px">'+esc(x.text||'')+'</div></div>';}).join('');}
-  else entryHtml='<div class="task2-empty">No '+(type==='progress'?'progress updates':'formal feedback')+' yet.</div>';
-  var imgHtml=imgs.length?'<div class="task-img-grid">'+imgs.map(function(u){var days=taskImageDaysLeft(u),cls=days!==null&&days<=3?'danger':days!==null&&days<=14?'warn':'',canDel=taskImageCanDelete(u,t),canArc=taskImageCanArchive(t);return '<div class="task-img-card"><div class="task-img-preview loading" id="task-img-preview-'+escAttr(u.id)+'" onclick="openTaskImageLightbox(\''+escJs(u.id)+'\')"></div><div class="task-img-meta"><div class="task-img-name" title="'+escAttr(u.fileName||'Image')+'">'+esc(u.fileName||'Image')+'</div><div class="task-img-sub">'+esc(u.uploaderName||'Team member')+' · '+formatBytes(u.sizeBytes||0)+(u.caption?' · '+esc(u.caption):'')+'</div><div class="task-img-expiry '+cls+'">'+(days===null?'Expiry unavailable':days<0?'Expired':days===0?'Expires today':'Expires in '+days+' days')+(u.archivedExternally?' · Archived externally':'')+'</div><div class="task-img-actions"><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();downloadTaskImage(\''+escJs(u.id)+'\')">Download</button>'+(canArc?'<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();toggleTaskImageArchived(\''+escJs(u.id)+'\','+(!u.archivedExternally)+')">'+(u.archivedExternally?'Unmark archive':'Mark archived')+'</button>':'')+(canDel?'<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTaskImage(\''+escJs(u.id)+'\')">Delete</button>':'')+'</div></div></div>';}).join('')+'</div>':'';
-  list.innerHTML=entryHtml+imgHtml;imgs.forEach(function(u){loadTaskImagePreview(u);});
+  if(entries.length){
+    entryHtml=entries.map(function(x){
+      var tag=x.requestChanges?'<span class="task2-badge bad">Changes requested</span>':'';
+      return '<div class="task2-entry"><div class="task2-entry-hdr"><span class="task2-entry-author">'+esc(x.authorName||((liveData.members[x.uid]||{}).name)||'Team member')+'</span><span class="task2-entry-time">'+formatTaskEntryTime(x.createdAt)+'</span></div>'+tag+'<div class="task2-entry-text" style="margin-top:'+(tag?'7':'0')+'px">'+esc(x.text||'')+'</div></div>';
+    }).join('');
+  } else {
+    entryHtml='<div class="task2-empty">No '+(type==='progress'?'progress updates':'formal feedback')+' yet.</div>';
+  }
+  var imgHtml=imgs.length?'<div class="task-img-grid">'+imgs.map(function(u){
+    var days=taskImageDaysLeft(u),cls=days!==null&&days<=3?'danger':days!==null&&days<=14?'warn':'',canDel=taskImageCanDelete(u,t),canArc=taskImageCanArchive(t);
+    return '<div class="task-img-card"><div class="task-img-preview loading" id="task-img-preview-'+escAttr(u.id)+'" onclick="openTaskImageLightbox(\''+escJs(u.id)+'\')"></div><div class="task-img-meta"><div class="task-img-name" title="'+escAttr(u.fileName||'Image')+'">'+esc(u.fileName||'Image')+'</div><div class="task-img-sub">'+esc(u.uploaderName||'Team member')+' · '+formatBytes(u.sizeBytes||0)+(u.caption?' · '+esc(u.caption):'')+'</div><div class="task-img-expiry '+cls+'">'+(days===null?'Expiry unavailable':days<0?'Expired':days===0?'Expires today':'Expires in '+days+' days')+(u.archivedExternally?' · Archived externally':'')+'</div><div class="task-img-actions"><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();downloadTaskImage(\''+escJs(u.id)+'\')">Download</button>'+(canArc?'<button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();toggleTaskImageArchived(\''+escJs(u.id)+'\','+(!u.archivedExternally)+')">'+(u.archivedExternally?'Unmark archive':'Mark archived')+'</button>':'')+(canDel?'<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTaskImage(\''+escJs(u.id)+'\')">Delete</button>':'')+'</div></div></div>';
+  }).join('')+'</div>':'<div class="task2-empty">No progress images uploaded yet.</div>';
+
+  if(type==='progress'){
+    var uploads=document.getElementById('td-progress-uploads'),history=document.getElementById('td-progress-history');
+    if(uploads)uploads.innerHTML=imgHtml;
+    if(history)history.innerHTML=entryHtml;
+    var cu=document.getElementById('td-count-progress-uploads'),ch=document.getElementById('td-count-progress-history');
+    if(cu)cu.textContent=imgs.length?'('+imgs.length+')':'';
+    if(ch)ch.textContent=entries.length?'('+entries.length+')':'';
+    switchProgressSubtab(currentProgressSubtab);
+  }else{
+    var list=document.getElementById('td-feedback-list');
+    if(list)list.innerHTML=entryHtml+imgHtml;
+  }
+  imgs.forEach(function(u){loadTaskImagePreview(u);});
 }
 async function privateStorageBlob(u){
   if(!u||!u.storagePath)throw new Error('Image storage path is missing.');
@@ -4909,7 +4949,7 @@ async function submitComment() {
 async function submitProgressUpdate() {
   var t=getTaskById(currentTaskId),input=document.getElementById('td-progress-input'),text=input.value.trim(),file=document.getElementById('td-progress-image')?.files?.[0];if(!t||(!text&&!file))return;
   if(!taskCanPostProgress(t)){toast('You cannot post progress to this task','err');return;}
-  await withTaskButtonBusy('td-progress-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image progress update',createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('progressUpdates').add(data);taskDetailData.progress.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('progress',r.id);input.value='';await recordTaskActivity(currentTaskId,'progress',currentProfile.name+' posted a progress update.');renderTaskDetailCollections(t);await awardCurrentUserXP(5,'progress_update',currentTaskId,'Progress update','progress_'+currentTaskId+'_'+new Date().toISOString().slice(0,10));toast('Progress update posted','ok');}catch(e){toast(e.message||'Could not post progress update','err');}});
+  await withTaskButtonBusy('td-progress-submit',async function(){try{var data={uid:currentUser.uid,authorName:currentProfile.name,text:text||'Image uploaded',createdAt:Date.now()};var r=await db.collection('tasks').doc(currentTaskId).collection('progressUpdates').add(data);taskDetailData.progress.unshift(Object.assign({id:r.id},data));if(file)await requestTaskImageUpload('progress',r.id);input.value='';await recordTaskActivity(currentTaskId,'progress',currentProfile.name+' posted a progress update.');renderTaskDetailCollections(t);await awardCurrentUserXP(5,'progress_update',currentTaskId,'Progress update','progress_'+currentTaskId+'_'+new Date().toISOString().slice(0,10));toast('Progress update posted','ok');}catch(e){toast(e.message||'Could not post progress update','err');}});
 }
 async function submitTaskFeedback(requestChanges) {
   var t=getTaskById(currentTaskId),input=document.getElementById('td-feedback-input'),text=input.value.trim(),file=document.getElementById('td-feedback-image')?.files?.[0];if(!t||(!text&&!file)){toast('Enter feedback or attach an image first','err');return false;}
@@ -8616,8 +8656,25 @@ function resizeSpark() {
 }
 resizeSpark();
 
+function activeClickSparkPalette() {
+  const b = document.body;
+  if (b.classList.contains('theme-spring')) return ['#d8ffb8','#8fe6c5','#d7a9ff'];
+  if (b.classList.contains('theme-summer')) return ['#ffe477','#ff9a72','#59d8ff'];
+  if (b.classList.contains('theme-autumn')) return ['#ffc15a','#e46f37','#a85ad8'];
+  if (b.classList.contains('theme-winter')) return ['#f8fdff','#a8ddff','#d7c6ff'];
+  if (b.classList.contains('theme-anniversary')) return ['#ff72c7','#b078ff','#57b8ff'];
+  return ['#ff8c50','#c8102e','#ffe6d2'];
+}
+function hexSparkRgba(hex, alpha) {
+  const h = String(hex||'#ffffff').replace('#','');
+  const v = h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n = parseInt(v,16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${alpha})`;
+}
 function spawnSparks(x, y) {
-  const count = 5 + Math.floor(Math.random() * 5);
+  if (document.body.classList.contains('motion-off')) return;
+  const palette = activeClickSparkPalette();
+  const count = document.body.classList.contains('motion-reduced') ? 4 : 5 + Math.floor(Math.random() * 5);
   for (let i = 0; i < count; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 1.5 + Math.random() * 3.5;
@@ -8629,6 +8686,8 @@ function spawnSparks(x, y) {
       maxLife: 0.2 + Math.random() * 0.35,
       size: 0.8 + Math.random() * 1.6,
       bright: Math.random() < 0.2,
+      c0: palette[Math.floor(Math.random()*palette.length)],
+      c1: palette[Math.floor(Math.random()*palette.length)],
     });
   }
 }
@@ -8644,11 +8703,11 @@ function sparkLoop() {
     if (al <= 0.01) return false;
     const g = sc.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 2.5);
     if (s.bright) {
-      g.addColorStop(0, `rgba(255,230,210,${al * 0.95})`);
-      g.addColorStop(0.4, `rgba(220,50,30,${al * 0.7})`);
+      g.addColorStop(0, hexSparkRgba('#ffffff', al * 0.96));
+      g.addColorStop(0.42, hexSparkRgba(s.c0, al * 0.78));
     } else {
-      g.addColorStop(0, `rgba(255,140,80,${al * 0.9})`);
-      g.addColorStop(0.4, `rgba(200,16,46,${al * 0.65})`);
+      g.addColorStop(0, hexSparkRgba(s.c0, al * 0.92));
+      g.addColorStop(0.44, hexSparkRgba(s.c1, al * 0.68));
     }
     g.addColorStop(1, 'rgba(0,0,0,0)');
     sc.beginPath();
@@ -9340,7 +9399,7 @@ window.internalThemeKey=function(v){return v==='cosmic'?'anniversary':v==='hallo
 window.effectiveHomeTheme=function(){var preview=sessionStorage.getItem('cvp_theme_preview')||'';if(preview)return preview;var pref=userHomeThemePreference();if(pref==='default')return '';if(['spring','summer','autumn','winter'].includes(pref))return pref;if(pref==='cosmic')return'anniversary';return activeScheduledTheme();};
 window.userHomeThemePreference=function(){var v=(currentProfile&&currentProfile.homeThemePreference)||'automatic';return v==='halloween'?'autumn':v;};
 window.activeScheduledTheme=function(){var cfg=dashboardCfg(),d=new Date(),md=('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),found=[];['spring','summer','autumn','winter','anniversary'].forEach(function(k){var t=cfg.themes&&cfg.themes[k];if(t&&t.enabled&&monthDayWithin(md,t.start,t.end))found.push({key:k,priority:Number(t.priority||0)});});found.sort(function(a,b){return b.priority-a.priority;});return found.length?found[0].key:'';};
-window.buildSeasonalEffects=function(theme){var layer=document.getElementById('seasonal-effects');if(!layer)return;layer.innerHTML='';if(!theme||hubMotionMode()==='off')return;var reduced=hubMotionMode()==='reduced'||(matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches),count=reduced?7:20;for(var i=0;i<count;i++){var e=document.createElement('span');if(theme==='spring'||theme==='autumn'){e.className='season-petal';e.style.left=((i*43+9)%100)+'%';e.style.setProperty('--dur',(12+i%7*1.4)+'s');e.style.setProperty('--delay',(-i*.9)+'s');e.style.setProperty('--drift',((i%2?1:-1)*(18+i%5*8))+'px');if(theme==='autumn')e.style.filter='hue-rotate(-35deg) saturate(1.4)';}else if(theme==='summer'){e.className=i%4===0?'season-solar':'season-cosmic-mote';e.style.left=((i*47+4)%100)+'%';e.style.top=((i*61+8)%100)+'%';e.style.setProperty('--dur',(9+i%8)+'s');e.style.setProperty('--delay',(-i*.7)+'s');e.style.setProperty('--rot',(-55+i%7*18)+'deg');}else if(theme==='winter'){e.className='season-snow';e.textContent=['✦','❄','·'][i%3];e.style.left=((i*37)%100)+'%';e.style.fontSize=(8+i%5*3)+'px';e.style.animationDuration=(10+i%6*1.8)+'s';e.style.animationDelay=(-i*.8)+'s';}else{e.className=i%6===0?'season-shooting-star':'season-cosmic-mote';e.style.left=((i*41)%100)+'%';e.style.top=((i*67)%100)+'%';e.style.setProperty('--dur',(8+i%7)+'s');e.style.setProperty('--delay',(-i*.65)+'s');e.style.setProperty('--dx',((i%2?1:-1)*(25+i%5*12))+'px');e.style.setProperty('--dy',(-20-i%6*8)+'px');}layer.appendChild(e);}};
+window.buildSeasonalEffects=function(theme){var layer=document.getElementById('seasonal-effects');if(!layer)return;layer.innerHTML='';if(!theme||hubMotionMode()==='off')return;var reduced=hubMotionMode()==='reduced'||(matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches),count=reduced?7:20;for(var i=0;i<count;i++){var e=document.createElement('span');if(theme==='spring'||theme==='autumn'){e.className='season-petal';e.style.left=((i*43+9)%100)+'%';e.style.setProperty('--dur',(12+i%7*1.4)+'s');e.style.setProperty('--delay',(-i*.9)+'s');e.style.setProperty('--drift',((i%2?1:-1)*(18+i%5*8))+'px');if(theme==='autumn')e.style.filter='hue-rotate(-35deg) saturate(1.4)';}else if(theme==='summer'){e.className='season-cosmic-mote';e.style.left=((i*47+4)%100)+'%';e.style.top=((i*61+8)%100)+'%';e.style.setProperty('--dur',(10+i%8)+'s');e.style.setProperty('--delay',(-i*.7)+'s');e.style.setProperty('--dx',((i%2?1:-1)*(18+i%5*7))+'px');e.style.setProperty('--dy',(-16-i%6*7)+'px');}else if(theme==='winter'){e.className='season-snow';e.textContent=['✦','❄','·'][i%3];e.style.left=((i*37)%100)+'%';e.style.fontSize=(8+i%5*3)+'px';e.style.animationDuration=(10+i%6*1.8)+'s';e.style.animationDelay=(-i*.8)+'s';}else{e.className=i%6===0?'season-shooting-star':'season-cosmic-mote';e.style.left=((i*41)%100)+'%';e.style.top=((i*67)%100)+'%';e.style.setProperty('--dur',(8+i%7)+'s');e.style.setProperty('--delay',(-i*.65)+'s');e.style.setProperty('--dx',((i%2?1:-1)*(25+i%5*12))+'px');e.style.setProperty('--dy',(-20-i%6*8)+'px');}layer.appendChild(e);}};
 window.applyScheduledTheme=function(){applyUserMotionPreference();var preview=sessionStorage.getItem('cvp_theme_preview')||'',theme=effectiveHomeTheme();document.body.classList.remove('theme-spring','theme-summer','theme-autumn','theme-halloween','theme-winter','theme-anniversary');if(theme)document.body.classList.add('theme-'+theme);buildSeasonalEffects(theme);var badge=document.getElementById('seasonal-preview-badge');if(badge){if(preview){badge.textContent='Previewing '+publicThemeName(preview)+' theme';badge.classList.remove('hidden');}else badge.classList.add('hidden');}};
 function v11PrestigeUnlocked(){return currentProfile&&journeyLevel(currentProfile)>=50;}
 function v11PrestigeChoice(){return sessionStorage.getItem('cvp_prestige_preview')||(currentProfile&&currentProfile.journeyPrestigeTheme)||((currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass)||'');}
@@ -9383,6 +9442,76 @@ window.closeDashboardSettingsWithoutSaving=function(){
 var _dashBg=document.getElementById('m-dashboard-settings');
 if(_dashBg&&!_dashBg.dataset.v11CloseBound){_dashBg.dataset.v11CloseBound='1';_dashBg.addEventListener('click',function(e){if(e.target===_dashBg){sessionStorage.removeItem('cvp_theme_preview');sessionStorage.removeItem('cvp_prestige_preview');applyScheduledTheme();applyPersonalCosmicTheme();}});}
 window.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('m-task-reassign-confirm').classList.contains('open'))cancelTaskDropConfirm();}});
+})();
+</script>
+
+
+<style id="v11-2-3-summer-comets-style">
+#summer-comet-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease}
+body.theme-summer:not(.motion-off) #summer-comet-canvas{opacity:1}
+body.motion-reduced #summer-comet-canvas{opacity:.62}
+</style>
+<script>
+(function(){
+  if(document.getElementById('summer-comet-canvas')) return;
+  const canvas=document.createElement('canvas');
+  canvas.id='summer-comet-canvas';
+  document.body.appendChild(canvas);
+  const ctx=canvas.getContext('2d');
+  let W=0,H=0,last=performance.now(),comets=[];
+  const colours=['#ffe477','#ff9a72','#59d8ff','#ffd36a'];
+  function resize(){const d=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*d;canvas.height=H*d;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(d,0,0,d,0,0)}
+  addEventListener('resize',resize);resize();
+  function edgeSpawn(){
+    const side=Math.floor(Math.random()*4),m=70;
+    if(side===0)return{x:Math.random()*W,y:-m,a:Math.PI/2+(Math.random()-.5)*1.2};
+    if(side===1)return{x:W+m,y:Math.random()*H,a:Math.PI+(Math.random()-.5)*1.2};
+    if(side===2)return{x:Math.random()*W,y:H+m,a:-Math.PI/2+(Math.random()-.5)*1.2};
+    return{x:-m,y:Math.random()*H,a:(Math.random()-.5)*1.2};
+  }
+  function makeComet(delay){
+    const p=edgeSpawn();
+    return {x:p.x,y:p.y,a:p.a,speed:35+Math.random()*45,target:45+Math.random()*80,curve:(Math.random()-.5)*1.05,curveTarget:(Math.random()-.5)*1.05,life:0,max:8+Math.random()*8,fade:0,escape:false,delay:delay||Math.random()*6,trail:[],c0:colours[Math.floor(Math.random()*colours.length)],c1:colours[Math.floor(Math.random()*colours.length)],size:1.6+Math.random()*2.2,nextShift:1+Math.random()*2};
+  }
+  function desiredCount(){if(!document.body.classList.contains('theme-summer')||document.body.classList.contains('motion-off'))return 0;return document.body.classList.contains('motion-reduced')?2:5}
+  function rgba(hex,a){const n=parseInt(hex.slice(1),16);return`rgba(${n>>16},${(n>>8)&255},${n&255},${a})`}
+  function drawTrail(c,alpha){
+    const pts=c.trail;if(pts.length<2)return;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    for(let i=1;i<pts.length;i++){
+      const t=i/(pts.length-1),p0=pts[i-1],p1=pts[i];
+      ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);
+      ctx.strokeStyle=rgba(i%2?c.c0:c.c1,alpha*t*.48);
+      ctx.lineWidth=.5+c.size*t*1.45;ctx.shadowColor=rgba(c.c0,alpha*t*.55);ctx.shadowBlur=7;ctx.stroke();
+    }
+    ctx.shadowBlur=0;
+  }
+  function drawHead(c,alpha){
+    const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,c.size*5);
+    g.addColorStop(0,rgba('#ffffff',alpha));g.addColorStop(.18,rgba(c.c0,alpha*.95));g.addColorStop(.55,rgba(c.c1,alpha*.32));g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,c.y,c.size*5,0,Math.PI*2);ctx.fill();
+  }
+  function update(c,dt){
+    if(c.delay>0){c.delay-=dt;return true}
+    c.life+=dt;c.nextShift-=dt;
+    if(c.nextShift<=0&&!c.escape){c.curveTarget=(Math.random()-.5)*1.3;c.target=28+Math.random()*105;c.nextShift=.7+Math.random()*2.3}
+    c.curve+=(c.curveTarget-c.curve)*Math.min(1,dt*.9);
+    c.speed+=(c.target-c.speed)*Math.min(1,dt*(.45+Math.random()*.35));
+    if(!c.escape){c.a+=c.curve*dt*.48;if(c.life>c.max*.76){c.escape=true;c.target=340+Math.random()*180;c.curveTarget=0}}
+    else{c.curve*=Math.max(0,1-dt*4);c.speed+=(c.target-c.speed)*Math.min(1,dt*2.8);c.fade+=dt/(c.max*.24)}
+    c.x+=Math.cos(c.a)*c.speed*dt;c.y+=Math.sin(c.a)*c.speed*dt;
+    c.trail.push({x:c.x,y:c.y});const maxTrail=document.body.classList.contains('motion-reduced')?18:42;if(c.trail.length>maxTrail)c.trail.shift();
+    const out=c.x<-180||c.x>W+180||c.y<-180||c.y>H+180;
+    return c.fade<1.05&&!out;
+  }
+  function loop(now){
+    const dt=Math.min(.04,(now-last)/1000);last=now;ctx.clearRect(0,0,W,H);
+    const target=desiredCount();while(comets.length<target)comets.push(makeComet(comets.length*.8));if(comets.length>target)comets.length=target;
+    comets=comets.filter(c=>update(c,dt));
+    for(const c of comets){if(c.delay>0)continue;const alpha=Math.max(0,1-c.fade);drawTrail(c,alpha);drawHead(c,alpha)}
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 })();
 </script>
 
