@@ -1020,6 +1020,22 @@ textarea.inp { resize:vertical; }
 .temp-upload-warning{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.35);border-left:3px solid var(--amber);padding:12px 14px;border-radius:5px;font-size:12px;line-height:1.55}.temp-upload-check{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--white);cursor:pointer}.temp-upload-check input{margin-top:3px}
 @media(max-width:700px){.task-img-grid{grid-template-columns:1fr 1fr}.task-img-preview{height:110px}}@media(max-width:460px){.task-img-grid{grid-template-columns:1fr}}
 
+
+/* Milestones 2.0 — dynamic department tags */
+.ms2-inherit-row{display:flex;align-items:center;gap:8px;color:var(--grey);font-size:12px;margin-bottom:8px;cursor:pointer}
+.ms2-inherit-row input{accent-color:var(--crimson-hi)}
+.ms2-field-help{font-size:11px;color:var(--grey-2);line-height:1.4;margin-top:4px}
+#del-depts:disabled{opacity:.48;cursor:not-allowed}
+.ms2-dept-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.ms2-dept-pill{font-size:9px;letter-spacing:.7px;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;border-radius:3px;background:rgba(255,255,255,.025)}
+.ms2-check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:176px;overflow:auto;padding:8px;background:rgba(8,10,18,.72);border:1px solid var(--border);border-radius:5px}
+.ms2-check-option{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid transparent;border-radius:4px;color:var(--grey);font-size:12px;cursor:pointer;min-width:0}
+.ms2-check-option:hover{border-color:var(--border-2);color:var(--white);background:rgba(255,255,255,.025)}
+.ms2-check-option input{accent-color:var(--crimson-hi);flex-shrink:0}
+.ms2-check-option span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms2-check-grid.disabled{opacity:.48;pointer-events:none}
+@media(max-width:650px){.ms2-check-grid{grid-template-columns:1fr}}
+
 /* ── MISC UTIL ───────────────────────────── */
 .flex { display:flex; }
 .flex-col { flex-direction:column; }
@@ -1580,6 +1596,24 @@ body { font-size:15px; }
 
 
 
+/* ── MILESTONE RETIREMENT & DELETION REVIEW ─────────── */
+.ms-retire-choice{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ms-retire-option{border:1px solid var(--border);border-radius:7px;padding:12px;background:rgba(8,10,18,.65);cursor:pointer;transition:.15s}
+.ms-retire-option:hover{border-color:var(--border-2);background:rgba(255,255,255,.025)}
+.ms-retire-option.selected{border-color:var(--gold);background:var(--gold-trace);box-shadow:0 0 0 1px rgba(201,168,76,.15)}
+.ms-retire-option input{accent-color:var(--gold);margin-right:7px}
+.ms-retire-option strong{display:block;font-size:13px;color:var(--white);margin-bottom:4px}
+.ms-retire-option span{font-size:11px;color:var(--grey);line-height:1.35}
+.ms-move-row{display:grid;grid-template-columns:minmax(140px,1fr) minmax(180px,1fr);gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(30,33,56,.55)}
+.ms-move-row:last-child{border-bottom:none}.ms-move-name{font-size:13px;font-weight:650;color:var(--white)}
+.ms-move-meta{font-size:10px;color:var(--grey-2);margin-top:2px}.ms-new-dest{margin-top:6px}
+.ms-delete-card{padding:14px 16px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.ms-delete-card:last-child{border-bottom:none}.ms-delete-title{font-size:15px;font-weight:700;color:var(--white)}
+.ms-delete-meta{font-size:11px;color:var(--grey);margin-top:4px;line-height:1.5}
+.ms-delete-badge{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--crimson-hi);border:1px solid rgba(200,16,46,.35);background:rgba(200,16,46,.08);padding:3px 7px;border-radius:3px}
+.ms-danger-box{border:1px solid rgba(200,16,46,.35);background:rgba(200,16,46,.07);border-radius:6px;padding:11px 13px;font-size:12px;color:var(--grey);line-height:1.5}
+@media(max-width:760px){.ms-retire-choice{grid-template-columns:1fr}.ms-move-row,.ms-delete-card{grid-template-columns:1fr}}
+
 /* ── ADMIN STORAGE MANAGEMENT ───────────────────────── */
 .storage-tabs { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
 .storage-tab {
@@ -1708,6 +1742,93 @@ body { font-size:15px; }
   .task2-tabs { padding:0 8px; }
   .task2-tab { padding-left:8px; padding-right:8px; font-size:11px; }
 }
+
+
+/* ═══════════════════════════════════════════════
+   MILESTONES 2.0 — PROJECT DELIVERY SYSTEM
+═══════════════════════════════════════════════ */
+.ms2-project-card{background:linear-gradient(135deg,rgba(17,19,32,.96),rgba(8,10,18,.92));border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.ms2-project-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ms2-project-title{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold)}
+.ms2-project-pct{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700}
+.ms2-bar{height:8px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:12px}
+.ms2-bar-fill{height:100%;background:linear-gradient(90deg,var(--crimson),var(--gold));border-radius:5px;transition:width .45s ease}
+.ms2-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--grey)}
+.ms2-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.ms2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
+.ms2-card{background:rgba(17,19,32,.9);border:1px solid var(--border);border-radius:9px;overflow:hidden;position:relative;transition:border-color .2s,box-shadow .2s}
+.ms2-card:hover{border-color:var(--border-2)}
+.ms2-card.ready{border-color:rgba(46,204,138,.65);box-shadow:0 0 20px rgba(46,204,138,.1)}
+.ms2-card.ready::before,.ms2-card.ready::after{content:'';position:absolute;width:3px;height:3px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);pointer-events:none;animation:msSpark 4s linear infinite}
+.ms2-card.ready::before{top:0;left:12%;}.ms2-card.ready::after{bottom:0;right:16%;animation-delay:-2s}
+@keyframes msSpark{0%{opacity:0;transform:translateX(0) scale(.5)}15%{opacity:1}50%{transform:translateX(80px) scale(1)}85%{opacity:1}100%{opacity:0;transform:translateX(170px) scale(.4)}}
+@media (prefers-reduced-motion:reduce){.ms2-card.ready::before,.ms2-card.ready::after{animation:none;opacity:.8}.ms2-bar-fill{transition:none}}
+.ms2-head{padding:15px 16px 12px;border-bottom:1px solid var(--border);background:rgba(8,10,18,.48)}
+.ms2-title-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ms2-title{font-size:17px;font-weight:700;line-height:1.2}
+.ms2-status{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;border:1px solid var(--border-2);padding:3px 7px;border-radius:3px;color:var(--grey);white-space:nowrap}
+.ms2-status.completed{color:var(--green);border-color:rgba(46,204,138,.4)}
+.ms2-status.active{color:var(--gold);border-color:var(--gold-dim)}
+.ms2-status.paused{color:var(--amber);border-color:rgba(232,160,32,.4)}
+.ms2-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px;font-size:11px;color:var(--grey)}
+.ms2-desc{font-size:13px;color:var(--grey);line-height:1.5;margin-top:8px}
+.ms2-progress-row{display:flex;align-items:center;gap:10px;margin-top:10px}.ms2-progress-row .ms2-bar{flex:1;margin:0;height:6px}.ms2-progress-num{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--gold);min-width:40px;text-align:right}
+.ms2-body{padding:12px 14px 14px}
+.ms2-deliverables{display:flex;flex-direction:column;gap:7px}
+.ms2-deliv{border:1px solid var(--border);border-radius:6px;background:rgba(8,10,18,.56);overflow:hidden}
+.ms2-deliv.sub{margin-left:24px;border-left:2px solid var(--gold-dim)}
+.ms2-deliv-row{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px 10px}
+.ms2-check{width:20px;height:20px;border:1px solid var(--border-2);border-radius:4px;background:transparent;color:var(--green);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}.ms2-check.done{border-color:var(--green);background:rgba(46,204,138,.12)}
+.ms2-deliv-name{font-size:13px;font-weight:650}.ms2-deliv-note{font-size:11px;color:var(--grey);margin-top:2px;line-height:1.35}.ms2-deliv-blocked{color:var(--crimson-hi);font-size:10px;margin-top:3px}
+.ms2-task-links{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.ms2-task-chip{font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:3px;color:var(--grey);cursor:pointer}.ms2-task-chip.done{color:var(--green);border-color:rgba(46,204,138,.3)}
+.ms2-deliv-actions{display:flex;gap:3px;align-items:center}.ms2-mini{background:none;border:1px solid transparent;color:var(--grey);border-radius:3px;cursor:pointer;padding:2px 5px;font-size:11px}.ms2-mini:hover{border-color:var(--border);color:var(--white)}
+.ms2-deliv-row>div:nth-child(3){min-width:0}.ms2-deliv-actions{justify-self:end;flex-wrap:wrap}
+.ms2-collapse-btn{width:21px;height:21px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--grey);cursor:pointer;font-size:11px;transition:all .15s;flex-shrink:0}.ms2-collapse-btn:hover{color:var(--white);border-color:var(--border-2);background:rgba(255,255,255,.03)}.ms2-collapse-btn.empty{visibility:hidden;pointer-events:none}
+.ms2-deliv-children{display:flex;flex-direction:column;gap:7px;padding:0 0 7px 0}.ms2-deliv-children.collapsed{display:none}.ms2-collapsed-summary{display:none;font-size:10px;color:var(--grey);padding:0 10px 8px 40px}.ms2-deliv.is-collapsed>.ms2-collapsed-summary{display:block}
+.ms2-milestone-tools{display:flex;gap:5px;flex-wrap:wrap;margin:0 0 9px;justify-content:flex-end}
+.ms2-completed-section{margin-top:22px;border:1px solid var(--border);border-radius:9px;background:rgba(8,10,18,.45);overflow:hidden}.ms2-completed-toggle{width:100%;border:0;background:rgba(17,19,32,.78);color:var(--grey);padding:12px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.ms2-completed-toggle:hover{color:var(--green);background:rgba(17,19,32,.95)}.ms2-completed-chevron{display:inline-block;margin-right:7px;transition:transform .18s}.ms2-completed-toggle.open .ms2-completed-chevron{transform:rotate(90deg)}.ms2-completed-count{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--green);background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.25);padding:2px 8px;border-radius:9px}.ms2-completed-body{display:none;padding:14px}.ms2-completed-body.open{display:block}.ms2-completed-section.is-empty{display:none}.ms2-card.completed-card{opacity:.88}.ms2-card.completed-card:hover{opacity:1}
+.ms2-card-foot{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid var(--border);padding:10px 14px;background:rgba(8,10,18,.38);flex-wrap:wrap}
+.ms2-ready-label{font-size:11px;color:var(--green);font-weight:700;letter-spacing:.7px}
+.ms2-activity{display:none;border-top:1px solid var(--border);padding:10px 14px;background:rgba(4,5,8,.35);max-height:220px;overflow:auto}.ms2-activity.open{display:block}.ms2-activity-item{font-size:11px;color:var(--grey);padding:6px 0;border-bottom:1px solid rgba(30,33,56,.45)}.ms2-activity-item:last-child{border-bottom:none}
+.ms2-empty{padding:22px;text-align:center;color:var(--grey-2);font-size:12px}
+.ms2-task-picker{max-height:330px;overflow:auto;border:1px solid var(--border);border-radius:6px;padding:7px}.ms2-task-option{display:flex;gap:9px;align-items:flex-start;padding:8px;border-bottom:1px solid rgba(30,33,56,.45)}.ms2-task-option:last-child{border-bottom:none}.ms2-task-option:hover{background:rgba(255,255,255,.025)}
+.ms2-hierarchy-note{font-size:11px;color:var(--grey);background:rgba(201,168,76,.06);border:1px solid var(--gold-dim);border-radius:5px;padding:9px 11px}
+.task-contrib-select{min-height:96px}
+@media(max-width:850px){.ms2-grid{grid-template-columns:1fr}.ms2-card{min-width:0}.ms2-deliv.sub{margin-left:12px}}
+
+/* Milestones v9.5 — fixed summary cards + focused detail overlay */
+.ms2-grid{grid-template-columns:repeat(auto-fill,minmax(285px,1fr));align-items:start}
+.ms2-card.ms2-summary-card{height:238px;display:flex;flex-direction:column;cursor:pointer;overflow:hidden}
+.ms2-card.ms2-summary-card:hover{transform:translateY(-2px);border-color:rgba(46,204,138,.45);box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.ms2-summary-card .ms2-head{padding:14px 15px 10px;flex:1;overflow:hidden}
+.ms2-summary-card .ms2-title{font-size:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ms2-summary-card .ms2-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:7px}
+.ms2-summary-card .ms2-dept-tags{max-height:25px;overflow:hidden}
+.ms2-summary-card .ms2-progress-row{margin-top:11px}
+.ms2-summary-card .ms2-bar{height:7px;background:rgba(46,204,138,.12);border:1px solid rgba(46,204,138,.16)}
+.ms2-summary-card .ms2-bar-fill{background:linear-gradient(90deg,#17895a,var(--green),#79e6b8)}
+.ms2-summary-card .ms2-card-foot{padding:9px 14px;min-height:43px}
+.ms2-card-open-hint{font-size:10px;color:var(--grey-2);letter-spacing:.7px;text-transform:uppercase}
+.ms2-card-count{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey)}
+.ms2-detail-bg{position:fixed;inset:0;z-index:1150;background:rgba(2,3,7,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px}
+.ms2-detail-bg.open{display:flex}
+.ms2-detail-shell{width:min(1180px,96vw);height:min(90vh,920px);background:var(--panel);border:1px solid var(--border-2);border-radius:12px;box-shadow:0 34px 100px rgba(0,0,0,.82),0 0 42px rgba(46,204,138,.08);display:flex;flex-direction:column;overflow:hidden}
+.ms2-detail-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(8,10,18,.94);flex-shrink:0}
+.ms2-detail-topbar-title{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase}
+.ms2-detail-close{width:34px;height:34px;border:1px solid var(--border);border-radius:5px;background:transparent;color:var(--grey);font-size:18px;cursor:pointer}
+.ms2-detail-close:hover{color:var(--crimson-hi);border-color:rgba(200,16,46,.45);background:rgba(200,16,46,.08)}
+.ms2-detail-content{flex:1;overflow:auto;padding:18px}
+.ms2-detail-card{max-width:1080px;margin:0 auto;background:rgba(17,19,32,.88)}
+.ms2-detail-card .ms2-head{padding:18px 20px 15px}
+.ms2-detail-card .ms2-title{font-size:21px}
+.ms2-detail-card .ms2-body{padding:16px 18px 20px}
+.ms2-detail-card .ms2-bar-fill{background:linear-gradient(90deg,#17895a,var(--green),#79e6b8)}
+.ms2-detail-card .ms2-bar{background:rgba(46,204,138,.12)}
+body.ms2-detail-open{overflow:hidden}
+/* Existing edit/link modals must sit above the milestone detail overlay. */
+.modal-bg{z-index:1250}
+@media(max-width:700px){.ms2-grid{grid-template-columns:1fr}.ms2-card.ms2-summary-card{height:225px}.ms2-detail-bg{padding:0}.ms2-detail-shell{width:100vw;height:100vh;max-height:none;border-radius:0}.ms2-detail-content{padding:10px}.ms2-detail-card .ms2-title{font-size:18px}}
+
 
 </style>
 </head>
@@ -1970,24 +2091,29 @@ body { font-size:15px; }
       <div class="my-tasks-board" id="my-tasks-board"></div>
     </div>
 
-    <!-- ── MILESTONES ── -->
+    <!-- ── MILESTONES 2.0 ── -->
     <div class="view" id="view-milestones">
       <div class="page-hdr">
-        <div class="page-hdr-left"><div class="ph-title">PROJECT MILESTONES</div><div class="ph-sub">Roadmap · project goals</div></div>
+        <div class="page-hdr-left"><div class="ph-title">PROJECT MILESTONES</div><div class="ph-sub">Objectives · deliverables · project completion</div></div>
         <div class="ph-actions" id="milestone-actions"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;">
-        <div class="panel">
-          <div class="panel-hdr"><span class="panel-title">Timeline</span></div>
-          <div class="milestone-timeline" id="milestone-list"></div>
-        </div>
-        <div>
-          <div class="panel">
-            <div class="panel-hdr"><span class="panel-title">Department Progress</span></div>
-            <div class="dept-overview-grid" id="dept-overview"></div>
-          </div>
-        </div>
+      <div class="ms2-project-card" id="ms2-project-summary"></div>
+      <div class="ms2-toolbar">
+        <input class="inp" id="ms2-search" style="max-width:230px" placeholder="Search milestones..." oninput="renderMilestones()">
+        <select class="inp" id="ms2-status-filter" style="max-width:170px" onchange="renderMilestones()"><option value="all">All statuses</option><option value="active">In progress</option><option value="planned">Planned</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="ready">Ready to complete</option></select>
+        <select class="inp" id="ms2-dept-filter" style="max-width:190px" onchange="renderMilestones()"><option value="all">All departments</option></select>
+        <label style="font-size:12px;color:var(--grey);display:flex;gap:6px;align-items:center"><input type="checkbox" id="ms2-show-archived" onchange="renderMilestones()"> Show archived</label>
       </div>
+      <div class="ms2-grid" id="milestone-list"></div>
+      <section class="ms2-completed-section" id="ms2-completed-section">
+        <button class="ms2-completed-toggle" id="ms2-completed-toggle" onclick="toggleCompletedMilestones()" aria-expanded="false">
+          <span><span class="ms2-completed-chevron">▸</span> Completed Milestones</span>
+          <span class="ms2-completed-count" id="ms2-completed-count">0</span>
+        </button>
+        <div class="ms2-completed-body" id="ms2-completed-body">
+          <div class="ms2-grid" id="milestone-completed-list"></div>
+        </div>
+      </section>
     </div>
 
     <!-- ── CREW ── -->
@@ -2337,6 +2463,13 @@ body { font-size:15px; }
           </div>
           <div id="admin-depts-list" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="panel-hdr" style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Pending Milestone Deletions</span>
+            <span class="ms-delete-badge" id="admin-ms-delete-count">0 pending</span>
+          </div>
+          <div id="admin-ms-delete-list"><div class="no-data">No milestones are awaiting deletion review.</div></div>
+        </div>
       </div>
     </div>
 
@@ -2469,6 +2602,7 @@ body { font-size:15px; }
         <select class="inp" id="t-dept"></select>
       </div>
       <div class="field"><span class="field-label">Assign To (optional)</span><select class="inp" id="t-assign"><option value="">Unassigned</option></select></div>
+      <div class="field"><span class="field-label">Contributors (optional)</span><select class="inp task-contrib-select" id="t-contributors" multiple></select><span style="font-size:11px;color:var(--grey)">The owner remains responsible for review submission. Contributors can post progress and receive task updates.</span></div>
       <input type="hidden" id="t-edit-id">
     </div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-task')">Cancel</button><button class="btn btn-primary" onclick="submitTask()">Create Task</button></div>
@@ -2741,25 +2875,100 @@ body { font-size:15px; }
 </div>
 
 <!-- Milestone Modal -->
-<div class="modal-bg" id="m-milestone">
-  <div class="modal">
-    <div class="modal-hdr"><span class="modal-title">&#9658; NEW MILESTONE</span><button class="modal-x" onclick="closeModal('m-milestone')">&#x2715;</button></div>
+
+<div class="ms2-detail-bg" id="ms2-detail-bg" onclick="if(event.target===this)closeMilestoneDetail()">
+  <div class="ms2-detail-shell" role="dialog" aria-modal="true" aria-labelledby="ms2-detail-heading">
+    <div class="ms2-detail-topbar"><span class="ms2-detail-topbar-title" id="ms2-detail-heading">Milestone Details</span><button class="ms2-detail-close" onclick="closeMilestoneDetail()" aria-label="Close milestone">&#10005;</button></div>
+    <div class="ms2-detail-content" id="ms2-detail-content"></div>
+  </div>
+</div>
+<!-- MILESTONE RETIREMENT -->
+<div class="modal-bg" id="m-retire-milestone">
+  <div class="modal" style="width:720px;">
+    <div class="modal-hdr"><div class="modal-title">RETIRE MILESTONE</div><button class="modal-x" onclick="closeModal('m-retire-milestone')">×</button></div>
     <div class="modal-body">
-      <div class="field"><span class="field-label">Milestone Title</span><input class="inp" id="ms-title" placeholder="e.g. Alpha Build Complete"></div>
+      <input type="hidden" id="retire-ms-id">
+      <div id="retire-ms-summary" class="ms-danger-box"></div>
+      <div class="field"><span class="field-label">Reason</span><select class="inp" id="retire-reason"><option value="mistake">Created by mistake</option><option value="duplicate">Duplicate milestone</option><option value="scope">Scope changed</option><option value="split">Splitting or reorganising work</option><option value="other">Other</option></select></div>
+      <div class="ms-retire-choice" id="retire-options">
+        <label class="ms-retire-option selected"><input type="radio" name="retire-action" value="archive" checked onchange="updateRetireAction()"><strong>Archive</strong><span>Hide it from the active roadmap while preserving everything for restoration.</span></label>
+        <label class="ms-retire-option"><input type="radio" name="retire-action" value="relocate" onchange="updateRetireAction()"><strong>Move work</strong><span>Move deliverables to other milestones, then retire this container.</span></label>
+        <label class="ms-retire-option"><input type="radio" name="retire-action" value="delete" onchange="updateRetireAction()"><strong id="retire-delete-title">Request deletion</strong><span id="retire-delete-desc">Remove it from the roadmap and send it to Admin for review.</span></label>
+      </div>
+      <div id="retire-move-wrap" class="hidden"><div class="field-label" style="margin-bottom:6px;">Choose a destination for each deliverable</div><div id="retire-move-list"></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-retire-milestone')">Cancel</button><button class="btn btn-danger" id="retire-submit-btn" onclick="submitMilestoneRetirement()">Archive Milestone</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-review-ms-delete">
+  <div class="modal" style="width:760px;">
+    <div class="modal-hdr"><div class="modal-title">REVIEW MILESTONE DELETION</div><button class="modal-x" onclick="closeModal('m-review-ms-delete')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="review-delete-ms-id">
+      <div id="review-delete-summary" class="ms-danger-box"></div>
+      <div class="field"><span class="field-label">What should happen to its deliverables?</span><select class="inp" id="review-delete-mode" onchange="renderDeletionMoveOptions()"><option value="delete">Delete deliverables and unlink tasks</option><option value="move">Move deliverables before deleting</option></select></div>
+      <div id="review-delete-move-wrap" class="hidden"><div id="review-delete-move-list"></div></div>
+      <div class="field"><span class="field-label">Type the milestone name to confirm permanent deletion</span><input class="inp" id="review-delete-confirm" autocomplete="off"></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="restoreDeletionRequestedMilestone()">Restore to Roadmap</button><button class="btn btn-danger" onclick="confirmPermanentMilestoneDeletion()">Delete Forever</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-milestone">
+  <div class="modal" style="width:640px">
+    <div class="modal-hdr"><span class="modal-title" id="ms-modal-title">&#9658; NEW MILESTONE</span><button class="modal-x" onclick="closeModal('m-milestone')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="field"><span class="field-label">Milestone Title</span><input class="inp" id="ms-title" placeholder="e.g. Armour Concepts Complete"></div>
+      <div class="field"><span class="field-label">Objective</span><textarea class="inp" id="ms-desc" rows="3" placeholder="What meaningful project outcome must be achieved?"></textarea></div>
       <div class="grid-2">
         <div class="field"><span class="field-label">Target Date</span><input class="inp" id="ms-date" type="date"></div>
-        <div class="field"><span class="field-label">Status</span>
-          <select class="inp" id="ms-status">
-            <option value="upcoming">Upcoming</option>
-            <option value="active">In Progress</option>
-            <option value="done">Completed</option>
-          </select>
-        </div>
+        <div class="field"><span class="field-label">Status</span><select class="inp" id="ms-status"><option value="planned">Planned</option><option value="active">In Progress</option><option value="paused">Paused</option><option value="completed">Completed</option></select></div>
       </div>
-      <div class="field"><span class="field-label">Description</span><textarea class="inp" id="ms-desc" rows="3" placeholder="What needs to be achieved..."></textarea></div>
+      <div class="grid-2">
+        <div class="field"><span class="field-label">Departments</span><div class="ms2-check-grid" id="ms-depts"></div><span class="ms2-field-help">Select every department involved in this milestone.</span></div>
+        <div class="field"><span class="field-label">Depends On (optional)</span><select class="inp" id="ms-dependencies" multiple style="min-height:116px"></select></div>
+      </div>
+      <div class="field"><span class="field-label">Important Notes / Blockers</span><textarea class="inp" id="ms-notes" rows="2" placeholder="Optional context, dependencies or constraints..."></textarea></div>
+      <div class="ms2-hierarchy-note">Progress is calculated automatically from top-level deliverables. Completing tasks makes a deliverable ready for review, but deliverables and milestones are always confirmed manually.</div>
       <input type="hidden" id="ms-edit-id">
     </div>
-    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-milestone')">Cancel</button><button class="btn btn-gold" onclick="submitMilestone()">Save Milestone</button></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-milestone')">Cancel</button><button class="btn btn-gold" id="ms-save-btn" onclick="submitMilestone()">Save Milestone</button></div>
+  </div>
+</div>
+
+<!-- Deliverable Modal -->
+<div class="modal-bg" id="m-deliverable">
+  <div class="modal" style="width:620px">
+    <div class="modal-hdr"><span class="modal-title" id="del-modal-title">&#9658; ADD DELIVERABLE</span><button class="modal-x" onclick="closeModal('m-deliverable')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="field"><span class="field-label">Deliverable</span><input class="inp" id="del-name" placeholder="e.g. Heavy Armour concept signed off"></div>
+      <div class="field"><span class="field-label">Description / Acceptance Condition</span><textarea class="inp" id="del-desc" rows="3" placeholder="What must be true before this can be ticked complete?"></textarea></div>
+      <div class="field"><span class="field-label">Parent Deliverable</span><select class="inp" id="del-parent" onchange="refreshDeliverableDepartmentHint()"><option value="">Top-level deliverable</option></select></div>
+      <div class="field">
+        <label class="ms2-inherit-row"><input type="checkbox" id="del-inherit-depts" checked onchange="toggleDeliverableDepartmentSelect()"><span id="del-inherit-label">Use milestone departments</span></label>
+        <span class="field-label">Departments</span>
+        <div class="ms2-check-grid" id="del-depts"></div>
+        <span class="ms2-field-help" id="del-dept-help">Inherited department tags keep setup quick. Untick to choose one or more independent departments.</span>
+      </div>
+      <div class="field"><span class="field-label">Blocked / Waiting Note (optional)</span><input class="inp" id="del-blocker" placeholder="e.g. Waiting for narrative approval"></div>
+      <input type="hidden" id="del-milestone-id"><input type="hidden" id="del-edit-id">
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-deliverable')">Cancel</button><button class="btn btn-gold" id="del-save-btn" onclick="submitDeliverable()">Save Deliverable</button></div>
+  </div>
+</div>
+
+<!-- Link Tasks Modal -->
+<div class="modal-bg" id="m-link-tasks">
+  <div class="modal" style="width:700px">
+    <div class="modal-hdr"><span class="modal-title">&#9658; LINK TASKS</span><button class="modal-x" onclick="closeModal('m-link-tasks')">&#x2715;</button></div>
+    <div class="modal-body">
+      <div class="field"><span class="field-label">Find Existing Task</span><input class="inp" id="ms2-task-search" placeholder="Search task name, department or assignee..." oninput="renderMilestoneTaskPicker()"></div>
+      <div id="ms2-task-picker" class="ms2-task-picker"></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="text-small text-grey">Linking never moves, duplicates or changes the original task.</span><button class="btn btn-primary btn-sm" onclick="createNewTaskForDeliverable()">+ Create New Linked Task</button></div>
+      <input type="hidden" id="link-deliverable-id"><input type="hidden" id="link-milestone-id">
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('m-link-tasks')">Cancel</button><button class="btn btn-gold" onclick="saveMilestoneTaskLinks()">Save Links</button></div>
   </div>
 </div>
 
@@ -3007,7 +3216,7 @@ STATUS_CLASS.away='s-working'; STATUS_LABEL.away='Away';
 // ─── STATE ────────────────────────────────────────────────
 let db, auth, storage, currentUser, currentProfile;
 let listeners = [];
-let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[], storageUploads:[], storageSettings:{} };
+let liveData = { members:{}, tasks:{}, meetings:[], transcripts:[], archiveMeetings:[], config:{}, milestones:[], milestoneDeliverables:[], milestoneActivity:[], weeklyAvail:{}, overrideAvail:{}, customDepts:[], notifications:[], storageUploads:[], storageSettings:{} };
 let crewSearch = '';
 let dragTask = null;
 
@@ -3346,6 +3555,21 @@ function startListeners() {
     });
   });
 
+  // Milestones 2.0
+  var uMilestones = db.collection('milestones').onSnapshot(function(snap) {
+    liveData.milestones = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
+    if(document.getElementById('view-admin') && document.getElementById('view-admin').classList.contains('active')) renderPendingMilestoneDeletions();
+  },function(err){console.warn('Milestone listener',err);});
+  var uMilestoneDeliverables = db.collection('milestone_deliverables').onSnapshot(function(snap) {
+    liveData.milestoneDeliverables = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
+  },function(err){console.warn('Deliverable listener',err);});
+  var uMilestoneActivity = db.collection('milestone_activity').onSnapshot(function(snap) {
+    liveData.milestoneActivity = snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    if(document.getElementById('view-milestones') && document.getElementById('view-milestones').classList.contains('active')) renderMilestones();
+  },function(err){console.warn('Milestone activity listener',err);});
+
   var storageListeners = [];
   if (isAdmin()) {
     var uStorageFiles = db.collection('task_uploads').onSnapshot(function(snap) {
@@ -3362,7 +3586,7 @@ function startListeners() {
     storageListeners.push(uStorageFiles, uStorageSettings);
   }
 
-  listeners = [u1,u2,u3,u4,u5,u6,u7,uNotif].concat(storageListeners);
+  listeners = [u1,u2,u3,u4,u5,u6,u7,uNotif,uMilestones,uMilestoneDeliverables,uMilestoneActivity].concat(storageListeners);
 }
 
 
@@ -3694,15 +3918,21 @@ function navTo(view) {
 }
 
 function _renderView(view) {
-  if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
-  if (view === 'profile')    renderProfile();
-  if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); }
-  if (view === 'storage')    { renderStorageManagement(); }
-  if (view === 'my-tasks')   renderMyTasks();
-  if (view === 'crew')       renderCrew();
-  if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
-  if (view === 'scheduler')  { renderMeetings(); renderTzTable(); renderAvailHeatmap(); checkAvailPrompt(); }
-  if (view === 'transcripts') { arcRenderAll(); }
+  try {
+    if (view.startsWith('dept-')) renderDeptBoard(view.replace('dept-',''));
+    if (view === 'profile')    renderProfile();
+    if (view === 'admin')      { renderAdminRoster(); renderAdminDepts(); renderPendingMilestoneDeletions(); }
+    if (view === 'storage')    { renderStorageManagement(); }
+    if (view === 'my-tasks')   renderMyTasks();
+    if (view === 'crew')       renderCrew();
+    if (view === 'milestones') { renderMilestones(); renderDeptOverview(); }
+    if (view === 'scheduler')  { renderMeetings(); renderTzTable(); renderAvailHeatmap(); checkAvailPrompt(); }
+    if (view === 'transcripts') { arcRenderAll(); }
+  } catch (err) {
+    console.error('View render failed:', view, err);
+    _navAnimating = false;
+    toast('Could not open this section. Please refresh and try again.','err');
+  }
 }
 
 // ─── STATUS ───────────────────────────────────────────────
@@ -3741,8 +3971,9 @@ function canSetState(state, task) {
   if (role === 'admin' || role === 'project_manager') return true;
   if ((role === 'lead' || role === 'director') && task && canManageDepartment(task.dept)) return true;
   var assignee = task ? task.assignee : null;
-  if (state === 'accepted'    && assignee === uid) return true;
-  if (state === 'in-progress' && assignee === uid) return true;
+  var isCollaborator = !!task && (assignee === uid || (task.contributors || []).includes(uid));
+  if (state === 'accepted'    && isCollaborator) return true;
+  if (state === 'in-progress' && isCollaborator) return true;
   if (state === 'review'      && assignee === uid) return true;
   return false;
 }
@@ -3753,6 +3984,8 @@ async function submitTask() {
   if (!name) { toast('Enter a task name','err'); return; }
   var editId   = document.getElementById('t-edit-id').value;
   var assignee = document.getElementById('t-assign').value;
+  var contributorsEl = document.getElementById('t-contributors');
+  var contributors = contributorsEl ? Array.from(contributorsEl.selectedOptions).map(function(o){return o.value;}).filter(function(x){return x && x !== assignee;}) : [];
   var allTasks = Object.values(liveData.tasks);
   var oldTask  = editId ? allTasks.find(function(t){ return t.id === editId; }) : null;
   var newState = assignee ? 'pending-accept' : 'unassigned';
@@ -3766,6 +3999,7 @@ async function submitTask() {
     dueDate:      document.getElementById('t-due').value,
     dept:         document.getElementById('t-dept').value,
     assignee:     assignee,
+    contributors: contributors,
     state:        newState,
     createdBy:    currentUser.uid,
     createdByName: currentProfile.name,
@@ -3780,6 +4014,7 @@ async function submitTask() {
     data.lastActivityAt = Date.now();
     var createdRef = await db.collection('tasks').add(data);
     await recordTaskActivity(createdRef.id,'task_created',currentProfile.name+' created the task.');
+    await linkNewTaskToPending(createdRef.id);
     toast('Task created!','ok');
   }
   closeModal('m-task');
@@ -3789,6 +4024,7 @@ async function submitTask() {
 function clearTaskForm() {
   ['t-name','t-desc','t-due'].forEach(id => document.getElementById(id).value='');
   document.getElementById('t-edit-id').value = '';
+  var c=document.getElementById('t-contributors'); if(c) Array.from(c.options).forEach(function(o){o.selected=false;});
 }
 
 async function setTaskState(taskId, newState) {
@@ -3829,6 +4065,7 @@ function openEditTask(taskId) {
   populateTaskDeptSelect(task.dept || '');
   if (deptEl)   deptEl.value   = task.dept || '';
   if (assignEl) { populateAssignSelect(task.dept); assignEl.value = task.assignee || ''; }
+  populateContributorSelect(task.dept, task.contributors || [], task.assignee || '');
   if (editEl)   editEl.value   = taskId;
   openModal('m-task');
 }
@@ -3848,6 +4085,7 @@ function openNewTask(dept) {
   populateTaskDeptSelect(dept || '');
   if (dept) document.getElementById('t-dept').value = dept;
   populateAssignSelect(dept);
+  populateContributorSelect(dept, [], '');
   openModal('m-task');
 }
 
@@ -4260,7 +4498,7 @@ function renderMyTasks() {
   });
   let html = '';
   cols.forEach(function(col) {
-    const tasks = myTasks.filter(function(t){ return t.state === col.id; });
+    const tasks = myTasks.filter(function(t){ return t.state === col.id; }).sort(taskUrgencySort);
     let colHtml = '<div class="my-task-col" ondragover="event.preventDefault()" ondrop="dropMyTask(event,\'' + col.id + '\')">';
     colHtml += '<div class="my-task-col-hdr">';
     colHtml += '<span style="font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:' + col.color + ';text-transform:uppercase;">' + col.icon + ' ' + col.label + '</span>';
@@ -4328,126 +4566,6 @@ async function dropMyTask(e, newState) {
   renderMyTasks(); // re-render immediately without waiting for snapshot
 }
 
-// ─── MILESTONES ───────────────────────────────────────────
-async function submitMilestone() {
-  const title  = document.getElementById('ms-title').value.trim();
-  const date   = document.getElementById('ms-date').value;
-  const status = document.getElementById('ms-status').value;
-  const desc   = document.getElementById('ms-desc').value.trim();
-  const editId = document.getElementById('ms-edit-id').value;
-  
-  if (!title) { toast('Milestone title required','err'); return; }
-  
-  const data = { title, date, status, desc, updatedBy: currentUser.uid, updatedAt: Date.now() };
-  
-  if (editId) {
-    await db.collection('milestones').doc(editId).update(data);
-    toast('Milestone updated','ok');
-  } else {
-    data.createdBy = currentUser.uid;
-    data.createdAt = Date.now();
-    await db.collection('milestones').add(data);
-    toast('Milestone created','ok');
-  }
-  closeModal('m-milestone');
-  clearMilestoneForm();
-}
-
-function clearMilestoneForm() {
-  ['ms-title','ms-date','ms-desc','ms-edit-id'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  const sel = document.getElementById('ms-status');
-  if (sel) sel.value = 'upcoming';
-}
-
-async function deleteMilestone(id) {
-  if (!confirm('Delete this milestone?')) return;
-  await db.collection('milestones').doc(id).delete();
-  toast('Milestone deleted','inf');
-}
-
-function openEditMilestone(id) {
-  const ms = liveData.milestones?.find(m => m.id === id);
-  if (!ms) return;
-  document.getElementById('ms-title').value  = ms.title||'';
-  document.getElementById('ms-date').value   = ms.date||'';
-  document.getElementById('ms-status').value = ms.status||'upcoming';
-  document.getElementById('ms-desc').value   = ms.desc||'';
-  document.getElementById('ms-edit-id').value = id;
-  openModal('m-milestone');
-}
-
-function renderMilestones() {
-  const el = document.getElementById('milestone-list');
-  const actEl = document.getElementById('milestone-actions');
-  if (!el) return;
-  
-  const canEdit = currentProfile?.role === 'admin' || currentProfile?.role === 'lead';
-  if (actEl) {
-    actEl.innerHTML = canEdit ? '<button class="btn btn-gold" onclick="openModal(\'m-milestone\');clearMilestoneForm()">+ Add Milestone</button>' : '';
-  }
-  
-  const milestones = (liveData.milestones || []).sort((a,b) => (a.date||'').localeCompare(b.date||''));
-  
-  if (milestones.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--grey-2);font-size:13px;">No milestones yet.' + (canEdit ? ' Add the first one!' : '') + '</div>';
-    return;
-  }
-  
-  const today = new Date().toISOString().split('T')[0];
-  
-  el.innerHTML = milestones.map(ms => {
-    const dotClass = ms.status === 'done' ? 'ms-done' : ms.status === 'active' ? 'ms-active' : ms.date && ms.date < today ? 'ms-overdue' : 'ms-upcoming';
-    const icon = ms.status === 'done' ? '✓' : ms.status === 'active' ? '▶' : ms.date && ms.date < today ? '!' : '◎';
-    const dateStr = ms.date ? new Date(ms.date+'T00:00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}) : 'No date set';
-    const titleColor = ms.status === 'done' ? 'var(--green)' : ms.status === 'active' ? 'var(--gold)' : dotClass === 'ms-overdue' ? 'var(--crimson-hi)' : 'var(--white)';
-    
-    return '<div class="milestone-item">' +
-      '<div class="milestone-dot ' + dotClass + '">' + icon + '</div>' +
-      '<div class="milestone-content">' +
-        '<div class="milestone-title" style="color:' + titleColor + ';">' + esc(ms.title||'') + '</div>' +
-        '<div class="milestone-date">' + dateStr + '</div>' +
-        (ms.desc ? '<div class="milestone-desc">' + esc(ms.desc) + '</div>' : '') +
-        (canEdit ? '<div style="margin-top:8px;display:flex;gap:6px;">' +
-          '<button class="btn btn-ghost btn-xs" onclick="openEditMilestone(\'' + ms.id + '\')">' + 'Edit</button>' +
-          '<button class="btn btn-danger btn-xs" onclick="deleteMilestone(\'' + ms.id + '\')">' + 'Delete</button>' +
-        '</div>' : '') +
-      '</div></div>';
-  }).join('');
-  
-  renderDeptOverview();
-}
-
-function renderDeptOverview() {
-  const el = document.getElementById('dept-overview');
-  if (!el) return;
-  
-  const depts = ['Programming','2D Art','3D Art','Marketing','Sound Design','Visual Effects','Narrative'];
-  const allTasks = Object.values(liveData.tasks);
-  
-  el.innerHTML = depts.map(dept => {
-    const dTasks = allTasks.filter(t => t.dept === dept);
-    const total = dTasks.length;
-    const done  = dTasks.filter(t => t.state === 'completed').length;
-    const inProg = dTasks.filter(t => t.state === 'in-progress').length;
-    const pct = total > 0 ? Math.round((done/total)*100) : 0;
-    const deptColor = DEPT_COLORS[dept] || 'var(--grey)';
-    
-    return '<div class="dept-ov-card">' +
-      '<div class="dept-ov-name" style="color:' + deptColor + ';">' + dept + '</div>' +
-      '<div class="dept-ov-bar"><div class="dept-ov-fill" style="width:' + pct + '%;background:' + deptColor + ';"></div></div>' +
-      '<div class="dept-ov-stats">' +
-        '<span>' + pct + '% done</span>' +
-        '<span>' + done + '/' + total + '</span>' +
-      '</div>' +
-      (inProg > 0 ? '<div style="font-size:10px;color:var(--amber);margin-top:4px;">' + inProg + ' in progress</div>' : '') +
-    '</div>';
-  }).join('');
-}
-
-// ─── NOTIFICATIONS ────────────────────────────────────────
 function updateNotifications() {
   const uid = currentUser?.uid;
   if (!uid) return;
@@ -4507,6 +4625,7 @@ function showMeetingInviteToast(m) {
   document.body.appendChild(el);
 }
 
+
 function renderDeptBoard(dept) {
   const container = document.querySelector(`.dept-board-container[data-dept="${dept}"]`);
   if (!container) return;
@@ -4527,8 +4646,8 @@ function renderDeptBoard(dept) {
   var rightCollapsed = container._rightCollapsed || false;
 
   // Unassigned tasks
-  var unassignedTasks = deptTasks.filter(t => !t.assignee);
-  var completedTasks  = deptTasks.filter(t => t.state === 'completed');
+  var unassignedTasks = deptTasks.filter(t => !t.assignee).sort(taskUrgencySort);
+  var completedTasks  = deptTasks.filter(t => t.state === 'completed').sort(taskUrgencySort);
 
   container.innerHTML = `
     <div class="page-hdr">
@@ -4564,7 +4683,7 @@ function renderDeptBoard(dept) {
       <div class="board-members" id="board-members-${dept}">
         ${deptMembers.length === 0 ? '<div class="no-data">No members in this department</div>' :
           deptMembers.map(m => {
-            const memberTasks = deptTasks.filter(t => t.assignee === m.uid && t.state !== 'completed');
+            const memberTasks = deptTasks.filter(t => t.assignee === m.uid && t.state !== 'completed').sort(taskUrgencySort);
             return `
             <div class="board-member-row">
               <div class="board-member-hdr">
@@ -4668,7 +4787,7 @@ function taskCardHTML(t) {
 
 // ─── DRAG & DROP ──────────────────────────────────────────
 function onDragStart(e, taskId) {
-  dragTask = taskId;
+  dragTask = taskId || (e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.id : null);
   e.dataTransfer.effectAllowed = 'move';
   e.currentTarget.classList.add('dragging');
 }
@@ -4712,6 +4831,196 @@ async function onDrop(e, dept, memberId) {
   } catch(e) {
     toast('Could not update task: ' + e.message, 'err');
   }
+}
+
+
+// ─── MILESTONES 2.0 ──────────────────────────────────────
+let pendingMilestoneTaskLink=null;
+
+function isAdminRole(){return normaliseRole(currentProfile&&currentProfile.role)==='admin';}
+function canRequestMilestoneDeletion(){var r=normaliseRole(currentProfile&&currentProfile.role);return r==='admin'||r==='project_manager'||r==='director';}
+function rootDeliverablesFor(msId){return childrenFor(msId,'');}
+function milestoneLinkedTaskCount(msId){var ids=new Set();deliverablesFor(msId).forEach(function(d){linkedTaskIds(d).forEach(function(id){ids.add(id);});});return ids.size;}
+function milestoneDeleteSummary(ms){var dels=deliverablesFor(ms.id),roots=rootDeliverablesFor(ms.id),tasks=milestoneLinkedTaskCount(ms.id);return '<strong style="color:var(--white)">'+esc(ms.title||'Untitled milestone')+'</strong><br>'+roots.length+' top-level deliverable'+(roots.length===1?'':'s')+' · '+dels.length+' total deliverable'+(dels.length===1?'':'s')+' · '+tasks+' linked task'+(tasks===1?'':'s')+'.<br><span style="color:var(--grey-2)">Linked tasks are never deleted by this workflow.</span>';}
+function retirementDestinationOptions(msId,prefix){var first=prefix==='review'?'Delete deliverable; keep tasks unlinked':'Keep with retired milestone';return '<option value="unlinked">'+first+'</option><option value="new">Create a new milestone</option>'+(liveData.milestones||[]).filter(function(m){return m.id!==msId&&!m.archived&&m.deletionStatus!=='pending';}).map(function(m){return '<option value="'+esc(m.id)+'">'+esc(m.title||'Untitled milestone')+'</option>';}).join('');}
+function renderMoveRows(msId,containerId,prefix){var el=document.getElementById(containerId);if(!el)return;var roots=rootDeliverablesFor(msId);if(!roots.length){el.innerHTML='<div class="no-data">This milestone has no deliverables to move.</div>';return;}el.innerHTML=roots.map(function(d){var kids=childrenFor(msId,d.id),tasks=linkedTaskIds(d).length+kids.reduce(function(n,c){return n+linkedTaskIds(c).length;},0);return '<div class="ms-move-row"><div><div class="ms-move-name">'+esc(d.name||'Untitled deliverable')+'</div><div class="ms-move-meta">'+kids.length+' sub-deliverable'+(kids.length===1?'':'s')+' · '+tasks+' linked task'+(tasks===1?'':'s')+'</div></div><div><select class="inp" id="'+prefix+'-dest-'+d.id+'" onchange="toggleNewDestinationInput(this)">'+retirementDestinationOptions(msId,prefix)+'</select><input class="inp ms-new-dest hidden" id="'+prefix+'-new-'+d.id+'" placeholder="New milestone name"></div></div>';}).join('');}
+function toggleNewDestinationInput(sel){if(!sel)return;var inp=sel.parentElement&&sel.parentElement.querySelector('.ms-new-dest');if(inp)inp.classList.toggle('hidden',sel.value!=='new');}
+function openRetireMilestone(id){if(!canRequestMilestoneDeletion())return;var ms=milestoneById(id);if(!ms)return;document.getElementById('retire-ms-id').value=id;document.getElementById('retire-ms-summary').innerHTML=milestoneDeleteSummary(ms);document.getElementById('retire-reason').value='mistake';document.querySelectorAll('input[name="retire-action"]').forEach(function(r){r.checked=r.value==='archive';});renderMoveRows(id,'retire-move-list','retire');var empty=deliverablesFor(id).length===0&&milestoneLinkedTaskCount(id)===0;document.getElementById('retire-delete-title').textContent=isAdminRole()&&empty?'Delete immediately':'Request deletion';document.getElementById('retire-delete-desc').textContent=isAdminRole()&&empty?'Permanently remove this empty milestone after confirmation.':'Hide it and send it to Admin for review before permanent deletion.';updateRetireAction();openModal('m-retire-milestone');}
+function updateRetireAction(){document.querySelectorAll('#retire-options .ms-retire-option').forEach(function(l){var r=l.querySelector('input');l.classList.toggle('selected',!!(r&&r.checked));});var action=(document.querySelector('input[name="retire-action"]:checked')||{}).value||'archive';document.getElementById('retire-move-wrap').classList.toggle('hidden',action!=='relocate');document.getElementById('retire-submit-btn').textContent=action==='archive'?'Archive Milestone':action==='relocate'?'Move Work & Retire':(isAdminRole()?'Send / Delete':'Request Deletion');}
+async function createRetirementMilestone(title,source){var data={title:title,desc:'Created while reorganising '+(source.title||'a retired milestone')+'.',notes:'',date:'',status:'planned',departments:Array.isArray(source.departments)?source.departments:[],dependencies:[],archived:false,createdAt:Date.now(),createdBy:currentUser.uid,updatedAt:Date.now(),updatedBy:currentUser.uid};var ref=await db.collection('milestones').add(data);await recordMilestoneActivity(ref.id,'created_from_retirement',currentProfile.name+' created this milestone while reorganising '+(source.title||'another milestone')+'.');return ref.id;}
+async function resolveDestinationMap(msId,prefix){var map={},source=milestoneById(msId),cache={};for(var d of rootDeliverablesFor(msId)){var sel=document.getElementById(prefix+'-dest-'+d.id),v=sel?sel.value:'unlinked';if(v==='new'){var name=(document.getElementById(prefix+'-new-'+d.id).value||'').trim();if(!name)throw new Error('Enter a name for each new milestone.');if(!cache[name])cache[name]=await createRetirementMilestone(name,source);v=cache[name];}map[d.id]=v;}return map;}
+async function moveRootDeliverables(msId,map){for(var root of rootDeliverablesFor(msId)){var dest=map[root.id];if(dest&&dest!=='unlinked'){await db.collection('milestone_deliverables').doc(root.id).set({milestoneId:dest,updatedAt:Date.now()},{merge:true});for(var kid of childrenFor(msId,root.id))await db.collection('milestone_deliverables').doc(kid.id).set({milestoneId:dest,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(dest,'deliverable_moved',currentProfile.name+' moved '+(root.name||'a deliverable')+' from '+((milestoneById(msId)||{}).title||'another milestone')+'.',root.id);}}}
+async function submitMilestoneRetirement(){var id=document.getElementById('retire-ms-id').value,ms=milestoneById(id);if(!ms||!canRequestMilestoneDeletion())return;var action=(document.querySelector('input[name="retire-action"]:checked')||{}).value||'archive',reason=document.getElementById('retire-reason').value;try{if(action==='archive'){await db.collection('milestones').doc(id).set({archived:true,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'archived',currentProfile.name+' archived the milestone.');toast('Milestone archived','inf');}else if(action==='relocate'){var map=await resolveDestinationMap(id,'retire');await moveRootDeliverables(id,map);await db.collection('milestones').doc(id).set({archived:true,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'retired_after_move',currentProfile.name+' moved its work and retired the milestone.');toast('Work moved and milestone retired','ok');}else{var empty=deliverablesFor(id).length===0&&milestoneLinkedTaskCount(id)===0;if(isAdminRole()&&empty){if(!confirm('Permanently delete this empty milestone? This cannot be undone.'))return;await permanentlyDeleteMilestone(id,{});toast('Milestone permanently deleted','ok');}else{await db.collection('milestones').doc(id).set({deletionStatus:'pending',deletionRequestedAt:Date.now(),deletionRequestedBy:currentUser.uid,deletionRequestedByName:currentProfile.name||'Team member',deletionReason:reason,archived:true,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'deletion_requested',currentProfile.name+' requested permanent deletion. Reason: '+reason+'.');toast('Deletion request sent to Admin','inf');}}closeModal('m-retire-milestone');closeMilestoneDetail();renderPendingMilestoneDeletions();}catch(e){toast(e.message||'Could not retire milestone','err');}}
+function pendingDeletionMilestones(){return (liveData.milestones||[]).filter(function(m){return m.deletionStatus==='pending';}).sort(function(a,b){return Number(b.deletionRequestedAt||0)-Number(a.deletionRequestedAt||0);});}
+function renderPendingMilestoneDeletions(){var el=document.getElementById('admin-ms-delete-list'),count=document.getElementById('admin-ms-delete-count');if(!el||!isAdminRole())return;var rows=pendingDeletionMilestones();if(count)count.textContent=rows.length+' pending';el.innerHTML=rows.length?rows.map(function(ms){return '<div class="ms-delete-card"><div><div class="ms-delete-title">'+esc(ms.title||'Untitled milestone')+'</div><div class="ms-delete-meta">Requested by '+esc(ms.deletionRequestedByName||'Unknown')+' · '+formatTaskEntryTime(ms.deletionRequestedAt)+'<br>Reason: '+esc(ms.deletionReason||'Not specified')+' · '+deliverablesFor(ms.id).length+' deliverables · '+milestoneLinkedTaskCount(ms.id)+' linked tasks</div></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-ghost btn-xs" onclick="restoreDeletionRequestedMilestone(&quot;'+ms.id+'&quot;)">Restore</button><button class="btn btn-danger btn-xs" onclick="openDeletionReview(&quot;'+ms.id+'&quot;)">Review</button></div></div>';}).join(''):'<div class="no-data">No milestones are awaiting deletion review.</div>';}
+function openDeletionReview(id){if(!isAdminRole())return;var ms=milestoneById(id);if(!ms)return;document.getElementById('review-delete-ms-id').value=id;document.getElementById('review-delete-summary').innerHTML=milestoneDeleteSummary(ms)+'<br>Requested by <strong>'+esc(ms.deletionRequestedByName||'Unknown')+'</strong>.';document.getElementById('review-delete-mode').value='delete';document.getElementById('review-delete-confirm').value='';renderMoveRows(id,'review-delete-move-list','review');renderDeletionMoveOptions();openModal('m-review-ms-delete');}
+function renderDeletionMoveOptions(){document.getElementById('review-delete-move-wrap').classList.toggle('hidden',document.getElementById('review-delete-mode').value!=='move');}
+async function restoreDeletionRequestedMilestone(id){if(!isAdminRole())return;id=id||document.getElementById('review-delete-ms-id').value;var ms=milestoneById(id);if(!ms)return;var del=firebase.firestore.FieldValue.delete();await db.collection('milestones').doc(id).set({deletionStatus:del,deletionRequestedAt:del,deletionRequestedBy:del,deletionRequestedByName:del,deletionReason:del,archived:false,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'deletion_restored',currentProfile.name+' restored the milestone from deletion review.');closeModal('m-review-ms-delete');toast('Milestone restored','ok');renderPendingMilestoneDeletions();}
+async function permanentlyDeleteMilestone(id,map){if(map&&Object.keys(map).length)await moveRootDeliverables(id,map);var movedRoots=new Set(Object.keys(map||{}).filter(function(k){return map[k]&&map[k]!=='unlinked';}));for(var d of (liveData.milestoneDeliverables||[]).filter(function(x){return x.milestoneId===id;})){var rootId=d.parentId||d.id;if(!movedRoots.has(rootId))await db.collection('milestone_deliverables').doc(d.id).delete();}for(var a of (liveData.milestoneActivity||[]).filter(function(x){return x.milestoneId===id;}))await db.collection('milestone_activity').doc(a.id).delete();await db.collection('milestones').doc(id).delete();}
+async function confirmPermanentMilestoneDeletion(){if(!isAdminRole())return;var id=document.getElementById('review-delete-ms-id').value,ms=milestoneById(id);if(!ms)return;if(document.getElementById('review-delete-confirm').value.trim()!==String(ms.title||'')){toast('Type the exact milestone name to confirm','err');return;}try{var map={};if(document.getElementById('review-delete-mode').value==='move')map=await resolveDestinationMap(id,'review');await permanentlyDeleteMilestone(id,map);closeModal('m-review-ms-delete');toast('Milestone permanently deleted. Linked tasks were preserved.','ok');renderPendingMilestoneDeletions();}catch(e){toast(e.message||'Could not delete milestone','err');}}
+
+let milestoneTaskPickerSelection=[];
+let milestoneDeliverableCollapsed={};
+let completedMilestonesOpen=false;
+let openMilestoneDetailId='';
+function refreshMilestonePresentation(){renderMilestones();if(openMilestoneDetailId)renderMilestoneDetail();}
+function toggleDeliverableCollapse(id){milestoneDeliverableCollapsed[id]=!milestoneDeliverableCollapsed[id];refreshMilestonePresentation();}
+function setMilestoneDeliverablesCollapsed(msId,collapsed){childrenFor(msId,'').forEach(function(root){if(childrenFor(msId,root.id).length)milestoneDeliverableCollapsed[root.id]=collapsed;});refreshMilestonePresentation();}
+function toggleCompletedMilestones(){completedMilestonesOpen=!completedMilestonesOpen;applyCompletedMilestoneVisibility();}
+function applyCompletedMilestoneVisibility(){var b=document.getElementById('ms2-completed-body'),t=document.getElementById('ms2-completed-toggle');if(b)b.classList.toggle('open',completedMilestonesOpen);if(t){t.classList.toggle('open',completedMilestonesOpen);t.setAttribute('aria-expanded',completedMilestonesOpen?'true':'false');}}
+function taskDueMs(t){if(!t||!t.dueDate)return Number.POSITIVE_INFINITY;var d=new Date(t.dueDate+'T00:00:00');return isNaN(d.getTime())?Number.POSITIVE_INFINITY:d.getTime();}
+function taskUrgencySort(a,b){var now=new Date();now.setHours(0,0,0,0);var ao=a&&a.state!=='completed'&&taskDueMs(a)<now.getTime(),bo=b&&b.state!=='completed'&&taskDueMs(b)<now.getTime();if(ao!==bo)return ao?-1:1;var ad=taskDueMs(a),bd=taskDueMs(b);if(ad!==bd)return ad-bd;return String(a&&a.name||a&&a.title||'').localeCompare(String(b&&b.name||b&&b.title||''));}
+function canManageMilestones(){var r=normaliseRole(currentProfile&&currentProfile.role);return r==='admin'||r==='project_manager'||r==='director';}
+function milestoneById(id){return (liveData.milestones||[]).find(function(x){return x.id===id;});}
+function deliverablesFor(msId){return (liveData.milestoneDeliverables||[]).filter(function(x){return x.milestoneId===msId&&!x.archived;});}
+function childrenFor(msId,parentId){return deliverablesFor(msId).filter(function(x){return (x.parentId||'')===(parentId||'');}).sort(function(a,b){return Number(a.order||0)-Number(b.order||0)||String(a.createdAt||'').localeCompare(String(b.createdAt||''));});}
+function linkedTaskIds(d){return Array.isArray(d&&d.linkedTaskIds)?d.linkedTaskIds:[];}
+function linkedTasks(d){return linkedTaskIds(d).map(function(id){return getTaskById(id);}).filter(Boolean);}
+function tasksReady(d){var ts=linkedTasks(d);return ts.length>0&&ts.every(function(t){return t.state==='completed';});}
+function deliverableProgress(msId,d){var ch=childrenFor(msId,d.id);if(ch.length)return ch.reduce(function(n,c){return n+deliverableProgress(msId,c);},0)/ch.length;return d.completed?100:0;}
+function milestoneProgress(ms){var roots=childrenFor(ms.id,'');if(!roots.length)return ms.status==='completed'?100:0;return roots.reduce(function(n,d){return n+deliverableProgress(ms.id,d);},0)/roots.length;}
+function milestoneAllPartsDone(ms){var roots=childrenFor(ms.id,'');return roots.length>0&&roots.every(function(d){return deliverableProgress(ms.id,d)>=100;});}
+function milestoneBlocked(ms){return (ms.dependencies||[]).some(function(id){var d=milestoneById(id);return d&&d.status!=='completed';});}
+function msDate(v){if(!v)return 'No target date';return new Date(v+'T00:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});}
+function selectedValues(id){var el=document.getElementById(id);if(!el)return [];if(el.tagName==='SELECT')return Array.from(el.selectedOptions).map(function(o){return o.value;});return Array.from(el.querySelectorAll('input[type=checkbox]:checked')).map(function(cb){return cb.value;});}
+function legacyDeliverableDepartments(d){if(Array.isArray(d&&d.departments))return d.departments.filter(Boolean);return d&&d.department?[d.department]:[];}
+function deliverableInheritsDepartments(d){if(!d)return true;if(typeof d.inheritDepartments==='boolean')return d.inheritDepartments;return legacyDeliverableDepartments(d).length===0;}
+function effectiveDeliverableDepartments(ms,d){
+  if(!d)return [];
+  if(!deliverableInheritsDepartments(d))return legacyDeliverableDepartments(d);
+  if(d.parentId){var p=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===d.parentId;});if(p)return effectiveDeliverableDepartments(ms,p);}
+  return Array.isArray(ms&&ms.departments)?ms.departments.filter(Boolean):[];
+}
+function milestoneDepartmentIds(ms){var ids=new Set(Array.isArray(ms&&ms.departments)?ms.departments:[]);deliverablesFor(ms.id).forEach(function(d){effectiveDeliverableDepartments(ms,d).forEach(function(id){ids.add(id);});});return Array.from(ids);}
+function deptLabel(id){var d=getDeptList().find(function(x){return x.id===id;});return d?d.label:id;}
+function renderDeptPills(ids){ids=Array.from(new Set((ids||[]).filter(Boolean)));if(!ids.length)return '';return '<div class="ms2-dept-tags">'+ids.map(function(id){var d=getDeptList().find(function(x){return x.id===id;}),c=d&&(d.color||DEPT_COLORS[id])||DEPT_COLORS[id]||'var(--grey)';return '<span class="ms2-dept-pill" style="color:'+c+'">'+esc(d?d.label:id)+'</span>';}).join('')+'</div>';}
+function fillMilestoneDepartmentFilter(){var el=document.getElementById('ms2-dept-filter');if(!el)return;var keep=el.value||'all';el.innerHTML='<option value="all">All departments</option>'+getDeptList().map(function(d){return '<option value="'+esc(d.id)+'">'+esc(d.label)+'</option>';}).join('');if(Array.from(el.options).some(function(o){return o.value===keep;}))el.value=keep;else el.value='all';}
+function refreshDeliverableDepartmentHint(){var p=document.getElementById('del-parent'),label=document.getElementById('del-inherit-label'),help=document.getElementById('del-dept-help');if(!p||!label)return;var isSub=!!p.value;label.textContent=isSub?'Use parent deliverable departments':'Use milestone departments';if(help)help.textContent=isSub?'Inherited from the parent deliverable. Untick to choose independent department tags.':'Inherited from the milestone. Untick to choose independent department tags.';}
+function toggleDeliverableDepartmentSelect(){var cb=document.getElementById('del-inherit-depts'),sel=document.getElementById('del-depts'),disabled=!!(cb&&cb.checked);if(sel){sel.classList.toggle('disabled',disabled);Array.from(sel.querySelectorAll('input')).forEach(function(x){x.disabled=disabled;});}refreshDeliverableDepartmentHint();}
+
+async function recordMilestoneActivity(msId,type,message,deliverableId){if(!db||!currentUser||!msId)return;try{await db.collection('milestone_activity').add({milestoneId:msId,deliverableId:deliverableId||'',type:type,message:message,uid:currentUser.uid,authorName:currentProfile.name||'Team member',createdAt:Date.now()});}catch(e){console.warn('Milestone activity',e);}}
+function renderDepartmentChecklist(el,selected){if(!el)return;selected=selected||[];el.innerHTML=getDeptList().map(function(d){return '<label class="ms2-check-option"><input type="checkbox" value="'+esc(d.id)+'" '+(selected.includes(d.id)?'checked':'')+'><span>'+esc(d.label)+'</span></label>';}).join('')||'<div class="ms2-field-help">No departments are currently available.</div>';}
+function fillMilestoneModalOptions(current){var dept=document.getElementById('ms-depts'),deps=document.getElementById('ms-dependencies');var currentDepts=(current&&Array.isArray(current.departments)?current.departments:(current&&current.department?[current.department]:[]));renderDepartmentChecklist(dept,currentDepts);if(deps){deps.innerHTML=(liveData.milestones||[]).filter(function(m){return !current||m.id!==current.id;}).map(function(m){return '<option value="'+m.id+'">'+esc(m.title||'Untitled')+'</option>';}).join('');(current&&current.dependencies||[]).forEach(function(v){var o=Array.from(deps.options).find(function(x){return x.value===v;});if(o)o.selected=true;});}}
+function clearMilestoneForm(){['ms-title','ms-date','ms-desc','ms-notes','ms-edit-id'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});document.getElementById('ms-status').value='planned';fillMilestoneModalOptions(null);document.getElementById('ms-modal-title').textContent='▸ NEW MILESTONE';}
+function openNewMilestone(){clearMilestoneForm();openModal('m-milestone');}
+function openEditMilestone(id){var ms=milestoneById(id);if(!ms)return;document.getElementById('ms-title').value=ms.title||'';document.getElementById('ms-date').value=ms.date||'';document.getElementById('ms-status').value=ms.status||'planned';document.getElementById('ms-desc').value=ms.desc||'';document.getElementById('ms-notes').value=ms.notes||'';document.getElementById('ms-edit-id').value=id;document.getElementById('ms-modal-title').textContent='▸ EDIT MILESTONE';fillMilestoneModalOptions(ms);openModal('m-milestone');}
+async function submitMilestone(){if(!canManageMilestones()){toast('No permission to manage milestones','err');return;}var title=document.getElementById('ms-title').value.trim(),id=document.getElementById('ms-edit-id').value;if(!title){toast('Milestone title required','err');return;}var old=id?milestoneById(id):null,status=document.getElementById('ms-status').value;if(status==='completed'&&old&&!milestoneAllPartsDone(old)){if(!confirm('Some deliverables are still incomplete. Mark this milestone completed anyway?'))return;}var data={title:title,desc:document.getElementById('ms-desc').value.trim(),notes:document.getElementById('ms-notes').value.trim(),date:document.getElementById('ms-date').value,status:status,departments:selectedValues('ms-depts'),dependencies:selectedValues('ms-dependencies'),updatedAt:Date.now(),updatedBy:currentUser.uid};try{if(id){await db.collection('milestones').doc(id).set(data,{merge:true});await recordMilestoneActivity(id,'edited',currentProfile.name+' updated the milestone.');toast('Milestone updated','ok');}else{data.createdAt=Date.now();data.createdBy=currentUser.uid;data.archived=false;var ref=await db.collection('milestones').add(data);await recordMilestoneActivity(ref.id,'created',currentProfile.name+' created the milestone.');toast('Milestone created','ok');}closeModal('m-milestone');clearMilestoneForm();}catch(e){toast(e.message||'Could not save milestone','err');}}
+async function archiveMilestone(id){if(!canManageMilestones())return;var ms=milestoneById(id);if(!ms)return;var next=!ms.archived;if(!confirm((next?'Archive':'Restore')+' this milestone? No tasks or deliverables will be deleted.'))return;await db.collection('milestones').doc(id).set({archived:next,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,next?'archived':'restored',currentProfile.name+(next?' archived':' restored')+' the milestone.');toast(next?'Milestone archived':'Milestone restored','inf');}
+async function completeMilestone(id){var ms=milestoneById(id);if(!ms||!canManageMilestones())return;if(!milestoneAllPartsDone(ms)){toast('Complete all deliverables first','err');return;}if(!confirm('All deliverables are complete. Confirm this milestone as finished?'))return;await db.collection('milestones').doc(id).set({status:'completed',completedAt:Date.now(),updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'completed',currentProfile.name+' completed the milestone.');toast('Milestone completed','ok');}
+async function reopenMilestone(id){if(!canManageMilestones())return;await db.collection('milestones').doc(id).set({status:'active',completedAt:null,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(id,'reopened',currentProfile.name+' reopened the milestone.');toast('Milestone reopened','inf');}
+function clearDeliverableForm(){['del-name','del-desc','del-blocker','del-edit-id'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});var cb=document.getElementById('del-inherit-depts');if(cb)cb.checked=true;}
+function openDeliverableModal(msId,parentId,editId){
+  if(!canManageMilestones())return;clearDeliverableForm();
+  var ms=milestoneById(msId),d=editId?(liveData.milestoneDeliverables||[]).find(function(x){return x.id===editId;}):null;
+  document.getElementById('del-milestone-id').value=msId;document.getElementById('del-edit-id').value=editId||'';document.getElementById('del-modal-title').textContent=d?'▸ EDIT DELIVERABLE':'▸ ADD DELIVERABLE';
+  var p=document.getElementById('del-parent');p.innerHTML='<option value="">Top-level deliverable</option>'+deliverablesFor(msId).filter(function(x){return !d||x.id!==d.id;}).map(function(x){return '<option value="'+x.id+'">'+esc(x.name||'Untitled')+'</option>';}).join('');p.value=d?(d.parentId||''):(parentId||'');
+  var dep=document.getElementById('del-depts');renderDepartmentChecklist(dep,d?legacyDeliverableDepartments(d):[]);
+  var inherit=document.getElementById('del-inherit-depts');
+  if(d){document.getElementById('del-name').value=d.name||'';document.getElementById('del-desc').value=d.description||'';document.getElementById('del-blocker').value=d.blocker||'';inherit.checked=deliverableInheritsDepartments(d);}
+  else{inherit.checked=true;}
+  refreshDeliverableDepartmentHint();toggleDeliverableDepartmentSelect();openModal('m-deliverable');
+}
+async function submitDeliverable(){
+  if(!canManageMilestones())return;var msId=document.getElementById('del-milestone-id').value,id=document.getElementById('del-edit-id').value,name=document.getElementById('del-name').value.trim();if(!name){toast('Deliverable name required','err');return;}
+  var parentId=document.getElementById('del-parent').value;if(parentId){var parent=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===parentId;});if(parent&&parent.parentId){toast('Only one sub-deliverable level is supported to keep milestones simple','err');return;}}
+  var inherit=!!document.getElementById('del-inherit-depts').checked,depts=selectedValues('del-depts');if(!inherit&&!depts.length){toast('Choose at least one department, or use inherited departments','err');return;}
+  var siblings=childrenFor(msId,parentId);var data={milestoneId:msId,parentId:parentId,name:name,description:document.getElementById('del-desc').value.trim(),blocker:document.getElementById('del-blocker').value.trim(),inheritDepartments:inherit,departments:inherit?[]:depts,department:'',updatedAt:Date.now()};
+  try{if(id){await db.collection('milestone_deliverables').doc(id).set(data,{merge:true});await recordMilestoneActivity(msId,'deliverable_edited',currentProfile.name+' edited '+name+'.',id);}else{data.completed=false;data.archived=false;data.linkedTaskIds=[];data.order=siblings.length;data.createdAt=Date.now();data.createdBy=currentUser.uid;var ref=await db.collection('milestone_deliverables').add(data);await recordMilestoneActivity(msId,'deliverable_added',currentProfile.name+' added '+name+'.',ref.id);}closeModal('m-deliverable');toast('Deliverable saved','ok');}catch(e){toast(e.message||'Could not save deliverable','err');}
+}
+async function archiveDeliverable(id){if(!canManageMilestones())return;var d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===id;});if(!d)return;if(!confirm('Remove this deliverable from the milestone? It will be archived, not deleted, and linked tasks will remain untouched.'))return;await db.collection('milestone_deliverables').doc(id).set({archived:true,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(d.milestoneId,'deliverable_archived',currentProfile.name+' archived '+(d.name||'a deliverable')+'.',id);toast('Deliverable archived','inf');}
+async function moveDeliverable(id,dir){if(!canManageMilestones())return;var d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===id;});if(!d)return;var sib=childrenFor(d.milestoneId,d.parentId),i=sib.findIndex(function(x){return x.id===id;}),j=i+dir;if(i<0||j<0||j>=sib.length)return;var other=sib[j];await Promise.all([db.collection('milestone_deliverables').doc(d.id).set({order:Number(other.order||j),updatedAt:Date.now()},{merge:true}),db.collection('milestone_deliverables').doc(other.id).set({order:Number(d.order||i),updatedAt:Date.now()},{merge:true})]);}
+function openLinkTasks(msId,delId){var d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===delId;});if(!d)return;document.getElementById('link-milestone-id').value=msId;document.getElementById('link-deliverable-id').value=delId;document.getElementById('ms2-task-search').value='';milestoneTaskPickerSelection=linkedTaskIds(d).slice();renderMilestoneTaskPicker();openModal('m-link-tasks');}
+function renderMilestoneTaskPicker(){var el=document.getElementById('ms2-task-picker');if(!el)return;var q=(document.getElementById('ms2-task-search').value||'').toLowerCase(),delId=document.getElementById('link-deliverable-id').value,d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===delId;});var rows=Object.values(liveData.tasks||{}).filter(function(t){var who=t.assignee&&liveData.members[t.assignee]?liveData.members[t.assignee].name:'';return !q||[t.name,t.dept,who].join(' ').toLowerCase().includes(q);}).slice(0,120);if(!rows.length){el.innerHTML='<div class="ms2-empty">No matching tasks.</div>';return;}el.innerHTML=rows.map(function(t){var checked=milestoneTaskPickerSelection.includes(t.id)?' checked':'';var owner=t.assignee&&liveData.members[t.assignee]?liveData.members[t.assignee].name:'Unassigned';return '<label class="ms2-task-option"><input type="checkbox" value="'+t.id+'"'+checked+' onchange="toggleMilestoneTaskPick(this)"><div><div style="font-size:13px;font-weight:650">'+esc(t.name||'Untitled task')+'</div><div style="font-size:11px;color:var(--grey)">'+esc(t.dept||'No department')+' · '+esc(owner)+' · '+esc((t.state||'unassigned').replace(/-/g,' '))+'</div></div></label>';}).join('');}
+function toggleMilestoneTaskPick(cb){var id=cb.value;if(cb.checked&&!milestoneTaskPickerSelection.includes(id))milestoneTaskPickerSelection.push(id);if(!cb.checked)milestoneTaskPickerSelection=milestoneTaskPickerSelection.filter(function(x){return x!==id;});}
+async function saveMilestoneTaskLinks(){var id=document.getElementById('link-deliverable-id').value,d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===id;});if(!d)return;await db.collection('milestone_deliverables').doc(id).set({linkedTaskIds:milestoneTaskPickerSelection,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(d.milestoneId,'tasks_linked',currentProfile.name+' updated task links for '+(d.name||'a deliverable')+'.',id);closeModal('m-link-tasks');toast('Task links updated','ok');}
+function createNewTaskForDeliverable(){var delId=document.getElementById('link-deliverable-id').value,d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===delId;});if(!d)return;var ms=milestoneById(d.milestoneId),dept=(effectiveDeliverableDepartments(ms,d)[0]||'');pendingMilestoneTaskLink={milestoneId:d.milestoneId,deliverableId:d.id};closeModal('m-link-tasks');openNewTask(dept);document.getElementById('t-name').value=d.name||'';document.getElementById('t-desc').value=d.description||'';}
+async function linkNewTaskToPending(taskId){if(!pendingMilestoneTaskLink||!taskId)return;var d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===pendingMilestoneTaskLink.deliverableId;});if(!d){pendingMilestoneTaskLink=null;return;}var ids=Array.from(new Set(linkedTaskIds(d).concat([taskId])));await db.collection('milestone_deliverables').doc(d.id).set({linkedTaskIds:ids,updatedAt:Date.now()},{merge:true});await recordMilestoneActivity(d.milestoneId,'task_created_linked',currentProfile.name+' created and linked a task to '+(d.name||'a deliverable')+'.',d.id);pendingMilestoneTaskLink=null;}
+function renderDeliverable(ms,d,depth){
+  var ch=childrenFor(ms.id,d.id),pct=Math.round(deliverableProgress(ms.id,d)),ts=linkedTasks(d),ready=tasksReady(d),can=canManageMilestones();
+  var collapsed=ch.length&&!!milestoneDeliverableCollapsed[d.id];
+  var taskHtml=ts.length?'<div class="ms2-task-links">'+ts.map(function(t){return '<span class="ms2-task-chip '+(t.state==='completed'?'done':'')+'" onclick="openTaskDetail(\''+t.id+'\')">'+esc(t.name||'Task')+'</span>';}).join('')+'</div>':'';
+  var acts=can?'<div class="ms2-deliv-actions"><button class="ms2-mini" title="Move up" onclick="moveDeliverable(\''+d.id+'\',-1)">↑</button><button class="ms2-mini" title="Move down" onclick="moveDeliverable(\''+d.id+'\',1)">↓</button><button class="ms2-mini" title="Add sub-deliverable" onclick="openDeliverableModal(\''+ms.id+'\',\''+d.id+'\')">＋</button><button class="ms2-mini" title="Link tasks" onclick="openLinkTasks(\''+ms.id+'\',\''+d.id+'\')">↗</button><button class="ms2-mini" title="Edit" onclick="openDeliverableModal(\''+ms.id+'\',\''+d.parentId+'\',\''+d.id+'\')">✎</button><button class="ms2-mini" title="Archive" onclick="archiveDeliverable(\''+d.id+'\')">✕</button></div>':'';
+  var completeCount=ch.filter(function(c){return deliverableProgress(ms.id,c)>=100;}).length;
+  var collapse='<button class="ms2-collapse-btn '+(ch.length?'':'empty')+'" title="'+(collapsed?'Expand':'Collapse')+' sub-deliverables" onclick="toggleDeliverableCollapse(\''+d.id+'\')">'+(collapsed?'▸':'▾')+'</button>';
+  var html='<div class="ms2-deliv '+(depth?'sub ':'')+(collapsed?'is-collapsed':'')+'"><div class="ms2-deliv-row">'+collapse+'<button class="ms2-check '+(pct>=100?'done':'')+'" title="'+(pct>=100?'Reopen':'Mark complete')+'" '+(can?'onclick="toggleDeliverable(\''+d.id+'\')"':'disabled')+'>'+(pct>=100?'✓':'')+'</button><div><div class="ms2-deliv-name">'+esc(d.name||'Untitled')+(ch.length?' <span style="font-size:10px;color:var(--gold)">'+pct+'%</span>':'')+'</div>'+(d.description?'<div class="ms2-deliv-note">'+esc(d.description)+'</div>':'')+renderDeptPills(effectiveDeliverableDepartments(ms,d))+(d.blocker?'<div class="ms2-deliv-blocked">Waiting: '+esc(d.blocker)+'</div>':'')+(ready&&!d.completed?'<div style="font-size:10px;color:var(--green);margin-top:3px">All linked tasks complete · ready to confirm</div>':'')+taskHtml+'</div>'+acts+'</div>'+(collapsed?'<div class="ms2-collapsed-summary">'+completeCount+' of '+ch.length+' sub-deliverables complete</div>':'')+'</div>';
+  if(ch.length)html+='<div class="ms2-deliv-children '+(collapsed?'collapsed':'')+'">'+ch.map(function(c){return renderDeliverable(ms,c,depth+1);}).join('')+'</div>';
+  return html;
+}
+async function toggleDeliverable(id){
+  if(!canManageMilestones()){toast('You do not have permission to update milestone deliverables','err');return;}
+  var d=(liveData.milestoneDeliverables||[]).find(function(x){return x.id===id;});
+  if(!d)return;
+  var children=childrenFor(d.milestoneId,d.id);
+  var currentlyComplete=deliverableProgress(d.milestoneId,d)>=100;
+  var nextComplete=!currentlyComplete;
+  try{
+    if(children.length){
+      var verb=nextComplete?'complete':'reopen';
+      if(!confirm((nextComplete?'Mark all sub-deliverables complete':'Reopen all sub-deliverables')+' for “'+(d.name||'this deliverable')+'”?'))return;
+      var batch=db.batch();
+      children.forEach(function(child){
+        batch.set(db.collection('milestone_deliverables').doc(child.id),{completed:nextComplete,completedAt:nextComplete?Date.now():null,updatedAt:Date.now()},{merge:true});
+      });
+      batch.set(db.collection('milestone_deliverables').doc(d.id),{completed:nextComplete,completedAt:nextComplete?Date.now():null,updatedAt:Date.now()},{merge:true});
+      await batch.commit();
+      await recordMilestoneActivity(d.milestoneId,nextComplete?'deliverable_completed':'deliverable_reopened',currentProfile.name+' '+verb+'ed '+(d.name||'a deliverable')+' and its sub-deliverables.',d.id);
+    }else{
+      await db.collection('milestone_deliverables').doc(d.id).set({completed:nextComplete,completedAt:nextComplete?Date.now():null,updatedAt:Date.now()},{merge:true});
+      await recordMilestoneActivity(d.milestoneId,nextComplete?'deliverable_completed':'deliverable_reopened',currentProfile.name+' '+(nextComplete?'completed ':'reopened ')+(d.name||'a deliverable')+'.',d.id);
+    }
+    toast(nextComplete?'Marked complete':'Reopened','ok');
+  }catch(e){toast(e.message||'Could not update deliverable','err');}
+}
+
+function toggleMilestoneActivity(id){var e=document.getElementById('ms2-activity-'+id);if(!e)return;e.classList.toggle('open');var card=e.closest('.ms2-card'),btn=card&&Array.from(card.querySelectorAll('button')).find(function(b){return /Activity Log/.test(b.textContent);});if(btn)btn.textContent=e.classList.contains('open')?'Hide Activity Log':'Show Activity Log';}
+function activityHtml(msId){var rows=(liveData.milestoneActivity||[]).filter(function(x){return x.milestoneId===msId;}).sort(function(a,b){return Number(b.createdAt||0)-Number(a.createdAt||0);}).slice(0,80);if(!rows.length)return '<div class="ms2-empty">No activity recorded yet.</div>';return rows.map(function(x){return '<div class="ms2-activity-item"><strong style="color:var(--white)">'+esc(x.authorName||'Mission Hub')+'</strong> · '+esc(x.message||'Updated milestone')+'<div style="font-size:10px;margin-top:2px">'+formatTaskEntryTime(x.createdAt)+'</div></div>';}).join('');}
+function renderProjectSummary(all){var active=all.filter(function(m){return !m.archived;}),pct=active.length?Math.round(active.reduce(function(n,m){return n+milestoneProgress(m);},0)/active.length):0,done=active.filter(function(m){return m.status==='completed';}).length,ready=active.filter(function(m){return milestoneAllPartsDone(m)&&m.status!=='completed';}).length,el=document.getElementById('ms2-project-summary');if(!el)return;el.innerHTML='<div class="ms2-project-top"><div><div class="ms2-project-title">COSMIC VESSEL · PROJECT COMPLETION</div><div class="ms2-summary"><span>'+active.length+' milestone'+(active.length===1?'':'s')+'</span><span>'+done+' completed</span><span>'+ready+' ready to confirm</span></div></div><div class="ms2-project-pct">'+pct+'%</div></div><div class="ms2-bar"><div class="ms2-bar-fill" style="width:'+pct+'%"></div></div>'+(active.length?'<div style="font-size:10px;color:var(--grey-2);margin-top:7px">Calculated equally from current milestone deliverables. It will refine as the roadmap is defined.</div>':'<div style="font-size:11px;color:var(--grey);margin-top:8px">Add milestones to begin calculating project completion.</div>');}
+function milestoneDeliverableCounts(ms){var roots=childrenFor(ms.id,''),done=roots.filter(function(d){return deliverableProgress(ms.id,d)>=100;}).length;return {total:roots.length,done:done};}
+function renderMilestoneSummaryCard(ms,isCompleted){
+  var pct=Math.round(milestoneProgress(ms)),ready=milestoneAllPartsDone(ms)&&ms.status!=='completed',blocked=milestoneBlocked(ms),status=ms.status||'planned',counts=milestoneDeliverableCounts(ms);
+  var statusText=status==='completed'?'Completed':status==='active'?'In Progress':status==='paused'?'Paused':'Planned';
+  return '<div class="ms2-card ms2-summary-card '+(ready?'ready ':'')+(isCompleted?'completed-card':'')+'" tabindex="0" role="button" onclick="openMilestoneDetail(\''+ms.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openMilestoneDetail(\''+ms.id+'\')}"><div class="ms2-head"><div class="ms2-title-row"><div class="ms2-title">'+esc(ms.title||'Untitled milestone')+'</div><span class="ms2-status '+status+'">'+statusText+'</span></div><div class="ms2-meta"><span>'+msDate(ms.date)+'</span>'+(blocked?'<span style="color:var(--crimson-hi)">Blocked</span>':'')+'</div>'+renderDeptPills(milestoneDepartmentIds(ms))+(ms.desc?'<div class="ms2-desc">'+esc(ms.desc)+'</div>':'')+'<div class="ms2-progress-row"><div class="ms2-bar"><div class="ms2-bar-fill" style="width:'+pct+'%"></div></div><div class="ms2-progress-num">'+pct+'%</div></div></div><div class="ms2-card-foot">'+(ready?'<span class="ms2-ready-label">READY TO CONFIRM</span>':'<span class="ms2-card-count">'+counts.done+' / '+counts.total+' deliverables</span>')+'<span class="ms2-card-open-hint">Open milestone ›</span></div></div>';
+}
+function renderMilestoneDetailCard(ms){
+  var pct=Math.round(milestoneProgress(ms)),ready=milestoneAllPartsDone(ms)&&ms.status!=='completed',blocked=milestoneBlocked(ms),roots=childrenFor(ms.id,''),deps=(ms.dependencies||[]).map(milestoneById).filter(Boolean),status=ms.status||'planned';
+  var statusText=status==='completed'?'Completed':status==='active'?'In Progress':status==='paused'?'Paused':'Planned';
+  var controls=canManageMilestones()?'<div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn btn-gold btn-xs" onclick="openDeliverableModal(\''+ms.id+'\',\'\')">+ Deliverable</button><button class="btn btn-ghost btn-xs" onclick="openEditMilestone(\''+ms.id+'\')">Edit</button>'+(ready?'<button class="btn btn-primary btn-xs" onclick="completeMilestone(\''+ms.id+'\')">Complete Milestone</button>':'')+(status==='completed'?'<button class="btn btn-ghost btn-xs" onclick="reopenMilestone(\''+ms.id+'\')">Reopen</button>':'')+(ms.archived?'<button class="btn btn-ghost btn-xs" onclick="archiveMilestone(\''+ms.id+'\')">Restore</button>':'<button class="btn btn-danger btn-xs" onclick="openRetireMilestone(\''+ms.id+'\')">Retire</button>')+'</div>':'';
+  var tools=roots.some(function(d){return childrenFor(ms.id,d.id).length;})?'<div class="ms2-milestone-tools"><button class="btn btn-ghost btn-xs" onclick="setMilestoneDeliverablesCollapsed(\''+ms.id+'\',true)">Collapse All</button><button class="btn btn-ghost btn-xs" onclick="setMilestoneDeliverablesCollapsed(\''+ms.id+'\',false)">Expand All</button></div>':'';
+  return '<div class="ms2-card ms2-detail-card '+(ready?'ready ':'')+'"><div class="ms2-head"><div class="ms2-title-row"><div class="ms2-title">'+esc(ms.title||'Untitled milestone')+'</div><span class="ms2-status '+status+'">'+statusText+'</span></div><div class="ms2-meta"><span>'+msDate(ms.date)+'</span>'+(ms.completedAt?'<span>Completed '+new Date(ms.completedAt).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})+'</span>':'')+(blocked?'<span style="color:var(--crimson-hi)">Blocked by dependency</span>':'')+'</div>'+(ms.desc?'<div class="ms2-desc">'+esc(ms.desc)+'</div>':'')+renderDeptPills(milestoneDepartmentIds(ms))+(ms.notes?'<div class="ms2-desc" style="color:var(--amber)">'+esc(ms.notes)+'</div>':'')+(deps.length?'<div class="ms2-desc">Depends on: '+deps.map(function(d){return esc(d.title||'Milestone')+(d.status==='completed'?' ✓':'');}).join(', ')+'</div>':'')+'<div class="ms2-progress-row"><div class="ms2-bar"><div class="ms2-bar-fill" style="width:'+pct+'%"></div></div><div class="ms2-progress-num">'+pct+'%</div></div></div><div class="ms2-body">'+tools+'<div class="ms2-deliverables">'+(roots.length?roots.map(function(d){return renderDeliverable(ms,d,0);}).join(''):'<div class="ms2-empty">No deliverables yet.</div>')+'</div></div><div class="ms2-card-foot">'+(ready?'<span class="ms2-ready-label">ALL PARTS COMPLETE · READY TO CONFIRM</span>':'<span style="font-size:11px;color:var(--grey)">'+roots.length+' deliverable'+(roots.length===1?'':'s')+'</span>')+'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><button class="btn btn-ghost btn-xs" onclick="toggleMilestoneActivity(\''+ms.id+'\')">Show Activity Log</button>'+controls+'</div></div><div class="ms2-activity" id="ms2-activity-'+ms.id+'">'+activityHtml(ms.id)+'</div></div>';
+}
+function openMilestoneDetail(id){var ms=milestoneById(id);if(!ms)return;openMilestoneDetailId=id;renderMilestoneDetail();var bg=document.getElementById('ms2-detail-bg');if(bg)bg.classList.add('open');document.body.classList.add('ms2-detail-open');}
+function renderMilestoneDetail(){var c=document.getElementById('ms2-detail-content'),ms=milestoneById(openMilestoneDetailId);if(!c)return;if(!ms){closeMilestoneDetail();return;}c.innerHTML=renderMilestoneDetailCard(ms);var h=document.getElementById('ms2-detail-heading');if(h)h.textContent=ms.title||'Milestone Details';}
+function closeMilestoneDetail(){openMilestoneDetailId='';var bg=document.getElementById('ms2-detail-bg');if(bg)bg.classList.remove('open');document.body.classList.remove('ms2-detail-open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&openMilestoneDetailId)closeMilestoneDetail();});
+function renderMilestones(){
+  var el=document.getElementById('milestone-list'),completedEl=document.getElementById('milestone-completed-list'),section=document.getElementById('ms2-completed-section'),count=document.getElementById('ms2-completed-count'),act=document.getElementById('milestone-actions');if(!el)return;
+  if(act)act.innerHTML=canManageMilestones()?'<button class="btn btn-gold" onclick="openNewMilestone()">+ Add Milestone</button>':'';
+  var all=(liveData.milestones||[]).slice();renderProjectSummary(all);
+  fillMilestoneDepartmentFilter();
+  var q=((document.getElementById('ms2-search')||{}).value||'').toLowerCase(),f=((document.getElementById('ms2-status-filter')||{}).value||'all'),deptFilter=((document.getElementById('ms2-dept-filter')||{}).value||'all'),showArchived=!!((document.getElementById('ms2-show-archived')||{}).checked);
+  var matches=function(ms){if(ms.deletionStatus==='pending')return false;if(!showArchived&&ms.archived)return false;var ready=milestoneAllPartsDone(ms)&&ms.status!=='completed';if(f!=='all'&&!(f==='ready'?ready:ms.status===f))return false;var allDepts=milestoneDepartmentIds(ms);if(deptFilter!=='all'&&!allDepts.includes(deptFilter))return false;var delText=deliverablesFor(ms.id).map(function(d){return [d.name,d.description,d.blocker,effectiveDeliverableDepartments(ms,d).map(deptLabel).join(' ')].join(' ');}).join(' ');return !q||[ms.title,ms.desc,ms.notes,allDepts.map(deptLabel).join(' '),delText].join(' ').toLowerCase().includes(q);};
+  var rows=all.filter(matches),activeRows=rows.filter(function(ms){return ms.status!=='completed';}).sort(function(a,b){return String(a.date||'9999').localeCompare(String(b.date||'9999'));}),completedRows=rows.filter(function(ms){return ms.status==='completed';}).sort(function(a,b){return Number(b.completedAt||b.updatedAt||0)-Number(a.completedAt||a.updatedAt||0);});
+  el.innerHTML=activeRows.length?activeRows.map(function(ms){return renderMilestoneSummaryCard(ms,false);}).join(''):'<div class="panel ms2-empty" style="grid-column:1/-1">'+(f==='completed'?'Completed milestones are shown below.':'No active milestones match this view.')+'</div>';
+  if(completedEl)completedEl.innerHTML=completedRows.length?completedRows.map(function(ms){return renderMilestoneSummaryCard(ms,true);}).join(''):'<div class="ms2-empty" style="grid-column:1/-1">No completed milestones match this view.</div>';
+  if(count)count.textContent=completedRows.length;
+  if(section)section.classList.toggle('is-empty',completedRows.length===0);
+  if(f==='completed'&&completedRows.length)completedMilestonesOpen=true;
+  applyCompletedMilestoneVisibility();
+  if(openMilestoneDetailId)renderMilestoneDetail();
+}
+function renderDeptOverview(){
+  const el=document.getElementById('dept-overview');
+  if(!el)return;
+  const allTasks=Object.values(liveData.tasks||{});
+  el.innerHTML=getDeptList().map(function(dept){
+    const dTasks=allTasks.filter(function(t){return t.dept===dept.id;});
+    const total=dTasks.length;
+    const done=dTasks.filter(function(t){return t.state==='completed';}).length;
+    const inProg=dTasks.filter(function(t){return t.state==='in-progress';}).length;
+    const pct=total?Math.round(done/total*100):0;
+    const c=DEPT_COLORS[dept.id]||dept.color||'var(--grey)';
+    return '<div class="dept-ov-card"><div class="dept-ov-name" style="color:'+c+'">'+esc(dept.label)+'</div><div class="dept-ov-bar"><div class="dept-ov-fill" style="width:'+pct+'%;background:'+c+'"></div></div><div class="dept-ov-stats"><span>'+pct+'% done</span><span>'+done+'/'+total+'</span></div>'+(inProg?'<div style="font-size:11px;color:var(--amber);margin-top:4px">'+inProg+' in progress</div>':'')+'</div>';
+  }).join('');
 }
 
 // ─── MEETINGS ─────────────────────────────────────────────
@@ -8019,6 +8328,15 @@ function renderAdminRoster() {
 document.addEventListener('input',function(e){if(e.target&&e.target.closest&&e.target.closest('#view-profile')){var v=document.getElementById('view-profile');if(v)v.dataset.profileDirty='1';}});
 document.addEventListener('change',function(e){if(e.target&&e.target.closest&&e.target.closest('#view-profile')){var v=document.getElementById('view-profile');if(v)v.dataset.profileDirty='1';}});
 setTimeout(renderRegistrationDepartments,500);
+
+function populateContributorSelect(dept,selected,owner){var sel=document.getElementById('t-contributors');if(!sel)return;selected=selected||[];sel.innerHTML='';Object.values(liveData.members||{}).filter(function(m){return !dept||(m.depts||[]).includes(dept)||normaliseRole(m.role)==='admin'||normaliseRole(m.role)==='project_manager';}).sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''));}).forEach(function(m){if(m.uid===owner)return;var o=document.createElement('option');o.value=m.uid;o.textContent=m.name||'Team member';o.selected=selected.includes(m.uid);sel.appendChild(o);});}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='t-dept'){populateAssignSelect(e.target.value);populateContributorSelect(e.target.value,[],document.getElementById('t-assign').value);}if(e.target&&e.target.id==='t-assign'){var chosen=Array.from((document.getElementById('t-contributors')||{selectedOptions:[]}).selectedOptions).map(function(o){return o.value;});populateContributorSelect(document.getElementById('t-dept').value,chosen,e.target.value);}});
+function taskIsCollaborator(t){return !!t&&!!currentUser&&(t.assignee===currentUser.uid||(t.contributors||[]).includes(currentUser.uid));}
+taskCanPostProgress=function(t){return !!t&&!!currentUser&&(taskIsCollaborator(t)||taskManagerCanManage(t));};
+taskCanAddReference=function(t){return !!t&&!!currentUser&&(taskIsCollaborator(t)||t.createdBy===currentUser.uid||taskManagerCanManage(t));};
+var _msOldRenderTaskDetailBase=renderTaskDetailBase;
+renderTaskDetailBase=function(t){_msOldRenderTaskDetailBase(t);var body=document.getElementById('td-body');if(body&&t&&t.contributors&&t.contributors.length){var names=t.contributors.map(function(uid){return (liveData.members[uid]||{}).name||'Unknown';}).join(', ');var grid=body.querySelector('.task2-meta-grid');if(grid)grid.insertAdjacentHTML('beforeend','<div class="task2-meta"><div class="task2-meta-label">Contributors</div><div class="task2-meta-value">'+esc(names)+'</div></div>');}};
+
 </script>
 </body>
 </html>
