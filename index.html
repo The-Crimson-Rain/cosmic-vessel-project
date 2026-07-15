@@ -9282,7 +9282,7 @@ if(_journeyOriginalRenderProfile){renderProfile=function(){var r=_journeyOrigina
 </script>
 <!-- MH-MODULE-END id="MOD-JS-006" -->
 
-<!-- MH-MODULE-START id="MOD-JS-007" version="1.11.0" name="Journey Titles, Custom Badges & Admin Grants" -->
+<!-- MH-MODULE-START id="MOD-JS-007" version="1.13.0" name="Journey Titles, Custom Badges & Admin Grants" -->
 <script>
 // Journey and seasonal refinements — v10B.2
 // Mission Hub v12 RC003 — true badge collection + title unlock correction
@@ -10461,6 +10461,513 @@ openJourneyAdminEdit=function(uid){
   return result;
 };
 window.openJourneyAdminEdit=openJourneyAdminEdit;
+
+
+// Mission Hub v12 RC014 — single-record rolling recurring meetings
+(function(){
+  const style=document.createElement('style');
+  style.id='cvp-rc014-recurring-meeting-styles';
+  style.textContent=`
+    .meeting-card .cvp-series-info{
+      display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+      margin:0 0 8px;font-family:'Share Tech Mono',monospace;
+      font-size:9px;letter-spacing:1px;color:var(--purple);
+      text-transform:uppercase
+    }
+    .meeting-card .cvp-series-pill{
+      padding:2px 6px;border:1px solid rgba(155,108,240,.38);
+      border-radius:3px;background:rgba(155,108,240,.08)
+    }
+  `;
+  if(!document.getElementById(style.id))document.head.appendChild(style);
+})();
+
+function cvpRc014RecurrenceStep(date,recurrence,steps){
+  var d=new Date(date),n=Math.max(1,Number(steps)||1);
+  if(recurrence==='weekly')d.setUTCDate(d.getUTCDate()+7*n);
+  else if(recurrence==='fortnightly')d.setUTCDate(d.getUTCDate()+14*n);
+  else if(recurrence==='monthly')d=cvpAddMonthsUtc(d,n);
+  return d;
+}
+function cvpRc014SeriesEndReached(meeting,nextIndex,nextDate){
+  if(meeting.recurrenceMaxOccurrences&&nextIndex>=Number(meeting.recurrenceMaxOccurrences))return true;
+  if(meeting.recurrenceEndDate){
+    var end=new Date(meeting.recurrenceEndDate+'T23:59:59.999Z');
+    if(nextDate>end)return true;
+  }
+  return false;
+}
+function cvpRc014FreshRsvp(meeting,attendees){
+  var rsvp={};
+  if(meeting.ownerAttending&&meeting.ownerId&&attendees.includes(meeting.ownerId))rsvp[meeting.ownerId]='accepted';
+  return rsvp;
+}
+function cvpRc014OccurrenceAttendees(meeting){
+  if(meeting.seriesMembershipPolicy==='dynamic'&&(meeting.departments||[]).length){
+    var list=cvpGetDeptMembers(meeting.departments||[]);
+    if(meeting.ownerAttending&&meeting.ownerId&&!list.includes(meeting.ownerId))list.push(meeting.ownerId);
+    return Array.from(new Set(list));
+  }
+  return Array.from(new Set(meeting.attendees||[]));
+}
+function cvpRc014SeriesLabel(meeting){
+  var frequency=meeting.recurrence==='weekly'?'Weekly':meeting.recurrence==='fortnightly'?'Every two weeks':meeting.recurrence==='monthly'?'Monthly':'Recurring';
+  var suffix='';
+  if(meeting.recurrenceEndDate){
+    try{suffix=' · until '+new Date(meeting.recurrenceEndDate+'T12:00:00Z').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}catch(e){}
+  }else if(meeting.recurrenceMaxOccurrences){
+    var current=Number(meeting.occurrenceIndex)||0;
+    suffix=' · '+Math.max(0,Number(meeting.recurrenceMaxOccurrences)-current)+' remaining';
+  }
+  return frequency+suffix;
+}
+function cvpRc014LegacySeriesGroups(){
+  var groups={};
+  (liveData.meetings||[]).forEach(function(m){
+    if(m.seriesId)(groups[m.seriesId]||(groups[m.seriesId]=[])).push(m);
+  });
+  return groups;
+}
+async function cvpRc014ConsolidateLegacySeries(){
+  if(!currentUser||!db)return;
+  var groups=cvpRc014LegacySeriesGroups(),now=Date.now();
+  for(const seriesId of Object.keys(groups)){
+    var docs=groups[seriesId];
+    if(docs.length<2)continue;
+    var manageable=docs.some(function(m){return canManageMeetingRecord(m);});
+    if(!manageable)continue;
+    docs.sort(function(a,b){return new Date(a.dateUtc)-new Date(b.dateUtc);});
+    var keeper=docs.find(function(m){return !m.cancelled&&(new Date(m.dateUtc).getTime()+(m.duration||60)*60000)>now;})||
+               docs.slice().reverse().find(function(m){return !m.cancelled;})||docs[0];
+    var first=docs[0],last=docs[docs.length-1],maxIndex=Math.max.apply(null,docs.map(function(m){return Number(m.occurrenceIndex)||0;}));
+    var update={
+      seriesMode:'rolling',
+      recurrenceMaxOccurrences:docs.length,
+      recurrenceEndDate:(last.dateUtc||'').slice(0,10),
+      occurrenceIndex:Number(keeper.occurrenceIndex)||0,
+      seriesStartUtc:first.seriesStartUtc||first.dateUtc,
+      updatedAt:new Date().toISOString()
+    };
+    try{
+      await db.collection('meetings').doc(keeper.id).set(update,{merge:true});
+      for(const duplicate of docs){
+        if(duplicate.id!==keeper.id)await db.collection('meetings').doc(duplicate.id).delete();
+      }
+    }catch(e){console.warn('Recurring meeting consolidation skipped',seriesId,e);}
+  }
+}
+async function cvpRc014AdvanceMeeting(meeting){
+  if(!meeting||meeting.cancelled||meeting.recurrence==='none'||!meeting.recurrence)return false;
+  var start=new Date(meeting.dateUtc),duration=Number(meeting.duration)||60,now=Date.now();
+  if(start.getTime()+duration*60000>now)return false;
+
+  var currentIndex=Number(meeting.occurrenceIndex)||0,nextIndex=currentIndex,nextDate=new Date(start);
+  do{
+    nextIndex+=1;
+    nextDate=cvpRc014RecurrenceStep(nextDate,meeting.recurrence,1);
+    if(cvpRc014SeriesEndReached(meeting,nextIndex,nextDate)){
+      if(canManageMeetingRecord(meeting)){
+        await db.collection('meetings').doc(meeting.id).set({
+          recurrenceCompleted:true,
+          completedAt:new Date().toISOString(),
+          updatedAt:new Date().toISOString()
+        },{merge:true});
+      }
+      return false;
+    }
+  }while(nextDate.getTime()+duration*60000<=now);
+
+  if(!canManageMeetingRecord(meeting))return false;
+
+  var attendees=cvpRc014OccurrenceAttendees(meeting);
+  var update={
+    dateUtc:nextDate.toISOString(),
+    occurrenceIndex:nextIndex,
+    attendees:attendees,
+    requiredAttendees:meeting.seriesMembershipPolicy==='dynamic'?attendees:(meeting.requiredAttendees||attendees),
+    optionalAttendees:meeting.seriesMembershipPolicy==='dynamic'?[]:(meeting.optionalAttendees||[]),
+    rsvp:cvpRc014FreshRsvp(meeting,attendees),
+    recurrenceCompleted:false,
+    calendarRevision:cvpGenerateCalendarRevision(),
+    updatedAt:new Date().toISOString()
+  };
+  await db.collection('meetings').doc(meeting.id).set(update,{merge:true});
+
+  await Promise.all(attendees.filter(function(uid){return uid!==meeting.ownerId;}).map(function(uid){
+    var tz=(liveData.members[uid]&&liveData.members[uid].tz)||'UTC';
+    return createUserNotification(
+      uid,
+      'meeting_invite',
+      'New occurrence: '+meeting.name,
+      formatMeetingRangeForTz(update.dateUtc,duration,tz)+' · Please accept or decline this occurrence and update your calendar.',
+      meeting.id
+    );
+  }));
+  return true;
+}
+var cvpRc014Rolling=false;
+async function cvpRc014RollRecurringMeetings(){
+  if(cvpRc014Rolling||!currentUser||!db)return;
+  cvpRc014Rolling=true;
+  try{
+    await cvpRc014ConsolidateLegacySeries();
+    var meetings=(liveData.meetings||[]).filter(function(m){
+      return !m.cancelled&&!m.recurrenceCompleted&&m.recurrence&&m.recurrence!=='none';
+    });
+    for(const meeting of meetings){
+      try{await cvpRc014AdvanceMeeting(meeting);}catch(e){console.warn('Recurring meeting rollover skipped',meeting.id,e);}
+    }
+  }finally{cvpRc014Rolling=false;}
+}
+window.cvpRc014RollRecurringMeetings=cvpRc014RollRecurringMeetings;
+
+submitMeeting=async function(){
+  var name=document.getElementById('mt-name').value.trim();
+  if(!name){toast('Enter a meeting name','err');return;}
+  var dateStr=document.getElementById('mt-date').value,timeStr=document.getElementById('mt-time').value||'00:00';
+  if(!dateStr){toast('Choose a meeting date','err');return;}
+  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
+  var duration=parseInt(document.getElementById('mt-duration').value)||60;
+  var required=[],optional=[];
+  Object.keys(liveData.members||{}).forEach(function(uid){
+    var role=getMeetingRole(uid);
+    if(role==='required')required.push(uid);
+    else if(role==='optional')optional.push(uid);
+  });
+  var ownerAttending=document.getElementById('mt-owner-attending').checked;
+  if(ownerAttending&&!required.includes(currentUser.uid)&&!optional.includes(currentUser.uid))required.push(currentUser.uid);
+  if(!ownerAttending){
+    required=required.filter(function(uid){return uid!==currentUser.uid;});
+    optional=optional.filter(function(uid){return uid!==currentUser.uid;});
+  }
+  var attendees=required.concat(optional.filter(function(uid){return !required.includes(uid);}));
+  if(!attendees.length){toast('Select at least one attendee','err');return;}
+
+  var recurrence=document.getElementById('mt-recurrence').value;
+  var until=(document.getElementById('mt-recur-until')||{}).value||'';
+  var requestedCount=Math.max(2,Math.min(52,parseInt((document.getElementById('mt-recur-count')||{}).value)||6));
+  var membership=(document.getElementById('mt-recur-membership')||{}).value||'fixed';
+  if(recurrence!=='none'&&!until&&!requestedCount){
+    toast('Choose when the recurring meeting should end','err');return;
+  }
+
+  var rsvp=cvpRc014FreshRsvp({ownerAttending:ownerAttending,ownerId:currentUser.uid},attendees);
+  var doc={
+    name:name,
+    dateUtc:dateUtc,
+    notes:document.getElementById('mt-notes').value.trim(),
+    duration:duration,
+    attendees:attendees,
+    requiredAttendees:required,
+    optionalAttendees:optional,
+    rsvp:rsvp,
+    ownerAttending:ownerAttending,
+    createdBy:currentUser.uid,
+    ownerId:currentUser.uid,
+    status:document.getElementById('mt-status').value,
+    provisional:document.getElementById('mt-status').value==='provisional',
+    recurrence:recurrence,
+    seriesId:recurrence==='none'?'':('series_'+currentUser.uid+'_'+Date.now().toString(36)),
+    seriesMode:recurrence==='none'?'single':'rolling',
+    seriesMembershipPolicy:membership,
+    recurrenceEndDate:recurrence==='none'?'':until,
+    recurrenceMaxOccurrences:recurrence==='none'?null:requestedCount,
+    occurrenceIndex:0,
+    seriesStartUtc:dateUtc,
+    departments:Array.from(schedulerSelectedDepts),
+    discordJoin:document.getElementById('mt-discord-join').checked,
+    createdAt:new Date().toISOString(),
+    updatedAt:new Date().toISOString(),
+    calendarRevision:cvpGenerateCalendarRevision()
+  };
+
+  try{
+    var ref=await db.collection('meetings').add(doc);
+    await Promise.all(attendees.map(function(uid){
+      var tz=(liveData.members[uid]&&liveData.members[uid].tz)||'UTC';
+      return createUserNotification(
+        uid,
+        'meeting_invite',
+        doc.provisional?'Provisional meeting proposed: '+name:(recurrence!=='none'?'Recurring meeting invitation: '+name:'Meeting invitation: '+name),
+        formatMeetingRangeForTz(dateUtc,duration,tz)+(recurrence!=='none'?' · '+cvpRc014SeriesLabel(doc):''),
+        ref.id
+      );
+    }));
+    closeModal('m-meeting');
+    resetMeetingPlanner();
+    toast(recurrence!=='none'?'Recurring meeting series created':'Meeting scheduled!','ok');
+  }catch(e){toast(e.message||'Could not schedule meeting','err');}
+};
+window.submitMeeting=submitMeeting;
+
+var _cvpRc014RenderMeetingsBase=renderMeetings;
+renderMeetings=function(){
+  cvpRc014RollRecurringMeetings();
+  _cvpRc014RenderMeetingsBase();
+
+  var groups=cvpRc014LegacySeriesGroups(),visibleBySeries={};
+  Object.keys(groups).forEach(function(seriesId){
+    var docs=groups[seriesId].slice().sort(function(a,b){return new Date(a.dateUtc)-new Date(b.dateUtc);});
+    visibleBySeries[seriesId]=(docs.find(function(m){return !m.cancelled&&!m.recurrenceCompleted;})||docs[0]||{}).id;
+  });
+
+  document.querySelectorAll('.meeting-card').forEach(function(card){
+    var idNode=card.querySelector('[data-mid]');
+    var id=idNode&&idNode.dataset?idNode.dataset.mid:'';
+    var meeting=(liveData.meetings||[]).find(function(m){return m.id===id;});
+    if(!meeting)return;
+    if(meeting.seriesId&&visibleBySeries[meeting.seriesId]&&visibleBySeries[meeting.seriesId]!==meeting.id){
+      card.style.display='none';
+      return;
+    }
+    if(meeting.recurrence&&meeting.recurrence!=='none'){
+      var old=card.querySelector('.series-badge');if(old)old.remove();
+      if(!card.querySelector('.cvp-series-info')){
+        var info=document.createElement('div');
+        info.className='cvp-series-info';
+        info.innerHTML='<span class="cvp-series-pill">↻ Recurring</span><span>'+esc(cvpRc014SeriesLabel(meeting))+'</span>';
+        var time=card.querySelector('.mc-time');
+        if(time)card.insertBefore(info,time);
+        else card.insertBefore(info,card.firstChild);
+      }
+    }
+  });
+};
+window.renderMeetings=renderMeetings;
+
+// Rolling occurs whenever the Hub is opened and periodically while it remains open.
+setTimeout(cvpRc014RollRecurringMeetings,2500);
+setInterval(cvpRc014RollRecurringMeetings,15*60*1000);
+
+
+// Mission Hub v12 RC015 — stable attendee selection + editable recurrence
+(function(){
+  const style=document.createElement('style');
+  style.id='cvp-rc015-meeting-fixes';
+  style.textContent=`
+    #edit-mt-recurrence-block{
+      border-top:1px solid var(--border);
+      padding-top:14px;margin-top:4px
+    }
+    #edit-mt-recurrence-fields.hidden{display:none}
+    #attendee-checks .meeting-attendee-row{scroll-margin-top:12px}
+  `;
+  if(!document.getElementById(style.id))document.head.appendChild(style);
+})();
+
+function cvpRc015EnsureEditRecurrenceFields(){
+  var modal=document.getElementById('m-edit-meeting');
+  var body=modal&&modal.querySelector('.modal-body');
+  if(!body)return null;
+  var block=document.getElementById('edit-mt-recurrence-block');
+  if(block)return block;
+
+  block=document.createElement('div');
+  block.id='edit-mt-recurrence-block';
+  block.innerHTML=`
+    <div class="field">
+      <label class="field-label">Recurrence</label>
+      <select class="inp" id="edit-mt-recurrence">
+        <option value="none">Does not repeat</option>
+        <option value="weekly">Weekly</option>
+        <option value="fortnightly">Every two weeks</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <div id="edit-mt-recurrence-fields" class="grid-2 hidden" style="margin-top:12px">
+      <div class="field">
+        <label class="field-label">Repeat until</label>
+        <input class="inp" id="edit-mt-recur-until" type="date">
+      </div>
+      <div class="field">
+        <label class="field-label">Total occurrences</label>
+        <input class="inp" id="edit-mt-recur-count" type="number" min="2" max="52" value="6">
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label class="field-label">Series membership</label>
+        <select class="inp" id="edit-mt-recur-membership">
+          <option value="fixed">Keep the selected attendees</option>
+          <option value="dynamic">Keep department membership in sync</option>
+        </select>
+      </div>
+      <div class="text-small text-grey" style="grid-column:1/-1">
+        Editing recurrence updates this entire rolling series. Only the next occurrence remains visible.
+      </div>
+    </div>
+  `;
+  body.appendChild(block);
+  document.getElementById('edit-mt-recurrence').addEventListener('change',cvpRc015ToggleEditRecurrence);
+  return block;
+}
+function cvpRc015ToggleEditRecurrence(){
+  var recurrence=(document.getElementById('edit-mt-recurrence')||{}).value||'none';
+  var fields=document.getElementById('edit-mt-recurrence-fields');
+  if(fields)fields.classList.toggle('hidden',recurrence==='none');
+}
+window.cvpRc015ToggleEditRecurrence=cvpRc015ToggleEditRecurrence;
+
+var _cvpRc015OpenEditMeetingBase=openEditMeeting;
+openEditMeeting=function(id){
+  _cvpRc015OpenEditMeetingBase(id);
+  var meeting=(liveData.meetings||[]).find(function(m){return m.id===id;});
+  if(!meeting)return;
+  cvpRc015EnsureEditRecurrenceFields();
+
+  var recurrence=document.getElementById('edit-mt-recurrence');
+  var until=document.getElementById('edit-mt-recur-until');
+  var count=document.getElementById('edit-mt-recur-count');
+  var membership=document.getElementById('edit-mt-recur-membership');
+
+  if(recurrence)recurrence.value=meeting.recurrence||'none';
+  if(until)until.value=meeting.recurrenceEndDate||'';
+  if(count)count.value=String(meeting.recurrenceMaxOccurrences||6);
+  if(membership)membership.value=meeting.seriesMembershipPolicy||'fixed';
+  cvpRc015ToggleEditRecurrence();
+};
+window.openEditMeeting=openEditMeeting;
+
+saveEditMeeting=async function(){
+  var id=document.getElementById('edit-mt-id').value;
+  var name=document.getElementById('edit-mt-name').value.trim();
+  var dateStr=document.getElementById('edit-mt-date').value;
+  var timeStr=document.getElementById('edit-mt-time').value||'00:00';
+  var dur=parseInt(document.getElementById('edit-mt-duration').value)||60;
+  var notes=document.getElementById('edit-mt-notes').value.trim();
+  var checks=document.querySelectorAll('#edit-attendee-checks input:checked');
+  if(!name){toast('Meeting name required','err');return;}
+
+  var old=(liveData.meetings||[]).find(function(m){return m.id===id;});
+  if(!old)return;
+
+  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
+  var attendees=Array.from(checks).map(function(c){return c.value;});
+  var oldAtt=old.attendees||[];
+  var added=attendees.filter(function(uid){return !oldAtt.includes(uid);});
+  var removed=oldAtt.filter(function(uid){return !attendees.includes(uid);});
+  var timingChanged=old.dateUtc!==dateUtc||(old.duration||60)!==dur;
+
+  var recurrence=(document.getElementById('edit-mt-recurrence')||{}).value||'none';
+  var recurrenceEndDate=(document.getElementById('edit-mt-recur-until')||{}).value||'';
+  var recurrenceMaxOccurrences=Math.max(2,Math.min(52,parseInt((document.getElementById('edit-mt-recur-count')||{}).value)||6));
+  var membership=(document.getElementById('edit-mt-recur-membership')||{}).value||'fixed';
+  var recurrenceChanged=
+    (old.recurrence||'none')!==recurrence||
+    (old.recurrenceEndDate||'')!==recurrenceEndDate||
+    Number(old.recurrenceMaxOccurrences||0)!==(recurrence==='none'?0:recurrenceMaxOccurrences)||
+    (old.seriesMembershipPolicy||'fixed')!==membership;
+
+  var update={
+    name:name,dateUtc:dateUtc,duration:dur,notes:notes,attendees:attendees,
+    requiredAttendees:attendees,
+    optionalAttendees:[],
+    recurrence:recurrence,
+    seriesMode:recurrence==='none'?'single':'rolling',
+    seriesId:recurrence==='none'?'':(old.seriesId||('series_'+(old.ownerId||currentUser.uid)+'_'+Date.now().toString(36))),
+    seriesStartUtc:recurrence==='none'?'':(old.seriesStartUtc||dateUtc),
+    recurrenceEndDate:recurrence==='none'?'':recurrenceEndDate,
+    recurrenceMaxOccurrences:recurrence==='none'?null:recurrenceMaxOccurrences,
+    seriesMembershipPolicy:recurrence==='none'?'fixed':membership,
+    recurrenceCompleted:false,
+    updatedAt:new Date().toISOString()
+  };
+
+  if(recurrenceChanged||timingChanged){
+    update.occurrenceIndex=0;
+    update.seriesStartUtc=dateUtc;
+    update.calendarRevision=cvpGenerateCalendarRevision();
+    update.rsvp=cvpRc014FreshRsvp(old,attendees);
+  }
+
+  try{
+    await db.collection('meetings').doc(id).set(update,{merge:true});
+    var oldRange=formatMeetingRangeForTz(old.dateUtc,old.duration||60,(currentProfile&&currentProfile.tz)||'UTC');
+    var newRange=formatMeetingRangeForTz(dateUtc,dur,(currentProfile&&currentProfile.tz)||'UTC');
+    var changedText=recurrence!=='none'?' · '+cvpRc014SeriesLabel(Object.assign({},old,update)):'';
+
+    await Promise.all(
+      attendees.filter(function(uid){return !added.includes(uid);}).map(function(uid){
+        if(timingChanged||recurrenceChanged){
+          return createUserNotification(uid,'meeting_changed','Meeting series changed: '+name,oldRange+' → '+newRange+changedText,id);
+        }
+        return Promise.resolve();
+      }).concat(
+        added.map(function(uid){return createUserNotification(uid,'meeting_added','You were added: '+name,newRange+changedText,id);}),
+        removed.map(function(uid){return createUserNotification(uid,'meeting_removed','You were removed: '+name,'You are no longer included in this meeting.',id);})
+      )
+    );
+
+    closeModal('m-edit-meeting');
+    toast(recurrence!=='none'?'Recurring meeting series updated':'Meeting updated and attendees notified','ok');
+  }catch(e){
+    toast(e.message||'Could not update meeting','err');
+  }
+};
+window.saveEditMeeting=saveEditMeeting;
+
+// Keep attendee list position and expanded departments stable while selecting roles.
+function cvpRc015UpdateAttendeeRow(uid,role){
+  document.querySelectorAll('input[name="mt-role-'+uid+'"]').forEach(function(input){
+    input.checked=input.value===role;
+  });
+  var row=document.querySelector('.meeting-attendee-row[data-uid="'+uid+'"]');
+  if(row){
+    row.classList.toggle('selected',role!=='none');
+    var button=row.querySelector('button');
+    if(button)button.textContent=role==='none'?'Not invited':'Remove from meeting';
+  }
+}
+setMeetingRole=function(uid,role){
+  meetingRoleState[uid]=role;
+  if(role==='none')meetingAutoSelectedUids.delete(uid);
+  cvpRc015UpdateAttendeeRow(uid,role);
+  refreshMeetingPlanner();
+};
+window.setMeetingRole=setMeetingRole;
+
+setMeetingPersonNone=function(uid){
+  meetingRoleState[uid]='none';
+  meetingAutoSelectedUids.delete(uid);
+  cvpRc015UpdateAttendeeRow(uid,'none');
+  refreshMeetingPlanner();
+};
+window.setMeetingPersonNone=setMeetingPersonNone;
+
+setAllInvitedRoles=function(role){
+  Object.keys(liveData.members||{}).forEach(function(uid){
+    if(getMeetingRole(uid)!=='none'){
+      meetingRoleState[uid]=role;
+      cvpRc015UpdateAttendeeRow(uid,role);
+    }
+  });
+  refreshMeetingPlanner();
+};
+window.setAllInvitedRoles=setAllInvitedRoles;
+
+// Preserve expanded groups and scroll position if the attendee list genuinely needs rebuilding.
+function cvpRc015AttendeeViewState(){
+  var box=document.getElementById('attendee-checks');
+  if(!box)return null;
+  return {
+    scrollTop:box.scrollTop,
+    expanded:Array.from(box.querySelectorAll('.mh-dept-group:not(.collapsed)')).map(function(g){return g.dataset.dept;})
+  };
+}
+function cvpRc015RestoreAttendeeViewState(state){
+  if(!state)return;
+  var box=document.getElementById('attendee-checks');if(!box)return;
+  box.querySelectorAll('.mh-dept-group').forEach(function(group){
+    group.classList.toggle('collapsed',!state.expanded.includes(group.dataset.dept));
+  });
+  box.scrollTop=state.scrollTop;
+}
+
+var _cvpRc015RenderOtherAttendeesBase=renderOtherAttendees;
+renderOtherAttendees=function(){
+  var state=cvpRc015AttendeeViewState();
+  _cvpRc015RenderOtherAttendeesBase();
+  cvpRc015RestoreAttendeeViewState(state);
+};
+window.renderOtherAttendees=renderOtherAttendees;
 
 </script>
 <!-- MH-MODULE-END id="MOD-JS-007" -->
