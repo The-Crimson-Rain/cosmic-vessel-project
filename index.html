@@ -1,4 +1,36 @@
 <!DOCTYPE html>
+<!--
+============================================================
+ MISSION HUB — DEVELOPER EDITION
+ Toolkit Version: 1.0.0
+ Generated: 2026-07-13T14:19:45
+
+ MODULE INDEX
+   MOD-META-TITLE           Browser Title
+   MOD-CSS-001              CSS Block 1
+   MOD-CSS-002              CSS Block 2
+   MOD-CSS-003              CSS Block 3
+   MOD-CSS-004              CSS Block 4
+   MOD-JS-001               Inline JavaScript Block 1
+   MOD-JS-002               Inline JavaScript Block 2
+   MOD-JS-003               Inline JavaScript Block 3
+   MOD-JS-004               Inline JavaScript Block 4
+   MOD-JS-005               Inline JavaScript Block 5
+   MOD-JS-006               Inline JavaScript Block 6
+   MOD-JS-007               Inline JavaScript Block 7
+   MOD-JS-008               Inline JavaScript Block 8
+   MOD-JS-009               Inline JavaScript Block 9
+   MOD-JS-010               Inline JavaScript Block 10
+   MOD-HTML-SETUP           Firebase Setup Screen
+   MOD-HTML-LOGIN           Login Screen
+   MOD-HTML-APP             Main Hub Application
+   MOD-HTML-TOASTS          Toast Container
+
+ Module marker format:
+   MH-MODULE-START / MH-MODULE-END
+============================================================
+-->
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +38,9 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- MH-MODULE-START id="MOD-META-TITLE" version="1.0.0" name="Browser Title" -->
 <title>Cosmic Vessel Project — Mission Hub v10B.3</title>
+<!-- MH-MODULE-END id="MOD-META-TITLE" -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
@@ -15,6 +49,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<!-- MH-MODULE-START id="MOD-JS-001" version="1.0.0" name="Inline JavaScript Block 1" -->
 <script>
 // Wait for Firebase to be ready before booting
 window.__fbReady = new Promise(resolve => {
@@ -22,7 +57,9 @@ window.__fbReady = new Promise(resolve => {
   check();
 });
 </script>
+<!-- MH-MODULE-END id="MOD-JS-001" -->
 
+<!-- MH-MODULE-START id="MOD-CSS-001" version="1.0.0" name="CSS Block 1" -->
 <style>
 /* ═══════════════════════════════════════════════
    CVP MISSION HUB v2 — DESIGN TOKENS
@@ -2001,7 +2038,9 @@ body.motion-off #personal-cosmic-effects{display:none!important}
 body.motion-off.personal-cosmic-theme .panel::after,body.motion-off.personal-cosmic-theme .home-card::after,body.motion-off.personal-cosmic-theme .home-focus-card::after{animation:none!important;background-position:50% 50%;opacity:.45}
 
 </style>
+<!-- MH-MODULE-END id="MOD-CSS-001" -->
 
+<!-- MH-MODULE-START id="MOD-CSS-002" version="1.0.0" name="CSS Block 2" -->
 <style id="v11-design-system">
 /* Mission Hub v11 — UX & Workflow Refresh */
 :root{
@@ -2070,7 +2109,9 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
 .v11-task-progress:hover::after{opacity:1}
 @media(max-width:720px){.v11-task-meta{grid-template-columns:1fr}.v11-card-actions{opacity:1}.v11-link-row{align-items:flex-start;flex-direction:column}.board-member-tasks .v11-task-card{width:100%!important;min-width:0;max-width:none}.v11-task-head{grid-template-columns:29px minmax(0,1fr) auto}}
 </style>
+<!-- MH-MODULE-END id="MOD-CSS-002" -->
 
+<!-- MH-MODULE-START id="MOD-CSS-003" version="1.0.0" name="CSS Block 3" -->
 <style>
 /* v11.2 testing fixes — compact cards and explicit workflow stages */
 .board-member-tasks .v11-task-card{width:260px!important;min-width:260px;max-width:260px}
@@ -2084,12 +2125,14 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
 .v11-workflow-key{display:flex;justify-content:space-between;margin-top:5px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.3px;color:var(--text-muted)}
 @media(max-width:720px){.board-member-tasks .v11-task-card{width:100%!important;min-width:0;max-width:none}}
 </style>
+<!-- MH-MODULE-END id="MOD-CSS-003" -->
 </head>
 <body>
 <div id="seasonal-effects" aria-hidden="true"></div>
 <div id="seasonal-preview-badge" class="seasonal-preview-badge hidden"></div>
 <canvas id="cvp-bg-canvas"></canvas>
 <!-- ═══════════════════ SETUP BANNER ═══════════════════ -->
+<!-- MH-MODULE-START id="MOD-HTML-SETUP" version="1.0.0" name="Firebase Setup Screen" -->
 <div id="setup-banner">
   <div class="setup-content">
     <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">FIREBASE SETUP REQUIRED</div>
@@ -2130,8 +2173,10 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
     <div id="config-err" class="login-error"></div>
   </div>
 </div>
+<!-- MH-MODULE-END id="MOD-HTML-SETUP" -->
 
 <!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<!-- MH-MODULE-START id="MOD-HTML-LOGIN" version="1.0.0" name="Login Screen" -->
 <div id="login-screen" style="display:none;">
   <div class="login-title">COSMIC VESSEL PROJECT</div>
   <div class="login-sub">Mission Control Hub</div>
@@ -2201,8 +2246,10 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
     </div>
   </div>
 </div>
+<!-- MH-MODULE-END id="MOD-HTML-LOGIN" -->
 
 <!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<!-- MH-MODULE-START id="MOD-HTML-APP" version="1.0.0" name="Main Hub Application" -->
 <div id="app" style="display:none;">
 
   <!-- HEADER -->
@@ -2916,6 +2963,7 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
 
   </main>
 </div>
+<!-- MH-MODULE-END id="MOD-HTML-APP" -->
 
 <!-- ═══════════════════ MODALS ═══════════════════ -->
 
@@ -3566,7 +3614,10 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
   <div class="journey-celebration-card"><div class="journey-celebration-symbol" id="jc-symbol">✦</div><div class="journey-celebration-title" id="jc-title">Journey Updated</div><div class="journey-celebration-msg" id="jc-message"></div><button class="btn btn-primary mt-16" onclick="dismissJourneyCelebration()">Continue</button></div>
 </div>
 
+<!-- MH-MODULE-START id="MOD-HTML-TOASTS" version="1.0.0" name="Toast Container" -->
 <div id="toasts"></div>
+<!-- MH-MODULE-END id="MOD-HTML-TOASTS" -->
+<!-- MH-MODULE-START id="MOD-JS-002" version="1.0.0" name="Inline JavaScript Block 2" -->
 <script>
 // ═══════════════════════════════════════════════════════════
 //  CVP MISSION HUB v2 — CORE LOGIC
@@ -6964,8 +7015,10 @@ window.addEventListener('load', function() {
   tryInit();
 });
 </script>
+<!-- MH-MODULE-END id="MOD-JS-002" -->
 
 
+<!-- MH-MODULE-START id="MOD-JS-003" version="1.0.0" name="Inline JavaScript Block 3" -->
 <script>
 var deferredPrompt = null;
 
@@ -8278,6 +8331,7 @@ async function arcAdminClearAll() {
   } catch(e) { toast('Error: '+e.message,'err'); }
 }
 </script>
+<!-- MH-MODULE-END id="MOD-JS-003" -->
 
 
 
@@ -8351,6 +8405,7 @@ async function arcAdminClearAll() {
   </div>
 </div>
 
+<!-- MH-MODULE-START id="MOD-JS-004" version="1.0.0" name="Inline JavaScript Block 4" -->
 <script>
 // ═══════════════════════════════════════════════════
 // CVP HEX BACKGROUND ENGINE
@@ -8525,6 +8580,8 @@ async function arcAdminClearAll() {
   setTimeout(()=>{ canvas.style.opacity='1'; },300);
 })();
 </script>
+<!-- MH-MODULE-END id="MOD-JS-004" -->
+<!-- MH-MODULE-START id="MOD-JS-005" version="1.0.0" name="Inline JavaScript Block 5" -->
 <script>
 // ═══════════════════════════════════════════════════
 // CVP HUB EFFECTS: Mouse Torch, Click Sparks, Idle
@@ -9167,7 +9224,9 @@ async function saveDashboardSettings(){
 }
 
 </script>
+<!-- MH-MODULE-END id="MOD-JS-005" -->
 
+<!-- MH-MODULE-START id="MOD-JS-006" version="1.0.0" name="Inline JavaScript Block 6" -->
 <script>
 // ═══════════════════════════════════════════════
 // JOURNEY, XP, PATHS & TITLES — v10B
@@ -9221,9 +9280,200 @@ function checkWeeklyAvailabilityConfirmation(){
 const _journeyOriginalRenderProfile=typeof renderProfile==='function'?renderProfile:null;
 if(_journeyOriginalRenderProfile){renderProfile=function(){var r=_journeyOriginalRenderProfile.apply(this,arguments);renderHomeJourney();maybePromptJourney();return r;};}
 </script>
+<!-- MH-MODULE-END id="MOD-JS-006" -->
 
+<!-- MH-MODULE-START id="MOD-JS-007" version="1.11.0" name="Journey Titles, Custom Badges & Admin Grants" -->
 <script>
 // Journey and seasonal refinements — v10B.2
+// Mission Hub v12 RC003 — true badge collection + title unlock correction
+let journeyAdminCollectedBadges=new Set();
+
+function journeySlug(value){
+ return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+function journeyClassBadgeId(pathId,name){return 'class:'+pathId+':'+journeySlug(name);}
+const JOURNEY_BADGE_LEVELS=[1,5,10,15,20];
+function journeyClassBadgeInfo(pathId,name,index){
+ return {
+  id:journeyClassBadgeId(pathId,name),
+  name:name,
+  category:(journeyPathObj(pathId).name||pathId)+' Badges',
+  pathId:pathId,
+  tierIndex:Number(index)||0,
+  level:JOURNEY_BADGE_LEVELS[Number(index)||0]||1,
+  description:'A collectible '+(journeyPathObj(pathId).name||pathId)+' Path badge earned through Journey progression.',
+  earned:'Reach Level '+(JOURNEY_BADGE_LEVELS[Number(index)||0]||1)+' on the '+(journeyPathObj(pathId).name||pathId)+' Path'
+ };
+}
+function journeyAllCollectibleBadges(){
+ const out=[];
+ Object.keys(JOURNEY_CLASS_CONTENT).forEach(function(pathId){
+  (JOURNEY_CLASS_CONTENT[pathId].badges||[]).forEach(function(name,index){out.push(journeyClassBadgeInfo(pathId,name,index));});
+ });
+ const recognition=Array.isArray(window.RECOGNITION_BADGES)?window.RECOGNITION_BADGES:[];
+ recognition.forEach(function(b){if(!out.some(function(x){return x.id===b.id;}))out.push(Object.assign({},b));});
+ return out;
+}
+function journeyCurrentPathId(member){
+ member=member||{};
+ return member.journeyPath==='cosmic-vessel'?(member.journeyPreviousPath||''):member.journeyPath;
+}
+function journeyNormalizeBadgeIds(ids){
+ const out=[];(Array.isArray(ids)?ids:[]).forEach(function(id){if(/^level_(1|5|10|15|20|25|30|35|40|45|50)$/.test(String(id)))return;if(id&&!out.includes(id))out.push(id);});return out;
+}
+function journeyAutoClassBadgeIds(member){
+ const pathId=journeyCurrentPathId(member),content=JOURNEY_CLASS_CONTENT[pathId],level=journeyLevel(member||{});
+ if(!content||!Array.isArray(content.badges))return [];
+ return content.badges.map(function(name,index){return level>=JOURNEY_BADGE_LEVELS[index]?journeyClassBadgeId(pathId,name):null;}).filter(Boolean);
+}
+async function journeySyncAutoClassBadges(member,uid){
+ member=member||{};
+ const current=journeyNormalizeBadgeIds(member.journeyUnlockedBadges);
+ const auto=journeyAutoClassBadgeIds(member),merged=current.slice();let changed=false;
+ auto.forEach(function(id){if(!merged.includes(id)){merged.push(id);changed=true;}});
+ if(changed){
+  member.journeyUnlockedBadges=merged;
+  if(uid&&typeof db!=='undefined'&&db){try{await db.collection('users').doc(uid).set({journeyUnlockedBadges:merged,journeyUpdatedAt:new Date().toISOString()},{merge:true});}catch(e){console.warn('Automatic class badge sync failed',e);}}
+ }
+ return merged;
+}
+function journeyBadgeHash(id){
+ let h=2166136261;String(id||'').split('').forEach(function(ch){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);});return h>>>0;
+}
+function journeySvgWrap(inner){
+ return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';
+}
+function journeyClassBadgeSvg(pathId,tier){
+ tier=Math.max(0,Math.min(4,Number(tier)||0));
+ const art={"cleric":["<path d=\"M32 12v40M18 28h28\"/>","<path d=\"M32 12c8 10 13 17 13 25 0 8-6 15-13 15S19 45 19 37c0-8 5-15 13-25z\"/><path d=\"M27 40c3 4 7 4 10 0\"/>","<path d=\"M22 18h20l-3 20c-1 8-13 8-14 0z\"/><path d=\"M26 48h12M32 42v6\"/><path d=\"M27 28h10M32 23v10\"/>","<path d=\"M32 10l18 22-18 22-18-22z\"/>","<path d=\"M18 28l5-13 9 8 9-8 5 13-5 18H23z\"/><path d=\"M22 47h20\"/><path d=\"M32 5v7M12 17l7 4M52 17l-7 4M11 38l8-2M53 38l-8-2\"/>"],"barbarian":["<path d=\"M21 47l22-30\"/><path d=\"M39 14l11 8-9 5-6-6\"/><path d=\"M17 42l9 10\"/>","<path d=\"M18 50c0-13 5-25 14-35 9 10 14 22 14 35\"/><path d=\"M23 28c6 4 12 4 18 0\"/><path d=\"M24 39h16\"/>","<path d=\"M16 46l32-28\"/><path d=\"M16 18l32 28\"/><path d=\"M42 14l9 8M13 41l9 10M13 23l9-10M42 51l9-10\"/>","<path d=\"M14 48l17-34 6 12 13 3-10 9 2 14-11-7-11 7 2-14z\"/>","<path d=\"M18 48c2-15 7-27 14-36 7 9 12 21 14 36\"/><path d=\"M22 28l10 8 10-8\"/><path d=\"M25 42h14\"/><path d=\"M16 17l7 6M48 17l-7 6\"/>"],"bard":["<ellipse cx=\"32\" cy=\"37\" rx=\"16\" ry=\"10\"/><path d=\"M16 29v16M48 29v16M22 25h20M24 32h16M24 42h16\"/>","<path d=\"M20 49c0-16 4-28 12-37 8 9 12 21 12 37\"/><path d=\"M24 42h16M26 34h12M28 26h8\"/><path d=\"M32 12v37\"/>","<path d=\"M22 14c7 5 13 5 20 0v33c-7 5-13 5-20 0z\"/><path d=\"M32 14v37M24 27h16M24 36h16\"/><path d=\"M42 18l7-5M22 18l-7-5\"/>","<path d=\"M20 44c4-10 10-17 17-22\"/><path d=\"M37 22c7 3 12 9 15 17\"/><path d=\"M22 45c6 5 15 5 21 0\"/><path d=\"M18 28c6-5 12-5 18 0\"/><path d=\"M42 31c5 2 8 5 10 9\"/>","<path d=\"M27 17c7-5 14-2 16 5 2 6-2 11-8 13l-1 13-11 4-4-9 8-5z\"/><path d=\"M35 35l11 13M21 43l13-5M31 22c4 0 6 3 6 6\"/>"],"druid":["<path d=\"M18 46c18 0 28-13 30-30-17 2-30 12-30 30z\"/><path d=\"M20 44c8-8 15-14 25-23\"/>","<path d=\"M32 10v43M32 19c-10-8-18-2-18 8 7-4 13-3 18 2M32 19c10-8 18-2 18 8-7-4-13-3-18 2M32 33c-8-6-15-1-15 8 6-3 11-2 15 2M32 33c8-6 15-1 15 8-6-3-11-2-15 2\"/><path d=\"M22 53h20\"/>","<path d=\"M18 37c2-13 8-20 14-20s12 7 14 20c-4 9-10 13-14 13s-10-4-14-13z\"/><path d=\"M23 29l5 3-4 4M41 29l-5 3 4 4\"/><path d=\"M28 42h8\"/><path d=\"M20 21l-6-6M44 21l6-6\"/>","<path d=\"M32 28c-7-10-19-4-16 7 3 8 12 12 16 17 4-5 13-9 16-17 3-11-9-17-16-7z\"/><path d=\"M32 28c-7-9-4-19 0-19s7 10 0 19z\"/><path d=\"M32 28c7-9 17-7 17-3s-10 10-17 3z\"/><path d=\"M32 28c-7-9-17-7-17-3s10 10 17 3z\"/>","<path d=\"M46 14c-10 1-17 8-17 18 0 8 5 14 12 18\"/><path d=\"M45 16c6 8 7 16 3 24\"/><path d=\"M17 46c2-12 7-20 15-24\"/><path d=\"M18 45l8 5M25 37l7 5M32 29l7 4\"/><path d=\"M12 51h14\"/><path d=\"M27 50c6-8 14-11 24-10\"/>"],"fighter":["<path d=\"M12 32h38\"/><path d=\"M41 24l11 8-11 8\"/><path d=\"M18 26v12\"/>","<path d=\"M20 48l28-30\"/><path d=\"M42 15l9 8-8 4-5-6\"/><path d=\"M16 42l10 10\"/>","<path d=\"M32 10l17 8v14c0 11-7 18-17 22-10-4-17-11-17-22V18z\"/><path d=\"M24 32h16M32 24v16\"/>","<path d=\"M16 15v39\"/><path d=\"M16 18h31v27H16\"/><path d=\"M18 20l27 12-27 11z\"/><path d=\"M11 54h11\"/>","<path d=\"M32 16l14 6v12c0 9-6 15-14 19-8-4-14-10-14-19V22z\"/><path d=\"M15 46l14-14M49 46L35 32\"/><path d=\"M12 40l9 9M52 40l-9 9\"/><path d=\"M18 18l11 8M46 18l-11 8\"/>"],"monk":["<path d=\"M13 34c4-8 10-11 19-8M51 34c-4-8-10-11-19-8\"/><path d=\"M14 34h15v13H14zM35 34h15v13H35z\"/><path d=\"M29 39h6\"/>","<circle cx=\"32\" cy=\"32\" r=\"21\"/><path d=\"M32 11c7 4 11 11 11 21s-4 17-11 21c-7-4-11-11-11-21s4-17 11-21z\"/><circle cx=\"32\" cy=\"22\" r=\"3\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"32\" cy=\"42\" r=\"3\"/>","<path d=\"M20 49c-2-8-1-16 4-23l4-6 4 8 4-8 4 6c5 7 6 15 4 23\"/><path d=\"M24 31h16M32 22v24\"/><path d=\"M22 49h20\"/>","<path d=\"M25 48c-6-8-6-19 0-28 4-6 10-6 14 0 6 9 6 20 0 28\"/><path d=\"M21 42c7-5 15-5 22 0\"/><path d=\"M19 23c8-5 18-5 26 0\"/>","<circle cx=\"32\" cy=\"22\" r=\"8\"/><path d=\"M18 52c2-14 7-21 14-21s12 7 14 21\"/><circle cx=\"32\" cy=\"22\" r=\"14\"/><path d=\"M21 52h22\"/>"],"paladin":["<path d=\"M32 10l17 8v14c0 11-7 18-17 22-10-4-17-11-17-22V18z\"/><path d=\"M32 21v23M23 31h18\"/>","<path d=\"M22 16h20l5 9-15 28-15-28z\"/><path d=\"M24 27h16M32 19v22\"/>","<circle cx=\"32\" cy=\"32\" r=\"21\"/><path d=\"M20 32h24M32 20v24\"/><path d=\"M24 24l16 16M40 24L24 40\"/>","<path d=\"M20 14h24l4 13-5 24H21l-5-24z\"/><path d=\"M24 24h16M27 33h10M24 42h16\"/>","<path d=\"M32 8l5 16 12 7-12 7-5 18-5-18-12-7 12-7z\"/><path d=\"M22 31h20\"/><path d=\"M32 13v36\"/><path d=\"M25 52h14\"/>"],"ranger":["<path d=\"M14 45c7-18 18-28 36-31-2 19-13 30-30 37\"/><path d=\"M17 48l31-31\"/><path d=\"M42 14l10 9M13 41l10 10\"/>","<path d=\"M10 32c7-9 15-14 22-14s15 5 22 14c-7 9-15 14-22 14S17 41 10 32z\"/><circle cx=\"32\" cy=\"32\" r=\"6\"/>","<path d=\"M32 18c-5-9-15-7-15 2 0 7 8 10 15 16 7-6 15-9 15-16 0-9-10-11-15-2z\"/><path d=\"M32 36v15M25 45h14\"/>","<path d=\"M12 50c6-12 12-20 20-25 7-5 13-8 20-9\"/><path d=\"M12 50h40\"/><path d=\"M23 43h6M31 35h6M39 27h6\"/><path d=\"M46 12l6 4-4 7\"/>","<ellipse cx=\"22\" cy=\"27\" rx=\"5\" ry=\"7\"/><ellipse cx=\"40\" cy=\"39\" rx=\"5\" ry=\"7\"/><circle cx=\"16\" cy=\"18\" r=\"3\"/><circle cx=\"22\" cy=\"15\" r=\"3\"/><circle cx=\"28\" cy=\"18\" r=\"3\"/><circle cx=\"34\" cy=\"30\" r=\"3\"/><circle cx=\"40\" cy=\"27\" r=\"3\"/><circle cx=\"46\" cy=\"30\" r=\"3\"/>"],"rogue":["<path d=\"M14 36c6-6 13-7 20-3\"/><path d=\"M34 33c5-2 10 1 10 5 0 5-5 8-10 7\"/><circle cx=\"40\" cy=\"34\" r=\"6\"/><path d=\"M14 36l-4 4 5 5\"/><path d=\"M20 45h17\"/>","<path d=\"M20 49l24-33 5 4-25 33z\"/><path d=\"M40 16l8-3-4 8M18 45l-5 7 8-2\"/>","<path d=\"M16 25c8-10 24-10 32 0-2 15-8 23-16 23s-14-8-16-23z\"/><path d=\"M23 30l7 3-5 5M41 30l-7 3 5 5\"/>","<path d=\"M16 49l24-34M40 15l9 5-7 4-4-5M16 49l8 3-3-8\"/><path d=\"M48 49L24 15M24 15l-9 5 7 4M48 49l-8 3 3-8\"/>","<path d=\"M15 48c2-17 8-28 17-35 9 7 15 18 17 35\"/><path d=\"M21 27c7 5 15 5 22 0\"/><path d=\"M24 35l5 2-4 4M40 35l-5 2 4 4\"/>"],"sorcerer":["<path d=\"M32 15c7 9 11 15 11 22 0 7-5 13-11 13s-11-6-11-13c0-7 4-13 11-22z\"/>","<path d=\"M12 41l31-21\"/><path d=\"M38 14l14 2-6 13\"/><path d=\"M17 27l3 3M22 20l3 3M25 44l3 3\"/><path d=\"M12 41l13-1\"/>","<path d=\"M32 12c8 9 13 15 13 23 0 8-6 14-13 14s-13-6-13-14c0-7 5-12 10-18-1 8 5 12 9 14-1-7-3-12-6-19z\"/>","<path d=\"M32 9l8 15-8 15-8-15z\"/><path d=\"M17 18l15 6 15-6M17 47l15-8 15 8\"/><path d=\"M17 18v29M47 18v29\"/>","<path d=\"M32 7l5 14 14-5-5 14 12 8-15 2 2 15-13-8-13 8 2-15-15-2 12-8-5-14 14 5z\"/>"],"warlock":["<path d=\"M10 32c7-9 15-14 22-14s15 5 22 14c-7 9-15 14-22 14S17 41 10 32z\"/><circle cx=\"32\" cy=\"32\" r=\"6\"/>","<path d=\"M16 18l32 28M16 46l32-28\"/><path d=\"M20 14l-6 6 6 6M44 38l6 6-6 6M44 14l6 6-6 6M20 38l-6 6 6 6\"/><path d=\"M14 20l6-6M50 20l-6-6M14 44l6 6M50 44l-6 6\"/>","<circle cx=\"32\" cy=\"18\" r=\"6\"/><circle cx=\"20\" cy=\"31\" r=\"5\"/><circle cx=\"44\" cy=\"31\" r=\"5\"/><circle cx=\"25\" cy=\"45\" r=\"5\"/><circle cx=\"39\" cy=\"45\" r=\"5\"/><path d=\"M29 18h6M18 31h4M42 31h4M23 45h4M37 45h4\"/>","<circle cx=\"32\" cy=\"27\" r=\"18\"/><path d=\"M14 27h36\"/><path d=\"M19 44c7-9 18-13 29-6\"/><path d=\"M23 43l9-12 7 8 5-5 7 10\"/>","<path d=\"M32 9l7 13 15 2-11 10 3 15-14-7-14 7 3-15-11-10 15-2z\"/><path d=\"M22 30c7-8 13-8 20 0-7 8-13 8-20 0z\"/><circle cx=\"32\" cy=\"30\" r=\"3\"/>"],"wizard":["<path d=\"M18 44l14-31 14 31z\"/><path d=\"M13 44h38M24 35h16\"/><path d=\"M32 13l5 8\"/>","<path d=\"M18 16h24c5 0 8 3 8 8v26H25c-4 0-7-3-7-7z\"/><path d=\"M25 16v34M30 25h13M30 32h10\"/>","<path d=\"M18 28h28v21H18z\"/><path d=\"M14 49h36\"/><path d=\"M25 28V16h14v12\"/><path d=\"M29 21h6\"/>","<circle cx=\"32\" cy=\"32\" r=\"21\"/><circle cx=\"32\" cy=\"32\" r=\"11\"/><path d=\"M32 8v8M32 48v8M8 32h8M48 32h8M15 15l6 6M43 43l6 6M49 15l-6 6M21 43l-6 6\"/><path d=\"M27 32l5-8 5 8-5 8z\"/>","<circle cx=\"32\" cy=\"32\" r=\"21\"/><circle cx=\"32\" cy=\"32\" r=\"13\"/><path d=\"M32 11v8M32 45v8M11 32h8M45 32h8M17 17l6 6M41 41l6 6M47 17l-6 6M23 41l-6 6\"/><path d=\"M32 24l4 8-4 8-4-8z\"/>"]};
+ const seq=art[pathId]||art.wizard;return journeySvgWrap(seq[tier]);
+}
+function journeyRecognitionBadgeSvg(badge){
+ const id=(badge&&badge.id)||'',name=(badge&&badge.name)||'',key=(id+' '+name).toLowerCase();
+ const icons={"first_steps":"<ellipse cx=\"23\" cy=\"39\" rx=\"6\" ry=\"9\"/><ellipse cx=\"39\" cy=\"24\" rx=\"6\" ry=\"9\"/><circle cx=\"17\" cy=\"29\" r=\"2\"/><circle cx=\"21\" cy=\"26\" r=\"2\"/><circle cx=\"25\" cy=\"26\" r=\"2\"/><circle cx=\"33\" cy=\"14\" r=\"2\"/><circle cx=\"37\" cy=\"11\" r=\"2\"/><circle cx=\"41\" cy=\"12\" r=\"2\"/>","steady_hand":"<path d=\"M12 37c8-6 15-8 20-3 5-5 12-3 20 3\"/><path d=\"M12 37c6 11 14 15 20 15s14-4 20-15\"/><path d=\"M22 40c3 3 6 5 10 5s7-2 10-5\"/>","helping_hand":"<path d=\"M13 30l11-9 9 7 8-7 10 9\"/><path d=\"M18 34l9 10c3 3 7 3 10 0l9-10\"/><path d=\"M24 28l8 7 8-7\"/><path d=\"M11 28l7 8M53 28l-7 8\"/>","reliable_companion":"<circle cx=\"24\" cy=\"23\" r=\"7\"/><circle cx=\"40\" cy=\"23\" r=\"7\"/><path d=\"M12 49c2-11 6-17 12-17s10 6 12 17\"/><path d=\"M28 49c2-11 6-17 12-17s10 6 12 17\"/>","quiet_hero":"<path d=\"M26 49h12\"/><path d=\"M28 44h8\"/><path d=\"M27 44c-3-7-3-14 1-20 2-3 6-3 8 0 4 6 4 13 1 20\"/><path d=\"M32 12c4 4 5 8 2 12-3 4-8 3-10 0 4-2 6-6 8-12z\"/>","night_owl":"<path d=\"M20 45c-3-8-2-16 4-22l8 6 8-6c6 6 7 14 4 22-7 5-17 5-24 0z\"/><circle cx=\"27\" cy=\"34\" r=\"3\"/><circle cx=\"37\" cy=\"34\" r=\"3\"/><path d=\"M29 40l3 2 3-2\"/><path d=\"M46 15c-6 0-10 4-10 10 6 0 10-4 10-10z\"/>","early_bird":"<path d=\"M15 38c8-11 19-15 32-10-4 12-13 18-25 18\"/><path d=\"M23 37l-11-5M23 42l-8 7\"/><path d=\"M30 30c5 2 9 2 13-1\"/><circle cx=\"40\" cy=\"29\" r=\"2\"/><path d=\"M47 27l7 3-7 3\"/>","founding_star":"<path d=\"M32 8l7 15 17 2-12 12 3 17-15-8-15 8 3-17L8 25l17-2z\"/><path d=\"M32 21l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z\"/>","master_artisan":"<path d=\"M21 47l23-23\"/><path d=\"M39 16l10 10-8 4-6-6\"/><path d=\"M17 43l8 8\"/>","sound_weaver":"<path d=\"M16 20c10-6 22-6 32 0M16 29c10-6 22-6 32 0M16 38c10-6 22-6 32 0\"/><path d=\"M25 44V21l14-3v19\"/><circle cx=\"21\" cy=\"46\" r=\"4\"/><circle cx=\"35\" cy=\"39\" r=\"4\"/>","guiding_hand":"<path d=\"M12 38c7-8 14-10 21-4\"/><path d=\"M52 38c-7-8-14-10-21-4\"/><path d=\"M18 42l9 7M46 42l-9 7\"/><path d=\"M27 34l5 4 5-4\"/>","project_luminary":"<path d=\"M32 9l5 12 13 5-13 5-5 12-5-12-13-5 13-5z\"/><path d=\"M32 3v4M32 45v6M8 26h4M52 26h4M15 9l4 4M49 9l-4 4M15 43l4-4M49 43l-4-4\"/>","milestone_keeper":"<path d=\"M17 49V17h24\"/><path d=\"M41 17l7 7-7 7\"/><circle cx=\"26\" cy=\"26\" r=\"5\"/><circle cx=\"26\" cy=\"39\" r=\"5\"/><path d=\"M31 26h12M31 39h12\"/><path d=\"M22 24l3 3 7-8\"/>","lorekeeper":"<path d=\"M19 16h26v34H19z\"/><path d=\"M24 16v34M29 25h11M29 32h9\"/><path d=\"M19 21h-4v25h4\"/>","storyteller":"<path d=\"M17 48l28-29\"/><path d=\"M40 15l9 9-7 4-6-6\"/><path d=\"M14 45l7 7\"/>","world_builder":"<circle cx=\"32\" cy=\"32\" r=\"20\"/><path d=\"M12 32h40M32 12c8 8 8 32 0 40M32 12c-8 8-8 32 0 40\"/>","bug_hunter":"<circle cx=\"29\" cy=\"29\" r=\"13\"/><path d=\"M38 38l12 12\"/>","bug_crusher":"<ellipse cx=\"32\" cy=\"34\" rx=\"12\" ry=\"15\"/><path d=\"M32 19v30M20 32h24\"/><circle cx=\"27\" cy=\"28\" r=\"2\"/><circle cx=\"37\" cy=\"28\" r=\"2\"/><circle cx=\"27\" cy=\"39\" r=\"2\"/><circle cx=\"37\" cy=\"39\" r=\"2\"/><path d=\"M24 20l-5-6M40 20l5-6\"/>","season_spring":"<path d=\"M19 20c8 2 12 7 13 14-8 1-13-3-15-10zM32 34c5-7 11-9 18-6-2 8-7 12-15 11M31 34c-7 5-10 11-8 18\"/><path d=\"M26 52h12\"/>","season_summer":"<path d=\"M20 43l12-17 6 4-10 18z\"/><path d=\"M28 48h12\"/><circle cx=\"45\" cy=\"18\" r=\"8\"/><path d=\"M45 6v4M45 26v4M33 18h4M53 18h4M37 10l3 3M50 23l3 3M53 10l-3 3M40 23l-3 3\"/>","season_autumn":"<path d=\"M24 50c-3-8-2-15 3-21 4 4 6 9 5 15 2-5 5-8 9-10 4 7 3 13-1 18\"/><path d=\"M18 22c7-3 12-1 16 5-7 4-12 2-16-5zM31 16c7-3 12-1 16 5-7 4-12 2-16-5zM37 29c7-3 12-1 16 5-7 4-12 2-16-5z\"/>","season_winter":"<path d=\"M32 9v46M9 32h46M16 16l32 32M48 16L16 48\"/><path d=\"M32 20l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z\"/>","cosmic_essence":"<path d=\"M32 10c8 11 14 18 14 27 0 8-6 15-14 15s-14-7-14-15c0-9 6-16 14-27z\"/>","cosmic_chronographer":"<path d=\"M22 12h20M22 52h20\"/><path d=\"M25 12c0 9 2 15 7 20-5 5-7 11-7 20M39 12c0 9-2 15-7 20 5 5 7 11 7 20\"/><path d=\"M27 24h10M27 40h10\"/>","cosmic_archivist":"<path d=\"M14 18h18c5 0 8 3 8 8v25H22c-5 0-8-3-8-8z\"/><path d=\"M40 18h10v25c0 5-3 8-8 8h-2\"/>","cosmic_starcaller":"<path d=\"M19 48l26-32M40 13l10 8-8 3-4-5M15 42l10 10\"/><path d=\"M16 18l3 7 7 3-7 3-3 7-3-7-7-3 7-3zM48 34l2 5 5 2-5 2-2 5-2-5-5-2 5-2z\"/>"};
+ if(icons[id])return journeySvgWrap(icons[id]);
+ if(key.includes('owl'))return journeySvgWrap(icons.night_owl);
+ if(key.includes('bird'))return journeySvgWrap(icons.early_bird);
+ if(key.includes('solar'))return journeySvgWrap(icons.season_summer);
+ if(key.includes('ember'))return journeySvgWrap(icons.season_autumn);
+ if(key.includes('frozen'))return journeySvgWrap(icons.season_winter);
+ if(key.includes('bloom'))return journeySvgWrap(icons.season_spring);
+ if(key.includes('bug'))return journeySvgWrap(icons.bug_hunter);
+ if(key.includes('lore'))return journeySvgWrap(icons.lorekeeper);
+ if(key.includes('story'))return journeySvgWrap(icons.storyteller);
+ if(key.includes('world'))return journeySvgWrap(icons.world_builder);
+ if(key.includes('help'))return journeySvgWrap(icons.helping_hand);
+ return journeySvgWrap('<path d="M32 12l5 12 13 5-13 5-5 12-5-12-13-5 13-5z"/>');
+}
+function journeyBadgeSvg(badge){
+ if(badge&&badge.pathId)return journeyClassBadgeSvg(badge.pathId,badge.tierIndex);
+ return journeyRecognitionBadgeSvg(badge||{});
+}
+function journeyBadgeInfoById(id){
+ const found=journeyAllCollectibleBadges().find(function(b){return b.id===id;});
+ if(found)return found;
+ if(String(id).startsWith('custom:')){
+  const name=String(id).slice(7);
+  return {id:id,name:name,category:'Custom Badges',icon:'✦',description:'A custom recognition badge awarded by the Project Admin.',earned:'Admin recognition'};
+ }
+ return {id:id,name:id,category:'Other Badges',description:'A collected Journey badge.',earned:'Journey recognition'};
+}
+function journeyUnlockedClassTitles(member){
+ member=member||{};
+ const pathId=member.journeyPath==='cosmic-vessel'?(member.journeyPreviousPath||''):member.journeyPath;
+ const titles=((JOURNEY_CLASS_CONTENT[pathId]||{}).titles||[]);
+ const levels=[1,5,10,15,20];
+ const level=journeyLevel(member);
+ return titles.filter(function(_,i){return level>=levels[i];});
+}
+function journeyAllTitleGroups(member){const groups={},pathId=journeyCurrentPathId(member||{}),pathName=pathId?journeyPathObj(pathId).name:'';if(pathId&&JOURNEY_CLASS_CONTENT[pathId])groups[pathName+' Titles']=(JOURNEY_CLASS_CONTENT[pathId].titles||[]).slice();Object.keys(JOURNEY_CLASS_CONTENT).forEach(function(id){if(id===pathId)return;groups[(journeyPathObj(id).name||id)+' Titles']=(JOURNEY_CLASS_CONTENT[id].titles||[]).slice();});groups['General Titles']=(Array.isArray(JOURNEY_GENERAL_TITLES)?JOURNEY_GENERAL_TITLES:[]).slice();return groups;}
+function ensureJourneyAdminTitleLibrary(){const modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;let lib=document.getElementById('ja-title-library');if(!lib){lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';lib.innerHTML='<div class="field-label">Grant a title</div><select id="ja-title-grant-select"><option value="">Choose a title to grant…</option></select><div class="ja-title-note">Granted titles are added to the member’s collection. The member chooses which one appears as their Active Title.</div>';const custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');if(field)body.insertBefore(lib,field);else body.appendChild(lib);}}
+function renderJourneyAdminTitleLibrary(member){ensureJourneyAdminTitleLibrary();const select=document.getElementById('ja-title-grant-select');if(!select)return;const groups=journeyAllTitleGroups(member||{});select.innerHTML='<option value="">Choose a title to grant…</option>'+Object.keys(groups).map(function(group){return '<optgroup label="'+esc(group)+'">'+groups[group].map(function(title){return '<option value="'+esc(title)+'">'+esc(title)+'</option>';}).join('')+'</optgroup>';}).join('');}
+function journeyAvailableMemberTitles(member){
+ const values=[];
+ function add(v){if(v&&!values.includes(v))values.push(v);}
+ journeyUnlockedClassTitles(member).forEach(add);
+ (Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[]).forEach(add);
+ add((member||{}).journeyActiveTitle);
+ return values;
+}
+function ensureJourneyCollectionStyles(){
+ if(document.getElementById('journey-collection-rc003-styles'))return;
+ const s=document.createElement('style');s.id='journey-collection-rc003-styles';s.textContent=`
+ .ja-badge-library{border:1px solid rgba(201,168,76,.3);border-radius:9px;padding:12px;background:linear-gradient(180deg,rgba(201,168,76,.055),rgba(8,10,18,.62))}
+ .ja-badge-library-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+ .ja-badge-library-title{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+ .ja-badge-library-scroll{max-height:390px;overflow:auto;padding-right:4px}
+ .ja-badge-category{border:1px solid var(--border);border-radius:7px;margin-bottom:8px;overflow:hidden;background:rgba(8,10,18,.45)}
+ .ja-badge-category>button{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:0;background:rgba(8,10,18,.75);color:var(--white);cursor:pointer;font:700 11px 'Rajdhani';letter-spacing:1px}
+ .ja-badge-category>button:hover{color:var(--gold-hi);background:rgba(201,168,76,.07)}
+ .ja-badge-category-body{padding:10px}.ja-badge-category.collapsed .ja-badge-category-body{display:none}
+ .ja-badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+ .ja-badge-icon{position:relative;min-height:104px;padding:10px 8px;border:1px solid var(--border);border-radius:8px;background:rgba(8,10,18,.74);color:var(--grey);cursor:pointer;text-align:center;transition:.18s}
+ .ja-badge-icon:hover{transform:translateY(-2px);border-color:var(--gold-dim);color:var(--white);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+ .ja-badge-icon.selected{border-color:var(--gold);color:var(--gold-hi);background:var(--gold-trace);box-shadow:0 0 18px rgba(201,168,76,.16)}
+ .ja-badge-icon .symbol{width:44px;height:44px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}.ja-badge-icon .symbol svg{width:100%;height:100%;display:block}.ja-badge-icon .name{font-size:10px;font-weight:700;line-height:1.2}
+ .ja-badge-icon.selected::after{content:'✓';position:absolute;top:5px;right:6px;color:var(--green);font-weight:700}
+ .ja-badge-tip{position:fixed;z-index:14000;pointer-events:none;max-width:280px;background:rgba(8,10,18,.98);border:1px solid var(--gold-dim);border-radius:7px;padding:10px 12px;box-shadow:0 12px 36px rgba(0,0,0,.75);font-size:11px;color:var(--grey);line-height:1.45}
+ .ja-badge-tip strong{display:block;color:var(--gold);font-size:12px;margin-bottom:4px}
+ .ja-title-library{margin-top:12px;padding:12px;border:1px solid rgba(126,87,194,.34);border-radius:9px;background:linear-gradient(180deg,rgba(126,87,194,.07),rgba(8,10,18,.58))}
+ .ja-title-library .field-label{margin-bottom:7px}.ja-title-library select{width:100%}
+ .ja-title-note{margin-top:7px;color:var(--grey);font-size:10px;line-height:1.4}
+ `;
+ document.head.appendChild(s);
+}
+function journeyShowBadgeTip(event,id){
+ let tip=document.getElementById('ja-badge-tip');if(!tip){tip=document.createElement('div');tip.id='ja-badge-tip';tip.className='ja-badge-tip';document.body.appendChild(tip);}
+ const b=journeyBadgeInfoById(id);
+ tip.innerHTML='<strong>'+esc(b.name)+'</strong>'+esc(b.description)+'<div style="margin-top:5px;color:var(--white)">Awarded for: '+esc(b.earned)+'</div>';
+ tip.style.left=Math.min(innerWidth-300,event.clientX+14)+'px';tip.style.top=Math.min(innerHeight-140,event.clientY+14)+'px';tip.hidden=false;
+}
+function journeyHideBadgeTip(){const t=document.getElementById('ja-badge-tip');if(t)t.hidden=true;}
+function journeyToggleCollectedBadge(id){
+ if(journeyAdminCollectedBadges.has(id))journeyAdminCollectedBadges.delete(id);else journeyAdminCollectedBadges.add(id);
+ renderJourneyAdminBadgeLibrary();
+}
+function journeyToggleBadgeCategory(button){if(button&&button.parentElement)button.parentElement.classList.toggle('collapsed');}
+function ensureJourneyAdminBadgeLibrary(){
+ ensureJourneyCollectionStyles();
+ const modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;
+ const oldSelect=document.getElementById('ja-badge-select'),oldField=oldSelect&&oldSelect.closest('.field');
+ const oldRow=oldField&&oldField.closest('.grid-2');
+ if(oldField)oldField.style.display='none';
+ const custom=document.getElementById('ja-badge-custom');
+ if(custom){
+  const label=custom.closest('.field')&&custom.closest('.field').querySelector('.field-label');
+  if(label)label.textContent='Add custom badge';
+  custom.placeholder='Type a custom badge name to add to the collection';
+ }
+ let lib=document.getElementById('ja-badge-library');
+ if(!lib){
+  lib=document.createElement('div');lib.id='ja-badge-library';lib.className='ja-badge-library';
+  lib.innerHTML='<div class="ja-badge-library-head"><div><div class="ja-badge-library-title">Badge Collection</div><div class="text-small text-grey">Badges are collected, not selected as a single active badge. Click icons to grant or remove them.</div></div><div id="ja-badge-selected-count" class="text-small text-gold"></div></div><div id="ja-badge-library-scroll" class="ja-badge-library-scroll"></div>';
+  if(oldRow)body.insertBefore(lib,oldRow);else body.appendChild(lib);
+ }
+ const modalBox=modal.querySelector('.modal');if(modalBox)modalBox.style.width='840px';
+}
+function renderJourneyAdminBadgeLibrary(){
+ ensureJourneyAdminBadgeLibrary();
+ const host=document.getElementById('ja-badge-library-scroll');if(!host)return;
+ const categories={};journeyAllCollectibleBadges().forEach(function(b){(categories[b.category]||(categories[b.category]=[])).push(b);});
+ const selectedCount=document.getElementById('ja-badge-selected-count');if(selectedCount)selectedCount.textContent=journeyAdminCollectedBadges.size+' collected';
+ const uid=(document.getElementById('ja-uid')||{}).value,member=(liveData.members||{})[uid]||{},selectedPath=journeyCurrentPathId(member),selectedCategory=selectedPath?(journeyPathObj(selectedPath).name+' Badges'):'';
+ const ordered=Object.keys(categories).sort(function(a,b){if(a===selectedCategory)return -1;if(b===selectedCategory)return 1;return a.localeCompare(b);});
+ host.innerHTML=ordered.map(function(cat){
+  const list=categories[cat],count=list.filter(function(b){return journeyAdminCollectedBadges.has(b.id);}).length;
+  return '<div class="ja-badge-category collapsed"><button type="button" onclick="journeyToggleBadgeCategory(this)"><span>'+esc(cat)+' <span style="color:var(--grey);font-weight:500">('+count+'/'+list.length+')</span></span><span>⌄</span></button><div class="ja-badge-category-body"><div class="ja-badge-grid">'+list.map(function(b){
+   const selected=journeyAdminCollectedBadges.has(b.id);
+   return '<button type="button" class="ja-badge-icon '+(selected?'selected':'')+'" aria-pressed="'+(selected?'true':'false')+'" data-badge-id="'+esc(b.id)+'" onclick="journeyToggleCollectedBadge(this.dataset.badgeId)" onmouseenter="journeyShowBadgeTip(event,this.dataset.badgeId)" onmousemove="journeyShowBadgeTip(event,this.dataset.badgeId)" onmouseleave="journeyHideBadgeTip()"><div class="symbol">'+journeyBadgeSvg(b)+'</div><div class="name">'+esc(b.name)+'</div></button>';
+  }).join('')+'</div></div></div>';
+ }).join('');
+}
+window.journeyToggleCollectedBadge=journeyToggleCollectedBadge;
+window.journeyToggleBadgeCategory=journeyToggleBadgeCategory;
+window.journeyShowBadgeTip=journeyShowBadgeTip;
+window.journeyHideBadgeTip=journeyHideBadgeTip;
+
 const JOURNEY_CLASS_CONTENT={
  barbarian:{titles:['Wildheart','Unbroken','Rageforged','Primal Champion','Titan of Resolve'],badges:['Barbarian Initiate','Ironhide','Berserker Crest','Primal Vanguard','Legendary Wildheart']},
  bard:{titles:['Storyteller','Silver Tongue','College Virtuoso','Voice of Inspiration','Legend of the Stage'],badges:['Bard Initiate','Silver Lyre','Virtuoso Seal','Inspiration Crest','Legendary Maestro']},
@@ -9265,27 +9515,28 @@ function refreshJourneyAdminContent(){
  fillJourneyGroupedSelect(document.getElementById('ja-active-title-select'),'titles',path,m.journeyActiveTitle||'','No selected title');
  var titleSelect=document.getElementById('ja-active-title-select'),customTitles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles:[];
  if(titleSelect&&customTitles.length){var existing=Array.from(titleSelect.options).map(function(o){return o.value;}),group=document.createElement('optgroup');group.label='Member Custom Titles';customTitles.forEach(function(t){if(t&&!existing.includes(t)){var o=document.createElement('option');o.value=t;o.textContent=t;group.appendChild(o);}});if(group.children.length)titleSelect.appendChild(group);titleSelect.value=m.journeyActiveTitle||'';}
- fillJourneyGroupedSelect(document.getElementById('ja-badge-select'),'badges',path,m.journeyBadgeOverride||journeyBadge(m),'Automatic level badge');
+ renderJourneyAdminBadgeLibrary();renderJourneyAdminTitleLibrary(m);
  adminJourneyPreview();
 }
 openJourneyAdminEdit=function(uid){
  var m=(liveData.members||{})[uid];if(!m)return;document.getElementById('ja-uid').value=uid;document.getElementById('ja-member-name').textContent=m.name||'Member';document.getElementById('ja-total-xp').value=journeyXp(m);document.getElementById('ja-xp-delta').value=0;
  var psel=document.getElementById('ja-path');psel.innerHTML='<option value="">Adventurer / not chosen</option>'+JOURNEY_PATHS.map(function(p){return '<option value="'+p.id+'">'+p.name+'</option>';}).join('');psel.value=m.journeyPath||'';document.getElementById('ja-subclass').value=m.journeySubclass||'';
  document.getElementById('ja-active-title-custom').value='';document.getElementById('ja-badge-custom').value='';document.getElementById('ja-new-title').value='';document.getElementById('ja-celebration').value='';document.getElementById('ja-celebrate').checked=true;
- refreshJourneyAdminContent();
+ journeySyncAutoClassBadges(m,uid);m.journeyUnlockedBadges=journeyNormalizeBadgeIds(m.journeyUnlockedBadges);journeyAdminCollectedBadges=new Set(m.journeyUnlockedBadges);
+ ensureJourneyAdminBadgeLibrary();ensureJourneyAdminTitleLibrary();refreshJourneyAdminContent();renderJourneyAdminTitleLibrary(m);
  ['ja-total-xp','ja-xp-delta'].forEach(function(id){document.getElementById(id).oninput=adminJourneyPreview;});psel.onchange=refreshJourneyAdminContent;openModal('m-journey-admin-edit');
 };
 saveJourneyAdminEdit=async function(){
  var uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;var base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
  var customTitle=document.getElementById('ja-active-title-custom').value.trim(),active=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
- var customBadge=document.getElementById('ja-badge-custom').value.trim(),badge=customBadge||document.getElementById('ja-badge-select').value||'';
- var msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:badge,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
- if(celebrate&&(msg||delta||newTitle||customTitle||customBadge))data.pendingJourneyCelebration={title:newTitle||customTitle?'New Title Unlocked':customBadge?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||((delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.')),symbol:'✦',createdAt:new Date().toISOString()};
+ var customBadge=document.getElementById('ja-badge-custom').value.trim(),badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges));if(customBadge){var customId='custom:'+customBadge;if(!badges.includes(customId))badges.push(customId);}
+ var msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:'',journeyUnlockedBadges:badges,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
+ if(celebrate&&(msg||delta||grantedTitle||newTitle||customTitle||customBadge))data.pendingJourneyCelebration={title:grantedTitle||newTitle||customTitle?'New Title Unlocked':customBadge?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||((delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.')),symbol:'✦',createdAt:new Date().toISOString()};
  try{await db.collection('users').doc(uid).set(data,{merge:true});var diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();toast('Member Journey updated','ok');}catch(e){toast(e.message||'Could not update Journey','err');}
 };
 function cosmicDecision(){var yes=document.getElementById('journey-cosmic-yes'),no=document.getElementById('journey-cosmic-no');return yes&&yes.checked?'yes':no&&no.checked?'no':'';}
 renderJourneyPathGrid=function(){
- var box=document.getElementById('journey-path-grid');if(!box)return;selectedJourneyPath=(currentProfile&&currentProfile.journeyPath)||selectedJourneyPath||'';var titleSel=document.getElementById('journey-title-select'),titles=(currentProfile&&currentProfile.journeyUnlockedTitles)||[];if(titleSel){titleSel.innerHTML='<option value="">No active title</option>'+titles.map(function(t){return '<option>'+esc(t)+'</option>';}).join('');titleSel.value=(currentProfile&&currentProfile.journeyActiveTitle)||'';}
+ var box=document.getElementById('journey-path-grid');if(!box)return;selectedJourneyPath=(currentProfile&&currentProfile.journeyPath)||selectedJourneyPath||'';var titleSel=document.getElementById('journey-title-select'),titles=journeyAvailableMemberTitles(currentProfile||{});if(titleSel){titleSel.innerHTML='<option value="">No active title</option>'+titles.map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');titleSel.value=(currentProfile&&currentProfile.journeyActiveTitle)||'';}
  box.innerHTML=JOURNEY_PATHS.map(function(p){return '<button type="button" class="path-choice '+(selectedJourneyPath===p.id?'selected':'')+'" onclick="selectJourneyPath(\''+p.id+'\')"><span class="path-choice-icon">'+p.icon+'</span><span class="path-choice-name">'+p.name+'</span></button>';}).join('');
  var cosmic=document.getElementById('journey-cosmic-choice'),sub=document.getElementById('journey-subclass-grid'),wrap=document.getElementById('journey-subclass-choice-wrap');if(journeyLevel(currentProfile)>=50){cosmic.classList.remove('hidden');var accepted=currentProfile&&currentProfile.journeyCosmicAccepted;if(accepted===true)document.getElementById('journey-cosmic-yes').checked=true;else if(accepted===false)document.getElementById('journey-cosmic-no').checked=true;selectedJourneySubclass=(currentProfile&&currentProfile.journeySubclass)||selectedJourneySubclass||'';sub.innerHTML=COSMIC_SUBCLASSES.map(function(x){return '<button type="button" class="path-choice '+(selectedJourneySubclass===x?'selected':'')+'" onclick="selectJourneySubclass(\''+x+'\')"><span class="path-choice-icon">✦</span><span class="path-choice-name">'+x+'</span></button>';}).join('');if(wrap)wrap.classList.toggle('hidden',cosmicDecision()!=='yes');}else cosmic.classList.add('hidden');
 };
@@ -9315,8 +9566,906 @@ buildSeasonalEffects=function(theme){
  else if(theme==='anniversary'){var nebCount=reduce?2:5;for(var n=0;n<nebCount;n++){var nb=document.createElement('span');nb.className='season-nebula';nb.style.left=(-12+((n*29)%95))+'%';nb.style.top=(-10+((n*31)%85))+'%';nb.style.animationDuration=(16+n*4)+'s';nb.style.animationDelay=(-n*4)+'s';layer.appendChild(nb);}var stars=reduce?10:32;for(var st=0;st<stars;st++){var se=document.createElement('span');se.className=st%8===0?'season-flare':'season-star';se.textContent=st%8===0?'✦':'·';se.style.left=((st*41)%100)+'%';se.style.top=((st*67)%100)+'%';se.style.animationDuration=(3+(st%6))+'s';se.style.animationDelay=(-st*.37)+'s';layer.appendChild(se);}if(!reduce){for(var sh=0;sh<7;sh++){var ss=document.createElement('span'),start=randomEdgePoint(130),end=randomEdgePoint(130);while(Math.hypot(end.x-start.x,end.y-start.y)<Math.min(innerWidth,innerHeight)*.55)end=randomEdgePoint(130);var ang=Math.atan2(end.y-start.y,end.x-start.x)*180/Math.PI;ss.className='season-shooting-star';ss.style.setProperty('--sx',start.x+'px');ss.style.setProperty('--sy',start.y+'px');ss.style.setProperty('--ex',end.x+'px');ss.style.setProperty('--ey',end.y+'px');ss.style.setProperty('--angle',ang+'deg');ss.style.setProperty('--trail-length',(75+Math.random()*105)+'px');ss.style.setProperty('--shoot-duration',(5+Math.random()*4)+'s');ss.style.setProperty('--shoot-delay',(-Math.random()*22)+'s');layer.appendChild(ss);}}}
 };
 var _v10b2MaybePromptJourney=maybePromptJourney;maybePromptJourney=function(){_v10b2MaybePromptJourney();maybePromptCosmicPrestige();applyPersonalCosmicTheme();};
-</script>
 
+
+// Mission Hub v12 RC008 — styled multi-title grants and custom badge creator
+let journeyAdminSelectedTitles=new Set();
+let journeyAdminCustomBadges={};
+const JOURNEY_CUSTOM_ICON_OPTIONS=[
+ {key:'star',name:'Radiant Star'},
+ {key:'laurel',name:'Laurel'},
+ {key:'compass',name:'Compass'},
+ {key:'flame',name:'Flame'},
+ {key:'crystal',name:'Crystal'},
+ {key:'eye',name:'Arcane Eye'},
+ {key:'crown',name:'Crown'},
+ {key:'shield',name:'Shield'}
+];
+function journeyCustomIconSvg(key){
+ const shapes={
+  star:'<path d="M32 8l6 16 18 8-18 8-6 16-6-16-18-8 18-8z"/><path d="M12 12l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',
+  laurel:'<path d="M24 50C12 42 10 25 18 14M40 50c12-8 14-25 6-36"/><path d="M18 19l-8-1 5 7M16 29l-8 2 7 5M20 40l-7 5 9 1M46 19l8-1-5 7M48 29l8 2-7 5M44 40l7 5-9 1"/><path d="M26 48h12"/>',
+  compass:'<circle cx="32" cy="32" r="19"/><path d="M38 18l-4 12-12 4 8 4 4 8 4-12 12-4-8-4z"/>',
+  flame:'<path d="M34 8c3 12-3 16 2 23 4-4 7-8 8-13 8 9 10 18 7 27-3 9-10 14-19 14S16 53 13 44c-3-10 2-20 13-31-1 9 2 15 7 19 2-9 0-16 1-24z"/><path d="M31 38c6 6 7 12 1 18-7-3-8-11-1-18z"/>',
+  crystal:'<path d="M20 12h24l10 17-22 27L10 29z"/><path d="M20 12l12 44 12-44M10 29h44M20 12l-10 17M44 12l10 17"/>',
+  eye:'<path d="M8 32c7-11 15-16 24-16s17 5 24 16c-7 11-15 16-24 16S15 43 8 32z"/><circle cx="32" cy="32" r="8"/><path d="M32 21v22M21 32h22"/>',
+  crown:'<path d="M12 20l11 10 9-18 9 18 11-10-5 29H17z"/><path d="M18 49h28M22 39h20"/>',
+  shield:'<path d="M32 8l19 8v15c0 12-7 21-19 27-12-6-19-15-19-27V16z"/><path d="M32 18v29M21 31h22"/>'
+ };
+ return journeySvgWrap(shapes[key]||shapes.star);
+}
+function journeyCustomBadgeDefinition(id,member){
+ const sources=[journeyAdminCustomBadges,(member||{}).journeyCustomBadges,(currentProfile||{}).journeyCustomBadges];
+ if(typeof liveData!=='undefined'&&liveData&&liveData.members){Object.keys(liveData.members).some(function(uid){const defs=liveData.members[uid]&&liveData.members[uid].journeyCustomBadges;if(defs&&defs[id]){sources.push(defs);return true;}return false;});}
+ for(const defs of sources){if(defs&&defs[id])return Object.assign({id:id,category:'Custom Badges',earned:'Admin recognition'},defs[id]);}
+ return null;
+}
+const _rc008JourneyBadgeInfoById=journeyBadgeInfoById;
+journeyBadgeInfoById=function(id){
+ const custom=journeyCustomBadgeDefinition(id);if(custom)return custom;
+ return _rc008JourneyBadgeInfoById(id);
+};
+const _rc008JourneyBadgeSvg=journeyBadgeSvg;
+journeyBadgeSvg=function(badge){
+ if(badge&&badge.customIconKey)return journeyCustomIconSvg(badge.customIconKey);
+ return _rc008JourneyBadgeSvg(badge);
+};
+function journeyEnsureRc008Styles(){
+ ensureJourneyCollectionStyles();
+ if(document.getElementById('journey-rc008-styles'))return;
+ const s=document.createElement('style');s.id='journey-rc008-styles';s.textContent=`
+ .ja-title-multi{position:relative}.ja-title-trigger{width:100%;min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:4px;color:var(--white);font:600 14px 'Rajdhani',sans-serif;cursor:pointer;text-align:left;transition:.18s}.ja-title-trigger:hover,.ja-title-trigger.open{border-color:rgba(200,16,46,.5);box-shadow:0 0 0 2px rgba(200,16,46,.08)}
+ .ja-title-trigger .summary{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ja-title-trigger .chev{color:var(--grey);font-size:11px}.ja-title-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:14500;display:none;max-height:310px;overflow:auto;background:rgba(12,14,26,.99);border:1px solid var(--border-2);border-radius:7px;box-shadow:0 18px 45px rgba(0,0,0,.72);padding:7px}.ja-title-menu.open{display:block}.ja-title-group-label{padding:8px 8px 5px;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase}.ja-title-option{display:flex;align-items:center;gap:9px;width:100%;padding:7px 8px;border-radius:4px;color:var(--white);font-size:12px;cursor:pointer}.ja-title-option:hover{background:rgba(255,255,255,.04)}.ja-title-option.owned{color:var(--grey);cursor:default}.ja-title-option input{accent-color:var(--crimson-hi);width:14px;height:14px}.ja-title-owned{margin-left:auto;color:var(--green);font-size:9px;letter-spacing:1px;text-transform:uppercase}
+ .ja-custom-badge-launch{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px}.ja-custom-badge-summary{margin-top:7px;color:var(--grey);font-size:10px;line-height:1.4}.ja-custom-badge-summary strong{color:var(--gold)}
+ .ja-custom-modal-bg{position:fixed;inset:0;z-index:15000;background:rgba(4,5,8,.9);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}.ja-custom-modal-bg.open{display:flex}.ja-custom-modal{width:560px;max-width:94vw;max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:0 30px 90px rgba(0,0,0,.85);animation:mIn .2s ease}.ja-custom-icon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.ja-custom-icon{min-height:86px;padding:10px 6px;border:1px solid var(--border);border-radius:7px;background:rgba(8,10,18,.72);color:var(--grey);cursor:pointer;text-align:center;transition:.18s}.ja-custom-icon:hover{border-color:var(--gold-dim);color:var(--white);transform:translateY(-1px)}.ja-custom-icon.selected{border-color:var(--gold);color:var(--gold-hi);background:var(--gold-trace);box-shadow:0 0 16px rgba(201,168,76,.14)}.ja-custom-icon svg{width:42px;height:42px;display:block;margin:0 auto 6px}.ja-custom-icon span{font-size:10px;font-weight:700}.rec-badge-icon svg{width:30px;height:30px;display:block;margin:0 auto}.ja-badge-icon .symbol svg{width:44px;height:44px}
+ `;document.head.appendChild(s);
+}
+function journeyCloseTitleMenus(event){
+ const multi=document.getElementById('ja-title-multi');if(!multi)return;
+ if(event&&!multi.contains(event.target)){const menu=document.getElementById('ja-title-menu'),trigger=document.getElementById('ja-title-trigger');if(menu)menu.classList.remove('open');if(trigger)trigger.classList.remove('open');}
+}
+function journeyToggleTitleMenu(){const menu=document.getElementById('ja-title-menu'),trigger=document.getElementById('ja-title-trigger');if(!menu||!trigger)return;menu.classList.toggle('open');trigger.classList.toggle('open',menu.classList.contains('open'));}
+function journeyToggleTitleGrant(input){if(!input||input.disabled)return;if(input.checked)journeyAdminSelectedTitles.add(input.value);else journeyAdminSelectedTitles.delete(input.value);journeyUpdateTitleGrantSummary();}
+function journeyUpdateTitleGrantSummary(){const el=document.querySelector('#ja-title-trigger .summary'),n=journeyAdminSelectedTitles.size;if(el)el.textContent=n?n+' title'+(n===1?'':'s')+' selected':'Choose one or more titles…';}
+ensureJourneyAdminTitleLibrary=function(){
+ journeyEnsureRc008Styles();const modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;let lib=document.getElementById('ja-title-library');
+ if(!lib){lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';const custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');if(field)body.insertBefore(lib,field);else body.appendChild(lib);}
+ lib.innerHTML='<div class="field-label">Grant titles</div><div id="ja-title-multi" class="ja-title-multi"><button id="ja-title-trigger" class="ja-title-trigger" type="button" onclick="journeyToggleTitleMenu()"><span class="summary">Choose one or more titles…</span><span class="chev">⌄</span></button><div id="ja-title-menu" class="ja-title-menu"></div></div><div class="ja-title-note">Select several titles at once. They are added to the member’s collection, and the member chooses which one appears as their Active Title.</div>';
+ if(!window.__journeyRc008TitleClick){document.addEventListener('click',journeyCloseTitleMenus);window.__journeyRc008TitleClick=true;}
+};
+renderJourneyAdminTitleLibrary=function(member){
+ ensureJourneyAdminTitleLibrary();const menu=document.getElementById('ja-title-menu');if(!menu)return;const groups=journeyAllTitleGroups(member||{}),owned=new Set(Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[]);
+ menu.innerHTML=Object.keys(groups).map(function(group){return '<div class="ja-title-group"><div class="ja-title-group-label">'+esc(group)+'</div>'+groups[group].map(function(title){const has=owned.has(title),checked=has||journeyAdminSelectedTitles.has(title);return '<label class="ja-title-option '+(has?'owned':'')+'"><input type="checkbox" value="'+esc(title)+'" '+(checked?'checked':'')+' '+(has?'disabled':'')+' onchange="journeyToggleTitleGrant(this)"><span>'+esc(title)+'</span>'+(has?'<span class="ja-title-owned">Granted</span>':'')+'</label>';}).join('')+'</div>';}).join('');journeyUpdateTitleGrantSummary();
+};
+function journeyEnsureCustomBadgeLauncher(){
+ journeyEnsureRc008Styles();const input=document.getElementById('ja-badge-custom');if(!input)return;const field=input.closest('.field');if(!field)return;input.style.display='none';let btn=document.getElementById('ja-custom-badge-launch');if(!btn){btn=document.createElement('button');btn.type='button';btn.id='ja-custom-badge-launch';btn.className='btn btn-gold ja-custom-badge-launch';btn.innerHTML='<span>✦</span><span>Create Custom Badge</span>';btn.onclick=journeyOpenCustomBadgeModal;field.appendChild(btn);const summary=document.createElement('div');summary.id='ja-custom-badge-summary';summary.className='ja-custom-badge-summary';field.appendChild(summary);}const label=field.querySelector('.field-label');if(label)label.textContent='Custom badge';journeyRenderCustomBadgeSummary();
+}
+function journeyRenderCustomBadgeSummary(){const el=document.getElementById('ja-custom-badge-summary');if(!el)return;const count=Object.keys(journeyAdminCustomBadges||{}).filter(function(id){return journeyAdminCollectedBadges.has(id);}).length;el.innerHTML=count?'<strong>'+count+'</strong> custom badge'+(count===1?'':'s')+' currently in this member’s collection.':'Create a one-off badge with its own name, description and icon.';}
+function journeyEnsureCustomBadgeModal(){
+ let bg=document.getElementById('ja-custom-badge-modal');if(bg)return bg;bg=document.createElement('div');bg.id='ja-custom-badge-modal';bg.className='ja-custom-modal-bg';bg.innerHTML='<div class="ja-custom-modal"><div class="modal-hdr"><div class="modal-title">CREATE CUSTOM BADGE</div><button type="button" class="modal-x" onclick="journeyCloseCustomBadgeModal()">×</button></div><div class="modal-body"><div class="field"><label class="field-label">Badge name</label><input id="ja-custom-name" class="inp" maxlength="60" placeholder="e.g. Exceptional Contributor"></div><div class="field"><label class="field-label">Badge description</label><textarea id="ja-custom-description" class="inp" rows="4" maxlength="260" placeholder="Explain what this badge recognises."></textarea></div><div class="field"><label class="field-label">Icon</label><div id="ja-custom-icon-grid" class="ja-custom-icon-grid"></div></div></div><div class="modal-foot"><button type="button" class="btn btn-ghost" onclick="journeyCloseCustomBadgeModal()">Cancel</button><button type="button" class="btn btn-primary" onclick="journeyCreateCustomBadge()">Add Badge</button></div></div>';bg.addEventListener('click',function(e){if(e.target===bg)journeyCloseCustomBadgeModal();});document.body.appendChild(bg);return bg;
+}
+let journeyCustomBadgeIconChoice='star';
+function journeyRenderCustomIconChoices(){const grid=document.getElementById('ja-custom-icon-grid');if(!grid)return;grid.innerHTML=JOURNEY_CUSTOM_ICON_OPTIONS.map(function(x){return '<button type="button" class="ja-custom-icon '+(x.key===journeyCustomBadgeIconChoice?'selected':'')+'" onclick="journeySelectCustomBadgeIcon(\''+x.key+'\')">'+journeyCustomIconSvg(x.key)+'<span>'+esc(x.name)+'</span></button>';}).join('');}
+function journeySelectCustomBadgeIcon(key){journeyCustomBadgeIconChoice=key;journeyRenderCustomIconChoices();}
+function journeyOpenCustomBadgeModal(){const bg=journeyEnsureCustomBadgeModal();document.getElementById('ja-custom-name').value='';document.getElementById('ja-custom-description').value='';journeyCustomBadgeIconChoice='star';journeyRenderCustomIconChoices();bg.classList.add('open');setTimeout(function(){document.getElementById('ja-custom-name').focus();},30);}
+function journeyCloseCustomBadgeModal(){const bg=document.getElementById('ja-custom-badge-modal');if(bg)bg.classList.remove('open');}
+function journeyCreateCustomBadge(){
+ const name=document.getElementById('ja-custom-name').value.trim(),description=document.getElementById('ja-custom-description').value.trim();if(!name){toast('Enter a badge name','err');return;}if(!description){toast('Enter a badge description','err');return;}
+ let id='custom:'+journeySlug(name),suffix=2;while(journeyAdminCustomBadges[id]&&journeyAdminCustomBadges[id].name!==name){id='custom:'+journeySlug(name)+'-'+suffix++;}
+ journeyAdminCustomBadges[id]={id:id,name:name,description:description,category:'Custom Badges',earned:'Admin recognition',customIconKey:journeyCustomBadgeIconChoice};journeyAdminCollectedBadges.add(id);journeyCloseCustomBadgeModal();renderJourneyAdminBadgeLibrary();journeyRenderCustomBadgeSummary();toast('Custom badge added to the collection','ok');
+}
+const _rc008EnsureJourneyAdminBadgeLibrary=ensureJourneyAdminBadgeLibrary;
+ensureJourneyAdminBadgeLibrary=function(){_rc008EnsureJourneyAdminBadgeLibrary();journeyEnsureCustomBadgeLauncher();};
+const _rc008RenderJourneyAdminBadgeLibrary=renderJourneyAdminBadgeLibrary;
+renderJourneyAdminBadgeLibrary=function(){_rc008RenderJourneyAdminBadgeLibrary();journeyRenderCustomBadgeSummary();};
+const _rc008OpenJourneyAdminEdit=openJourneyAdminEdit;
+openJourneyAdminEdit=function(uid){
+ const m=(liveData.members||{})[uid]||{};journeyAdminSelectedTitles=new Set();journeyAdminCustomBadges=Object.assign({},m.journeyCustomBadges||{});_rc008OpenJourneyAdminEdit(uid);setTimeout(function(){journeyEnsureCustomBadgeLauncher();renderJourneyAdminTitleLibrary(m);},0);
+};
+window.openJourneyAdminEdit=openJourneyAdminEdit;
+saveJourneyAdminEdit=async function(){
+ const uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;
+ const base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];
+ journeyAdminSelectedTitles.forEach(function(t){if(t&&!titles.includes(t))titles.push(t);});if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
+ const customTitle=document.getElementById('ja-active-title-custom').value.trim(),active=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
+ const badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges)),customDefs={};badges.forEach(function(id){if(String(id).startsWith('custom:')&&journeyAdminCustomBadges[id])customDefs[id]=journeyAdminCustomBadges[id];});
+ const newlyGrantedTitles=Array.from(journeyAdminSelectedTitles),newCustomIds=badges.filter(function(id){return String(id).startsWith('custom:')&&!(m.journeyUnlockedBadges||[]).includes(id);});
+ const msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:'',journeyUnlockedBadges:badges,journeyCustomBadges:customDefs,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
+ if(celebrate&&(msg||delta||newlyGrantedTitles.length||newTitle||customTitle||newCustomIds.length)){const titleAwarded=newlyGrantedTitles[0]||newTitle||customTitle,customAward=newCustomIds[0]&&customDefs[newCustomIds[0]];data.pendingJourneyCelebration={title:titleAwarded?'New Title Unlocked':customAward?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||(titleAwarded?titleAwarded+' has been added to your title collection.':customAward?customAward.name+' has been awarded to recognise your contribution.':delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.'),symbol:customAward?journeyCustomIconSvg(customAward.customIconKey):'✦',createdAt:new Date().toISOString()};}
+ try{await db.collection('users').doc(uid).set(data,{merge:true});const diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();toast('Member Journey updated','ok');}catch(e){toast(e.message||'Could not update Journey','err');}
+};
+window.saveJourneyAdminEdit=saveJourneyAdminEdit;
+if(typeof recBadgeById==='function'){
+ const _rc008RecBadgeById=recBadgeById;recBadgeById=function(id){const custom=journeyCustomBadgeDefinition(id,currentProfile||{});if(custom)return Object.assign({},custom,{icon:journeyCustomIconSvg(custom.customIconKey)});return _rc008RecBadgeById(id);};
+}
+
+
+
+// Mission Hub v12 RC009 — cohesive custom Grant Titles dropdown hotfix
+function journeyRc009EnsureTitleStyles(){
+ if(document.getElementById('journey-rc009-title-styles'))return;
+ var style=document.createElement('style');style.id='journey-rc009-title-styles';style.textContent=`
+  #ja-title-library #ja-title-grant-select{display:none!important}
+  #ja-title-library{position:relative}
+  #ja-title-library .ja-title-multi{position:relative;width:100%;font-family:'Rajdhani',sans-serif}
+  #ja-title-library .ja-title-trigger{
+   appearance:none;-webkit-appearance:none;width:100%;height:38px;padding:0 42px 0 12px;
+   display:flex;align-items:center;justify-content:flex-start;position:relative;
+   background:rgba(8,10,18,.92);border:1px solid var(--border);border-radius:4px;
+   color:var(--grey);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;
+   letter-spacing:.35px;line-height:1;text-align:left;cursor:pointer;outline:none;
+   transition:border-color .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease;
+  }
+  #ja-title-library .ja-title-trigger:hover{border-color:var(--border-2);background:rgba(12,14,26,.96);color:var(--white)}
+  #ja-title-library .ja-title-trigger:focus-visible,
+  #ja-title-library .ja-title-trigger.open{border-color:rgba(200,16,46,.58);box-shadow:0 0 0 2px rgba(200,16,46,.09),0 0 16px rgba(200,16,46,.08);color:var(--white)}
+  #ja-title-library .ja-title-trigger .summary{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #ja-title-library .ja-title-trigger .chev{position:absolute;right:14px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:rotate(45deg);transition:transform .18s ease,margin-top .18s ease;pointer-events:none}
+  #ja-title-library .ja-title-trigger.open .chev{transform:rotate(225deg);margin-top:-2px}
+  #ja-title-library .ja-title-menu{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:16000;display:none;max-height:320px;overflow-y:auto;padding:7px;background:rgba(12,14,26,.995);border:1px solid var(--border-2);border-radius:6px;box-shadow:0 18px 46px rgba(0,0,0,.78),0 0 18px rgba(200,16,46,.06)}
+  #ja-title-library .ja-title-menu.open{display:block;animation:rc009TitleMenuIn .14s ease-out}
+  @keyframes rc009TitleMenuIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  #ja-title-library .ja-title-group+.ja-title-group{margin-top:5px;padding-top:5px;border-top:1px solid rgba(37,40,64,.65)}
+  #ja-title-library .ja-title-group-label{padding:6px 8px 4px;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1.7px;text-transform:uppercase}
+  #ja-title-library .ja-title-option{display:flex;align-items:center;gap:9px;min-height:32px;padding:6px 8px;border-radius:4px;color:var(--grey);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.25px;cursor:pointer;user-select:none;transition:background .14s ease,color .14s ease}
+  #ja-title-library .ja-title-option:hover{background:rgba(201,168,76,.07);color:var(--white)}
+  #ja-title-library .ja-title-option.owned{opacity:.56;cursor:default}
+  #ja-title-library .ja-title-check{position:relative;width:15px;height:15px;flex:0 0 15px}
+  #ja-title-library .ja-title-check input{position:absolute;inset:0;opacity:0;cursor:inherit}
+  #ja-title-library .ja-title-check i{position:absolute;inset:0;border:1px solid var(--grey-2);border-radius:3px;background:rgba(4,5,8,.72);transition:.14s}
+  #ja-title-library .ja-title-check input:checked+i{border-color:var(--gold);background:rgba(201,168,76,.16);box-shadow:0 0 8px rgba(201,168,76,.12)}
+  #ja-title-library .ja-title-check input:checked+i:after{content:'';position:absolute;left:4px;top:1px;width:4px;height:8px;border-right:2px solid var(--gold-hi);border-bottom:2px solid var(--gold-hi);transform:rotate(45deg)}
+  #ja-title-library .ja-title-owned{margin-left:auto;color:var(--green);font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase}
+  #ja-title-library .ja-title-note{margin-top:7px;color:var(--grey-2);font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:.2px;line-height:1.35}
+ `;document.head.appendChild(style);
+}
+function journeyRc009CloseTitleMenu(){
+ var menu=document.getElementById('ja-title-menu'),trigger=document.getElementById('ja-title-trigger');
+ if(menu)menu.classList.remove('open');if(trigger){trigger.classList.remove('open');trigger.setAttribute('aria-expanded','false');}
+}
+function journeyRc009UpdateTitleSummary(){
+ var summary=document.querySelector('#ja-title-trigger .summary'),count=journeyAdminSelectedTitles.size;
+ if(summary)summary.textContent=count?(count===1?Array.from(journeyAdminSelectedTitles)[0]:count+' titles selected'):'Choose titles to grant…';
+}
+function journeyRc009RenderTitleControl(member){
+ journeyRc009EnsureTitleStyles();
+ var modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;
+ var lib=document.getElementById('ja-title-library');
+ if(!lib){lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';var custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');if(field)body.insertBefore(lib,field);else body.appendChild(lib);}
+ lib.innerHTML='<div class="field-label">Grant titles</div><div id="ja-title-multi" class="ja-title-multi"><button id="ja-title-trigger" class="ja-title-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="summary">Choose titles to grant…</span><span class="chev" aria-hidden="true"></span></button><div id="ja-title-menu" class="ja-title-menu" role="listbox" aria-multiselectable="true"></div></div><div class="ja-title-note">Select one or more titles to add to the member’s collection. They choose which granted title appears as their Active Title.</div>';
+ var trigger=document.getElementById('ja-title-trigger'),menu=document.getElementById('ja-title-menu');
+ trigger.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var open=!menu.classList.contains('open');journeyRc009CloseTitleMenu();if(open){menu.classList.add('open');trigger.classList.add('open');trigger.setAttribute('aria-expanded','true');}});
+ var groups=journeyAllTitleGroups(member||{}),owned=new Set(Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[]);
+ menu.innerHTML=Object.keys(groups).map(function(group){return '<div class="ja-title-group"><div class="ja-title-group-label">'+esc(group)+'</div>'+groups[group].map(function(title){var has=owned.has(title),checked=has||journeyAdminSelectedTitles.has(title);return '<label class="ja-title-option '+(has?'owned':'')+'"><span class="ja-title-check"><input type="checkbox" value="'+esc(title)+'" '+(checked?'checked':'')+' '+(has?'disabled':'')+'><i></i></span><span>'+esc(title)+'</span>'+(has?'<span class="ja-title-owned">Granted</span>':'')+'</label>';}).join('')+'</div>';}).join('');
+ menu.querySelectorAll('input:not(:disabled)').forEach(function(input){input.addEventListener('change',function(){if(this.checked)journeyAdminSelectedTitles.add(this.value);else journeyAdminSelectedTitles.delete(this.value);journeyRc009UpdateTitleSummary();});});
+ journeyRc009UpdateTitleSummary();
+}
+renderJourneyAdminTitleLibrary=journeyRc009RenderTitleControl;
+window.renderJourneyAdminTitleLibrary=renderJourneyAdminTitleLibrary;
+if(!window.__journeyRc009OutsideClick){document.addEventListener('click',function(e){var multi=document.getElementById('ja-title-multi');if(multi&&!multi.contains(e.target))journeyRc009CloseTitleMenu();});window.__journeyRc009OutsideClick=true;}
+var _rc009OpenJourneyAdminEdit=openJourneyAdminEdit;
+openJourneyAdminEdit=function(uid){
+ var member=(liveData.members||{})[uid]||{};var result=_rc009OpenJourneyAdminEdit(uid);
+ [0,40,140].forEach(function(delay){setTimeout(function(){journeyRc009RenderTitleControl(member);},delay);});
+ return result;
+};
+window.openJourneyAdminEdit=openJourneyAdminEdit;
+journeyRc009EnsureTitleStyles();
+
+
+// Mission Hub v12 RC010 — title collection synchronisation and revocation
+function journeyRc010TitleGroups(member){
+ var groups=journeyAllTitleGroups(member||{}),known=new Set();
+ Object.keys(groups).forEach(function(group){(groups[group]||[]).forEach(function(title){known.add(title);});});
+ var custom=(Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[]).filter(function(title){return title&&!known.has(title);});
+ if(custom.length)groups['Member Custom Titles']=custom.slice().sort(function(a,b){return String(a).localeCompare(String(b));});
+ return groups;
+}
+function journeyRc010RenderTitleControl(member){
+ journeyRc009EnsureTitleStyles();
+ var modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;
+ var lib=document.getElementById('ja-title-library');
+ if(!lib){
+  lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';
+  var custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');
+  if(field)body.insertBefore(lib,field);else body.appendChild(lib);
+ }
+ lib.innerHTML='<div class="field-label">Granted titles</div><div id="ja-title-multi" class="ja-title-multi"><button id="ja-title-trigger" class="ja-title-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="summary">Choose granted titles…</span><span class="chev" aria-hidden="true"></span></button><div id="ja-title-menu" class="ja-title-menu" role="listbox" aria-multiselectable="true"></div></div><div class="ja-title-note">Checked titles belong to this member. Tick titles to grant them or untick titles to revoke them. If their Active Title is revoked, it will be cleared.</div>';
+ var trigger=document.getElementById('ja-title-trigger'),menu=document.getElementById('ja-title-menu');
+ trigger.addEventListener('click',function(e){
+  e.preventDefault();e.stopPropagation();
+  var open=!menu.classList.contains('open');journeyRc009CloseTitleMenu();
+  if(open){menu.classList.add('open');trigger.classList.add('open');trigger.setAttribute('aria-expanded','true');}
+ });
+ var groups=journeyRc010TitleGroups(member||{}),original=new Set(Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[]);
+ menu.innerHTML=Object.keys(groups).map(function(group){
+  return '<div class="ja-title-group"><div class="ja-title-group-label">'+esc(group)+'</div>'+
+   groups[group].map(function(title){
+    var checked=journeyAdminSelectedTitles.has(title),wasOwned=original.has(title);
+    return '<label class="ja-title-option '+(wasOwned?'owned':'')+'"><span class="ja-title-check"><input type="checkbox" value="'+esc(title)+'" '+(checked?'checked':'')+'><i></i></span><span>'+esc(title)+'</span>'+(wasOwned?'<span class="ja-title-owned">Current</span>':'')+'</label>';
+   }).join('')+'</div>';
+ }).join('');
+ menu.querySelectorAll('input').forEach(function(input){
+  input.addEventListener('change',function(){
+   if(this.checked)journeyAdminSelectedTitles.add(this.value);else journeyAdminSelectedTitles.delete(this.value);
+   journeyRc009UpdateTitleSummary();
+  });
+ });
+ journeyRc009UpdateTitleSummary();
+}
+renderJourneyAdminTitleLibrary=journeyRc010RenderTitleControl;
+window.renderJourneyAdminTitleLibrary=renderJourneyAdminTitleLibrary;
+
+(function(){
+ var style=document.createElement('style');style.id='journey-rc010-title-styles';style.textContent=`
+  #ja-title-library .ja-title-option.owned{opacity:1;cursor:pointer}
+  #ja-title-library .ja-title-option.owned:hover{background:rgba(201,168,76,.07);color:var(--white)}
+  #ja-title-library .ja-title-owned{color:var(--green)}
+ `;
+ if(!document.getElementById(style.id))document.head.appendChild(style);
+})();
+
+var _rc010OpenJourneyAdminEdit=openJourneyAdminEdit;
+openJourneyAdminEdit=function(uid){
+ var member=(liveData.members||{})[uid]||{};
+ var result=_rc010OpenJourneyAdminEdit(uid);
+ journeyAdminSelectedTitles=new Set(Array.isArray(member.journeyUnlockedTitles)?member.journeyUnlockedTitles:[]);
+ [0,45,150].forEach(function(delay){setTimeout(function(){journeyRc010RenderTitleControl(member);},delay);});
+ return result;
+};
+window.openJourneyAdminEdit=openJourneyAdminEdit;
+
+saveJourneyAdminEdit=async function(){
+ const uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;
+ const base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0);
+ const delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta);
+ const previousTitles=new Set(Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles:[]);
+ const titles=Array.from(journeyAdminSelectedTitles);
+ const newTitle=document.getElementById('ja-new-title').value.trim();
+ if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
+ const customTitle=document.getElementById('ja-active-title-custom').value.trim();
+ if(customTitle&&!titles.includes(customTitle))titles.push(customTitle);
+ const requestedActive=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
+ const active=requestedActive&&titles.includes(requestedActive)?requestedActive:'';
+ const badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges)),customDefs={};
+ badges.forEach(function(id){if(String(id).startsWith('custom:')&&journeyAdminCustomBadges[id])customDefs[id]=journeyAdminCustomBadges[id];});
+ const newlyGrantedTitles=titles.filter(function(title){return !previousTitles.has(title);});
+ const revokedTitles=Array.from(previousTitles).filter(function(title){return !titles.includes(title);});
+ const newCustomIds=badges.filter(function(id){return String(id).startsWith('custom:')&&!(m.journeyUnlockedBadges||[]).includes(id);});
+ const msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked;
+ const data={
+  journeyXp:total,
+  journeyPath:document.getElementById('ja-path').value||'',
+  journeySubclass:document.getElementById('ja-subclass').value||'',
+  journeyActiveTitle:active,
+  journeyBadgeOverride:'',
+  journeyUnlockedBadges:badges,
+  journeyCustomBadges:customDefs,
+  journeyUnlockedTitles:titles,
+  journeyUpdatedAt:new Date().toISOString()
+ };
+ if(celebrate&&(msg||delta||newlyGrantedTitles.length||newTitle||customTitle||newCustomIds.length)){
+  const titleAwarded=newlyGrantedTitles[0]||newTitle||customTitle,customAward=newCustomIds[0]&&customDefs[newCustomIds[0]];
+  data.pendingJourneyCelebration={
+   title:titleAwarded?'New Title Unlocked':customAward?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',
+   message:msg||(titleAwarded?titleAwarded+' has been added to your title collection.':customAward?customAward.name+' has been awarded to recognise your contribution.':delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.'),
+   symbol:customAward?journeyCustomIconSvg(customAward.customIconKey):'✦',
+   createdAt:new Date().toISOString()
+  };
+ }
+ try{
+  await db.collection('users').doc(uid).set(data,{merge:true});
+  const diff=total-journeyXp(m);
+  if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});
+  Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();
+  var note='Member Journey updated';
+  if(revokedTitles.length)note+=' · '+revokedTitles.length+' title'+(revokedTitles.length===1?'':'s')+' revoked';
+  toast(note,'ok');
+ }catch(e){toast(e.message||'Could not update Journey','err');}
+};
+window.saveJourneyAdminEdit=saveJourneyAdminEdit;
+
+
+// Mission Hub v12 RC011 — derived class titles + department-grouped member lists
+(function(){
+  const style=document.createElement('style');
+  style.id='journey-rc011-grouped-members-styles';
+  style.textContent=`
+    .mh-dept-group{border:1px solid var(--border);border-radius:6px;background:rgba(8,10,18,.55);overflow:hidden;margin-bottom:8px}
+    .mh-dept-group:last-child{margin-bottom:0}
+    .mh-dept-group-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:0;background:rgba(17,19,32,.92);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer}
+    .mh-dept-group-head:hover{background:rgba(30,33,56,.75)}
+    .mh-dept-group-head .count{font-family:'Share Tech Mono',monospace;color:var(--grey);font-size:10px}
+    .mh-dept-group-body{padding:7px;display:flex;flex-direction:column;gap:5px}
+    .mh-dept-group.collapsed .mh-dept-group-body{display:none}
+    .mh-dept-group-head .arrow{color:var(--gold);font-size:11px;transition:transform .15s ease}
+    .mh-dept-group.collapsed .mh-dept-group-head .arrow{transform:rotate(-90deg)}
+    .mh-grouped-roster{display:flex;flex-direction:column;gap:10px}
+    .mh-grouped-roster .roster-card{margin:0}
+    .mh-grouped-chips{display:flex;flex-direction:column;gap:7px;width:100%}
+    .mh-grouped-chips .mh-dept-group-body{flex-direction:row;flex-wrap:wrap}
+    .mh-native-grouped-select optgroup{background:var(--panel);color:var(--gold);font-family:'Rajdhani',sans-serif}
+    .mh-native-grouped-select option{background:var(--panel);color:var(--white);font-family:'Rajdhani',sans-serif}
+    #ja-title-library .ja-title-option.auto-title{cursor:default;background:rgba(201,168,76,.045)}
+    #ja-title-library .ja-title-option.auto-title:hover{background:rgba(201,168,76,.045)}
+    #ja-title-library .ja-title-option.auto-title .ja-title-check{opacity:.75}
+    #ja-title-library .ja-title-auto{margin-left:auto;color:var(--gold);font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase}
+  `;
+  if(!document.getElementById(style.id))document.head.appendChild(style);
+})();
+
+function mhDeptDefinitions(){
+  var list=(typeof getDeptList==='function'?getDeptList():[])||[];
+  if(!list.length){
+    list=Object.keys(DEPT_NAMES||{}).map(function(id){return {id:id,label:DEPT_NAMES[id]||id};});
+  }
+  return list.slice();
+}
+function mhMemberDepartments(member){
+  return normaliseDepts((member||{}).depts||[]);
+}
+function mhAlphaMembers(members){
+  return (members||[]).slice().sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'});});
+}
+function mhGroupedMembers(members,preferredDept,includeUnassigned){
+  members=mhAlphaMembers(members||[]);
+  var groups=[],seenDept=new Set(),defs=mhDeptDefinitions();
+  if(preferredDept){
+    var preferred=defs.find(function(d){return d.id===preferredDept;});
+    if(preferred){groups.push({id:preferred.id,label:preferred.label,members:[]});seenDept.add(preferred.id);}
+  }
+  defs.forEach(function(d){if(!seenDept.has(d.id)){groups.push({id:d.id,label:d.label,members:[]});seenDept.add(d.id);}});
+  var other={id:'other',label:'Other / No Department',members:[]};
+  members.forEach(function(m){
+    var ds=mhMemberDepartments(m),placed=false;
+    ds.forEach(function(id){
+      var g=groups.find(function(x){return x.id===id;});
+      if(g){g.members.push(m);placed=true;}
+    });
+    if(!placed&&includeUnassigned!==false)other.members.push(m);
+  });
+  groups.forEach(function(g){g.members=mhAlphaMembers(g.members);});
+  if(other.members.length)groups.push(other);
+  return groups.filter(function(g){return g.members.length;});
+}
+function mhToggleDeptGroup(btn){
+  var group=btn&&btn.closest('.mh-dept-group');if(group)group.classList.toggle('collapsed');
+}
+window.mhToggleDeptGroup=mhToggleDeptGroup;
+function mhGroupHtml(groups,rowBuilder,expandedDept,allExpanded){
+  return groups.map(function(group,index){
+    var expanded=allExpanded||group.id===expandedDept||(!expandedDept&&index===0);
+    return '<section class="mh-dept-group '+(expanded?'':'collapsed')+'" data-dept="'+esc(group.id)+'">'+
+      '<button type="button" class="mh-dept-group-head" onclick="mhToggleDeptGroup(this)"><span>'+esc(group.label)+'</span><span style="display:flex;align-items:center;gap:8px"><span class="count">'+group.members.length+'</span><span class="arrow">▾</span></span></button>'+
+      '<div class="mh-dept-group-body">'+group.members.map(rowBuilder).join('')+'</div></section>';
+  }).join('');
+}
+function mhPopulateGroupedSelect(sel,preferredDept,selectedValue,allowUnassigned,excludeUid,multipleSelected){
+  if(!sel)return;
+  var selectedSet=new Set(multipleSelected||[]);
+  var groups=mhGroupedMembers(Object.values(liveData.members||{}),preferredDept,true);
+  sel.classList.add('mh-native-grouped-select');
+  sel.innerHTML=allowUnassigned?'<option value="">Unassigned</option>':'';
+  groups.forEach(function(group){
+    var og=document.createElement('optgroup');og.label=group.label;
+    group.members.forEach(function(m){
+      if(excludeUid&&m.uid===excludeUid)return;
+      var opt=document.createElement('option');opt.value=m.uid;opt.textContent=m.name||'Team member';
+      if(sel.multiple)opt.selected=selectedSet.has(m.uid);else opt.selected=m.uid===selectedValue;
+      og.appendChild(opt);
+    });
+    if(og.children.length)sel.appendChild(og);
+  });
+}
+
+// Derived class titles always follow class and level.
+function journeyRc011ClassTitles(pathId,totalXp){
+  var content=JOURNEY_CLASS_CONTENT[pathId],titles=content&&Array.isArray(content.titles)?content.titles:[];
+  var level=Math.max(1,Math.floor(Math.max(0,Number(totalXp)||0)/100)+1);
+  var count=Math.min(titles.length,Math.max(0,Math.floor(level/2)));
+  if(level>=10)count=titles.length;
+  return titles.slice(0,count);
+}
+function journeyRc011AllClassTitleSet(){
+  var set=new Set();
+  Object.keys(JOURNEY_CLASS_CONTENT||{}).forEach(function(id){
+    (JOURNEY_CLASS_CONTENT[id].titles||[]).forEach(function(t){set.add(t);});
+  });
+  return set;
+}
+function journeyRc011SelectedState(member){
+  var path=(document.getElementById('ja-path')||{}).value||journeyCurrentPathId(member||{})||'';
+  if(path==='cosmic-vessel')path=(document.getElementById('ja-subclass')||{}).value||journeyCurrentPathId(member||{})||'';
+  var base=Math.max(0,Number((document.getElementById('ja-total-xp')||{}).value)||journeyXp(member||{}));
+  var delta=Number((document.getElementById('ja-xp-delta')||{}).value)||0;
+  return {path:path,total:Math.max(0,base+delta),auto:journeyRc011ClassTitles(path,Math.max(0,base+delta))};
+}
+function journeyRc011RenderTitleControl(member){
+  journeyRc009EnsureTitleStyles();
+  var modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;
+  var lib=document.getElementById('ja-title-library');
+  if(!lib){
+    lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';
+    var custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');
+    if(field)body.insertBefore(lib,field);else body.appendChild(lib);
+  }
+  var state=journeyRc011SelectedState(member||{}),autoSet=new Set(state.auto),allClass=journeyRc011AllClassTitleSet();
+  var stored=Array.isArray((member||{}).journeyUnlockedTitles)?member.journeyUnlockedTitles:[];
+  var extras=stored.filter(function(t){return t&&!allClass.has(t);});
+  journeyAdminSelectedTitles=new Set(extras.concat(state.auto));
+  var groups=journeyAllTitleGroups(Object.assign({},member,{journeyPath:state.path})),known=new Set();
+  Object.keys(groups).forEach(function(k){(groups[k]||[]).forEach(function(t){known.add(t);});});
+  var customTitles=extras.filter(function(t){return !known.has(t);});
+  if(customTitles.length)groups['Member Custom Titles']=customTitles.slice().sort();
+  lib.innerHTML='<div class="field-label">Granted titles</div><div id="ja-title-multi" class="ja-title-multi"><button id="ja-title-trigger" class="ja-title-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="summary">Choose granted titles…</span><span class="chev" aria-hidden="true"></span></button><div id="ja-title-menu" class="ja-title-menu" role="listbox" aria-multiselectable="true"></div></div><div class="ja-title-note">Class titles are granted automatically from the member’s selected class and level. Other checked titles can be granted or revoked manually.</div>';
+  var trigger=document.getElementById('ja-title-trigger'),menu=document.getElementById('ja-title-menu');
+  trigger.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var open=!menu.classList.contains('open');journeyRc009CloseTitleMenu();if(open){menu.classList.add('open');trigger.classList.add('open');trigger.setAttribute('aria-expanded','true');}});
+  menu.innerHTML=Object.keys(groups).map(function(group){
+    return '<div class="ja-title-group"><div class="ja-title-group-label">'+esc(group)+'</div>'+
+      (groups[group]||[]).map(function(title){
+        var auto=autoSet.has(title),checked=auto||journeyAdminSelectedTitles.has(title);
+        return '<label class="ja-title-option '+(auto?'auto-title':'')+'"><span class="ja-title-check"><input type="checkbox" value="'+esc(title)+'" '+(checked?'checked':'')+' '+(auto?'disabled':'')+'><i></i></span><span>'+esc(title)+'</span>'+(auto?'<span class="ja-title-auto">Level unlock</span>':'')+'</label>';
+      }).join('')+'</div>';
+  }).join('');
+  menu.querySelectorAll('input:not(:disabled)').forEach(function(input){
+    input.addEventListener('change',function(){if(this.checked)journeyAdminSelectedTitles.add(this.value);else journeyAdminSelectedTitles.delete(this.value);journeyRc009UpdateTitleSummary();});
+  });
+  journeyRc009UpdateTitleSummary();
+}
+renderJourneyAdminTitleLibrary=journeyRc011RenderTitleControl;
+window.renderJourneyAdminTitleLibrary=renderJourneyAdminTitleLibrary;
+
+document.addEventListener('change',function(e){
+  if(e.target&&(e.target.id==='ja-path'||e.target.id==='ja-subclass'||e.target.id==='ja-total-xp'||e.target.id==='ja-xp-delta')){
+    var uid=(document.getElementById('ja-uid')||{}).value,m=(liveData.members||{})[uid]||{};
+    setTimeout(function(){journeyRc011RenderTitleControl(m);},0);
+  }
+});
+
+var _rc011OpenJourneyAdminEdit=openJourneyAdminEdit;
+openJourneyAdminEdit=function(uid){
+  var result=_rc011OpenJourneyAdminEdit(uid),m=(liveData.members||{})[uid]||{};
+  [0,55,170].forEach(function(delay){setTimeout(function(){journeyRc011RenderTitleControl(m);},delay);});
+  return result;
+};
+window.openJourneyAdminEdit=openJourneyAdminEdit;
+
+saveJourneyAdminEdit=async function(){
+  const uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;
+  const base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta);
+  var chosenPath=document.getElementById('ja-path').value||'',chosenSubclass=document.getElementById('ja-subclass').value||'';
+  var classPath=chosenPath==='cosmic-vessel'?(chosenSubclass||journeyCurrentPathId(m)):chosenPath;
+  const allClass=journeyRc011AllClassTitleSet(),autoTitles=journeyRc011ClassTitles(classPath,total);
+  const previousExtras=(Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles:[]).filter(function(t){return !allClass.has(t);});
+  var extras=Array.from(journeyAdminSelectedTitles).filter(function(t){return !allClass.has(t);});
+  const newTitle=document.getElementById('ja-new-title').value.trim();if(newTitle&&!extras.includes(newTitle))extras.push(newTitle);
+  const customTitle=document.getElementById('ja-active-title-custom').value.trim();if(customTitle&&!extras.includes(customTitle))extras.push(customTitle);
+  const available=Array.from(new Set(autoTitles.concat(extras)));
+  const requestedActive=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
+  const active=requestedActive&&available.includes(requestedActive)?requestedActive:'';
+  const badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges)),customDefs={};
+  badges.forEach(function(id){if(String(id).startsWith('custom:')&&journeyAdminCustomBadges[id])customDefs[id]=journeyAdminCustomBadges[id];});
+  const newlyGranted=extras.filter(function(t){return !previousExtras.includes(t);});
+  const revoked=previousExtras.filter(function(t){return !extras.includes(t);});
+  const newCustomIds=badges.filter(function(id){return String(id).startsWith('custom:')&&!(m.journeyUnlockedBadges||[]).includes(id);});
+  const msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked;
+  const data={journeyXp:total,journeyPath:chosenPath,journeySubclass:chosenSubclass,journeyActiveTitle:active,journeyBadgeOverride:'',journeyUnlockedBadges:badges,journeyCustomBadges:customDefs,journeyUnlockedTitles:extras,journeyUpdatedAt:new Date().toISOString()};
+  if(celebrate&&(msg||delta||newlyGranted.length||newCustomIds.length)){
+    const titleAwarded=newlyGranted[0],customAward=newCustomIds[0]&&customDefs[newCustomIds[0]];
+    data.pendingJourneyCelebration={title:titleAwarded?'New Title Unlocked':customAward?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||(titleAwarded?titleAwarded+' has been added to your title collection.':customAward?customAward.name+' has been awarded to recognise your contribution.':delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.'),symbol:customAward?journeyCustomIconSvg(customAward.customIconKey):'✦',createdAt:new Date().toISOString()};
+  }
+  try{
+    await db.collection('users').doc(uid).set(data,{merge:true});
+    const diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});
+    Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();
+    toast('Member Journey updated'+(revoked.length?' · '+revoked.length+' title'+(revoked.length===1?'':'s')+' revoked':''),'ok');
+  }catch(e){toast(e.message||'Could not update Journey','err');}
+};
+window.saveJourneyAdminEdit=saveJourneyAdminEdit;
+
+// Task owner and contributor selectors: preferred task department first, alphabetical within groups.
+populateAssignSelect=function(dept){
+  var sel=document.getElementById('t-assign'),role=currentProfile?normaliseRole(currentProfile.role):'',canAssignAll=['admin','project_manager','lead','director'].includes(role);
+  if(!sel)return;
+  if(!canAssignAll){
+    sel.innerHTML='';var me=(liveData.members||{})[currentUser.uid]||{};var o=document.createElement('option');o.value=currentUser.uid;o.textContent=(me.name||'Me')+' (you)';sel.appendChild(o);return;
+  }
+  var previous=sel.value;mhPopulateGroupedSelect(sel,dept,previous,true);
+};
+window.populateAssignSelect=populateAssignSelect;
+
+populateContributorSelect=function(dept,selected,owner){
+  var sel=document.getElementById('t-contributors');if(!sel)return;
+  mhPopulateGroupedSelect(sel,dept,'',false,owner,selected||[]);
+};
+window.populateContributorSelect=populateContributorSelect;
+
+// Scheduler person picker grouped by department; members appear in every department they belong to.
+renderSchedulerFilters=function(){
+  var dbx=document.getElementById('sched-dept-filters'),pbx=document.getElementById('sched-person-filters');if(!dbx||!pbx)return;
+  dbx.innerHTML=getDeptList().map(function(d){return '<div class="sched-chip '+(schedulerSelectedDepts.has(d.id)?'active':'')+'" onclick="toggleSchedulerDept(\''+d.id+'\')">'+esc(d.label)+'</div>';}).join('');
+  var q=((document.getElementById('sched-person-search')||{}).value||'').toLowerCase();
+  var members=Object.values(liveData.members||{}).filter(function(m){return !q||String(m.name||'').toLowerCase().includes(q);});
+  pbx.classList.add('mh-grouped-chips');
+  pbx.innerHTML=mhGroupHtml(mhGroupedMembers(members,'',true),function(m){return '<div class="sched-chip '+(schedulerSelectedPeople.has(m.uid)?'active':'')+'" onclick="toggleSchedulerPerson(\''+m.uid+'\')">'+esc(m.name||'Team member')+'</div>';},'',!!q);
+};
+window.renderSchedulerFilters=renderSchedulerFilters;
+
+// Meeting attendee list grouped by department.
+renderOtherAttendees=function(){
+  var box=document.getElementById('attendee-checks');if(!box)return;
+  var q=((document.getElementById('mt-attendee-search')||{}).value||'').trim().toLowerCase();
+  if(q){box.classList.remove('collapsed');var btn=document.getElementById('mt-toggle-others');if(btn)btn.textContent='Hide team';}
+  var members=Object.values(liveData.members||{}).filter(function(m){
+    if(meetingAutoSelectedUids.has(m.uid)&&meetingRoleState[m.uid]!=='none')return false;
+    if(!q)return getMeetingRole(m.uid)!=='none'||!box.classList.contains('collapsed');
+    return String(m.name||'').toLowerCase().includes(q);
+  });
+  var groups=mhGroupedMembers(members,'',true);
+  box.innerHTML=groups.length?mhGroupHtml(groups,function(m){return meetingAttendeeRow(m,false);},'',!!q):'<div class="meeting-list-empty">'+(q?'No matching team members.':'Search for a person to add them, or choose “Show team”.')+'</div>';
+};
+window.renderOtherAttendees=renderOtherAttendees;
+toggleOtherAttendees=function(){
+  var box=document.getElementById('attendee-checks'),btn=document.getElementById('mt-toggle-others');if(!box)return;
+  var opening=box.classList.contains('collapsed');box.classList.toggle('collapsed',!opening);if(btn)btn.textContent=opening?'Hide team':'Show team';
+  renderOtherAttendees();
+};
+window.toggleOtherAttendees=toggleOtherAttendees;
+
+// Members tab grouped by department and alphabetised. Multi-department members intentionally appear in each group.
+renderCrew=function(){
+  const el=document.getElementById('crew-roster');if(!el)return;
+  const actionsEl=document.getElementById('crew-actions');
+  if(actionsEl&&currentProfile.role==='admin')actionsEl.innerHTML="<button class='btn btn-gold' onclick='openModal(&quot;m-add-member&quot;);populateDeptChecks()'>+ Add Member</button>";
+  var q=String(crewFilter||'').toLowerCase();
+  var members=Object.values(liveData.members||{}).filter(function(m){return !q||String(m.name||'').toLowerCase().includes(q)||String(m.email||'').toLowerCase().includes(q);});
+  var groups=mhGroupedMembers(members,'',true);
+  if(!groups.length){el.innerHTML='<div class="no-data">No members</div>';return;}
+  el.classList.add('mh-grouped-roster');
+  function card(m){
+    const statusCls=STATUS_CLASS[getPresenceState(m)],localTime=getLocalTime(m.tz||'UTC');
+    var depts=mhMemberDepartments(m).map(function(d){var dc=DEPT_COLORS[d]||'#888';return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(DEPT_NAMES[d]||d)+'</span>';}).join('');
+    return `<div class="roster-card"><div style="position:relative;"><div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;">${initials(m.name)}</div><div class="status-dot ${statusCls}" style="position:absolute;bottom:0;right:0;width:10px;height:10px;border:2px solid var(--panel);"></div></div><div><div style="font-size:14px;font-weight:600;cursor:pointer;color:var(--white);" onclick="openMemberProfile('${m.uid}')" title="View profile">${esc(m.name)} <span style="font-size:10px;color:var(--grey-2);">↗</span></div><div style="font-size:11px;color:var(--grey);font-family:'Share Tech Mono',monospace;">${esc(m.email||'')}</div><div style="margin-top:4px;">${depts}</div></div><div style="text-align:right;"><div class="text-mono" style="font-size:13px;color:var(--gold);">${localTime}</div><div style="font-size:10px;color:var(--grey);margin-top:2px;">${getTzOffset(m.tz||'UTC')}</div></div><div><span class="u-role ${normaliseRole(m.role)}">${normaliseRole(m.role).toUpperCase()}</span></div><div style="display:flex;gap:4px;">${currentProfile.role==='admin'?`<button class="icon-btn" onclick="openEditMember('${m.uid}')" title="Edit">✎</button><button class="icon-btn danger" onclick="removeMember('${m.uid}')" title="Remove">✕</button>`:''}</div></div>`;
+  }
+  el.innerHTML=mhGroupHtml(groups,card,'',!!q);
+};
+window.renderCrew=renderCrew;
+
+// Department boards were already department-specific; ensure their member rows are alphabetical.
+var _rc011RenderDeptBoard=renderDeptBoard;
+renderDeptBoard=function(dept){
+  var members=liveData&&liveData.members?liveData.members:null;
+  if(!members)return _rc011RenderDeptBoard(dept);
+  var ordered={};
+  mhAlphaMembers(Object.values(members)).forEach(function(m){ordered[m.uid]=m;});
+  liveData.members=ordered;
+  try{return _rc011RenderDeptBoard(dept);}finally{liveData.members=members;}
+};
+window.renderDeptBoard=renderDeptBoard;
+
+
+// Mission Hub v12 RC012 — management grouping, contextual task ordering, flat scheduler, scroll repair
+(function(){
+  const style=document.createElement('style');
+  style.id='journey-rc012-member-list-styles';
+  style.textContent=`
+    #view-crew.active{overflow:visible !important;min-height:0}
+    #view-crew #crew-roster{overflow:visible !important;max-height:none !important;padding-bottom:28px}
+    #main:has(#view-crew.active){overflow-y:auto !important}
+    .mh-dept-group[data-dept="management"] .mh-dept-group-head{border-left:2px solid var(--gold)}
+    .mh-dept-group[data-dept="management"] .mh-dept-group-head .count{color:var(--gold)}
+    #sched-person-filters.mh-flat-people{display:flex;flex-wrap:wrap;gap:6px}
+  `;
+  if(!document.getElementById(style.id))document.head.appendChild(style);
+})();
+
+function mhIsManagementMember(member){
+  return ['admin','director','project_manager','lead'].includes(normaliseRole((member||{}).role));
+}
+function mhRc012GroupedMembers(members,preferredDept,includeUnassigned){
+  members=mhAlphaMembers(members||[]);
+  var management={id:'management',label:'Management',members:[]};
+  var defs=mhDeptDefinitions().slice().sort(function(a,b){
+    return String(a.label||a.id).localeCompare(String(b.label||b.id),undefined,{sensitivity:'base'});
+  });
+  var groups=[],seen=new Set();
+
+  if(preferredDept){
+    var preferred=defs.find(function(d){return d.id===preferredDept;});
+    if(preferred){groups.push({id:preferred.id,label:preferred.label,members:[]});seen.add(preferred.id);}
+  }
+  defs.forEach(function(d){
+    if(!seen.has(d.id)){groups.push({id:d.id,label:d.label,members:[]});seen.add(d.id);}
+  });
+
+  var other={id:'other',label:'Other / No Department',members:[]};
+  members.forEach(function(member){
+    if(mhIsManagementMember(member)){
+      management.members.push(member);
+      return;
+    }
+    var depts=mhMemberDepartments(member),placed=false;
+    depts.forEach(function(id){
+      var group=groups.find(function(g){return g.id===id;});
+      if(group){group.members.push(member);placed=true;}
+    });
+    if(!placed&&includeUnassigned!==false)other.members.push(member);
+  });
+
+  management.members=mhAlphaMembers(management.members);
+  groups.forEach(function(g){g.members=mhAlphaMembers(g.members);});
+  other.members=mhAlphaMembers(other.members);
+
+  var result=[];
+  if(management.members.length)result.push(management);
+  result=result.concat(groups.filter(function(g){return g.members.length;}));
+  if(other.members.length)result.push(other);
+  return result;
+}
+mhGroupedMembers=mhRc012GroupedMembers;
+window.mhGroupedMembers=mhGroupedMembers;
+
+function mhRc012GroupHtml(groups,rowBuilder,expandedDept,allExpanded,allCollapsed){
+  return groups.map(function(group,index){
+    var expanded=!allCollapsed&&(allExpanded||group.id===expandedDept||(!expandedDept&&index===0));
+    return '<section class="mh-dept-group '+(expanded?'':'collapsed')+'" data-dept="'+esc(group.id)+'">'+
+      '<button type="button" class="mh-dept-group-head" onclick="mhToggleDeptGroup(this)"><span>'+esc(group.label)+'</span><span style="display:flex;align-items:center;gap:8px"><span class="count">'+group.members.length+'</span><span class="arrow">▾</span></span></button>'+
+      '<div class="mh-dept-group-body">'+group.members.map(rowBuilder).join('')+'</div></section>';
+  }).join('');
+}
+mhGroupHtml=mhRc012GroupHtml;
+window.mhGroupHtml=mhGroupHtml;
+
+function mhRc012PopulateGroupedSelect(sel,preferredDept,selectedValue,allowUnassigned,excludeUid,multipleSelected){
+  if(!sel)return;
+  var selectedSet=new Set(multipleSelected||[]);
+  var groups=mhRc012GroupedMembers(Object.values(liveData.members||{}),preferredDept,true);
+  sel.classList.add('mh-native-grouped-select');
+  sel.innerHTML=allowUnassigned?'<option value="">Unassigned</option>':'';
+
+  groups.forEach(function(group){
+    var og=document.createElement('optgroup');
+    og.label=group.label;
+    group.members.forEach(function(member){
+      if(excludeUid&&member.uid===excludeUid)return;
+      var option=document.createElement('option');
+      option.value=member.uid;
+      option.textContent=member.name||'Team member';
+      option.selected=sel.multiple?selectedSet.has(member.uid):member.uid===selectedValue;
+      og.appendChild(option);
+    });
+    if(og.children.length)sel.appendChild(og);
+  });
+}
+mhPopulateGroupedSelect=mhRc012PopulateGroupedSelect;
+window.mhPopulateGroupedSelect=mhPopulateGroupedSelect;
+
+// Task assignment: Management first, task department second, then all remaining departments.
+populateAssignSelect=function(dept){
+  var sel=document.getElementById('t-assign');
+  var role=currentProfile?normaliseRole(currentProfile.role):'';
+  var canAssignAll=['admin','project_manager','lead','director'].includes(role);
+  if(!sel)return;
+  if(!canAssignAll){
+    sel.innerHTML='';
+    var me=(liveData.members||{})[currentUser.uid]||{},option=document.createElement('option');
+    option.value=currentUser.uid;option.textContent=(me.name||'Me')+' (you)';sel.appendChild(option);return;
+  }
+  mhRc012PopulateGroupedSelect(sel,dept,sel.value,true);
+};
+window.populateAssignSelect=populateAssignSelect;
+
+populateContributorSelect=function(dept,selected,owner){
+  var sel=document.getElementById('t-contributors');if(!sel)return;
+  mhRc012PopulateGroupedSelect(sel,dept,'',false,owner,selected||[]);
+};
+window.populateContributorSelect=populateContributorSelect;
+
+// Scheduler: one simple alphabetical list, without department categories.
+renderSchedulerFilters=function(){
+  var dbx=document.getElementById('sched-dept-filters'),pbx=document.getElementById('sched-person-filters');
+  if(!dbx||!pbx)return;
+  dbx.innerHTML=getDeptList().map(function(d){
+    return '<div class="sched-chip '+(schedulerSelectedDepts.has(d.id)?'active':'')+'" onclick="toggleSchedulerDept(\''+d.id+'\')">'+esc(d.label)+'</div>';
+  }).join('');
+  var q=((document.getElementById('sched-person-search')||{}).value||'').toLowerCase();
+  var members=mhAlphaMembers(Object.values(liveData.members||{}).filter(function(m){
+    return !q||String(m.name||'').toLowerCase().includes(q);
+  }));
+  pbx.className='sched-chip-wrap mh-flat-people';
+  pbx.innerHTML=members.map(function(m){
+    return '<div class="sched-chip '+(schedulerSelectedPeople.has(m.uid)?'active':'')+'" onclick="toggleSchedulerPerson(\''+m.uid+'\')">'+esc(m.name||'Team member')+'</div>';
+  }).join('');
+};
+window.renderSchedulerFilters=renderSchedulerFilters;
+
+// Meeting attendee picker retains useful categories: Management, selected meeting department, then the rest.
+renderOtherAttendees=function(){
+  var box=document.getElementById('attendee-checks');if(!box)return;
+  var q=((document.getElementById('mt-attendee-search')||{}).value||'').trim().toLowerCase();
+  if(q){
+    box.classList.remove('collapsed');
+    var button=document.getElementById('mt-toggle-others');if(button)button.textContent='Hide team';
+  }
+  var members=Object.values(liveData.members||{}).filter(function(m){
+    if(meetingAutoSelectedUids.has(m.uid)&&meetingRoleState[m.uid]!=='none')return false;
+    if(!q)return getMeetingRole(m.uid)!=='none'||!box.classList.contains('collapsed');
+    return String(m.name||'').toLowerCase().includes(q);
+  });
+  var preferred=typeof schedulerSelectedDepts!=='undefined'&&schedulerSelectedDepts.size?Array.from(schedulerSelectedDepts)[0]:'';
+  var groups=mhRc012GroupedMembers(members,preferred,true);
+  box.innerHTML=groups.length?mhRc012GroupHtml(groups,function(m){return meetingAttendeeRow(m,false);},preferred,!!q,false):
+    '<div class="meeting-list-empty">'+(q?'No matching team members.':'Search for a person to add them, or choose “Show team”.')+'</div>';
+};
+window.renderOtherAttendees=renderOtherAttendees;
+
+// Members page: Management members only appear in Management. Admin opens with every category collapsed.
+renderCrew=function(){
+  const el=document.getElementById('crew-roster');if(!el)return;
+  const actionsEl=document.getElementById('crew-actions');
+  if(actionsEl&&currentProfile.role==='admin'){
+    actionsEl.innerHTML="<button class='btn btn-gold' onclick='openModal(&quot;m-add-member&quot;);populateDeptChecks()'>+ Add Member</button>";
+  }
+  var q=String(crewFilter||'').toLowerCase();
+  var members=Object.values(liveData.members||{}).filter(function(m){
+    return !q||String(m.name||'').toLowerCase().includes(q)||String(m.email||'').toLowerCase().includes(q);
+  });
+  var groups=mhRc012GroupedMembers(members,'',true);
+  if(!groups.length){el.innerHTML='<div class="no-data">No members</div>';return;}
+  el.classList.add('mh-grouped-roster');
+
+  function card(m){
+    const statusCls=STATUS_CLASS[getPresenceState(m)];
+    const localTime=getLocalTime(m.tz||'UTC');
+    var depts=mhMemberDepartments(m).map(function(d){
+      var dc=DEPT_COLORS[d]||'#888';
+      return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(DEPT_NAMES[d]||d)+'</span>';
+    }).join('');
+    return `<div class="roster-card"><div style="position:relative;"><div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;">${initials(m.name)}</div><div class="status-dot ${statusCls}" style="position:absolute;bottom:0;right:0;width:10px;height:10px;border:2px solid var(--panel);"></div></div><div><div style="font-size:14px;font-weight:600;cursor:pointer;color:var(--white);" onclick="openMemberProfile('${m.uid}')" title="View profile">${esc(m.name)} <span style="font-size:10px;color:var(--grey-2);">↗</span></div><div style="font-size:11px;color:var(--grey);font-family:'Share Tech Mono',monospace;">${esc(m.email||'')}</div><div style="margin-top:4px;">${depts}</div></div><div style="text-align:right;"><div class="text-mono" style="font-size:13px;color:var(--gold);">${localTime}</div><div style="font-size:10px;color:var(--grey);margin-top:2px;">${getTzOffset(m.tz||'UTC')}</div></div><div><span class="u-role ${normaliseRole(m.role)}">${normaliseRole(m.role).toUpperCase()}</span></div><div style="display:flex;gap:4px;">${currentProfile.role==='admin'?`<button class="icon-btn" onclick="openEditMember('${m.uid}')" title="Edit">✎</button><button class="icon-btn danger" onclick="removeMember('${m.uid}')" title="Remove">✕</button>`:''}</div></div>`;
+  }
+
+  var adminView=normaliseRole((currentProfile||{}).role)==='admin';
+  el.innerHTML=mhRc012GroupHtml(groups,card,'',!!q,adminView&&!q);
+};
+window.renderCrew=renderCrew;
+
+
+// Mission Hub v12 RC013 — restore complete badge catalogue + correct Management membership
+function mhIsManagementMember(member){
+  return ['admin','director','project_manager'].includes(normaliseRole((member||{}).role));
+}
+window.mhIsManagementMember=mhIsManagementMember;
+
+function journeyRc013RecognitionBadges(){
+  try{
+    if(typeof RECOGNITION_BADGES!=='undefined'&&Array.isArray(RECOGNITION_BADGES)){
+      return RECOGNITION_BADGES;
+    }
+  }catch(e){}
+  if(Array.isArray(window.RECOGNITION_BADGES))return window.RECOGNITION_BADGES;
+  return [];
+}
+
+journeyAllCollectibleBadges=function(){
+  var output=[],seen=new Set();
+
+  function add(badge){
+    if(!badge||!badge.id||seen.has(badge.id))return;
+    seen.add(badge.id);
+    output.push(Object.assign({},badge));
+  }
+
+  Object.keys(JOURNEY_CLASS_CONTENT||{}).forEach(function(pathId){
+    ((JOURNEY_CLASS_CONTENT[pathId]||{}).badges||[]).forEach(function(name,index){
+      add(journeyClassBadgeInfo(pathId,name,index));
+    });
+  });
+
+  journeyRc013RecognitionBadges().forEach(add);
+
+  Object.keys(journeyAdminCustomBadges||{}).forEach(function(id){
+    var badge=journeyAdminCustomBadges[id];
+    if(badge)add(Object.assign({id:id,category:'Custom Badges',earned:'Admin recognition'},badge));
+  });
+
+  return output;
+};
+window.journeyAllCollectibleBadges=journeyAllCollectibleBadges;
+
+renderJourneyAdminBadgeLibrary=function(){
+  ensureJourneyAdminBadgeLibrary();
+  var host=document.getElementById('ja-badge-library-scroll');
+  if(!host)return;
+
+  var catalogue=journeyAllCollectibleBadges();
+  var categories={};
+
+  catalogue.forEach(function(badge){
+    var category=badge.category||'Other Badges';
+    (categories[category]||(categories[category]=[])).push(badge);
+  });
+
+  Object.keys(categories).forEach(function(category){
+    categories[category].sort(function(a,b){
+      if(a.pathId&&b.pathId){
+        return (Number(a.tierIndex)||0)-(Number(b.tierIndex)||0);
+      }
+      return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'});
+    });
+  });
+
+  var selectedCount=document.getElementById('ja-badge-selected-count');
+  if(selectedCount)selectedCount.textContent=journeyAdminCollectedBadges.size+' collected';
+
+  var uid=(document.getElementById('ja-uid')||{}).value;
+  var member=(liveData.members||{})[uid]||{};
+  var selectedPath=journeyCurrentPathId(member);
+  var selectedCategory=selectedPath?(journeyPathObj(selectedPath).name+' Badges'):'';
+
+  var preferredOrder=[
+    selectedCategory,
+    'General',
+    'Community',
+    'Art & Creativity',
+    'Audio',
+    'Programming & QA',
+    'Narrative',
+    'Management',
+    'Cosmic Vessel',
+    'Founder',
+    'Hidden',
+    'Seasonal',
+    'Custom Badges'
+  ].filter(Boolean);
+
+  var ordered=Object.keys(categories).sort(function(a,b){
+    var ai=preferredOrder.indexOf(a),bi=preferredOrder.indexOf(b);
+    if(ai!==-1||bi!==-1){
+      if(ai===-1)return 1;
+      if(bi===-1)return -1;
+      return ai-bi;
+    }
+    return a.localeCompare(b,undefined,{sensitivity:'base'});
+  });
+
+  host.innerHTML=ordered.map(function(category){
+    var list=categories[category];
+    var collected=list.filter(function(badge){return journeyAdminCollectedBadges.has(badge.id);}).length;
+    return '<div class="ja-badge-category collapsed" data-badge-category="'+esc(category)+'">'+
+      '<button type="button" onclick="journeyToggleBadgeCategory(this)">'+
+        '<span>'+esc(category)+' <span style="color:var(--grey);font-weight:500">('+collected+'/'+list.length+')</span></span>'+
+        '<span>⌄</span>'+
+      '</button>'+
+      '<div class="ja-badge-category-body"><div class="ja-badge-grid">'+
+        list.map(function(badge){
+          var selected=journeyAdminCollectedBadges.has(badge.id);
+          return '<button type="button" class="ja-badge-icon '+(selected?'selected':'')+'" aria-pressed="'+(selected?'true':'false')+'" data-badge-id="'+esc(badge.id)+'" onclick="journeyToggleCollectedBadge(this.dataset.badgeId)" onmouseenter="journeyShowBadgeTip(event,this.dataset.badgeId)" onmousemove="journeyShowBadgeTip(event,this.dataset.badgeId)" onmouseleave="journeyHideBadgeTip()">'+
+            '<div class="symbol">'+journeyBadgeSvg(badge)+'</div>'+
+            '<div class="name">'+esc(badge.name)+'</div>'+
+          '</button>';
+        }).join('')+
+      '</div></div>'+
+    '</div>';
+  }).join('');
+
+  journeyRenderCustomBadgeSummary();
+};
+window.renderJourneyAdminBadgeLibrary=renderJourneyAdminBadgeLibrary;
+
+var _rc013OpenJourneyAdminEdit=openJourneyAdminEdit;
+openJourneyAdminEdit=function(uid){
+  var result=_rc013OpenJourneyAdminEdit(uid);
+  [0,60,180].forEach(function(delay){
+    setTimeout(function(){renderJourneyAdminBadgeLibrary();},delay);
+  });
+  return result;
+};
+window.openJourneyAdminEdit=openJourneyAdminEdit;
+
+</script>
+<!-- MH-MODULE-END id="MOD-JS-007" -->
+
+<!-- MH-MODULE-START id="MOD-JS-008" version="1.0.0" name="Inline JavaScript Block 8" -->
 <script>
 // v10B.3 — Cosmic Vessel identity, personal Home themes and saved animation preferences.
 function hubMotionMode(){return (currentProfile&&currentProfile.homeAnimationMode)||'full';}
@@ -9346,6 +10495,7 @@ var _v10b3BuildSeasonalEffects=buildSeasonalEffects;
 buildSeasonalEffects=function(theme){if(hubMotionMode()==='off'){var layer=document.getElementById('seasonal-effects');if(layer)layer.innerHTML='';return;} _v10b3BuildSeasonalEffects(theme);if(hubMotionMode()==='reduced'){document.querySelectorAll('#seasonal-effects .season-bat,#seasonal-effects .season-shooting-star').forEach(function(x){x.remove();});}};
 var _v10b3MaybePromptJourney=maybePromptJourney;maybePromptJourney=function(){_v10b3MaybePromptJourney();applyUserMotionPreference();applyScheduledTheme();applyPersonalCosmicTheme();};
 </script>
+<!-- MH-MODULE-END id="MOD-JS-008" -->
 
 
 <div class="modal-bg" id="m-task-reassign-confirm">
@@ -9365,6 +10515,7 @@ var _v10b3MaybePromptJourney=maybePromptJourney;maybePromptJourney=function(){_v
 <div id="prestige-effects"></div>
 
 
+<!-- MH-MODULE-START id="MOD-JS-009" version="1.0.0" name="Inline JavaScript Block 9" -->
 <script id="v11-workflow-refresh">
 (function(){
 'use strict';
@@ -9444,13 +10595,17 @@ if(_dashBg&&!_dashBg.dataset.v11CloseBound){_dashBg.dataset.v11CloseBound='1';_d
 window.addEventListener('keydown',function(e){if(e.key==='Escape'){if(document.getElementById('m-task-reassign-confirm').classList.contains('open'))cancelTaskDropConfirm();}});
 })();
 </script>
+<!-- MH-MODULE-END id="MOD-JS-009" -->
 
 
+<!-- MH-MODULE-START id="MOD-CSS-004" version="1.0.0" name="CSS Block 4" -->
 <style id="v11-2-3-summer-comets-style">
 #summer-comet-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity .5s ease}#app,#login-screen,#setup-banner{position:relative;z-index:1}
 body.theme-summer:not(.motion-off) #summer-comet-canvas{opacity:1}
 body.motion-reduced #summer-comet-canvas{opacity:.62}
 </style>
+<!-- MH-MODULE-END id="MOD-CSS-004" -->
+<!-- MH-MODULE-START id="MOD-JS-010" version="1.0.0" name="Inline JavaScript Block 10" -->
 <script>
 (function(){
   if(document.getElementById('summer-comet-canvas')) return;
@@ -9521,6 +10676,7 @@ body.motion-reduced #summer-comet-canvas{opacity:.62}
   requestAnimationFrame(loop);
 })();
 </script>
+<!-- MH-MODULE-END id="MOD-JS-010" -->
 
 </body>
 </html>
