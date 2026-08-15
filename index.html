@@ -2249,7 +2249,216 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
 <!-- MH-MODULE-END id="MOD-HTML-LOGIN" -->
 
 <!-- ═══════════════════ MAIN APP ═══════════════════ -->
-<!-- MH-MODULE-START id="MOD-HTML-APP" version="1.0.0" name="Main Hub Application" -->
+<!-- MH-MODULE-START id="MOD-HTML-APP" version="1.1.19" name="Main Hub Application" -->
+
+<style>
+/* ═══════════════════════════════════════════════
+   NARRATIVE INTERACTION ENGINE — CLEAN BUILD 3
+═══════════════════════════════════════════════ */
+.ext-btn.narrative:hover{border-color:var(--dept-nar);color:var(--dept-nar);background:rgba(255,107,53,.05)}
+#view-narrative.active,#view-narrative-canvas.active{display:block}
+.narf-shell,.narf-canvas-shell{min-height:100%;padding-bottom:24px}
+.narf-summary-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.narf-summary-card{position:relative;overflow:hidden;background:rgba(17,19,32,.86);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.narf-summary-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--dept-nar);box-shadow:0 0 12px rgba(255,107,53,.45)}
+.narf-summary-card strong{font:700 20px 'Orbitron',sans-serif;color:var(--white)}
+.narf-summary-label{font-size:9px;letter-spacing:2px;color:var(--grey);font-weight:700}
+.narf-toolbar{padding:13px 14px;margin-bottom:16px}
+.narf-toolbar-main{display:grid;grid-template-columns:minmax(260px,1fr) 220px;gap:10px}
+.narf-toolbar-note{font-size:11px;color:var(--grey-2);margin-top:9px}
+.narf-library{display:flex;flex-direction:column;gap:14px}
+.narf-section{background:rgba(17,19,32,.78);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.narf-section-head{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;background:rgba(8,10,18,.58);border-bottom:1px solid var(--border)}
+.narf-section-title{font:700 10px 'Orbitron',sans-serif;letter-spacing:2px;color:var(--gold)}
+.narf-section-count{font:10px 'Share Tech Mono',monospace;color:var(--grey)}
+.narf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;padding:12px}
+.narf-card{position:relative;min-height:158px;background:rgba(8,10,18,.76);border:1px solid var(--border);border-top:3px solid var(--narf-colour,var(--dept-nar));border-radius:7px;padding:14px;display:flex;flex-direction:column;transition:.16s;cursor:pointer}
+.narf-card:hover{transform:translateY(-2px);border-color:var(--border-2);box-shadow:0 10px 24px rgba(0,0,0,.28)}
+.narf-card-title{font-size:16px;font-weight:700;margin-bottom:5px;color:var(--white)}
+.narf-card-desc{font-size:12px;color:var(--grey);line-height:1.45;flex:1;white-space:pre-wrap}
+.narf-card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:9px;color:var(--grey-2)}
+.narf-pill{border:1px solid var(--border);border-radius:3px;padding:2px 6px;letter-spacing:.7px;text-transform:uppercase}
+.narf-card-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.narf-empty{padding:36px 20px;text-align:center;background:rgba(17,19,32,.5);border:1px dashed var(--border);border-radius:8px;color:var(--grey-2)}
+.narf-empty strong{display:block;color:var(--grey);font-size:15px;margin-bottom:5px}
+.narf-removal-wrap{margin-top:16px}
+.narf-removal-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;border:0;background:rgba(8,10,18,.5);color:var(--grey);padding:12px 16px;cursor:pointer;font:700 10px 'Orbitron',sans-serif;letter-spacing:2px}
+.narf-removal-toggle:hover{color:var(--white)}
+.narf-removal-arrow{display:inline-block;margin-right:7px;transition:transform .15s}.narf-removal-arrow.open{transform:rotate(90deg)}
+.narf-removal-queue{border-top:1px solid var(--border);padding:12px}
+.narf-removal-card{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px;border:1px solid rgba(200,16,46,.25);border-left:3px solid var(--crimson-hi);border-radius:6px;background:rgba(200,16,46,.035);margin-bottom:8px}
+.narf-removal-card:last-child{margin-bottom:0}.narf-removal-title{font-size:14px;font-weight:700}.narf-removal-meta{font-size:10px;color:var(--grey);margin-top:4px;line-height:1.45}.narf-removal-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.narf-back{border:0;background:transparent;color:var(--dept-nar);font:700 11px 'Rajdhani',sans-serif;letter-spacing:1px;cursor:pointer;margin-bottom:8px;padding:0}
+.narf-canvas-placeholder{min-height:460px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+.narf-placeholder-orb{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,107,53,.5);background:rgba(255,107,53,.08);color:var(--dept-nar);font-size:28px;box-shadow:0 0 28px rgba(255,107,53,.13);margin-bottom:18px}
+.narf-placeholder-title{font:700 13px 'Orbitron',sans-serif;letter-spacing:3px;color:var(--gold);margin-bottom:10px}
+.narf-placeholder-copy{max-width:620px;font-size:13px;color:var(--grey);line-height:1.6}
+.narf-placeholder-meta{margin-top:18px;font:10px 'Share Tech Mono',monospace;color:var(--grey-2)}
+.narf-colour-row{display:flex;gap:8px;align-items:center}.narf-colour-row input[type=color]{width:54px;height:38px;padding:3px}.narf-access-list{display:flex;flex-direction:column;gap:7px;max-height:420px;overflow:auto}.narf-access-row{display:grid;grid-template-columns:42px 1fr 155px;gap:10px;align-items:center;padding:9px;border:1px solid var(--border);border-radius:5px;background:rgba(8,10,18,.48)}
+.narf-access-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--crimson),#3a0812);font-size:10px;font-weight:700}.narf-access-name{font-size:13px;font-weight:700}.narf-access-email{font-size:10px;color:var(--grey)}
+.narf-danger-note{font-size:11px;color:var(--grey);padding:9px 11px;border:1px solid rgba(200,16,46,.25);background:rgba(200,16,46,.05);border-radius:5px}
+@media(max-width:900px){.narf-summary-row{grid-template-columns:1fr 1fr}.narf-toolbar-main{grid-template-columns:1fr}.narf-access-row{grid-template-columns:38px 1fr}.narf-access-row select{grid-column:1/-1}}
+
+
+/* ═══════════════════════════════════════════════
+   NARRATIVE WORKSPACE + INTERACTION ENGINE — CLEAN BUILD 3
+═══════════════════════════════════════════════ */
+.narf-canvas-shell{height:calc(100vh - 132px);min-height:560px;padding-bottom:0;display:flex;flex-direction:column;overflow:hidden}
+.narf-canvas-shell .page-hdr{flex:0 0 auto;margin-bottom:12px}
+.narf-workspace-panel{position:relative;flex:1;min-height:420px;border:1px solid var(--border);border-top:3px solid var(--narf-accent,var(--dept-nar));border-radius:8px;overflow:hidden;background:#070912;box-shadow:inset 0 0 40px rgba(0,0,0,.35)}
+.narf-workspace-viewport{position:absolute;inset:0;overflow:hidden;touch-action:none;user-select:none;cursor:grab;background-color:#070912;background-image:linear-gradient(rgba(122,127,154,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(122,127,154,.13) 1px,transparent 1px),linear-gradient(rgba(255,107,53,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,53,.07) 1px,transparent 1px);background-size:var(--narf-grid-minor,24px) var(--narf-grid-minor,24px),var(--narf-grid-minor,24px) var(--narf-grid-minor,24px),var(--narf-grid-major,120px) var(--narf-grid-major,120px),var(--narf-grid-major,120px) var(--narf-grid-major,120px);background-position:var(--narf-grid-x,0px) var(--narf-grid-y,0px),var(--narf-grid-x,0px) var(--narf-grid-y,0px),var(--narf-grid-x,0px) var(--narf-grid-y,0px),var(--narf-grid-x,0px) var(--narf-grid-y,0px)}
+.narf-workspace-viewport.is-panning{cursor:grabbing}
+.narf-workspace-world{position:absolute;left:0;top:0;width:1px;height:1px;transform-origin:0 0;pointer-events:none}
+.narf-origin-marker{position:absolute;left:-12px;top:-12px;width:24px;height:24px;border:1px solid rgba(255,107,53,.48);border-radius:50%;box-shadow:0 0 15px rgba(255,107,53,.18)}
+.narf-origin-marker::before,.narf-origin-marker::after{content:'';position:absolute;background:rgba(255,107,53,.65)}
+.narf-origin-marker::before{left:11px;top:-9px;width:1px;height:40px}.narf-origin-marker::after{top:11px;left:-9px;height:1px;width:40px}
+.narf-workspace-toolbar{position:absolute;left:12px;top:12px;z-index:8;display:flex;align-items:center;gap:5px;padding:6px;background:rgba(8,10,18,.9);border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+.narf-cam-btn{width:32px;height:30px;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.025);color:var(--grey);font:700 15px 'Rajdhani',sans-serif;cursor:pointer}.narf-cam-btn:hover{color:var(--white);border-color:var(--border-2);background:rgba(255,255,255,.06)}
+.narf-zoom-readout{min-width:58px;text-align:center;font:10px 'Share Tech Mono',monospace;color:var(--gold)}
+.narf-workspace-help{position:absolute;left:12px;bottom:12px;z-index:7;padding:6px 9px;border:1px solid var(--border);border-radius:4px;background:rgba(8,10,18,.78);font:9px 'Share Tech Mono',monospace;color:var(--grey-2);letter-spacing:.5px;pointer-events:none}
+.narf-minimap{position:absolute;right:12px;bottom:12px;z-index:9;width:210px;height:140px;border:1px solid var(--border-2);border-radius:6px;background:rgba(6,8,15,.94);box-shadow:0 10px 28px rgba(0,0,0,.55);overflow:hidden;cursor:crosshair}
+.narf-minimap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(122,127,154,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(122,127,154,.08) 1px,transparent 1px);background-size:21px 21px}
+.narf-minimap-origin{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:var(--dept-nar);transform:translate(-50%,-50%);box-shadow:0 0 8px var(--dept-nar)}
+.narf-minimap-viewport{position:absolute;border:1px solid var(--gold);background:rgba(201,168,76,.08);min-width:4px;min-height:4px;box-shadow:0 0 8px rgba(201,168,76,.2);pointer-events:none}
+.narf-minimap-label{position:absolute;left:7px;top:5px;font:8px 'Share Tech Mono',monospace;color:var(--grey-2);letter-spacing:1px}
+.narf-camera-status{position:absolute;right:12px;top:12px;z-index:8;padding:6px 9px;border:1px solid var(--border);border-radius:4px;background:rgba(8,10,18,.82);font:9px 'Share Tech Mono',monospace;color:var(--grey-2);pointer-events:none}
+@media(max-width:760px){.narf-canvas-shell{height:calc(100vh - 116px)}.narf-minimap{width:160px;height:105px}.narf-workspace-help{display:none}.narf-camera-status{display:none}}
+/* Build 2 — basic node foundation */
+/* Build 4A — polished narrative node cards */
+.narf-node{position:absolute;width:268px;min-height:132px;pointer-events:auto;background:linear-gradient(155deg,rgba(20,23,39,.99),rgba(8,10,19,.99));border:1px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 22%,var(--border-2));border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.025);overflow:hidden;cursor:grab;transform:translateZ(0) scale(1);transform-origin:center;transition:border-color .16s,box-shadow .16s,filter .16s,transform .12s;will-change:left,top,transform;touch-action:none}
+.narf-node::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 22px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 5%,transparent)}
+.narf-node:hover{border-color:color-mix(in srgb,var(--node-colour,var(--dept-nar)) 68%,var(--border-2));filter:brightness(1.045);box-shadow:0 14px 34px rgba(0,0,0,.5),0 0 18px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 10%,transparent)}
+.narf-node.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2),0 14px 36px rgba(0,0,0,.52),0 0 24px rgba(201,168,76,.15)}
+.narf-node.is-dragging{cursor:grabbing;transform:translateZ(0) scale(1.018);filter:brightness(1.075);box-shadow:0 0 0 2px rgba(201,168,76,.2),0 20px 46px rgba(0,0,0,.65),0 0 26px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 30%,transparent);z-index:50;transition:border-color .14s,box-shadow .12s,filter .12s,transform .12s}
+.narf-workspace-viewport.is-node-dragging{cursor:default}
+.narf-workspace-viewport.is-node-dragging .narf-node:not(.is-dragging){pointer-events:none}
+body.narf-node-drag-active{user-select:none!important}
+.narf-node-head{position:relative;min-height:66px;padding:11px 42px 11px 13px;border-bottom:1px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 28%,rgba(255,255,255,.055));background:linear-gradient(120deg,color-mix(in srgb,var(--node-colour,var(--dept-nar)) 24%,rgba(8,10,18,.96)),rgba(8,10,18,.82) 72%)}
+.narf-node-head::before{content:none;display:none}
+.narf-node-type{font:8px 'Share Tech Mono',monospace;letter-spacing:1.65px;color:color-mix(in srgb,var(--node-colour,var(--dept-nar)) 84%,white);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.narf-node-title{font-size:16px;font-weight:700;line-height:1.22;color:var(--white);margin-top:5px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere;text-shadow:0 1px 7px rgba(0,0,0,.35)}
+.narf-node-menu-slot{position:absolute;right:11px;top:12px;width:24px;height:24px;border:1px solid rgba(255,255,255,.08);border-radius:5px;display:flex;align-items:center;justify-content:center;color:rgba(239,239,239,.42);font:700 15px/1 'Rajdhani',sans-serif;letter-spacing:1px;background:rgba(4,5,8,.24);pointer-events:none;user-select:none}
+.narf-node-body{position:relative;padding:12px 13px 11px;font-size:12px;line-height:1.5;color:var(--grey);min-height:65px}
+.narf-node-description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere}
+.narf-node-description.is-placeholder{color:var(--grey-2);font-style:italic}
+.narf-node-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
+.narf-node-id{font:8px 'Share Tech Mono',monospace;color:var(--grey-2);letter-spacing:.65px}
+.narf-node-status-dot{width:6px;height:6px;border-radius:50%;background:var(--node-colour,var(--dept-nar));box-shadow:0 0 7px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 75%,transparent);opacity:.8}
+.narf-node-toolbar-divider{width:1px;height:22px;background:var(--border);margin:0 2px}
+.narf-node-action{height:30px;border:1px solid var(--border);border-radius:4px;background:rgba(255,255,255,.025);color:var(--grey);font:700 10px 'Rajdhani',sans-serif;letter-spacing:.8px;text-transform:uppercase;padding:0 10px;cursor:pointer}
+.narf-node-action:hover:not(:disabled){color:var(--white);border-color:var(--border-2);background:rgba(255,255,255,.06)}
+.narf-node-action.primary{color:var(--dept-nar);border-color:rgba(255,107,53,.35);background:rgba(255,107,53,.07)}
+.narf-node-action.danger{color:var(--crimson-hi);border-color:rgba(200,16,46,.3)}
+.narf-node-action:disabled{opacity:.35;cursor:not-allowed}
+.narf-node-count{min-width:64px;text-align:center;font:9px 'Share Tech Mono',monospace;color:var(--grey-2)}
+.narf-minimap-nodes{position:absolute;inset:0;pointer-events:none}
+.narf-minimap-node{position:absolute;width:5px;height:4px;border-radius:1px;background:var(--node-colour,var(--dept-nar));transform:translate(-50%,-50%);box-shadow:0 0 5px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 70%,transparent)}
+.narf-minimap-node.selected{width:7px;height:6px;background:var(--gold);box-shadow:0 0 7px var(--gold)}
+@media(max-width:700px){.narf-node{width:230px}.narf-node-action{padding:0 7px}.narf-node-count{display:none}}
+
+
+
+/* ═══════════════════════════════════════════════
+   NARRATIVE MULTI-SELECTION — BUILD 6B
+═══════════════════════════════════════════════ */
+.narf-node.is-selected-secondary::before{
+  border-color:color-mix(in srgb,var(--node-colour,var(--dept-nar)) 76%,white)!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.05),0 0 16px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 22%,transparent)!important
+}
+.narf-node.is-group-dragging{transform:scale(1.01)}
+.narf-connection-group.is-selected-secondary .narf-connection-path{stroke-width:3}
+.narf-selection-marquee{
+  position:absolute;z-index:14;display:none;pointer-events:none;
+  border:1px solid var(--gold);background:rgba(201,168,76,.10);
+  border-radius:3px
+}
+.narf-selection-marquee.active{display:block}
+.narf-workspace-viewport.is-marquee-selecting{cursor:crosshair}
+body.narf-group-drag-active,body.narf-group-drag-active *{cursor:grabbing!important}
+
+/* ═══════════════════════════════════════════════
+   NARRATIVE DETAILS INSPECTOR — CLEAN BUILD 4B
+═══════════════════════════════════════════════ */
+.narf-workspace-world{transform-style:flat;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.narf-workspace-world,.narf-workspace-world *{-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.narf-node{transform:scale(1);will-change:left,top}
+.narf-node.is-dragging{transform:scale(1.018)}
+.narf-inspector{position:absolute;right:0;top:0;bottom:0;z-index:15;width:340px;max-width:min(88vw,340px);display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(15,18,31,.985),rgba(8,10,18,.99));border-left:1px solid var(--border-2);box-shadow:-18px 0 44px rgba(0,0,0,.42);transform:translateX(102%);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .16s ease;backdrop-filter:blur(12px)}
+.narf-inspector.open{transform:translateX(0);opacity:1;pointer-events:auto}
+.narf-inspector-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:15px 16px 13px;border-bottom:1px solid var(--border);background:linear-gradient(120deg,color-mix(in srgb,var(--inspector-colour,var(--dept-nar)) 14%,rgba(8,10,18,.96)),rgba(8,10,18,.92))}
+.narf-inspector-kicker{font:8px 'Share Tech Mono',monospace;letter-spacing:1.8px;text-transform:uppercase;color:color-mix(in srgb,var(--inspector-colour,var(--dept-nar)) 84%,white)}
+.narf-inspector-name{font:700 13px 'Orbitron',sans-serif;letter-spacing:1.5px;color:var(--white);margin-top:5px;line-height:1.3;overflow-wrap:anywhere}
+.narf-inspector-close{width:30px;height:30px;flex:0 0 auto;border:1px solid var(--border);border-radius:5px;background:rgba(255,255,255,.025);color:var(--grey);font-size:18px;line-height:1;cursor:pointer}.narf-inspector-close:hover{color:var(--crimson-hi);border-color:rgba(200,16,46,.42);background:rgba(200,16,46,.08)}
+.narf-inspector-scroll{flex:1;overflow:auto;padding:15px 16px 22px}
+.narf-inspector-section{display:flex;flex-direction:column;gap:12px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.055)}
+.narf-inspector-section:last-child{border-bottom:0;margin-bottom:0}
+.narf-inspector-section-title{font:700 9px 'Orbitron',sans-serif;letter-spacing:2px;color:var(--gold);text-transform:uppercase}
+.narf-inspector .inp{font-size:14px}.narf-inspector textarea.inp{min-height:126px;resize:vertical;line-height:1.5}
+.narf-inspector-colour-row{display:grid;grid-template-columns:54px minmax(0,1fr);gap:9px;align-items:center}.narf-inspector-colour-row input[type=color]{width:54px;height:38px;padding:3px;cursor:pointer}
+.narf-inspector-meta{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px 10px;font-size:11px;line-height:1.4}.narf-inspector-meta dt{color:var(--grey-2);text-transform:uppercase;letter-spacing:.7px}.narf-inspector-meta dd{color:var(--grey);overflow-wrap:anywhere}
+.narf-save-state{display:flex;align-items:center;gap:7px;min-height:18px;font:9px 'Share Tech Mono',monospace;letter-spacing:1px;color:var(--grey-2);text-transform:uppercase}.narf-save-state::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--grey-2)}.narf-save-state.saving{color:var(--gold)}.narf-save-state.saving::before{background:var(--gold);box-shadow:0 0 7px var(--gold);animation:narfSavePulse .8s ease-in-out infinite alternate}.narf-save-state.saved{color:var(--green)}.narf-save-state.saved::before{background:var(--green);box-shadow:0 0 7px rgba(46,204,138,.55)}.narf-save-state.error{color:var(--crimson-hi)}.narf-save-state.error::before{background:var(--crimson-hi);box-shadow:0 0 7px rgba(232,21,58,.55)}
+@keyframes narfSavePulse{from{opacity:.35}to{opacity:1}}
+.narf-inspector-readonly{opacity:.78}.narf-inspector-view-note{font-size:11px;color:var(--grey-2);line-height:1.45;padding:9px 10px;border:1px solid var(--border);border-radius:5px;background:rgba(255,255,255,.018)}
+@media(max-width:700px){.narf-inspector{width:min(88vw,330px)}.narf-minimap{right:8px}.narf-inspector.open~.narf-minimap{opacity:.15;pointer-events:none}}
+
+
+/* ═══════════════════════════════════════════════
+   NARRATIVE CONNECTION FOUNDATION — BUILD 5A FIX 2
+═══════════════════════════════════════════════ */
+.narf-workspace-world{overflow:visible}
+.narf-connection-layer{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none;z-index:1}
+.narf-connection-path,.narf-connection-preview{fill:none;stroke:var(--connection-colour,var(--dept-nar));stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--connection-colour,var(--dept-nar)) 30%,transparent))}
+.narf-connection-preview{--connection-colour:var(--gold);stroke-dasharray:7 7;opacity:.9;marker-start:url(#narf-connection-arrow-start);marker-end:url(#narf-connection-arrow-end)}
+.narf-node{z-index:2;overflow:visible}
+.narf-node-head,.narf-node-body{overflow:hidden}
+.narf-connection-handle{position:absolute;width:14px;height:14px;padding:0;margin:0;border:1px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 76%,white);border-radius:50%;background:#111522;box-shadow:0 0 0 2px rgba(7,9,18,.9),0 0 8px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 30%,transparent);z-index:6;cursor:crosshair!important;touch-action:none;appearance:none;-webkit-appearance:none;transition:transform .13s ease,background .13s ease,border-color .13s ease,box-shadow .13s ease}
+.narf-connection-handle::after{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--node-colour,var(--dept-nar));box-shadow:0 0 4px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 72%,transparent)}
+.narf-connection-handle:hover,.narf-node.selected .narf-connection-handle,.narf-node.is-connecting .narf-connection-handle{transform:translate(var(--port-tx,-50%),var(--port-ty,-50%)) scale(1.14);border-color:var(--gold);background:#171a28;box-shadow:0 0 0 3px rgba(7,9,18,.92),0 0 11px rgba(201,168,76,.42)}
+.narf-connection-handle.is-target{transform:translate(var(--port-tx,-50%),var(--port-ty,-50%)) scale(1.24);border-color:var(--green);background:rgba(46,204,138,.14);box-shadow:0 0 0 3px rgba(7,9,18,.94),0 0 14px rgba(46,204,138,.55)}
+.narf-connection-handle.port-left{left:0;top:50%;--port-tx:-50%;--port-ty:-50%;transform:translate(-50%,-50%)}
+.narf-connection-handle.port-right{right:0;top:50%;--port-tx:50%;--port-ty:-50%;transform:translate(50%,-50%)}
+.narf-connection-handle.port-top{left:50%;top:0;--port-tx:-50%;--port-ty:-50%;transform:translate(-50%,-50%)}
+.narf-connection-handle.port-bottom{left:50%;bottom:0;--port-tx:-50%;--port-ty:50%;transform:translate(-50%,50%)}
+.narf-workspace-viewport.is-connecting{cursor:crosshair}
+body.narf-connection-drag-active,body.narf-connection-drag-active *{cursor:crosshair!important}
+@media(max-width:760px){.narf-connection-handle{width:16px;height:16px}.narf-connection-handle::after{inset:5px}}
+
+/* Build 5A Fix 4 — clean node frame and obstacle-aware routes */
+.narf-node{border:0!important;border-radius:10px;background:linear-gradient(155deg,rgba(20,23,39,.99),rgba(8,10,19,.99))}
+.narf-node::before{content:'';position:absolute;inset:0;z-index:5;border:1px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 32%,var(--border-2));border-radius:10px;pointer-events:none;box-sizing:border-box}
+.narf-node:hover::before{border-color:color-mix(in srgb,var(--node-colour,var(--dept-nar)) 68%,var(--border-2))}
+.narf-node.selected::before{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(201,168,76,.18)}
+.narf-node-head{border-radius:10px 10px 0 0;clip-path:inset(0 0 0 0 round 10px 10px 0 0)}
+.narf-node-body{border-radius:0 0 10px 10px}
+.narf-connection-path,.narf-connection-preview{transition:d .14s ease}
+.narf-connection-group{pointer-events:auto}
+.narf-connection-hit{fill:none;stroke:transparent;stroke-width:14;vector-effect:non-scaling-stroke;pointer-events:stroke;cursor:pointer!important}
+.narf-connection-path{pointer-events:none;transition:d .14s ease,stroke-width .14s ease,filter .14s ease,opacity .14s ease}
+.narf-connection-group:hover .narf-connection-path{stroke-width:2.35;filter:drop-shadow(0 0 5px color-mix(in srgb,var(--connection-colour,var(--dept-nar)) 48%,transparent))}
+.narf-connection-group.selected .narf-connection-path{stroke-width:2.6;filter:drop-shadow(0 0 7px var(--gold));opacity:1}
+.narf-connection-label{font:9px 'Share Tech Mono',monospace;letter-spacing:.6px;fill:var(--white);paint-order:stroke;stroke:#070912;stroke-width:4px;stroke-linejoin:round;pointer-events:none;text-anchor:middle;dominant-baseline:middle}
+.narf-connection-label-path{fill:none;stroke:none;pointer-events:none}
+.narf-connection-label-fallback-bg{fill:rgba(7,9,18,.94);stroke:color-mix(in srgb,var(--connection-colour,var(--dept-nar)) 42%,var(--border));stroke-width:1;vector-effect:non-scaling-stroke;rx:4;ry:4;pointer-events:none}
+.narf-connection-label-fallback{font:9px 'Share Tech Mono',monospace;letter-spacing:.55px;fill:var(--white);pointer-events:none;text-anchor:middle;dominant-baseline:middle}
+.narf-inspector-danger{padding-top:2px}.narf-inspector-danger .btn{width:100%}
+
+/* ═══════════════════════════════════════════════
+   NODE GEOMETRY + RESIZING — BUILD 6A
+═══════════════════════════════════════════════ */
+.narf-node{box-sizing:border-box;min-width:220px;min-height:132px}
+.narf-node.is-resizing{cursor:nwse-resize;filter:brightness(1.075);box-shadow:0 0 0 2px rgba(201,168,76,.2),0 20px 46px rgba(0,0,0,.65),0 0 26px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 30%,transparent);z-index:51;transition:none}
+.narf-node-resize-handle{position:absolute;right:-5px;bottom:-5px;z-index:8;width:18px;height:18px;padding:0;border:0;background:transparent;cursor:nwse-resize!important;touch-action:none;appearance:none;-webkit-appearance:none}
+.narf-node-resize-handle::before{content:'';position:absolute;right:4px;bottom:4px;width:8px;height:8px;border-right:2px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 78%,white);border-bottom:2px solid color-mix(in srgb,var(--node-colour,var(--dept-nar)) 78%,white);border-radius:0 0 2px 0;opacity:.72;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--node-colour,var(--dept-nar)) 35%,transparent));transition:opacity .13s,transform .13s,border-color .13s}
+.narf-node:hover .narf-node-resize-handle::before,.narf-node.selected .narf-node-resize-handle::before{opacity:1;border-color:var(--gold);transform:scale(1.12)}
+.narf-workspace-viewport.is-node-resizing{cursor:nwse-resize}
+.narf-workspace-viewport.is-node-resizing .narf-node:not(.is-resizing){pointer-events:none}
+body.narf-node-resize-active,body.narf-node-resize-active *{user-select:none!important}
+.narf-node-body{height:calc(100% - 66px);min-height:65px;display:flex;flex-direction:column;box-sizing:border-box}
+.narf-node-description{flex:1;min-height:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--narf-description-lines,1);overflow:hidden;text-overflow:ellipsis;white-space:pre-wrap;overflow-wrap:anywhere}
+.narf-node-footer{flex:0 0 auto}
+@media(max-width:700px){.narf-node{min-width:200px}.narf-node-resize-handle{width:22px;height:22px}}
+
+</style>
 <div id="app" style="display:none;">
 
   <!-- HEADER -->
@@ -2295,6 +2504,10 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
     <button class="ext-btn notecat" onclick="openExt('notecat')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       NoteCat
+    </button>
+    <button class="ext-btn narrative" id="narrative-quick-link" onclick="narrativeOpen()" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h6v6H4zM14 13h6v6h-6zM14 3h6v6h-6zM4 15h6v6H4z"/><path d="M10 8h4M7 11v4M17 9v4M10 18h4"/></svg>
+      Narrative Planner
     </button>
     <div style="flex:1"></div>
     <span class="text-mono text-small text-grey" id="invite-code-display"></span>
@@ -2960,9 +3173,508 @@ body.motion-reduced .prestige-particle:nth-child(n+7),body.motion-off .prestige-
       </section>
     </div>
 
+    <!-- ── NARRATIVE PLANNER FOUNDATION ── -->
+    <div class="view" id="view-narrative">
+      <div class="narf-shell">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <div class="ph-title">NARRATIVE PLANNER</div>
+            <div class="ph-sub">Organise acts, quests, cutscenes and branching story work across shared canvases.</div>
+          </div>
+          <div class="ph-actions">
+            <button class="btn btn-ghost btn-sm" id="narf-access-btn" onclick="narrativeOpenAccess()" style="display:none;">Manage Access</button>
+            <button class="btn btn-gold btn-sm" id="narf-new-btn" onclick="narrativeOpenCanvasEditor()" style="display:none;">+ New Canvas</button>
+          </div>
+        </div>
+
+        <div class="narf-summary-row">
+          <div class="narf-summary-card"><span class="narf-summary-label">ACTIVE CANVASES</span><strong id="narf-count-active">0</strong></div>
+          <div class="narf-summary-card"><span class="narf-summary-label">SECTIONS</span><strong id="narf-count-sections">0</strong></div>
+          <div class="narf-summary-card"><span class="narf-summary-label">AWAITING REVIEW</span><strong id="narf-count-removal">0</strong></div>
+          <div class="narf-summary-card"><span class="narf-summary-label">YOUR ACCESS</span><strong id="narf-current-access">—</strong></div>
+        </div>
+
+        <div class="narf-toolbar panel">
+          <div class="narf-toolbar-main">
+            <input class="inp" id="narf-search" placeholder="Search canvases by name or description…" oninput="narrativeRenderLibrary()">
+            <select class="inp" id="narf-section-filter" onchange="narrativeRenderLibrary()"><option value="">All sections</option></select>
+          </div>
+          <div class="narf-toolbar-note">Open a canvas to enter its shared infinite workspace. Node tools will be introduced in the next controlled build.</div>
+        </div>
+
+        <div id="narf-library" class="narf-library"></div>
+
+        <div class="narf-removal-wrap panel">
+          <button class="narf-removal-toggle" onclick="narrativeToggleRemovalQueue()">
+            <span><span class="narf-removal-arrow" id="narf-removal-arrow">▸</span> MARKED FOR REMOVAL</span>
+            <span class="ni-badge" id="narf-removal-badge">0</span>
+          </button>
+          <div id="narf-removal-queue" class="narf-removal-queue" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Narrative canvas foundation placeholder -->
+    <div class="view" id="view-narrative-canvas">
+      <div class="narf-canvas-shell">
+        <div class="page-hdr">
+          <div class="page-hdr-left">
+            <button class="narf-back" onclick="narrativeOpen()">← Back to Narrative Planner</button>
+            <div class="ph-title" id="narf-open-title">CANVAS</div>
+            <div class="ph-sub" id="narf-open-description"></div>
+          </div>
+          <div class="ph-actions">
+            <button class="btn btn-primary btn-sm" id="narf-new-node" onclick="narrativeCreateNode()" style="display:none;">+ New Node</button>
+            <button class="btn btn-danger btn-sm" id="narf-delete-node" onclick="narrativeDeleteSelectedNode()" style="display:none;" disabled>Delete Selected</button>
+            <button class="btn btn-ghost btn-sm" id="narf-open-edit" onclick="narrativeEditOpenCanvas()" style="display:none;">Edit Details</button>
+          </div>
+        </div>
+        <div class="narf-workspace-panel" id="narf-workspace-panel">
+          <div class="narf-workspace-viewport" id="narf-workspace-viewport" aria-label="Narrative infinite canvas">
+            <div class="narf-selection-marquee" id="narf-selection-marquee" aria-hidden="true"></div>
+            <div class="narf-workspace-world" id="narf-workspace-world"><svg class="narf-connection-layer" id="narf-connection-layer" aria-hidden="true"><defs><marker id="narf-connection-arrow-start" markerWidth="7" markerHeight="7" refX="-11" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L6,3 L0,6 z" fill="context-stroke"></path></marker><marker id="narf-connection-arrow-end" markerWidth="7" markerHeight="7" refX="17" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L6,3 L0,6 z" fill="context-stroke"></path></marker></defs><g id="narf-connections"></g><path id="narf-connection-preview" class="narf-connection-preview" d="" style="display:none;"></path></svg><div class="narf-origin-marker" title="Canvas origin"></div></div>
+          </div>
+          <div class="narf-workspace-toolbar" aria-label="Canvas camera controls">
+            <button class="narf-cam-btn" type="button" onclick="narrativeZoomBy(-0.15)" title="Zoom out">−</button>
+            <span class="narf-zoom-readout" id="narf-zoom-readout">100%</span>
+            <button class="narf-cam-btn" type="button" onclick="narrativeZoomBy(0.15)" title="Zoom in">+</button>
+            <button class="narf-cam-btn" type="button" onclick="narrativeResetCamera()" title="Reset camera">⌂</button>
+            <span class="narf-node-toolbar-divider"></span>
+            <button class="narf-node-action primary" id="narf-toolbar-new-node" type="button" onclick="narrativeCreateNode()" style="display:none;">+ Node</button>
+            <button class="narf-node-action danger" id="narf-toolbar-delete-node" type="button" onclick="narrativeDeleteSelectedNode()" style="display:none;" disabled>Delete</button>
+            <span class="narf-node-count" id="narf-node-count">0 NODES</span>
+          </div>
+
+          <aside class="narf-inspector" id="narf-node-inspector" aria-label="Narrative item details inspector" aria-hidden="true">
+            <div class="narf-inspector-head">
+              <div><div class="narf-inspector-kicker">Selected Node</div><div class="narf-inspector-name" id="narf-inspector-name">NODE DETAILS</div></div>
+              <button class="narf-inspector-close" type="button" onclick="narrativeCloseInspector()" aria-label="Close inspector">×</button>
+            </div>
+            <div class="narf-inspector-scroll" id="narf-inspector-content"></div>
+          </aside>
+          <div class="narf-camera-status" id="narf-camera-status">X 0 · Y 0</div>
+          <div class="narf-workspace-help">DRAG NODE TO MOVE · DRAG RIGHT HANDLE TO LEFT HANDLE TO CONNECT · DRAG EMPTY SPACE TO PAN · SCROLL TO ZOOM</div>
+          <div class="narf-minimap" id="narf-minimap" title="Click to move around the canvas">
+            <span class="narf-minimap-label">MINIMAP</span>
+            <div class="narf-minimap-origin"></div>
+            <div class="narf-minimap-nodes" id="narf-minimap-nodes"></div>
+            <div class="narf-minimap-viewport" id="narf-minimap-viewport"></div>
+          </div>
+          <div class="narf-placeholder-meta" id="narf-open-meta" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
 
   </main>
 </div>
+
+<script>
+// ═══════════════════════════════════════════════
+// NARRATIVE NODE FOUNDATION — CLEAN BUILD 2
+// ═══════════════════════════════════════════════
+(function(){
+'use strict';
+var NF={canvases:[],unsub:null,loaded:false,openCanvasId:null,workspace:null,nodes:[],nodesUnsub:null,selectedNodeId:null,selectedConnectionId:null,selection:{nodes:new Set(),connections:new Set(),primaryType:null,primaryId:null},marquee:null,nodeDrag:null,nodeResize:null,connections:[],connectionsUnsub:null,connectionDrag:null,inspectorNodeId:null,inspectorConnectionId:null,inspectorSaveTimer:null,inspectorSaving:false,inspectorDirty:false,sections:['Main Project','Acts','Quests','Cutscenes','Companion Arcs','Locations','Endings','Other']};
+
+var NarrativeSelection={
+ ensure:function(){
+  if(!NF.selection)NF.selection={nodes:new Set(),connections:new Set(),primaryType:null,primaryId:null};
+  if(!(NF.selection.nodes instanceof Set))NF.selection.nodes=new Set(NF.selection.nodes||[]);
+  if(!(NF.selection.connections instanceof Set))NF.selection.connections=new Set(NF.selection.connections||[]);
+  return NF.selection;
+ },
+ sync:function(){
+  var st=this.ensure();
+  NF.selectedNodeId=st.primaryType==='node'&&st.nodes.has(st.primaryId)?st.primaryId:null;
+  NF.selectedConnectionId=st.primaryType==='connection'&&st.connections.has(st.primaryId)?st.primaryId:null;
+ },
+ clear:function(render){
+  var st=this.ensure();st.nodes.clear();st.connections.clear();st.primaryType=null;st.primaryId=null;this.sync();
+  if(render!==false)this.render();
+ },
+ replace:function(type,id){
+  var st=this.ensure();st.nodes.clear();st.connections.clear();
+  if(type==='node')st.nodes.add(id);else if(type==='connection')st.connections.add(id);
+  st.primaryType=type;st.primaryId=id;this.sync();this.render();
+ },
+ setPrimary:function(type,id){
+  var st=this.ensure(),set=type==='node'?st.nodes:st.connections;
+  if(!set.has(id))return;
+  st.primaryType=type;st.primaryId=id;this.sync();this.render();
+ },
+ toggle:function(type,id){
+  var st=this.ensure(),set=type==='node'?st.nodes:st.connections;
+  if(set.has(id))set.delete(id);else set.add(id);
+  if(set.has(id)){st.primaryType=type;st.primaryId=id;}
+  else if(st.nodes.size){st.primaryType='node';st.primaryId=st.nodes.values().next().value;}
+  else if(st.connections.size){st.primaryType='connection';st.primaryId=st.connections.values().next().value;}
+  else{st.primaryType=null;st.primaryId=null;}
+  this.sync();this.render();
+ },
+ addMany:function(nodes,connections,additive){
+  var st=this.ensure();if(!additive){st.nodes.clear();st.connections.clear();}
+  (nodes||[]).forEach(function(id){st.nodes.add(id);});
+  (connections||[]).forEach(function(id){st.connections.add(id);});
+  if(nodes&&nodes.length){st.primaryType='node';st.primaryId=nodes[nodes.length-1];}
+  else if(connections&&connections.length){st.primaryType='connection';st.primaryId=connections[connections.length-1];}
+  else if(!additive){st.primaryType=null;st.primaryId=null;}
+  this.sync();this.render();
+ },
+ nodeIds:function(){return Array.from(this.ensure().nodes);},
+ connectionIds:function(){return Array.from(this.ensure().connections);},
+ hasNode:function(id){return this.ensure().nodes.has(id);},
+ hasConnection:function(id){return this.ensure().connections.has(id);},
+ render:function(){
+  var st=this.ensure();
+  document.querySelectorAll('.narf-node').forEach(function(el){
+   var chosen=st.nodes.has(el.dataset.nodeId),primary=st.primaryType==='node'&&st.primaryId===el.dataset.nodeId;
+   el.classList.toggle('selected',primary);
+   el.classList.toggle('is-selected-secondary',chosen&&!primary);
+  });
+  document.querySelectorAll('.narf-connection-group').forEach(function(el){
+   var chosen=st.connections.has(el.dataset.connectionId),primary=st.primaryType==='connection'&&st.primaryId===el.dataset.connectionId;
+   el.classList.toggle('selected',primary);
+   el.classList.toggle('is-selected-secondary',chosen&&!primary);
+  });
+  nfUpdateNodeUi();if(NF.workspace)NF.workspace.renderMinimap();
+  if(st.primaryType==='node'&&st.primaryId){var n=nfNodeById(st.primaryId);if(n)nfInspectorOpen(n);}
+  else if(st.primaryType==='connection'&&st.primaryId){var c=nfConnectionById(st.primaryId);if(c)nfInspectorOpenConnection(c);}
+  else nfInspectorClose(false);
+ }
+};
+
+function nfDb(){try{return typeof db!=='undefined'&&db?db:(window.db||null);}catch(e){return window.db||null;}}
+function nfLiveData(){try{return typeof liveData!=='undefined'&&liveData?liveData:(window.liveData||{});}catch(e){return window.liveData||{};}}
+function nfCurrentUser(){try{return typeof currentUser!=='undefined'&&currentUser?currentUser:(window.currentUser||null);}catch(e){return window.currentUser||null;}}
+window.NARRATIVE_FOUNDATION=NF;
+function nfEsc(v){return typeof esc==='function'?esc(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];});}
+function nfProfile(){try{return typeof currentProfile!=='undefined'&&currentProfile?currentProfile:null;}catch(e){return null;}}
+function nfIsHubAdmin(){try{if(typeof isAdmin==='function'&&isAdmin())return true;if(typeof currentRole==='function'&&currentRole()==='admin')return true;var p=nfProfile();return !!(p&&typeof normaliseRole==='function'&&normaliseRole(p.role)==='admin');}catch(e){return false;}}
+function nfRole(){if(nfIsHubAdmin())return 'admin';var p=nfProfile();return p&&p.narrativeAccess||'none';}
+function nfCanView(){return ['admin','lead','editor','viewer'].includes(nfRole());}
+function nfCanEdit(){return ['admin','lead','editor'].includes(nfRole());}
+function nfCanManage(){return ['admin','lead'].includes(nfRole());}
+function nfCanPurge(){return nfRole()==='admin'||nfRole()==='lead';}
+function nfUid(){var u=nfCurrentUser();return u&&u.uid||'';}
+function nfName(){var p=nfProfile(),u=nfCurrentUser();return p&&p.name||u&&u.email||'Unknown member';}
+function nfNow(){return new Date().toISOString();}
+function nfColour(v){return /^#[0-9a-f]{6}$/i.test(v||'')?v:'#ff6b35';}
+function nfDate(v){if(!v)return 'Unknown';var d=new Date(v);return isNaN(d)?'Unknown':d.toLocaleString();}
+function nfToast(m,t){if(typeof toast==='function')toast(m,t||'ok');}
+function nfView(view){if(typeof navTo==='function'){navTo(view);return;}document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});var el=document.getElementById('view-'+view);if(el)el.classList.add('active');}
+
+function NarrativeWorkspace(canvas){
+ this.canvas=canvas;this.viewport=null;this.world=null;this.minimap=null;this.minimapViewport=null;this.resizeObserver=null;this.saveTimer=null;this.mounted=false;this.drag=null;
+ this.camera={x:Number(canvas.cameraX),y:Number(canvas.cameraY),zoom:Number(canvas.cameraZoom)};
+ if(!Number.isFinite(this.camera.x))this.camera.x=0;if(!Number.isFinite(this.camera.y))this.camera.y=0;if(!Number.isFinite(this.camera.zoom))this.camera.zoom=1;
+ this.camera.zoom=Math.max(.2,Math.min(2.5,this.camera.zoom));
+ this.onPointerDown=this.pointerDown.bind(this);this.onPointerMove=this.pointerMove.bind(this);this.onPointerUp=this.pointerUp.bind(this);this.onWheel=this.wheel.bind(this);this.onMinimap=this.minimapClick.bind(this);this.onKey=this.keyDown.bind(this);
+}
+NarrativeWorkspace.prototype.mount=function(){
+ this.viewport=document.getElementById('narf-workspace-viewport');this.world=document.getElementById('narf-workspace-world');this.minimap=document.getElementById('narf-minimap');this.minimapViewport=document.getElementById('narf-minimap-viewport');
+ if(!this.viewport||!this.world||!this.minimap||!this.minimapViewport)return;
+ this.mounted=true;this.viewport.addEventListener('pointerdown',this.onPointerDown);this.viewport.addEventListener('wheel',this.onWheel,{passive:false});this.minimap.addEventListener('pointerdown',this.onMinimap);window.addEventListener('keydown',this.onKey);
+ var self=this;this.resizeObserver=new ResizeObserver(function(){self.ensureInitialCamera();self.render();});this.resizeObserver.observe(this.viewport);this.ensureInitialCamera();this.render();
+};
+NarrativeWorkspace.prototype.ensureInitialCamera=function(){
+ if(!this.viewport)return;var r=this.viewport.getBoundingClientRect();if(!r.width||!r.height)return;
+ var hasSaved=Number.isFinite(Number(this.canvas.cameraX))&&Number.isFinite(Number(this.canvas.cameraY))&&Number.isFinite(Number(this.canvas.cameraZoom));
+ if(!hasSaved&&this.camera.x===0&&this.camera.y===0){this.camera.x=r.width/2;this.camera.y=r.height/2;this.camera.zoom=1;}
+};
+NarrativeWorkspace.prototype.unmount=function(){
+ if(!this.mounted)return;this.mounted=false;if(this.viewport){this.viewport.removeEventListener('pointerdown',this.onPointerDown);this.viewport.removeEventListener('wheel',this.onWheel);}if(this.minimap)this.minimap.removeEventListener('pointerdown',this.onMinimap);window.removeEventListener('pointermove',this.onPointerMove);window.removeEventListener('pointerup',this.onPointerUp);window.removeEventListener('pointercancel',this.onPointerUp);window.removeEventListener('keydown',this.onKey);if(this.resizeObserver)this.resizeObserver.disconnect();if(this.saveTimer){clearTimeout(this.saveTimer);this.persist();this.saveTimer=null;}this.drag=null;
+};
+NarrativeWorkspace.prototype.pointerDown=function(e){
+ if(e.button!==0&&e.button!==1)return;
+ if(e.target.closest('.narf-workspace-toolbar,.narf-minimap,.narf-node,.narf-connection-handle,.narf-connection-group'))return;
+ e.preventDefault();
+ if(e.button===0){
+  var r=this.viewport.getBoundingClientRect(),box=document.getElementById('narf-selection-marquee');
+  NF.marquee={id:e.pointerId,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,rect:r,additive:!!(e.shiftKey||e.ctrlKey||e.metaKey),moved:false};
+  if(box){box.classList.add('active');box.style.left=(e.clientX-r.left)+'px';box.style.top=(e.clientY-r.top)+'px';box.style.width='0px';box.style.height='0px';}
+  this.viewport.classList.add('is-marquee-selecting');
+ }else{
+  this.drag={id:e.pointerId,startX:e.clientX,startY:e.clientY,camX:this.camera.x,camY:this.camera.y};
+  this.viewport.classList.add('is-panning');
+ }
+ try{this.viewport.setPointerCapture(e.pointerId);}catch(_e){}
+ window.addEventListener('pointermove',this.onPointerMove);
+ window.addEventListener('pointerup',this.onPointerUp);
+ window.addEventListener('pointercancel',this.onPointerUp);
+};
+NarrativeWorkspace.prototype.pointerMove=function(e){
+ if(NF.marquee&&e.pointerId===NF.marquee.id){
+  var m=NF.marquee,r=m.rect,box=document.getElementById('narf-selection-marquee');
+  m.x=e.clientX;m.y=e.clientY;
+  if(Math.abs(m.x-m.startX)>3||Math.abs(m.y-m.startY)>3)m.moved=true;
+  var l=Math.max(0,Math.min(m.startX,m.x)-r.left),t=Math.max(0,Math.min(m.startY,m.y)-r.top);
+  var rr=Math.min(r.width,Math.max(m.startX,m.x)-r.left),bb=Math.min(r.height,Math.max(m.startY,m.y)-r.top);
+  if(box){box.style.left=l+'px';box.style.top=t+'px';box.style.width=Math.max(0,rr-l)+'px';box.style.height=Math.max(0,bb-t)+'px';}
+  return;
+ }
+ if(!this.drag||e.pointerId!==this.drag.id)return;
+ this.camera.x=this.drag.camX+(e.clientX-this.drag.startX);this.camera.y=this.drag.camY+(e.clientY-this.drag.startY);this.render();
+};
+NarrativeWorkspace.prototype.pointerUp=function(e){
+ if(NF.marquee&&e.pointerId===NF.marquee.id){
+  var m=NF.marquee;NF.marquee=null;
+  try{this.viewport.releasePointerCapture(e.pointerId);}catch(_e){}
+  this.viewport.classList.remove('is-marquee-selecting');
+  var box=document.getElementById('narf-selection-marquee');if(box)box.classList.remove('active');
+  if(m.moved)nfFinishMarqueeSelection(m);else if(!m.additive)NarrativeSelection.clear();
+  window.removeEventListener('pointermove',this.onPointerMove);window.removeEventListener('pointerup',this.onPointerUp);window.removeEventListener('pointercancel',this.onPointerUp);return;
+ }
+ if(!this.drag||e.pointerId!==this.drag.id)return;
+ try{this.viewport.releasePointerCapture(e.pointerId);}catch(_e){}
+ this.viewport.classList.remove('is-panning');this.drag=null;
+ window.removeEventListener('pointermove',this.onPointerMove);window.removeEventListener('pointerup',this.onPointerUp);window.removeEventListener('pointercancel',this.onPointerUp);this.queuePersist();
+};
+NarrativeWorkspace.prototype.wheel=function(e){e.preventDefault();var r=this.viewport.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;var wx=(sx-this.camera.x)/this.camera.zoom,wy=(sy-this.camera.y)/this.camera.zoom;var factor=Math.exp(-e.deltaY*.0015),next=Math.max(.2,Math.min(2.5,this.camera.zoom*factor));this.camera.zoom=next;this.camera.x=sx-wx*next;this.camera.y=sy-wy*next;this.render();this.queuePersist();};
+NarrativeWorkspace.prototype.zoomBy=function(delta){var r=this.viewport.getBoundingClientRect(),sx=r.width/2,sy=r.height/2,wx=(sx-this.camera.x)/this.camera.zoom,wy=(sy-this.camera.y)/this.camera.zoom;var next=Math.max(.2,Math.min(2.5,this.camera.zoom+delta));this.camera.zoom=next;this.camera.x=sx-wx*next;this.camera.y=sy-wy*next;this.render();this.queuePersist();};
+NarrativeWorkspace.prototype.reset=function(){var r=this.viewport.getBoundingClientRect();this.camera={x:r.width/2,y:r.height/2,zoom:1};this.render();this.queuePersist();};
+NarrativeWorkspace.prototype.keyDown=function(e){if(!this.mounted)return;if(e.key==='Escape'&&NF.connectionDrag){e.preventDefault();nfCancelConnectionDrag();return;}var active=document.activeElement;if(active&&/INPUT|TEXTAREA|SELECT/.test(active.tagName))return;if((e.key==='Home'||e.key==='0')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();this.reset();return;}if((e.key==='Delete'||e.key==='Backspace')&&nfCanEdit()&&(NarrativeSelection.nodeIds().length||NarrativeSelection.connectionIds().length)){e.preventDefault();window.narrativeDeleteSelection();}};
+NarrativeWorkspace.prototype.render=function(){
+ if(!this.mounted||!this.viewport)return;var z=this.camera.zoom;this.world.style.transform='translate('+this.camera.x+'px,'+this.camera.y+'px) scale('+z+')';var minor=24*z,major=120*z;this.viewport.style.setProperty('--narf-grid-minor',minor+'px');this.viewport.style.setProperty('--narf-grid-major',major+'px');this.viewport.style.setProperty('--narf-grid-x',this.camera.x+'px');this.viewport.style.setProperty('--narf-grid-y',this.camera.y+'px');var zr=document.getElementById('narf-zoom-readout');if(zr)zr.textContent=Math.round(z*100)+'%';var st=document.getElementById('narf-camera-status');if(st)st.textContent='X '+Math.round(-this.camera.x/z)+' · Y '+Math.round(-this.camera.y/z);this.renderMinimap();
+};
+NarrativeWorkspace.prototype.renderMinimap=function(){
+ if(!this.minimapViewport||!this.viewport||!this.minimap)return;var vr=this.viewport.getBoundingClientRect(),mr=this.minimap.getBoundingClientRect(),worldSize=10000,worldMin=-5000;var leftWorld=(0-this.camera.x)/this.camera.zoom,topWorld=(0-this.camera.y)/this.camera.zoom,wWorld=vr.width/this.camera.zoom,hWorld=vr.height/this.camera.zoom;var x=(leftWorld-worldMin)/worldSize*mr.width,y=(topWorld-worldMin)/worldSize*mr.height,w=wWorld/worldSize*mr.width,h=hWorld/worldSize*mr.height;this.minimapViewport.style.left=Math.max(-2,Math.min(mr.width-2,x))+'px';this.minimapViewport.style.top=Math.max(-2,Math.min(mr.height-2,y))+'px';this.minimapViewport.style.width=Math.max(4,Math.min(mr.width,w))+'px';this.minimapViewport.style.height=Math.max(4,Math.min(mr.height,h))+'px';this.renderMinimapNodes(mr,worldMin,worldSize);
+};
+NarrativeWorkspace.prototype.renderMinimapNodes=function(mr,worldMin,worldSize){var layer=document.getElementById('narf-minimap-nodes');if(!layer)return;layer.innerHTML=NF.nodes.map(function(n){var x=(Number(n.x||0)-worldMin)/worldSize*mr.width,y=(Number(n.y||0)-worldMin)/worldSize*mr.height;return '<i class="narf-minimap-node '+(NarrativeSelection.hasNode(n.id)?'selected':'')+'" style="left:'+x+'px;top:'+y+'px;--node-colour:'+nfColour(n.colour||'#ff6b35')+'"></i>';}).join('');};
+NarrativeWorkspace.prototype.minimapClick=function(e){e.preventDefault();var mr=this.minimap.getBoundingClientRect(),vr=this.viewport.getBoundingClientRect(),worldSize=10000,worldMin=-5000;var wx=worldMin+((e.clientX-mr.left)/mr.width)*worldSize,wy=worldMin+((e.clientY-mr.top)/mr.height)*worldSize;this.camera.x=vr.width/2-wx*this.camera.zoom;this.camera.y=vr.height/2-wy*this.camera.zoom;this.render();this.queuePersist();};
+NarrativeWorkspace.prototype.queuePersist=function(){var self=this;if(!nfCanEdit())return;if(this.saveTimer)clearTimeout(this.saveTimer);this.saveTimer=setTimeout(function(){self.persist();self.saveTimer=null;},450);};
+NarrativeWorkspace.prototype.persist=function(){if(!nfCanEdit()||!this.canvas||!this.canvas.id||!nfDb())return;var data={cameraX:this.camera.x,cameraY:this.camera.y,cameraZoom:this.camera.zoom,cameraUpdatedAt:nfNow(),cameraUpdatedBy:nfUid()};this.canvas.cameraX=data.cameraX;this.canvas.cameraY=data.cameraY;this.canvas.cameraZoom=data.cameraZoom;nfDb().collection('narrativeCanvases').doc(this.canvas.id).set(data,{merge:true}).catch(function(e){console.error('Narrative camera save',e);});};
+function nfConnectionCollection(){var store=nfDb();return store&&NF.openCanvasId?store.collection('narrativeCanvases').doc(NF.openCanvasId).collection('connections'):null;}
+function nfNormaliseConnection(id,data){data=data||{};return {id:id,sourceId:String(data.sourceId||''),targetId:String(data.targetId||''),sourceSide:String(data.sourceSide||'right'),targetSide:String(data.targetSide||'left'),label:String(data.label||''),colour:nfColour(data.colour||'#ff6b35'),createdAt:data.createdAt||null,createdBy:data.createdBy||'',createdByName:data.createdByName||'',updatedAt:data.updatedAt||null};}
+function nfNodeById(id){return NF.nodes.find(function(n){return n.id===id;})||null;}
+function nfNodeHeight(node){var el=document.querySelector('.narf-node[data-node-id="'+node.id+'"]');return el?Math.max(Number(node.height)||0,el.offsetHeight||0):Math.max(Number(node.height)||116,116);}
+function nfConnectionPoint(node,side){var w=Number(node.width)||268,h=nfNodeHeight(node),x=Number(node.x||0),y=Number(node.y||0);if(side==='top')return {x:x+w/2,y:y};if(side==='bottom')return {x:x+w/2,y:y+h};if(side==='right'||side==='out')return {x:x+w,y:y+h/2};return {x:x,y:y+h/2};}
+function nfPortVector(side){if(side==='top')return{x:0,y:-1};if(side==='bottom')return{x:0,y:1};if(side==='left')return{x:-1,y:0};return{x:1,y:0};}
+function nfSegmentHitsRect(a,b,r){var minX=Math.min(a.x,b.x),maxX=Math.max(a.x,b.x),minY=Math.min(a.y,b.y),maxY=Math.max(a.y,b.y);if(maxX<r.left||minX>r.right||maxY<r.top||minY>r.bottom)return false;var dx=b.x-a.x,dy=b.y-a.y,t0=0,t1=1;function clip(p,q){if(p===0)return q>=0;var t=q/p;if(p<0){if(t>t1)return false;if(t>t0)t0=t;}else{if(t<t0)return false;if(t<t1)t1=t;}return true;}return clip(-dx,a.x-r.left)&&clip(dx,r.right-a.x)&&clip(-dy,a.y-r.top)&&clip(dy,r.bottom-a.y);}
+function nfRoutePath(points,radius){if(points.length<2)return'';var d='M '+points[0].x+' '+points[0].y;for(var i=1;i<points.length-1;i++){var prev=points[i-1],cur=points[i],next=points[i+1],v1x=cur.x-prev.x,v1y=cur.y-prev.y,v2x=next.x-cur.x,v2y=next.y-cur.y,l1=Math.hypot(v1x,v1y)||1,l2=Math.hypot(v2x,v2y)||1,r=Math.min(radius,l1/2,l2/2),p1={x:cur.x-v1x/l1*r,y:cur.y-v1y/l1*r},p2={x:cur.x+v2x/l2*r,y:cur.y+v2y/l2*r};d+=' L '+p1.x+' '+p1.y+' Q '+cur.x+' '+cur.y+' '+p2.x+' '+p2.y;}var end=points[points.length-1];return d+' L '+end.x+' '+end.y;}
+function nfConnectionPath(a,b,sourceSide,targetSide,sourceId,targetId){sourceSide=sourceSide||'right';targetSide=targetSide||'left';var sv=nfPortVector(sourceSide),tv=nfPortVector(targetSide),direct=Math.hypot(b.x-a.x,b.y-a.y),stub=Math.min(28,Math.max(10,direct*.16)),start={x:a.x+sv.x*stub,y:a.y+sv.y*stub},end={x:b.x+tv.x*stub,y:b.y+tv.y*stub},padding=22,blockers=(NF.nodes||[]).filter(function(n){return n.id!==sourceId&&n.id!==targetId;}).map(function(n){var h=nfNodeHeight(n),w=Number(n.width)||268,x=Number(n.x)||0,y=Number(n.y)||0;return{left:x-padding,right:x+w+padding,top:y-padding,bottom:y+h+padding};}).filter(function(r){return nfSegmentHitsRect(start,end,r);});if(!blockers.length){var span=Math.hypot(end.x-start.x,end.y-start.y);if(direct<=92||span<=48)return'M '+a.x+' '+a.y+' L '+b.x+' '+b.y;var dist=Math.min(82,Math.max(14,span*.28)),c1={x:start.x+sv.x*dist,y:start.y+sv.y*dist},c2={x:end.x+tv.x*dist,y:end.y+tv.y*dist};if(direct<170)dist=Math.min(dist,30);c1={x:start.x+sv.x*dist,y:start.y+sv.y*dist};c2={x:end.x+tv.x*dist,y:end.y+tv.y*dist};return'M '+a.x+' '+a.y+' L '+start.x+' '+start.y+' C '+c1.x+' '+c1.y+', '+c2.x+' '+c2.y+', '+end.x+' '+end.y+' L '+b.x+' '+b.y;}var union=blockers.reduce(function(u,r){return{left:Math.min(u.left,r.left),right:Math.max(u.right,r.right),top:Math.min(u.top,r.top),bottom:Math.max(u.bottom,r.bottom)};},{left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity}),horizontal=Math.abs(end.x-start.x)>=Math.abs(end.y-start.y),candidates;if(horizontal){var above=union.top-18,below=union.bottom+18;candidates=[[start,{x:start.x,y:above},{x:end.x,y:above},end],[start,{x:start.x,y:below},{x:end.x,y:below},end]];}else{var left=union.left-18,right=union.right+18;candidates=[[start,{x:left,y:start.y},{x:left,y:end.y},end],[start,{x:right,y:start.y},{x:right,y:end.y},end]];}function score(route){var len=0,hits=0;for(var i=1;i<route.length;i++){len+=Math.hypot(route[i].x-route[i-1].x,route[i].y-route[i-1].y);blockers.forEach(function(r){if(nfSegmentHitsRect(route[i-1],route[i],r))hits++;});}return len+hits*100000;}var route=score(candidates[0])<=score(candidates[1])?candidates[0]:candidates[1];return nfRoutePath([a].concat(route,[b]),12);}
+function nfConnectionById(id){return NF.connections.find(function(c){return c.id===id;})||null;}
+function nfConnectionMidpoint(pathEl){try{var len=pathEl.getTotalLength(),p=pathEl.getPointAtLength(len/2);return{x:p.x,y:p.y};}catch(_e){return{x:0,y:0};}}
+function nfConnectionLabelGeometry(pathEl,label){try{var len=pathEl.getTotalLength(),textWidth=Math.max(34,String(label||'').length*6.1),mid=len/2,p0=pathEl.getPointAtLength(Math.max(0,mid-16)),pm=pathEl.getPointAtLength(mid),p1=pathEl.getPointAtLength(Math.min(len,mid+16)),a0=Math.atan2(pm.y-p0.y,pm.x-p0.x),a1=Math.atan2(p1.y-pm.y,p1.x-pm.x),turn=Math.abs(Math.atan2(Math.sin(a1-a0),Math.cos(a1-a0))),follow=len>=Math.max(150,textWidth+64)&&turn<.48;if(!follow)return{follow:false,x:pm.x,y:pm.y-12,width:textWidth+14};var samples=[],count=Math.max(18,Math.min(42,Math.round(len/12)));for(var i=0;i<=count;i++){var p=pathEl.getPointAtLength(len*i/count);samples.push(p);}if((samples[samples.length-1].x-samples[0].x)<0)samples.reverse();return{follow:true,d:samples.map(function(p,i){return(i?'L ':'M ')+p.x+' '+p.y;}).join(' ')};}catch(_e){return{follow:false,x:0,y:0,width:60};}}
+function nfRenderConnections(){var layer=document.getElementById('narf-connections');if(!layer)return;var html='';NF.connections.forEach(function(c){var a=nfNodeById(c.sourceId),b=nfNodeById(c.targetId);if(!a||!b)return;var sourceSide=c.sourceSide||'right',targetSide=c.targetSide||'left',colour=nfColour(c.colour||a.colour),d=nfConnectionPath(nfConnectionPoint(a,sourceSide),nfConnectionPoint(b,targetSide),sourceSide,targetSide,a.id,b.id),selected=NarrativeSelection.hasConnection(c.id)?((NF.selection.primaryType==='connection'&&NF.selection.primaryId===c.id)?' selected':' is-selected-secondary'):'';html+='<g class="narf-connection-group'+selected+'" data-connection-id="'+nfEsc(c.id)+'" style="--connection-colour:'+colour+'"><path class="narf-connection-hit" d="'+d+'"></path><path class="narf-connection-path" d="'+d+'" marker-start="url(#narf-connection-arrow-start)" marker-end="url(#narf-connection-arrow-end)"></path></g>';});layer.innerHTML=html;layer.querySelectorAll('.narf-connection-group').forEach(function(group){group.addEventListener('pointerdown',function(e){if(e.button!==0)return;e.preventDefault();e.stopPropagation();nfSelectConnection(group.dataset.connectionId,e.shiftKey||e.ctrlKey||e.metaKey);});});NF.connections.forEach(function(c){var label=String(c.label||'').trim();if(!label)return;var group=layer.querySelector('.narf-connection-group[data-connection-id="'+CSS.escape(c.id)+'"]'),path=group&&group.querySelector('.narf-connection-path');if(!group||!path)return;var g=nfConnectionLabelGeometry(path,label);if(g.follow){var id='narf-label-path-'+String(c.id).replace(/[^a-zA-Z0-9_-]/g,''),labelPath=document.createElementNS('http://www.w3.org/2000/svg','path'),text=document.createElementNS('http://www.w3.org/2000/svg','text'),textPath=document.createElementNS('http://www.w3.org/2000/svg','textPath');labelPath.setAttribute('id',id);labelPath.setAttribute('class','narf-connection-label-path');labelPath.setAttribute('d',g.d);text.setAttribute('class','narf-connection-label');textPath.setAttribute('href','#'+id);textPath.setAttribute('startOffset','50%');textPath.setAttribute('text-anchor','middle');textPath.textContent=label;text.appendChild(textPath);group.appendChild(labelPath);group.appendChild(text);}else{var bg=document.createElementNS('http://www.w3.org/2000/svg','rect'),text=document.createElementNS('http://www.w3.org/2000/svg','text');bg.setAttribute('class','narf-connection-label-fallback-bg');bg.setAttribute('x',g.x-g.width/2);bg.setAttribute('y',g.y-9);bg.setAttribute('width',g.width);bg.setAttribute('height',18);text.setAttribute('class','narf-connection-label-fallback');text.setAttribute('x',g.x);text.setAttribute('y',g.y+.5);text.textContent=label;group.appendChild(bg);group.appendChild(text);}});}
+function nfWorldPoint(clientX,clientY){if(!NF.workspace||!NF.workspace.viewport)return {x:0,y:0};var r=NF.workspace.viewport.getBoundingClientRect(),z=NF.workspace.camera.zoom||1;return {x:(clientX-r.left-NF.workspace.camera.x)/z,y:(clientY-r.top-NF.workspace.camera.y)/z};}
+function nfBeginConnectionDrag(e,node,sourceSide){if(!nfCanEdit()||!NF.workspace||NF.connectionDrag||NF.nodeDrag)return;e.preventDefault();e.stopPropagation();sourceSide=sourceSide||'right';var start=nfConnectionPoint(node,sourceSide);NF.connectionDrag={pointerId:e.pointerId,sourceId:node.id,sourceSide:sourceSide,start:start,current:start,targetId:null,targetSide:null};var source=document.querySelector('.narf-node[data-node-id="'+node.id+'"]');if(source)source.classList.add('connection-source','is-connecting');NF.workspace.viewport.classList.add('is-connecting');document.body.classList.add('narf-connection-drag-active');var preview=document.getElementById('narf-connection-preview');if(preview){preview.style.display='block';preview.setAttribute('d',nfConnectionPath(start,start,sourceSide,'left'));}try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_e){}window.addEventListener('pointermove',nfMoveConnectionDrag);window.addEventListener('pointerup',nfEndConnectionDrag);window.addEventListener('pointercancel',nfEndConnectionDrag);}
+function nfMoveConnectionDrag(e){var d=NF.connectionDrag;if(!d||e.pointerId!==d.pointerId)return;e.preventDefault();d.current=nfWorldPoint(e.clientX,e.clientY);document.querySelectorAll('.narf-connection-handle.is-target').forEach(function(el){el.classList.remove('is-target');});var hit=document.elementFromPoint(e.clientX,e.clientY),handle=hit&&hit.closest&&hit.closest('.narf-connection-handle'),nodeEl=handle&&handle.closest('.narf-node');d.targetId=nodeEl&&nodeEl.dataset.nodeId!==d.sourceId?nodeEl.dataset.nodeId:null;d.targetSide=d.targetId&&handle?String(handle.dataset.side||'left'):null;if(handle&&d.targetId)handle.classList.add('is-target');var end=d.targetId&&nfNodeById(d.targetId)?nfConnectionPoint(nfNodeById(d.targetId),d.targetSide):d.current;var preview=document.getElementById('narf-connection-preview');if(preview)preview.setAttribute('d',nfConnectionPath(d.start,end,d.sourceSide,d.targetSide||'left'));}
+async function nfEndConnectionDrag(e){var d=NF.connectionDrag;if(!d||e.pointerId!==d.pointerId)return;var target=d.targetId,targetSide=d.targetSide||'left',sourceSide=d.sourceSide||'right';nfCancelConnectionDrag();if(!target||target===d.sourceId)return;if(NF.connections.some(function(c){return c.sourceId===d.sourceId&&c.targetId===target;})){nfToast('Those nodes are already connected in that direction','inf');return;}var source=nfNodeById(d.sourceId),col=nfConnectionCollection();if(!source||!col)return;var now=nfNow(),payload={sourceId:d.sourceId,targetId:target,sourceSide:sourceSide,targetSide:targetSide,label:'',colour:nfColour(source.colour),createdAt:now,createdBy:nfUid(),createdByName:nfName(),updatedAt:now,updatedBy:nfUid(),updatedByName:nfName()};try{await col.add(payload);nfToast('Connection created','ok');}catch(err){console.error('Narrative connection create',err);nfToast(err.message||'Could not create connection','err');}}
+function nfCancelConnectionDrag(){if(!NF.connectionDrag)return;NF.connectionDrag=null;document.querySelectorAll('.narf-node.connection-source,.narf-node.is-connecting').forEach(function(el){el.classList.remove('connection-source','is-connecting');});document.querySelectorAll('.narf-connection-handle.is-target').forEach(function(el){el.classList.remove('is-target');});if(NF.workspace&&NF.workspace.viewport)NF.workspace.viewport.classList.remove('is-connecting');document.body.classList.remove('narf-connection-drag-active');var preview=document.getElementById('narf-connection-preview');if(preview){preview.style.display='none';preview.setAttribute('d','');}window.removeEventListener('pointermove',nfMoveConnectionDrag);window.removeEventListener('pointerup',nfEndConnectionDrag);window.removeEventListener('pointercancel',nfEndConnectionDrag);}
+function nfUnsubscribeConnections(){nfCancelConnectionDrag();if(NF.connectionsUnsub){try{NF.connectionsUnsub();}catch(e){}NF.connectionsUnsub=null;}NF.connections=[];NarrativeSelection.clear(false);nfRenderConnections();}
+function nfSubscribeConnections(){nfUnsubscribeConnections();var col=nfConnectionCollection();if(!col)return;var canvasId=NF.openCanvasId;NF.connectionsUnsub=col.onSnapshot(function(snap){if(NF.openCanvasId!==canvasId)return;NF.connections=snap.docs.map(function(d){return nfNormaliseConnection(d.id,d.data());});if(NF.selectedConnectionId&&!NF.connections.some(function(c){return c.id===NF.selectedConnectionId;}))NF.selectedConnectionId=null;nfRenderConnections();nfInspectorRefresh(false);},function(err){console.error('Narrative connections listener',err);nfToast('Could not load narrative connections','err');});}
+function nfNodeCollection(){var store=nfDb();return store&&NF.openCanvasId?store.collection('narrativeCanvases').doc(NF.openCanvasId).collection('nodes'):null;}
+function nfDescriptionLineCount(height){
+ height=Number(height)||132;
+ return Math.max(1,Math.min(22,Math.floor((height-112)/18)));
+}
+function nfClampNodeWidth(v){v=Number(v);return Math.max(220,Math.min(720,Number.isFinite(v)?v:268));}
+function nfClampNodeHeight(v){v=Number(v);return Math.max(132,Math.min(520,Number.isFinite(v)?v:132));}
+function nfNormaliseNode(id,data){data=data||{};return {id:id,type:data.type||'basic',x:Number.isFinite(Number(data.x))?Number(data.x):0,y:Number.isFinite(Number(data.y))?Number(data.y):0,width:nfClampNodeWidth(data.width),height:nfClampNodeHeight(data.height),colour:nfColour(data.colour||'#ff6b35'),data:Object.assign({title:'Untitled Node'},data.data||{}),createdAt:data.createdAt||null,updatedAt:data.updatedAt||null};}
+function nfRenderNodes(){var world=document.getElementById('narf-workspace-world');if(!world||NF.nodeDrag||NF.nodeResize)return;Array.from(world.querySelectorAll('.narf-node')).forEach(function(el){el.remove();});NF.nodes.forEach(function(n){var el=document.createElement('article'),data=n.data||{},title=data.title||'Untitled Node',description=data.description||data.summary||'',hasDescription=!!String(description).trim();n.width=nfClampNodeWidth(n.width);n.height=nfClampNodeHeight(n.height);var chosen=NarrativeSelection.hasNode(n.id),primary=NF.selection.primaryType==='node'&&NF.selection.primaryId===n.id;el.className='narf-node'+(primary?' selected':(chosen?' is-selected-secondary':''));el.dataset.nodeId=n.id;el.style.left=n.x+'px';el.style.top=n.y+'px';el.style.width=n.width+'px';el.style.height=n.height+'px';el.style.setProperty('--node-colour',n.colour);el.style.setProperty('--narf-description-lines',nfDescriptionLineCount(n.height));el.innerHTML='<button class="narf-connection-handle port-left" data-side="left" type="button" aria-label="Left connection point" title="Drag to connect"></button><button class="narf-connection-handle port-top" data-side="top" type="button" aria-label="Top connection point" title="Drag to connect"></button><div class="narf-node-head"><div class="narf-node-type">Basic Narrative Node</div><div class="narf-node-title">'+nfEsc(title)+'</div><span class="narf-node-menu-slot" aria-hidden="true">•••</span></div><div class="narf-node-body"><div class="narf-node-description'+(hasDescription?'':' is-placeholder')+'">'+nfEsc(hasDescription?description:'No description added yet.')+'</div><div class="narf-node-footer"><div class="narf-node-id">'+nfEsc(n.id.slice(0,8).toUpperCase())+'</div><span class="narf-node-status-dot" aria-hidden="true"></span></div></div><button class="narf-connection-handle port-right" data-side="right" type="button" aria-label="Right connection point" title="Drag to connect"></button><button class="narf-connection-handle port-bottom" data-side="bottom" type="button" aria-label="Bottom connection point" title="Drag to connect"></button>'+(nfCanEdit()?'<button class="narf-node-resize-handle" type="button" aria-label="Resize node" title="Drag to resize"></button>':'');el.addEventListener('pointerdown',function(e){
+ if(e.button!==0||e.target.closest('.narf-connection-handle,.narf-node-resize-handle'))return;
+ e.stopPropagation();
+ var additive=!!(e.shiftKey||e.ctrlKey||e.metaKey),alreadySelected=NarrativeSelection.hasNode(n.id);
+ if(additive){nfSelectNode(n.id,true);return;}
+ if(alreadySelected)NarrativeSelection.setPrimary('node',n.id);
+ else nfSelectNode(n.id,false);
+ if(nfCanEdit())nfBeginNodeDrag(e,n,el);
+});el.querySelectorAll('.narf-connection-handle').forEach(function(handle){handle.addEventListener('pointerdown',function(e){nfSelectNode(n.id);nfBeginConnectionDrag(e,n,String(handle.dataset.side||'right'));});});var resize=el.querySelector('.narf-node-resize-handle');if(resize)resize.addEventListener('pointerdown',function(e){nfSelectNode(n.id);nfBeginNodeResize(e,n,el,resize);});el.addEventListener('dragstart',function(e){e.preventDefault();});world.appendChild(el);});nfRenderConnections();nfUpdateNodeUi();if(NF.workspace)NF.workspace.renderMinimap();}
+function nfBeginNodeDrag(e,node,el){
+ if(!NF.workspace||NF.nodeDrag||!nfCanEdit())return;e.preventDefault();
+ var ids=NarrativeSelection.hasNode(node.id)?NarrativeSelection.nodeIds():[node.id],z=NF.workspace.camera.zoom||1;
+ var items=ids.map(function(id){var n=nfNodeById(id),nodeEl=document.querySelector('.narf-node[data-node-id="'+CSS.escape(id)+'"]');return n&&nodeEl?{id:id,node:n,el:nodeEl,startX:Number(n.x)||0,startY:Number(n.y)||0}:null;}).filter(Boolean);
+ NF.nodeDrag={pointerId:e.pointerId,el:el,items:items,startClientX:e.clientX,startClientY:e.clientY,zoom:z,moved:false,raf:0};
+ items.forEach(function(item){item.el.classList.add(item.id===node.id?'is-dragging':'is-group-dragging');});
+ NF.workspace.viewport.classList.add('is-node-dragging');document.body.classList.add('narf-group-drag-active');
+ try{el.setPointerCapture(e.pointerId);}catch(_e){}
+ window.addEventListener('pointermove',nfMoveNodeDrag);window.addEventListener('pointerup',nfEndNodeDrag);window.addEventListener('pointercancel',nfEndNodeDrag);
+}
+function nfMoveNodeDrag(e){
+ var d=NF.nodeDrag;if(!d||e.pointerId!==d.pointerId)return;e.preventDefault();
+ var dx=(e.clientX-d.startClientX)/d.zoom,dy=(e.clientY-d.startClientY)/d.zoom;
+ if(Math.abs(dx)>.25||Math.abs(dy)>.25)d.moved=true;
+ d.items.forEach(function(item){item.node.x=item.startX+dx;item.node.y=item.startY+dy;});
+ if(d.raf)return;d.raf=requestAnimationFrame(function(){d.raf=0;if(!NF.nodeDrag)return;d.items.forEach(function(item){item.el.style.left=item.node.x+'px';item.el.style.top=item.node.y+'px';});nfRenderConnections();if(NF.workspace)NF.workspace.renderMinimap();});
+}
+async function nfEndNodeDrag(e){
+ var d=NF.nodeDrag;if(!d||e.pointerId!==d.pointerId)return;NF.nodeDrag=null;if(d.raf)cancelAnimationFrame(d.raf);
+ try{d.el.releasePointerCapture(e.pointerId);}catch(_e){}
+ d.items.forEach(function(item){item.el.classList.remove('is-dragging','is-group-dragging');item.node.x=Math.round(item.node.x);item.node.y=Math.round(item.node.y);item.el.style.left=item.node.x+'px';item.el.style.top=item.node.y+'px';});
+ NF.workspace.viewport.classList.remove('is-node-dragging');document.body.classList.remove('narf-group-drag-active');
+ window.removeEventListener('pointermove',nfMoveNodeDrag);window.removeEventListener('pointerup',nfEndNodeDrag);window.removeEventListener('pointercancel',nfEndNodeDrag);
+ nfRenderConnections();if(NF.workspace)NF.workspace.renderMinimap();if(!d.moved)return;
+ try{var batch=nfDb().batch(),col=nfNodeCollection(),stamp=nfNow();d.items.forEach(function(item){batch.set(col.doc(item.id),{x:item.node.x,y:item.node.y,updatedAt:stamp,updatedBy:nfUid(),updatedByName:nfName()},{merge:true});});await batch.commit();}
+ catch(err){nfToast(err.message||'Could not save selected node positions','err');nfSubscribeNodes();}
+}
+function nfCancelNodeDrag(){
+ var d=NF.nodeDrag;if(!d)return;NF.nodeDrag=null;if(d.raf)cancelAnimationFrame(d.raf);
+ (d.items||[]).forEach(function(item){item.el.classList.remove('is-dragging','is-group-dragging');});
+ if(NF.workspace)NF.workspace.viewport.classList.remove('is-node-dragging');document.body.classList.remove('narf-group-drag-active');
+ window.removeEventListener('pointermove',nfMoveNodeDrag);window.removeEventListener('pointerup',nfEndNodeDrag);window.removeEventListener('pointercancel',nfEndNodeDrag);
+}
+function nfBeginNodeResize(e,node,el,handle){if(!NF.workspace||NF.nodeResize||NF.nodeDrag||!nfCanEdit())return;e.preventDefault();e.stopPropagation();var z=NF.workspace.camera.zoom||1;NF.nodeResize={pointerId:e.pointerId,nodeId:node.id,node:node,el:el,handle:handle,startClientX:e.clientX,startClientY:e.clientY,startWidth:nfClampNodeWidth(node.width),startHeight:nfClampNodeHeight(node.height),zoom:z,moved:false,raf:0};el.classList.add('is-resizing');NF.workspace.viewport.classList.add('is-node-resizing');document.body.classList.add('narf-node-resize-active');try{handle.setPointerCapture(e.pointerId);}catch(_e){}window.addEventListener('pointermove',nfMoveNodeResize);window.addEventListener('pointerup',nfEndNodeResize);window.addEventListener('pointercancel',nfEndNodeResize);}
+function nfMoveNodeResize(e){var d=NF.nodeResize;if(!d||e.pointerId!==d.pointerId)return;e.preventDefault();var nw=nfClampNodeWidth(d.startWidth+(e.clientX-d.startClientX)/d.zoom),nh=nfClampNodeHeight(d.startHeight+(e.clientY-d.startClientY)/d.zoom);if(Math.abs(nw-d.startWidth)>.25||Math.abs(nh-d.startHeight)>.25)d.moved=true;d.node.width=nw;d.node.height=nh;if(d.raf)return;d.raf=requestAnimationFrame(function(){d.raf=0;if(!NF.nodeResize)return;d.el.style.width=d.node.width+'px';d.el.style.height=d.node.height+'px';d.el.style.setProperty('--narf-description-lines',nfDescriptionLineCount(d.node.height));nfRenderConnections();if(NF.workspace)NF.workspace.renderMinimap();});}
+async function nfEndNodeResize(e){var d=NF.nodeResize;if(!d||e.pointerId!==d.pointerId)return;NF.nodeResize=null;if(d.raf)cancelAnimationFrame(d.raf);try{d.handle.releasePointerCapture(e.pointerId);}catch(_e){}d.el.classList.remove('is-resizing');if(NF.workspace&&NF.workspace.viewport)NF.workspace.viewport.classList.remove('is-node-resizing');document.body.classList.remove('narf-node-resize-active');window.removeEventListener('pointermove',nfMoveNodeResize);window.removeEventListener('pointerup',nfEndNodeResize);window.removeEventListener('pointercancel',nfEndNodeResize);d.node.width=Math.round(nfClampNodeWidth(d.node.width));d.node.height=Math.round(nfClampNodeHeight(d.node.height));d.el.style.width=d.node.width+'px';d.el.style.height=d.node.height+'px';d.el.style.setProperty('--narf-description-lines',nfDescriptionLineCount(d.node.height));nfRenderConnections();if(NF.workspace)NF.workspace.renderMinimap();if(!d.moved)return;var col=nfNodeCollection();if(!col)return;try{await col.doc(d.nodeId).set({width:d.node.width,height:d.node.height,updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()},{merge:true});}catch(err){console.error('Narrative node geometry save',err);nfToast(err.message||'Could not save node size','err');nfSubscribeNodes();}}
+function nfCancelNodeResize(){var d=NF.nodeResize;if(!d)return;NF.nodeResize=null;if(d.raf)cancelAnimationFrame(d.raf);try{d.handle.releasePointerCapture(d.pointerId);}catch(_e){}d.el.classList.remove('is-resizing');if(NF.workspace&&NF.workspace.viewport)NF.workspace.viewport.classList.remove('is-node-resizing');document.body.classList.remove('narf-node-resize-active');window.removeEventListener('pointermove',nfMoveNodeResize);window.removeEventListener('pointerup',nfEndNodeResize);window.removeEventListener('pointercancel',nfEndNodeResize);}
+
+
+function nfRectsIntersect(a,b){return a.left<=b.right&&a.right>=b.left&&a.top<=b.bottom&&a.bottom>=b.top;}
+function nfFinishMarqueeSelection(m){
+ var box={left:Math.min(m.startX,m.x),right:Math.max(m.startX,m.x),top:Math.min(m.startY,m.y),bottom:Math.max(m.startY,m.y)},nodes=[],connections=[];
+ document.querySelectorAll('.narf-node').forEach(function(el){if(nfRectsIntersect(box,el.getBoundingClientRect()))nodes.push(el.dataset.nodeId);});
+ document.querySelectorAll('.narf-connection-group').forEach(function(el){
+  var hit=el.querySelector('.narf-connection-hit')||el.querySelector('.narf-connection-path');
+  if(hit&&nfRectsIntersect(box,hit.getBoundingClientRect()))connections.push(el.dataset.connectionId);
+ });
+ NarrativeSelection.addMany(nodes,connections,m.additive);
+}
+function nfSelectedNode(){return NF.selectedNodeId?NF.nodes.find(function(n){return n.id===NF.selectedNodeId;})||null:null;}
+function nfInspectorFields(){return [
+ {key:'title',label:'Title',type:'text',maxlength:120,placeholder:'Untitled Node'},
+ {key:'description',label:'Description',type:'textarea',maxlength:2400,placeholder:'Add narrative notes, purpose, beats, or context…'},
+ {key:'colour',label:'Colour',type:'colour'}
+];}
+function nfInspectorValue(node,key){if(key==='colour')return nfColour(node.colour);return String(node.data&&node.data[key]||'');}
+function nfInspectorOpen(node){var panel=document.getElementById('narf-node-inspector');if(!panel||!node)return;NF.inspectorNodeId=node.id;NF.inspectorConnectionId=null;panel.classList.add('open');panel.setAttribute('aria-hidden','false');panel.style.setProperty('--inspector-colour',nfColour(node.colour));nfInspectorRender(node,true);}
+function nfInspectorClose(clearSelection){if(NF.inspectorSaveTimer){clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=null;nfInspectorFlush();}var panel=document.getElementById('narf-node-inspector');if(panel){panel.classList.remove('open');panel.setAttribute('aria-hidden','true');}NF.inspectorNodeId=null;NF.inspectorConnectionId=null;NF.inspectorDirty=false;if(clearSelection){NF.selectedNodeId=null;NF.selectedConnectionId=null;document.querySelectorAll('.narf-node').forEach(function(el){el.classList.remove('selected');});nfUpdateNodeUi();if(NF.workspace)NF.workspace.renderMinimap();}}
+window.narrativeCloseInspector=function(){nfInspectorClose(true);};
+function nfInspectorOpenConnection(c){var panel=document.getElementById('narf-node-inspector');if(!panel||!c)return;NF.inspectorNodeId=null;NF.inspectorConnectionId=c.id;NF.inspectorDirty=false;if(NF.inspectorSaveTimer){clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=null;}panel.classList.add('open');panel.setAttribute('aria-hidden','false');panel.style.setProperty('--inspector-colour',nfColour(c.colour));nfInspectorRenderConnection(c,true);}
+function nfInspectorRenderConnection(c,force){var panel=document.getElementById('narf-node-inspector'),box=document.getElementById('narf-inspector-content'),name=document.getElementById('narf-inspector-name'),kicker=panel&&panel.querySelector('.narf-inspector-kicker');if(!panel||!box||!c)return;var active=document.activeElement;if(!force&&active&&active.closest&&active.closest('#narf-node-inspector'))return;var a=nfNodeById(c.sourceId),b=nfNodeById(c.targetId),editable=nfCanEdit(),disabled=editable?'':' disabled';panel.style.setProperty('--inspector-colour',nfColour(c.colour));if(kicker)kicker.textContent='Selected Connection';if(name)name.textContent=String(c.label||'CONNECTION').toUpperCase();var html='<div class="narf-inspector-section"><div class="narf-inspector-section-title">Connection</div><label class="field"><span class="field-label">Label</span><input class="inp" data-narf-connection-field="label" data-narf-connection-owner="'+nfEsc(c.id)+'" maxlength="120" value="'+nfEsc(c.label||'')+'" placeholder="Optional relationship label"'+disabled+'></label><label class="field"><span class="field-label">Colour</span><div class="narf-inspector-colour-row"><input class="inp" type="color" data-narf-connection-field="colour" data-narf-connection-owner="'+nfEsc(c.id)+'" value="'+nfEsc(nfColour(c.colour))+'"'+disabled+'><input class="inp" data-narf-colour-text value="'+nfEsc(nfColour(c.colour).toUpperCase())+'" readonly></div></label><div class="narf-save-state saved" id="narf-save-state">'+(editable?'Saved':'View only')+'</div>'+(editable?'':'<div class="narf-inspector-view-note">Editor access is required to change this connection.</div>')+'</div><div class="narf-inspector-section narf-inspector-readonly"><div class="narf-inspector-section-title">Route</div><dl class="narf-inspector-meta"><dt>From</dt><dd>'+nfEsc(a&&a.data&&a.data.title||c.sourceId)+'</dd><dt>To</dt><dd>'+nfEsc(b&&b.data&&b.data.title||c.targetId)+'</dd><dt>Created by</dt><dd>'+nfEsc(c.createdByName||'Unknown member')+'</dd><dt>Created</dt><dd>'+nfEsc(nfDate(c.createdAt))+'</dd><dt>Last edited</dt><dd>'+nfEsc(nfDate(c.updatedAt||c.createdAt))+'</dd><dt>Connection ID</dt><dd>'+nfEsc(c.id)+'</dd></dl></div>'+(editable?'<div class="narf-inspector-section narf-inspector-danger"><div class="narf-inspector-section-title">Remove</div><button class="btn btn-danger btn-sm" type="button" onclick="narrativeDeleteSelectedConnection()">Delete Connection</button></div>':'');box.innerHTML=html;if(editable)box.querySelectorAll('[data-narf-connection-field]').forEach(function(el){el.addEventListener('input',nfConnectionInspectorInput);el.addEventListener('change',nfConnectionInspectorInput);el.addEventListener('blur',nfConnectionInspectorFlush);el.addEventListener('pointerdown',function(e){e.stopPropagation();});});}
+function nfConnectionInspectorInput(e){if(!nfCanEdit())return;var ownerId=e.target.dataset.narfConnectionOwner;if(!ownerId||ownerId!==NF.selectedConnectionId||ownerId!==NF.inspectorConnectionId)return;var c=nfConnectionById(ownerId);if(!c)return;var key=e.target.dataset.narfConnectionField,value=e.target.value;if(key==='colour'){value=nfColour(value);c.colour=value;var txt=document.querySelector('[data-narf-colour-text]');if(txt)txt.value=value.toUpperCase();var panel=document.getElementById('narf-node-inspector');if(panel)panel.style.setProperty('--inspector-colour',value);}else c.label=value;NF.inspectorDirty=true;var name=document.getElementById('narf-inspector-name');if(name)name.textContent=String(c.label||'CONNECTION').toUpperCase();nfRenderConnections();nfSetSaveState('saving','Saving…');if(NF.inspectorSaveTimer)clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=setTimeout(nfConnectionInspectorFlush,650);}
+async function nfConnectionInspectorFlush(){if(NF.inspectorSaveTimer){clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=null;}if(!NF.inspectorDirty||NF.inspectorSaving||!nfCanEdit())return;var c=nfSelectedConnection();if(!c||c.id!==NF.inspectorConnectionId)return;NF.inspectorDirty=false;NF.inspectorSaving=true;nfSetSaveState('saving','Saving…');var payload={label:String(c.label||''),colour:nfColour(c.colour),updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()};c.updatedAt=payload.updatedAt;try{var col=nfConnectionCollection();if(!col)throw new Error('Connection collection unavailable');await col.doc(c.id).set(payload,{merge:true});nfSetSaveState('saved','Saved');}catch(err){NF.inspectorDirty=true;nfSetSaveState('error','Save failed');nfToast(err.message||'Could not save connection','err');}finally{NF.inspectorSaving=false;}}
+function nfInspectorRender(node,force){var panel=document.getElementById('narf-node-inspector'),box=document.getElementById('narf-inspector-content'),name=document.getElementById('narf-inspector-name');if(!panel||!box||!node)return;var active=document.activeElement;if(!force&&active&&active.closest&&active.closest('#narf-node-inspector'))return;panel.style.setProperty('--inspector-colour',nfColour(node.colour));var kicker=panel.querySelector('.narf-inspector-kicker');if(kicker)kicker.textContent='Selected Node';if(name)name.textContent=String(node.data&&node.data.title||'Untitled Node').toUpperCase();var editable=nfCanEdit();var fields=nfInspectorFields();var html='<div class="narf-inspector-section"><div class="narf-inspector-section-title">Details</div>';
+ fields.forEach(function(f){var value=nfInspectorValue(node,f.key),disabled=editable?'':' disabled';if(f.type==='textarea')html+='<label class="field"><span class="field-label">'+nfEsc(f.label)+'</span><textarea class="inp" data-narf-field="'+f.key+'" maxlength="'+f.maxlength+'" placeholder="'+nfEsc(f.placeholder)+'"'+disabled+'>'+nfEsc(value)+'</textarea></label>';else if(f.type==='colour')html+='<label class="field"><span class="field-label">'+nfEsc(f.label)+'</span><div class="narf-inspector-colour-row"><input class="inp" type="color" data-narf-field="colour" value="'+nfEsc(value)+'"'+disabled+'><input class="inp" data-narf-colour-text value="'+nfEsc(value.toUpperCase())+'" readonly></div></label>';else html+='<label class="field"><span class="field-label">'+nfEsc(f.label)+'</span><input class="inp" data-narf-field="'+f.key+'" maxlength="'+f.maxlength+'" value="'+nfEsc(value)+'" placeholder="'+nfEsc(f.placeholder)+'"'+disabled+'></label>';});
+ html+='<div class="narf-save-state saved" id="narf-save-state">'+(editable?'Saved':'View only')+'</div>'+(editable?'':'<div class="narf-inspector-view-note">You can view this node, but editor access is required to change it.</div>')+'</div>';
+ html+='<div class="narf-inspector-section narf-inspector-readonly"><div class="narf-inspector-section-title">Metadata</div><dl class="narf-inspector-meta"><dt>Node type</dt><dd>'+nfEsc(node.type||'basic')+'</dd><dt>Created by</dt><dd>'+nfEsc(node.createdByName||'Unknown member')+'</dd><dt>Created</dt><dd>'+nfEsc(nfDate(node.createdAt))+'</dd><dt>Last edited</dt><dd>'+nfEsc(nfDate(node.updatedAt||node.createdAt))+'</dd><dt>Node ID</dt><dd>'+nfEsc(node.id)+'</dd></dl></div>';
+ box.innerHTML=html;if(editable)box.querySelectorAll('[data-narf-field]').forEach(function(el){el.addEventListener('input',nfInspectorInput);el.addEventListener('change',nfInspectorInput);el.addEventListener('blur',function(){nfInspectorFlush();});el.addEventListener('pointerdown',function(e){e.stopPropagation();});});}
+function nfSetSaveState(state,text){var el=document.getElementById('narf-save-state');if(!el)return;el.className='narf-save-state '+state;el.textContent=text||state;}
+function nfInspectorInput(e){if(!nfCanEdit()||NF.inspectorConnectionId)return;var node=nfSelectedNode();if(!node||node.id!==NF.inspectorNodeId)return;var key=e.target.dataset.narfField,value=e.target.value;if(key==='colour'){value=nfColour(value);node.colour=value;var txt=document.querySelector('[data-narf-colour-text]');if(txt)txt.value=value.toUpperCase();var panel=document.getElementById('narf-node-inspector');if(panel)panel.style.setProperty('--inspector-colour',value);}else{node.data=node.data||{};node.data[key]=value;}NF.inspectorDirty=true;nfInspectorPreview(node,key);nfSetSaveState('saving','Saving…');if(NF.inspectorSaveTimer)clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=setTimeout(nfInspectorFlush,650);}
+function nfInspectorPreview(node,key){var el=document.querySelector('.narf-node[data-node-id="'+node.id+'"]');if(el){if(key==='title'){var t=el.querySelector('.narf-node-title');if(t)t.textContent=node.data.title||'Untitled Node';var name=document.getElementById('narf-inspector-name');if(name)name.textContent=String(node.data.title||'Untitled Node').toUpperCase();}else if(key==='description'){var d=el.querySelector('.narf-node-description'),v=String(node.data.description||'').trim();if(d){d.textContent=v||'No description added yet.';d.classList.toggle('is-placeholder',!v);}}else if(key==='colour')el.style.setProperty('--node-colour',node.colour);}if(NF.workspace)NF.workspace.renderMinimap();}
+async function nfInspectorFlush(){if(NF.inspectorConnectionId){return nfConnectionInspectorFlush();}if(NF.inspectorSaveTimer){clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=null;}if(!NF.inspectorDirty||NF.inspectorSaving||!nfCanEdit())return;var node=nfSelectedNode();if(!node||node.id!==NF.inspectorNodeId)return;NF.inspectorDirty=false;NF.inspectorSaving=true;nfSetSaveState('saving','Saving…');var payload={colour:nfColour(node.colour),data:Object.assign({},node.data||{}),updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()};node.updatedAt=payload.updatedAt;node.updatedBy=payload.updatedBy;node.updatedByName=payload.updatedByName;try{var col=nfNodeCollection();if(!col)throw new Error('Node collection unavailable');await col.doc(node.id).set(payload,{merge:true});nfSetSaveState('saved','Saved');}catch(err){console.error('Narrative node details save',err);NF.inspectorDirty=true;nfSetSaveState('error','Save failed');nfToast(err.message||'Could not save node details','err');}finally{NF.inspectorSaving=false;}}
+function nfInspectorRefresh(force){var c=nfSelectedConnection();if(c){if(NF.inspectorConnectionId!==c.id)nfInspectorOpenConnection(c);else nfInspectorRenderConnection(c,!!force);return;}var node=nfSelectedNode();if(!node){nfInspectorClose(false);return;}if(NF.inspectorNodeId!==node.id)nfInspectorOpen(node);else nfInspectorRender(node,!!force);}
+function nfUpdateNodeUi(){
+ var count=document.getElementById('narf-node-count'),sn=NarrativeSelection.nodeIds().length,sc=NarrativeSelection.connectionIds().length;
+ if(count)count.textContent=(sn||sc)?(sn+' NODE'+(sn===1?'':'S')+' · '+sc+' LINK'+(sc===1?'':'S')):(NF.nodes.length+' NODE'+(NF.nodes.length===1?'':'S'));
+ ['narf-delete-node','narf-toolbar-delete-node'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=!(sn||sc);});
+}
+function nfSelectNode(id,additive){if(!id){if(!additive)NarrativeSelection.clear();return;}if(additive)NarrativeSelection.toggle('node',id);else NarrativeSelection.replace('node',id);}
+function nfSelectedConnection(){return nfConnectionById(NF.selectedConnectionId);}
+function nfSelectConnection(id,additive){
+ var nextId=id&&NF.connections.some(function(c){return c.id===id;})?id:null;
+ if(NF.inspectorConnectionId&&NF.inspectorConnectionId!==nextId&&NF.inspectorDirty){if(NF.inspectorSaveTimer){clearTimeout(NF.inspectorSaveTimer);NF.inspectorSaveTimer=null;}nfConnectionInspectorFlush();}
+ if(!nextId){if(!additive)NarrativeSelection.clear();return;}
+ if(additive)NarrativeSelection.toggle('connection',nextId);else NarrativeSelection.replace('connection',nextId);
+}
+window.narrativeDeleteSelection=async function(){
+ if(!nfCanEdit())return;
+ var nodeIds=NarrativeSelection.nodeIds(),connectionIds=NarrativeSelection.connectionIds();
+ if(!nodeIds.length&&!connectionIds.length)return;
+ var attached=NF.connections.filter(function(c){return nodeIds.includes(c.sourceId)||nodeIds.includes(c.targetId);}).map(function(c){return c.id;});
+ var allConnections=Array.from(new Set(connectionIds.concat(attached)));
+ var summary=[];if(nodeIds.length)summary.push(nodeIds.length+' node'+(nodeIds.length===1?'':'s'));if(allConnections.length)summary.push(allConnections.length+' connection'+(allConnections.length===1?'':'s'));
+ if(!confirm('Delete '+summary.join(' and ')+'?'))return;
+ try{
+  var batch=nfDb().batch(),nc=nfNodeCollection(),cc=nfConnectionCollection();
+  allConnections.forEach(function(id){if(cc)batch.delete(cc.doc(id));});
+  nodeIds.forEach(function(id){if(nc)batch.delete(nc.doc(id));});
+  await batch.commit();NarrativeSelection.clear();nfToast('Selection deleted','ok');
+ }catch(err){nfToast(err.message||'Could not delete selection','err');}
+};
+window.narrativeDeleteSelectedConnection=function(){return window.narrativeDeleteSelection();};
+function nfUnsubscribeNodes(){nfCancelNodeResize();nfCancelNodeDrag();if(NF.nodesUnsub){try{NF.nodesUnsub();}catch(e){}NF.nodesUnsub=null;}NF.nodes=[];NarrativeSelection.clear(false);nfInspectorClose(false);nfRenderNodes();}
+function nfSubscribeNodes(){nfUnsubscribeNodes();var col=nfNodeCollection();if(!col)return;var canvasId=NF.openCanvasId;NF.nodesUnsub=col.onSnapshot(function(snap){if(NF.openCanvasId!==canvasId)return;NF.nodes=snap.docs.map(function(d){return nfNormaliseNode(d.id,d.data());}).sort(function(a,b){return String(a.createdAt||'').localeCompare(String(b.createdAt||''));});if(NF.selectedNodeId&&!NF.nodes.some(function(n){return n.id===NF.selectedNodeId;}))NF.selectedNodeId=null;nfRenderNodes();nfInspectorRefresh(false);},function(e){console.error('Narrative nodes listener',e);nfToast('Could not load narrative nodes','err');});}
+window.narrativeCreateNode=async function(){if(!nfCanEdit()){nfToast('Editor access required','err');return;}if(!NF.workspace||!NF.openCanvasId)return;var col=nfNodeCollection();if(!col)return;var vr=NF.workspace.viewport.getBoundingClientRect(),x=(vr.width/2-NF.workspace.camera.x)/NF.workspace.camera.zoom-130,y=(vr.height/2-NF.workspace.camera.y)/NF.workspace.camera.zoom-58;var num=NF.nodes.length+1,data={type:'basic',x:Math.round(x),y:Math.round(y),width:260,height:116,colour:nfColour(NF.workspace.canvas.colour),data:{title:'Narrative Node '+num},createdAt:nfNow(),createdBy:nfUid(),createdByName:nfName(),updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()};try{var ref=await col.add(data);nfSelectNode(ref.id);nfToast('Node created','ok');}catch(e){nfToast(e.message||'Could not create node','err');}};
+window.narrativeDeleteSelectedNode=function(){return window.narrativeDeleteSelection();};
+function nfWorkspaceUnmount(){nfUnsubscribeConnections();nfUnsubscribeNodes();if(NF.workspace){NF.workspace.unmount();NF.workspace=null;}}
+function nfWorkspaceMount(canvas){nfWorkspaceUnmount();var panel=document.getElementById('narf-workspace-panel');if(panel)panel.style.setProperty('--narf-accent',nfColour(canvas.colour));NF.workspace=new NarrativeWorkspace(canvas);NF.workspace.mount();nfSubscribeNodes();nfSubscribeConnections();}
+window.narrativeZoomBy=function(delta){if(NF.workspace)NF.workspace.zoomBy(Number(delta)||0);};
+window.narrativeResetCamera=function(){if(NF.workspace)NF.workspace.reset();};
+
+function nfMemberList(){var ld=nfLiveData(),map=ld&&ld.members||{};return Object.keys(map).map(function(uid){return Object.assign({uid:uid},map[uid]||{});}).sort(function(a,b){return String(a.name||a.email||'').localeCompare(String(b.name||b.email||''));});}
+function nfInitials(n){return String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(function(x){return x[0];}).join('').toUpperCase();}
+function nfUpdateVisibility(){var btn=document.getElementById('narrative-quick-link');if(btn)btn.style.display=nfCanView()?'flex':'none';var access=document.getElementById('narf-access-btn');if(access)access.style.display=nfCanManage()?'inline-flex':'none';var add=document.getElementById('narf-new-btn');if(add)add.style.display=nfCanEdit()?'inline-flex':'none';}
+function nfSubscribe(){var store=nfDb();if(!store||!nfCanView())return;if(NF.unsub)NF.unsub();NF.unsub=store.collection('narrativeCanvases').onSnapshot(function(s){NF.canvases=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});NF.loaded=true;narrativeRenderLibrary();if(NF.openCanvasId)narrativeRenderOpenCanvas();},function(e){console.error('Narrative canvases listener',e);nfToast('Could not load Narrative canvases','err');});}
+window.narrativeOpen=function(){nfWorkspaceUnmount();NF.openCanvasId=null;nfUpdateVisibility();if(!nfCanView()){nfToast('You do not have access to Narrative Planner','err');return;}nfView('narrative');if(!NF.unsub)nfSubscribe();narrativeRenderLibrary();};
+window.narrativeRenderLibrary=function(){
+ var box=document.getElementById('narf-library');if(!box)return;nfUpdateVisibility();
+ var q=String(document.getElementById('narf-search')&&document.getElementById('narf-search').value||'').trim().toLowerCase();
+ var sf=String(document.getElementById('narf-section-filter')&&document.getElementById('narf-section-filter').value||'');
+ var active=NF.canvases.filter(function(c){return !c.markedForRemoval;});var removed=NF.canvases.filter(function(c){return !!c.markedForRemoval;});
+ var sections=Array.from(new Set(NF.sections.concat(active.map(function(c){return c.section||'Other';}))));
+ var filter=document.getElementById('narf-section-filter');if(filter){var val=filter.value;filter.innerHTML='<option value="">All sections</option>'+sections.map(function(s){return '<option value="'+nfEsc(s)+'">'+nfEsc(s)+'</option>';}).join('');filter.value=val;}
+ var filtered=active.filter(function(c){var hay=String(c.name||'')+' '+String(c.description||'');return (!q||hay.toLowerCase().includes(q))&&(!sf||(c.section||'Other')===sf);});
+ document.getElementById('narf-count-active').textContent=active.length;document.getElementById('narf-count-sections').textContent=new Set(active.map(function(c){return c.section||'Other';})).size;document.getElementById('narf-count-removal').textContent=removed.length;document.getElementById('narf-current-access').textContent=nfRole().replace('_',' ').toUpperCase();document.getElementById('narf-removal-badge').textContent=removed.length;
+ var html='';sections.forEach(function(section){var list=filtered.filter(function(c){return (c.section||'Other')===section;}).sort(function(a,b){return Number(a.order||0)-Number(b.order||0)||String(a.name||'').localeCompare(String(b.name||''));});if(!list.length)return;html+='<section class="narf-section"><div class="narf-section-head"><span class="narf-section-title">'+nfEsc(section)+'</span><span class="narf-section-count">'+list.length+' CANVAS'+(list.length===1?'':'ES')+'</span></div><div class="narf-grid">'+list.map(nfCard).join('')+'</div></section>';});
+ if(!html)html='<div class="narf-empty"><strong>'+(active.length?'No canvases match these filters.':'No narrative canvases yet.')+'</strong>'+(nfCanEdit()?'Create the first canvas to begin organising the project narrative.':'An editor will create the first shared canvas here.')+'</div>';box.innerHTML=html;nfRenderRemoval(removed);
+};
+function nfCard(c){return '<article class="narf-card" style="--narf-colour:'+nfColour(c.colour)+'" onclick="narrativeOpenCanvas(\''+c.id+'\')"><div class="narf-card-title">'+nfEsc(c.name||'Untitled Canvas')+'</div><div class="narf-card-desc">'+nfEsc(c.description||'No description has been added yet.')+'</div><div class="narf-card-meta"><span class="narf-pill">'+nfEsc(c.status||'Planning')+'</span><span class="narf-pill">'+nfEsc(c.section||'Other')+'</span><span>Updated '+nfEsc(nfDate(c.updatedAt||c.createdAt))+'</span></div>'+(nfCanEdit()?'<div class="narf-card-actions"><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();narrativeOpenCanvasEditor(\''+c.id+'\')">Edit</button><button class="btn btn-danger btn-xs" onclick="event.stopPropagation();narrativeMarkRemoval(\''+c.id+'\')">Mark for removal</button></div>':'')+'</article>';}
+function nfRenderRemoval(list){var box=document.getElementById('narf-removal-queue');if(!box)return;box.innerHTML=list.length?list.sort(function(a,b){return String(b.markedForRemovalAt||'').localeCompare(String(a.markedForRemovalAt||''));}).map(function(c){return '<div class="narf-removal-card"><div><div class="narf-removal-title">'+nfEsc(c.name||'Untitled Canvas')+'</div><div class="narf-removal-meta">Marked by '+nfEsc(c.markedForRemovalByName||'Unknown member')+' on '+nfEsc(nfDate(c.markedForRemovalAt))+(c.removalReason?'<br>Reason: '+nfEsc(c.removalReason):'')+'</div></div><div class="narf-removal-actions">'+(nfCanEdit()?'<button class="btn btn-gold btn-xs" onclick="narrativeReinstate(\''+c.id+'\')">Reinstate</button>':'')+(nfCanPurge()?'<button class="btn btn-danger btn-xs" onclick="narrativePurge(\''+c.id+'\')">Permanently Delete</button>':'')+'</div></div>';}).join(''):'<div class="narf-empty" style="padding:20px">Nothing is awaiting deletion review.</div>';}
+window.narrativeToggleRemovalQueue=function(){var q=document.getElementById('narf-removal-queue'),a=document.getElementById('narf-removal-arrow');var open=q.style.display!=='none';q.style.display=open?'none':'block';a.classList.toggle('open',!open);};
+window.narrativeOpenCanvas=function(id){var c=NF.canvases.find(function(x){return x.id===id;});if(!c||c.markedForRemoval)return;nfWorkspaceUnmount();NF.openCanvasId=id;nfView('narrative-canvas');narrativeRenderOpenCanvas();requestAnimationFrame(function(){requestAnimationFrame(function(){if(NF.openCanvasId===id)nfWorkspaceMount(c);});});};
+window.narrativeRenderOpenCanvas=function(){var c=NF.canvases.find(function(x){return x.id===NF.openCanvasId;});if(!c)return;document.getElementById('narf-open-title').textContent=String(c.name||'Canvas').toUpperCase();document.getElementById('narf-open-description').textContent=c.description||'No description added.';document.getElementById('narf-open-meta').textContent=(c.section||'Other')+' · '+(c.status||'Planning')+' · Last updated '+nfDate(c.updatedAt||c.createdAt);document.getElementById('narf-open-edit').style.display=nfCanEdit()?'inline-flex':'none';['narf-new-node','narf-toolbar-new-node','narf-delete-node','narf-toolbar-delete-node'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=nfCanEdit()?'inline-flex':'none';});nfUpdateNodeUi();var panel=document.getElementById('narf-workspace-panel');if(panel)panel.style.setProperty('--narf-accent',nfColour(c.colour));};
+window.narrativeEditOpenCanvas=function(){if(NF.openCanvasId)narrativeOpenCanvasEditor(NF.openCanvasId);};
+function nfModal(id,title,width){var bg=document.getElementById(id);if(!bg){bg=document.createElement('div');bg.className='modal-bg';bg.id=id;bg.innerHTML='<div class="modal" style="width:'+(width||'600px')+'"><div class="modal-hdr"><span class="modal-title">'+title+'</span><button class="modal-x" onclick="closeModal(\''+id+'\')">✕</button></div><div class="modal-body" id="'+id+'-body"></div></div>';document.body.appendChild(bg);}return bg;}
+window.narrativeOpenCanvasEditor=function(id){if(!nfCanEdit()){nfToast('Editor access required','err');return;}var c=id?NF.canvases.find(function(x){return x.id===id;}):null;nfModal('m-narf-canvas',c?'EDIT NARRATIVE CANVAS':'NEW NARRATIVE CANVAS','600px');var b=document.getElementById('m-narf-canvas-body');b.innerHTML='<div class="field"><span class="field-label">Canvas Name</span><input class="inp" id="narf-edit-name" maxlength="90" value="'+nfEsc(c&&c.name||'')+'" placeholder="e.g. Act One — Sanctum Arrival"></div><div class="field"><span class="field-label">Description</span><textarea class="inp" id="narf-edit-desc" rows="4" maxlength="700" placeholder="What is this canvas for?">'+nfEsc(c&&c.description||'')+'</textarea></div><div class="grid-2"><div class="field"><span class="field-label">Section</span><select class="inp" id="narf-edit-section">'+NF.sections.map(function(s){return '<option '+(s===(c&&c.section||'Other')?'selected':'')+'>'+nfEsc(s)+'</option>';}).join('')+'</select></div><div class="field"><span class="field-label">Status</span><select class="inp" id="narf-edit-status">'+['Planning','Drafting','In Review','Approved','Implemented','On Hold'].map(function(s){return '<option '+(s===(c&&c.status||'Planning')?'selected':'')+'>'+s+'</option>';}).join('')+'</select></div></div><div class="field"><span class="field-label">Canvas Colour</span><div class="narf-colour-row"><input class="inp" id="narf-edit-colour" type="color" value="'+nfColour(c&&c.colour)+'"><span class="text-small text-grey">Used to identify this canvas throughout Narrative Planner.</span></div></div><div class="modal-foot" style="padding:14px 0 0"><button class="btn btn-ghost" onclick="closeModal(\'m-narf-canvas\')">Cancel</button><button class="btn btn-primary" onclick="narrativeSaveCanvas(\''+(id||'')+'\')">'+(id?'Save Changes':'Create Canvas')+'</button></div>';openModal('m-narf-canvas');};
+window.narrativeSaveCanvas=async function(id){var name=document.getElementById('narf-edit-name').value.trim();if(!name){nfToast('Canvas name is required','err');return;}var data={name:name,description:document.getElementById('narf-edit-desc').value.trim(),section:document.getElementById('narf-edit-section').value,status:document.getElementById('narf-edit-status').value,colour:document.getElementById('narf-edit-colour').value,updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()};try{if(id)await nfDb().collection('narrativeCanvases').doc(id).set(data,{merge:true});else{Object.assign(data,{createdAt:nfNow(),createdBy:nfUid(),createdByName:nfName(),markedForRemoval:false,order:NF.canvases.length});var ref=await nfDb().collection('narrativeCanvases').add(data);NF.openCanvasId=ref.id;}closeModal('m-narf-canvas');nfToast(id?'Canvas details updated':'Narrative canvas created','ok');}catch(e){nfToast(e.message||'Could not save canvas','err');}};
+window.narrativeMarkRemoval=async function(id){if(!nfCanEdit())return;var c=NF.canvases.find(function(x){return x.id===id;});if(!c)return;var reason=prompt('Why should “'+(c.name||'this canvas')+'” be removed? (Optional)','');if(reason===null)return;if(!confirm('Move this canvas to Marked for Removal? Anyone with Editor access can reinstate it.'))return;try{await nfDb().collection('narrativeCanvases').doc(id).set({markedForRemoval:true,markedForRemovalAt:nfNow(),markedForRemovalBy:nfUid(),markedForRemovalByName:nfName(),removalReason:reason.trim(),updatedAt:nfNow(),updatedBy:nfUid()},{merge:true});nfToast('Canvas moved for deletion review','ok');}catch(e){nfToast(e.message||'Could not update canvas','err');}};
+window.narrativeReinstate=async function(id){if(!nfCanEdit())return;try{await nfDb().collection('narrativeCanvases').doc(id).set({markedForRemoval:false,markedForRemovalAt:null,markedForRemovalBy:null,markedForRemovalByName:null,removalReason:null,updatedAt:nfNow(),updatedBy:nfUid(),updatedByName:nfName()},{merge:true});nfToast('Canvas reinstated','ok');}catch(e){nfToast(e.message||'Could not reinstate canvas','err');}};
+window.narrativePurge=async function(id){if(!nfCanPurge())return;var c=NF.canvases.find(function(x){return x.id===id;});if(!c||!c.markedForRemoval)return;if(!confirm('Permanently delete “'+(c.name||'this canvas')+'”? This cannot be undone.'))return;try{await nfDb().collection('narrativeCanvases').doc(id).delete();nfToast('Canvas permanently deleted','ok');}catch(e){nfToast(e.message||'Could not delete canvas','err');}};
+window.narrativeOpenAccess=function(){if(!nfCanManage()){nfToast('Narrative Lead or Admin access required','err');return;}nfModal('m-narf-access','NARRATIVE ACCESS','680px');var members=nfMemberList(),admin=nfRole()==='admin';document.getElementById('m-narf-access-body').innerHTML='<div class="narf-danger-note">No Access hides the Narrative button. Viewers can read. Editors can create and change canvases. Narrative Leads can also approve permanent deletion. Hub Admins always retain full access.</div><div class="narf-access-list">'+members.map(function(m){var r=m.narrativeAccess||'none';return '<div class="narf-access-row"><div class="narf-access-avatar">'+nfEsc(nfInitials(m.name||m.email))+'</div><div><div class="narf-access-name">'+nfEsc(m.name||m.email||m.uid)+'</div><div class="narf-access-email">'+nfEsc(m.email||'')+'</div></div><select class="inp" data-narf-uid="'+nfEsc(m.uid)+'" '+(admin?'':'disabled')+'><option value="none" '+(r==='none'?'selected':'')+'>No Access</option><option value="viewer" '+(r==='viewer'?'selected':'')+'>Viewer</option><option value="editor" '+(r==='editor'?'selected':'')+'>Editor</option><option value="lead" '+(r==='lead'?'selected':'')+'>Narrative Lead</option></select></div>';}).join('')+'</div>'+(admin?'<div class="modal-foot" style="padding:14px 0 0"><button class="btn btn-ghost" onclick="closeModal(\'m-narf-access\')">Cancel</button><button class="btn btn-primary" onclick="narrativeSaveAccess()">Save Access</button></div>':'<div class="text-small text-grey">Narrative Leads may review access, while only the Hub Admin can change member access levels.</div>');openModal('m-narf-access');};
+window.narrativeSaveAccess=async function(){if(nfRole()!=='admin')return;var sels=Array.from(document.querySelectorAll('[data-narf-uid]'));try{var store=nfDb(),batch=store.batch();sels.forEach(function(s){batch.set(store.collection('users').doc(s.dataset.narfUid),{narrativeAccess:s.value},{merge:true});});await batch.commit();closeModal('m-narf-access');nfToast('Narrative access updated','ok');}catch(e){nfToast(e.message||'Could not update access','err');}};
+
+function nfAccessLabel(role){return ({none:'No Access',viewer:'Viewer',editor:'Editor',lead:'Narrative Lead'})[role]||'No Access';}
+window.narrativeSetMemberAccess=async function(uid,value){
+ if(!nfIsHubAdmin()){nfToast('Only a Hub Admin can change Narrative access','err');return;}
+ try{
+  var store=nfDb(),ld=nfLiveData();
+  await store.collection('users').doc(uid).set({narrativeAccess:value},{merge:true});
+  if(ld&&ld.members&&ld.members[uid])ld.members[uid].narrativeAccess=value;
+  nfToast('Narrative access set to '+nfAccessLabel(value),'ok');
+  nfUpdateVisibility();
+ }catch(e){nfToast(e.message||'Could not update Narrative access','err');}
+};
+function nfEnhanceAdminRoster(){
+ var table=document.querySelector('#admin-roster table');
+ if(!table||table.dataset.narrativeAccessEnhanced==='1'||!nfIsHubAdmin())return;
+ var ld=nfLiveData(),members=Object.values(ld&&ld.members||{});
+ var headRow=table.querySelector('thead tr');
+ if(headRow){var th=document.createElement('th');th.textContent='NARRATIVE ACCESS';th.style.cssText="padding:8px 16px;text-align:left;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);";headRow.insertBefore(th,headRow.lastElementChild);}
+ Array.from(table.querySelectorAll('tbody tr')).forEach(function(row,index){
+  var m=members[index];if(!m)return;
+  var td=document.createElement('td');td.style.cssText='padding:10px 16px;min-width:150px;';
+  var sel=document.createElement('select');sel.className='inp';sel.style.cssText='padding:5px 8px;font-size:12px;';
+  [['none','No Access'],['viewer','Viewer'],['editor','Editor'],['lead','Narrative Lead']].forEach(function(opt){var o=document.createElement('option');o.value=opt[0];o.textContent=opt[1];o.selected=(m.narrativeAccess||'none')===opt[0];sel.appendChild(o);});
+  sel.onchange=function(){narrativeSetMemberAccess(m.uid,sel.value);};td.appendChild(sel);row.insertBefore(td,row.lastElementChild);
+ });
+ table.dataset.narrativeAccessEnhanced='1';
+}
+function nfInstallAdminRosterAccess(){
+ var attempts=0,wait=setInterval(function(){
+  attempts++;
+  if(typeof window.renderAdminRoster==='function'){
+   clearInterval(wait);
+   var original=window.renderAdminRoster;
+   if(!original.__narfAccessWrapped){
+    var wrapped=function(){var result=original.apply(this,arguments);setTimeout(nfEnhanceAdminRoster,0);return result;};
+    wrapped.__narfAccessWrapped=true;window.renderAdminRoster=wrapped;
+   }
+   setTimeout(function(){try{window.renderAdminRoster();}catch(e){nfEnhanceAdminRoster();}},0);
+  }else if(attempts>160)clearInterval(wait);
+ },250);
+}
+setInterval(function(){
+ if(nfProfile()){nfUpdateVisibility();if(nfCanView()&&!NF.unsub&&nfDb())nfSubscribe();}
+ if(document.getElementById('view-admin')&&document.getElementById('view-admin').classList.contains('active'))nfEnhanceAdminRoster();
+},1000);
+
+function nfBoot(){nfUpdateVisibility();if(nfCanView())nfSubscribe();}
+var tries=0,t=setInterval(function(){tries++;if(nfProfile()&&nfDb()){clearInterval(t);nfBoot();nfInstallAdminRosterAccess();}else if(tries>120)clearInterval(t);},250);
+var oldRenderProfile=window.renderProfile;if(typeof oldRenderProfile==='function'&&!oldRenderProfile.__narfWrapped){var wrapped=function(){var r=oldRenderProfile.apply(this,arguments);setTimeout(function(){nfUpdateVisibility();if(nfCanView()&&!NF.unsub)nfSubscribe();},0);return r;};wrapped.__narfWrapped=true;window.renderProfile=wrapped;}
+})();
+</script>
+
 <!-- MH-MODULE-END id="MOD-HTML-APP" -->
 
 <!-- ═══════════════════ MODALS ═══════════════════ -->
@@ -5629,26 +6341,7 @@ function renderDeptOverview(){
 }
 
 // ─── MEETINGS ─────────────────────────────────────────────
-async function submitMeeting() {
-  var name=document.getElementById('mt-name').value.trim();
-  if(!name){toast('Enter a meeting name','err');return;}
-  var dateStr=document.getElementById('mt-date').value, timeStr=document.getElementById('mt-time').value||'00:00';
-  if(!dateStr){toast('Choose a meeting date','err');return;}
-  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
-  var required=[], optional=[];
-  Object.keys(liveData.members).forEach(function(uid){var role=getMeetingRole(uid);if(role==='required')required.push(uid);else if(role==='optional')optional.push(uid);});
-  var ownerAttending=document.getElementById('mt-owner-attending').checked;
-  if(ownerAttending && !required.includes(currentUser.uid) && !optional.includes(currentUser.uid)) required.push(currentUser.uid);
-  if(!ownerAttending){required=required.filter(function(x){return x!==currentUser.uid;});optional=optional.filter(function(x){return x!==currentUser.uid;});}
-  var attendees=required.concat(optional.filter(function(x){return !required.includes(x);}));
-  if(!attendees.length){toast('Select at least one attendee','err');return;}
-  var initRsvp={}; if(ownerAttending)initRsvp[currentUser.uid]='accepted';
-  var meeting={name:name,dateUtc:dateUtc,notes:document.getElementById('mt-notes').value.trim(),duration:parseInt(document.getElementById('mt-duration').value)||60,attendees:attendees,requiredAttendees:required,optionalAttendees:optional,rsvp:initRsvp,ownerAttending:ownerAttending,createdBy:currentUser.uid,ownerId:currentUser.uid,status:document.getElementById('mt-status').value,provisional:document.getElementById('mt-status').value==='provisional',recurrence:document.getElementById('mt-recurrence').value,departments:Array.from(schedulerSelectedDepts),discordJoin:document.getElementById('mt-discord-join').checked,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
-  var meetingRef=await db.collection('meetings').add(meeting);
-  await Promise.all(attendees.map(function(uid){return createUserNotification(uid,'meeting_invite',meeting.provisional?'Provisional meeting proposed: '+meeting.name:'Meeting invitation: '+meeting.name,formatMeetingRangeForTz(meeting.dateUtc,meeting.duration,(liveData.members[uid]&&liveData.members[uid].tz)||'UTC'),meetingRef.id);}));
-  if(liveData.config.gcalId&&liveData.config.gcalKey)addToGCal(meeting).catch(function(){});
-  closeModal('m-meeting'); resetMeetingPlanner(); toast(meeting.provisional?'Provisional meeting created!':'Meeting scheduled!','ok');
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of submitMeeting */
 
 
 // ─── MEETING RSVP ─────────────────────────────────────────
@@ -5746,7 +6439,7 @@ function openEditMeeting(id) {
   openModal('m-edit-meeting');
 }
 
-async function saveEditMeeting(){var id=document.getElementById('edit-mt-id').value,name=document.getElementById('edit-mt-name').value.trim(),dateStr=document.getElementById('edit-mt-date').value,timeStr=document.getElementById('edit-mt-time').value||'00:00',dur=parseInt(document.getElementById('edit-mt-duration').value)||60,notes=document.getElementById('edit-mt-notes').value.trim(),checks=document.querySelectorAll('#edit-attendee-checks input:checked');if(!name){toast('Meeting name required','err');return;}var old=liveData.meetings.find(function(m){return m.id===id;});if(!old)return;var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC'),attendees=Array.from(checks).map(function(c){return c.value;});var oldAtt=old.attendees||[],added=attendees.filter(function(u){return !oldAtt.includes(u);}),removed=oldAtt.filter(function(u){return !attendees.includes(u);}),timingChanged=old.dateUtc!==dateUtc||(old.duration||60)!==dur;var update={name:name,dateUtc:dateUtc,duration:dur,notes:notes,attendees:attendees,updatedAt:new Date().toISOString()};if(timingChanged){var r={};attendees.forEach(function(uid){r[uid]=uid===currentUser.uid?'accepted':'pending';});update.rsvp=r;}await db.collection('meetings').doc(id).update(update);var oldRange=formatMeetingRangeForTz(old.dateUtc,old.duration||60,(currentProfile&&currentProfile.tz)||'UTC'),newRange=formatMeetingRangeForTz(dateUtc,dur,(currentProfile&&currentProfile.tz)||'UTC');await Promise.all(attendees.filter(function(u){return !added.includes(u);}).map(function(uid){if(timingChanged)return createUserNotification(uid,'meeting_changed','Meeting changed: '+name,oldRange+' → '+newRange,id);return Promise.resolve();}).concat(added.map(function(uid){return createUserNotification(uid,'meeting_added','You were added: '+name,newRange,id);}),removed.map(function(uid){return createUserNotification(uid,'meeting_removed','You were removed: '+name,'You are no longer included in this meeting.',id);})));closeModal('m-edit-meeting');toast('Meeting updated and attendees notified','ok');}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of saveEditMeeting */
 
 
 async function cancelMeeting(meetingId) {
@@ -5970,30 +6663,11 @@ function renderOtherAttendees(){
   }).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
   box.innerHTML=members.length?members.map(function(m){return meetingAttendeeRow(m,false);}).join(''):'<div class="meeting-list-empty">'+(q?'No matching team members.':'Search for a person to add them, or choose “Show team”.')+'</div>';
 }
-function toggleOtherAttendees(){
-  var box=document.getElementById('attendee-checks'),btn=document.getElementById('mt-toggle-others');if(!box)return;
-  var opening=box.classList.contains('collapsed');box.classList.toggle('collapsed',!opening);
-  if(btn)btn.textContent=opening?'Hide team':'Show team';
-  if(opening&&!((document.getElementById('mt-attendee-search')||{}).value||'')){
-    var members=Object.values(liveData.members).filter(function(m){return !(meetingAutoSelectedUids.has(m.uid)&&getMeetingRole(m.uid)!=='none');}).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});
-    box.innerHTML=members.length?members.map(function(m){return meetingAttendeeRow(m,false);}).join(''):'<div class="meeting-list-empty">Everyone is already selected.</div>';
-  }else renderOtherAttendees();
-}
-function setAllInvitedRoles(role){
-  Object.keys(liveData.members).forEach(function(uid){if(getMeetingRole(uid)!=='none')meetingRoleState[uid]=role;});
-  populateAttendeeChecks([]);
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of toggleOtherAttendees */
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of setAllInvitedRoles */
 
-function setMeetingRole(uid,role){
-  meetingRoleState[uid]=role;
-  if(role==='none')meetingAutoSelectedUids.delete(uid);
-  populateAttendeeChecks([]);
-}
-function setMeetingPersonNone(uid){
-  meetingRoleState[uid]='none';
-  meetingAutoSelectedUids.delete(uid);
-  populateAttendeeChecks([]);
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of setMeetingRole */
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of setMeetingPersonNone */
 function getMeetingRole(uid){
   if(meetingRoleState[uid])return meetingRoleState[uid];
   var el=document.querySelector('input[name="mt-role-'+uid+'"]:checked');
@@ -6647,36 +7321,7 @@ async function submitEditDept() {
     closeModal('m-edit-dept');
   } catch(e) { toast('Error: ' + e.message,'err'); }
 }
-function renderAdminRoster() {
-  const el = document.getElementById('admin-roster');
-  if (!el) return;
-  const members = Object.values(liveData.members);
-  if (!members.length) { el.innerHTML='<div class="no-data">No crew</div>'; return; }
-  el.innerHTML = `<table style="width:100%;border-collapse:collapse;">
-    <thead><tr>
-      <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">NAME</th>
-      <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">EMAIL</th>
-      <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">ROLE</th>
-      <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">TIMEZONE</th>
-      <th style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--grey-2);padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);">ACTIONS</th>
-    </tr></thead>
-    <tbody>
-    ${members.map(m=>`<tr style="border-bottom:1px solid rgba(30,33,56,.4);">
-      <td style="padding:10px 16px;font-weight:600;">${esc(m.name)}</td>
-      <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${esc(m.email||'')}</td>
-      <td style="padding:10px 16px;">
-        <select class="u-role ${normaliseRole(m.role)}" onchange="updateMemberRole('${m.uid}',this.value)" style="background:transparent;border:none;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;appearance:none;outline:none;padding:2px 6px;border-radius:3px;">
-          <option value="member">MEMBER</option><option value="lead">LEAD</option><option value="director">DIRECTOR</option><option value="project_manager">PROJECT MANAGER</option><option value="admin">ADMIN</option>
-        </select>
-      </td>
-      <td style="padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grey);">${getTzOffset(m.tz||'UTC')}</td>
-      <td style="padding:10px 16px;display:flex;gap:6px;align-items:center;">
-        ${m.uid!==currentUser.uid?`<button class="btn btn-ghost btn-xs" onclick="openEditMember('${m.uid}')">Edit</button><button class="btn btn-danger btn-xs" onclick="removeMember('${m.uid}')">Delete</button>`:'<span style="font-size:11px;color:var(--grey-2);">You</span>'}
-      </td>
-    </tr>`).join('')}
-    </tbody>
-  </table>`;
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of renderAdminRoster */
 
 async function updateMemberRole(uid, role) {
   try {
@@ -9195,33 +9840,14 @@ function buildSeasonalEffects(theme){
     if(!reduce){for(var sh=0;sh<5;sh++){var ss=document.createElement('span');ss.className='season-shooting-star';ss.style.left=(-12+((sh*23)%80))+'%';ss.style.top=(8+((sh*17)%58))+'%';ss.style.animationDuration=(7+sh*2.1)+'s';ss.style.animationDelay=(sh*3.4)+'s';layer.appendChild(ss);}}
   }
 }
-function applyScheduledTheme(){
-  var preview=sessionStorage.getItem('cvp_theme_preview')||'',theme=preview||activeScheduledTheme();
-  document.body.classList.remove('theme-halloween','theme-winter','theme-anniversary');
-  if(theme)document.body.classList.add('theme-'+theme);
-  buildSeasonalEffects(theme);
-  var badge=document.getElementById('seasonal-preview-badge');
-  if(badge){
-    if(preview){badge.textContent='Previewing '+(preview==='anniversary'?'Project Anniversary':preview.charAt(0).toUpperCase()+preview.slice(1))+' theme';badge.classList.remove('hidden');}
-    else badge.classList.add('hidden');
-  }
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of applyScheduledTheme */
 function previewDashboardTheme(theme){
   if(theme)sessionStorage.setItem('cvp_theme_preview',theme);else sessionStorage.removeItem('cvp_theme_preview');
   applyScheduledTheme();
   if(theme)toast('Theme preview active','inf');else toast('Theme preview cleared','inf');
 }
-function openDashboardSettings(){
-  if(currentRole()!=='admin')return;var cfg=dashboardCfg(),box=document.getElementById('dashboard-theme-settings'),names={halloween:'Halloween',winter:'Winter',anniversary:'Project Anniversary'};
-  box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'" placeholder="10-20"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'" placeholder="11-02"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');
-  document.getElementById('dash-anniversary-date').value=cfg.anniversaryDate||'';openModal('m-dashboard-settings');
-}
-async function saveDashboardSettings(){
-  if(currentRole()!=='admin')return;var themes={};
-  ['halloween','winter','anniversary'].forEach(function(k){themes[k]={enabled:document.getElementById('theme-'+k+'-enabled').checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:k==='halloween'?20:10};});
-  var data={themes:themes,anniversaryDate:document.getElementById('dash-anniversary-date').value||'',updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};
-  try{await db.collection('config').doc('dashboard_settings').set(data,{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,data);sessionStorage.removeItem('cvp_theme_preview');closeModal('m-dashboard-settings');applyScheduledTheme();toast('Home settings saved','ok');}catch(e){toast(e.message||'Could not save Home settings','err');}
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of openDashboardSettings */
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of saveDashboardSettings */
 
 </script>
 <!-- MH-MODULE-END id="MOD-JS-005" -->
@@ -9242,7 +9868,7 @@ let selectedJourneyPath='',selectedJourneySubclass='';
 function journeyXp(m){return Math.max(0,Number((m||{}).journeyXp||0));}
 function journeyLevel(m){return Math.floor(journeyXp(m)/100)+1;}
 function journeyXpIntoLevel(m){return journeyXp(m)%100;}
-function journeyPathObj(id){return JOURNEY_PATHS.find(function(p){return p.id===id;})||{id:'adventurer',name:'Adventurer',icon:'✧'};}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of journeyPathObj */
 function journeyBadge(m){if((m||{}).journeyBadgeOverride)return m.journeyBadgeOverride;var lvl=journeyLevel(m),idx=Math.min(JOURNEY_BADGES.length-1,Math.floor((lvl-1)/5));return JOURNEY_BADGES[idx];}
 function renderHomeJourney(){
   var el=document.getElementById('home-journey');if(!el||!currentProfile)return;
@@ -9257,7 +9883,7 @@ function renderJourneyPathGrid(){
 function selectJourneyPath(id){selectedJourneyPath=id;renderJourneyPathGrid();}
 function selectJourneySubclass(id){selectedJourneySubclass=id;renderJourneyPathGrid();}
 function openJourneyProfile(){renderJourneyPathGrid();openModal('m-journey-path');}
-async function saveJourneyPath(){if(!selectedJourneyPath){toast('Choose a path first','err');return;}var data={journeyPath:selectedJourneyPath,journeyPathChosenAt:new Date().toISOString(),journeyActiveTitle:(document.getElementById('journey-title-select')||{}).value||''};if(journeyLevel(currentProfile)>=50&&selectedJourneySubclass)data.journeySubclass=selectedJourneySubclass;await db.collection('users').doc(currentUser.uid).set(data,{merge:true});Object.assign(currentProfile,data);closeModal('m-journey-path');renderHomeJourney();toast('Your path has been chosen','ok');}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of saveJourneyPath */
 async function awardXPToUser(uid,amount,type,sourceId,label,dedupe){
   amount=Number(amount)||0;if(!uid||!amount)return false;var key=dedupe||[uid,type,sourceId].join('_'),ref=db.collection('xp_events').doc(key.replace(/[^a-zA-Z0-9_-]/g,'_'));
   try{return await db.runTransaction(async function(tx){var existing=await tx.get(ref);if(existing.exists)return false;var uref=db.collection('users').doc(uid),ud=await tx.get(uref);if(!ud.exists)return false;var before=journeyXp(ud.data()),after=Math.max(0,before+amount),oldLvl=Math.floor(before/100)+1,newLvl=Math.floor(after/100)+1;tx.set(ref,{userId:uid,amount:amount,type:type,sourceId:sourceId||'',label:label||type,createdAt:new Date().toISOString(),awardedBy:currentUser?currentUser.uid:'system'});var upd={journeyXp:after,journeyUpdatedAt:new Date().toISOString()};if(newLvl>oldLvl)upd.pendingJourneyCelebration={title:'Level '+newLvl+' Reached',message:'Your contributions have carried you further along your chosen path.',symbol:'✦',createdAt:new Date().toISOString()};tx.set(uref,upd,{merge:true});return true;});}catch(e){console.warn('XP award failed',e);return false;}
@@ -9282,7 +9908,7 @@ if(_journeyOriginalRenderProfile){renderProfile=function(){var r=_journeyOrigina
 </script>
 <!-- MH-MODULE-END id="MOD-JS-006" -->
 
-<!-- MH-MODULE-START id="MOD-JS-007" version="1.13.0" name="Journey Titles, Custom Badges & Admin Grants" -->
+<!-- MH-MODULE-START id="MOD-JS-007" version="1.3.0" name="Inline JavaScript Block 7 — Scheduler Recovery RC024" -->
 <script>
 // Journey and seasonal refinements — v10B.2
 // Mission Hub v12 RC003 — true badge collection + title unlock correction
@@ -9305,15 +9931,7 @@ function journeyClassBadgeInfo(pathId,name,index){
   earned:'Reach Level '+(JOURNEY_BADGE_LEVELS[Number(index)||0]||1)+' on the '+(journeyPathObj(pathId).name||pathId)+' Path'
  };
 }
-function journeyAllCollectibleBadges(){
- const out=[];
- Object.keys(JOURNEY_CLASS_CONTENT).forEach(function(pathId){
-  (JOURNEY_CLASS_CONTENT[pathId].badges||[]).forEach(function(name,index){out.push(journeyClassBadgeInfo(pathId,name,index));});
- });
- const recognition=Array.isArray(window.RECOGNITION_BADGES)?window.RECOGNITION_BADGES:[];
- recognition.forEach(function(b){if(!out.some(function(x){return x.id===b.id;}))out.push(Object.assign({},b));});
- return out;
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of journeyAllCollectibleBadges */
 function journeyCurrentPathId(member){
  member=member||{};
  return member.journeyPath==='cosmic-vessel'?(member.journeyPreviousPath||''):member.journeyPath;
@@ -9387,8 +10005,8 @@ function journeyUnlockedClassTitles(member){
  return titles.filter(function(_,i){return level>=levels[i];});
 }
 function journeyAllTitleGroups(member){const groups={},pathId=journeyCurrentPathId(member||{}),pathName=pathId?journeyPathObj(pathId).name:'';if(pathId&&JOURNEY_CLASS_CONTENT[pathId])groups[pathName+' Titles']=(JOURNEY_CLASS_CONTENT[pathId].titles||[]).slice();Object.keys(JOURNEY_CLASS_CONTENT).forEach(function(id){if(id===pathId)return;groups[(journeyPathObj(id).name||id)+' Titles']=(JOURNEY_CLASS_CONTENT[id].titles||[]).slice();});groups['General Titles']=(Array.isArray(JOURNEY_GENERAL_TITLES)?JOURNEY_GENERAL_TITLES:[]).slice();return groups;}
-function ensureJourneyAdminTitleLibrary(){const modal=document.getElementById('m-journey-admin-edit'),body=modal&&modal.querySelector('.modal-body');if(!body)return;let lib=document.getElementById('ja-title-library');if(!lib){lib=document.createElement('div');lib.id='ja-title-library';lib.className='ja-title-library';lib.innerHTML='<div class="field-label">Grant a title</div><select id="ja-title-grant-select"><option value="">Choose a title to grant…</option></select><div class="ja-title-note">Granted titles are added to the member’s collection. The member chooses which one appears as their Active Title.</div>';const custom=document.getElementById('ja-new-title'),field=custom&&custom.closest('.field');if(field)body.insertBefore(lib,field);else body.appendChild(lib);}}
-function renderJourneyAdminTitleLibrary(member){ensureJourneyAdminTitleLibrary();const select=document.getElementById('ja-title-grant-select');if(!select)return;const groups=journeyAllTitleGroups(member||{});select.innerHTML='<option value="">Choose a title to grant…</option>'+Object.keys(groups).map(function(group){return '<optgroup label="'+esc(group)+'">'+groups[group].map(function(title){return '<option value="'+esc(title)+'">'+esc(title)+'</option>';}).join('')+'</optgroup>';}).join('');}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of ensureJourneyAdminTitleLibrary */
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of renderJourneyAdminTitleLibrary */
 function journeyAvailableMemberTitles(member){
  const values=[];
  function add(v){if(v&&!values.includes(v))values.push(v);}
@@ -9526,36 +10144,18 @@ openJourneyAdminEdit=function(uid){
  ensureJourneyAdminBadgeLibrary();ensureJourneyAdminTitleLibrary();refreshJourneyAdminContent();renderJourneyAdminTitleLibrary(m);
  ['ja-total-xp','ja-xp-delta'].forEach(function(id){document.getElementById(id).oninput=adminJourneyPreview;});psel.onchange=refreshJourneyAdminContent;openModal('m-journey-admin-edit');
 };
-saveJourneyAdminEdit=async function(){
- var uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;var base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
- var customTitle=document.getElementById('ja-active-title-custom').value.trim(),active=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
- var customBadge=document.getElementById('ja-badge-custom').value.trim(),badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges));if(customBadge){var customId='custom:'+customBadge;if(!badges.includes(customId))badges.push(customId);}
- var msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:'',journeyUnlockedBadges:badges,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
- if(celebrate&&(msg||delta||grantedTitle||newTitle||customTitle||customBadge))data.pendingJourneyCelebration={title:grantedTitle||newTitle||customTitle?'New Title Unlocked':customBadge?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||((delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.')),symbol:'✦',createdAt:new Date().toISOString()};
- try{await db.collection('users').doc(uid).set(data,{merge:true});var diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();toast('Member Journey updated','ok');}catch(e){toast(e.message||'Could not update Journey','err');}
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of saveJourneyAdminEdit */
 function cosmicDecision(){var yes=document.getElementById('journey-cosmic-yes'),no=document.getElementById('journey-cosmic-no');return yes&&yes.checked?'yes':no&&no.checked?'no':'';}
 renderJourneyPathGrid=function(){
  var box=document.getElementById('journey-path-grid');if(!box)return;selectedJourneyPath=(currentProfile&&currentProfile.journeyPath)||selectedJourneyPath||'';var titleSel=document.getElementById('journey-title-select'),titles=journeyAvailableMemberTitles(currentProfile||{});if(titleSel){titleSel.innerHTML='<option value="">No active title</option>'+titles.map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');titleSel.value=(currentProfile&&currentProfile.journeyActiveTitle)||'';}
  box.innerHTML=JOURNEY_PATHS.map(function(p){return '<button type="button" class="path-choice '+(selectedJourneyPath===p.id?'selected':'')+'" onclick="selectJourneyPath(\''+p.id+'\')"><span class="path-choice-icon">'+p.icon+'</span><span class="path-choice-name">'+p.name+'</span></button>';}).join('');
  var cosmic=document.getElementById('journey-cosmic-choice'),sub=document.getElementById('journey-subclass-grid'),wrap=document.getElementById('journey-subclass-choice-wrap');if(journeyLevel(currentProfile)>=50){cosmic.classList.remove('hidden');var accepted=currentProfile&&currentProfile.journeyCosmicAccepted;if(accepted===true)document.getElementById('journey-cosmic-yes').checked=true;else if(accepted===false)document.getElementById('journey-cosmic-no').checked=true;selectedJourneySubclass=(currentProfile&&currentProfile.journeySubclass)||selectedJourneySubclass||'';sub.innerHTML=COSMIC_SUBCLASSES.map(function(x){return '<button type="button" class="path-choice '+(selectedJourneySubclass===x?'selected':'')+'" onclick="selectJourneySubclass(\''+x+'\')"><span class="path-choice-icon">✦</span><span class="path-choice-name">'+x+'</span></button>';}).join('');if(wrap)wrap.classList.toggle('hidden',cosmicDecision()!=='yes');}else cosmic.classList.add('hidden');
 };
-saveJourneyPath=async function(){
- if(!selectedJourneyPath){toast('Choose a path first','err');return;}var data={journeyPath:selectedJourneyPath,journeyPathChosenAt:new Date().toISOString(),journeyActiveTitle:(document.getElementById('journey-title-select')||{}).value||''};if(journeyLevel(currentProfile)>=50){var d=cosmicDecision();if(!d){toast('Choose whether to remain on your Path or become a Cosmic Vessel','err');return;}data.journeyCosmicAccepted=d==='yes';if(d==='yes'){if(!selectedJourneySubclass){toast('Choose a Cosmic Vessel subclass','err');return;}data.journeySubclass=selectedJourneySubclass;}else{data.journeySubclass='';data.journeyCosmicThemeEnabled=false;}}
- try{await db.collection('users').doc(currentUser.uid).set(data,{merge:true});Object.assign(currentProfile,data);closeModal('m-journey-path');applyPersonalCosmicTheme();renderHomeJourney();toast(data.journeyCosmicAccepted?'Your Cosmic Vessel path is chosen':'Your path has been saved','ok');}catch(e){toast(e.message||'Could not save your Path','err');}
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of saveJourneyPath */
 function maybePromptCosmicPrestige(){if(!currentProfile||journeyLevel(currentProfile)<50||typeof currentProfile.journeyCosmicAccepted==='boolean')return;var k='cvp_cosmic_prompt_'+currentUser.uid;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');setTimeout(function(){openJourneyProfile();toast('You may now choose whether to become a Cosmic Vessel','inf');},800);}
-function applyPersonalCosmicTheme(){
- var classes=['personal-cosmic-theme','personal-cosmic-essence','personal-cosmic-chronographer','personal-cosmic-astral-archivist','personal-cosmic-starcaller'];document.body.classList.remove.apply(document.body.classList,classes);if(!currentProfile||!currentProfile.journeyCosmicAccepted||!currentProfile.journeyCosmicThemeEnabled||!currentProfile.journeySubclass)return;document.body.classList.add('personal-cosmic-theme','personal-cosmic-'+currentProfile.journeySubclass.toLowerCase().replace(/\s+/g,'-'));
-}
-openDashboardSettings=function(){
- var admin=currentRole()==='admin',cfg=dashboardCfg(),box=document.getElementById('dashboard-theme-settings'),names={halloween:'Halloween',winter:'Winter',anniversary:'Project Anniversary'};document.getElementById('personal-cosmic-theme').checked=!!(currentProfile&&currentProfile.journeyCosmicThemeEnabled);document.getElementById('personal-cosmic-theme').disabled=!(currentProfile&&currentProfile.journeyCosmicAccepted&&currentProfile.journeySubclass);
- if(admin){box.innerHTML=Object.keys(names).map(function(k){var t=cfg.themes[k]||{};return '<div class="theme-row"><label style="display:flex;justify-content:space-between;align-items:center;font-weight:700">'+names[k]+'<input type="checkbox" id="theme-'+k+'-enabled" '+(t.enabled?'checked':'')+'></label><div class="grid-2"><div class="field"><label class="field-label">Start (MM-DD)</label><input class="inp" id="theme-'+k+'-start" value="'+esc(t.start||'')+'"></div><div class="field"><label class="field-label">End (MM-DD)</label><input class="inp" id="theme-'+k+'-end" value="'+esc(t.end||'')+'"></div></div><button class="btn btn-ghost btn-xs mt-12" onclick="previewDashboardTheme(\''+k+'\')">Preview</button></div>';}).join('');document.getElementById('dash-anniversary-date').value=cfg.anniversaryDate||'';document.getElementById('dash-anniversary-date').closest('.field').classList.remove('hidden');}else{box.innerHTML='<div class="text-small text-grey">Seasonal schedules are managed by the Project Admin. You can still use your personal Cosmic Vessel styling above.</div>';document.getElementById('dash-anniversary-date').closest('.field').classList.add('hidden');}
- openModal('m-dashboard-settings');
-};
-saveDashboardSettings=async function(){
- try{var personal=!!document.getElementById('personal-cosmic-theme').checked;await db.collection('users').doc(currentUser.uid).set({journeyCosmicThemeEnabled:personal},{merge:true});currentProfile.journeyCosmicThemeEnabled=personal;applyPersonalCosmicTheme();if(currentRole()==='admin'){var themes={};['halloween','winter','anniversary'].forEach(function(k){themes[k]={enabled:document.getElementById('theme-'+k+'-enabled').checked,start:document.getElementById('theme-'+k+'-start').value.trim(),end:document.getElementById('theme-'+k+'-end').value.trim(),priority:k==='anniversary'?30:k==='halloween'?20:10};});var data={themes:themes,anniversaryDate:document.getElementById('dash-anniversary-date').value||'',updatedAt:new Date().toISOString(),updatedBy:currentUser.uid};await db.collection('config').doc('dashboard_settings').set(data,{merge:true});liveData.dashboardSettings=Object.assign({},liveData.dashboardSettings,data);sessionStorage.removeItem('cvp_theme_preview');applyScheduledTheme();}closeModal('m-dashboard-settings');toast('Home settings saved','ok');}catch(e){toast(e.message||'Could not save Home settings','err');}
-};
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of applyPersonalCosmicTheme */
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of openDashboardSettings */
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of saveDashboardSettings */
 function randomEdgePoint(pad){var side=Math.floor(Math.random()*4),x,y;if(side===0){x=-pad;y=Math.random()*innerHeight;}else if(side===1){x=innerWidth+pad;y=Math.random()*innerHeight;}else if(side===2){x=Math.random()*innerWidth;y=-pad;}else{x=Math.random()*innerWidth;y=innerHeight+pad;}return{x:x,y:y};}
 function pumpkinSvg(id){return '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="pg'+id+'" cx="38%" cy="30%"><stop offset="0" stop-color="#ffb14c"/><stop offset=".62" stop-color="#e36f22"/><stop offset="1" stop-color="#8f351c"/></radialGradient></defs><path d="M29 13c1-6 7-8 11-5-4 1-6 4-6 8" fill="#557b37"/><ellipse cx="32" cy="38" rx="23" ry="19" fill="url(#pg'+id+')"/><path d="M21 32l6 5-8 2zM43 32l-6 5 8 2zM23 47c7 5 13 5 19 0-6 2-13 2-19 0z" fill="#26120d" opacity=".9"/><path d="M24 20c-5 8-5 27 0 35M40 20c5 8 5 27 0 35M32 19v38" stroke="#a3451e" stroke-width="2" opacity=".55" fill="none"/></svg>';}
 function batSvg(){return '<svg viewBox="0 0 80 40" aria-hidden="true"><path class="bat-wing wing-l" d="M38 21C28 7 12 4 1 10c9 2 8 9 3 15 10-4 15 4 20 9 2-8 8-10 14-13z" fill="#171020"/><path class="bat-wing wing-r" d="M42 21C52 7 68 4 79 10c-9 2-8 9-3 15-10-4-15 4-20 9-2-8-8-10-14-13z" fill="#171020"/><ellipse cx="40" cy="22" rx="6" ry="10" fill="#21152e"/><circle cx="37" cy="19" r="1" fill="#d05cff"/><circle cx="43" cy="19" r="1" fill="#d05cff"/></svg>';}
@@ -9663,17 +10263,7 @@ openJourneyAdminEdit=function(uid){
  const m=(liveData.members||{})[uid]||{};journeyAdminSelectedTitles=new Set();journeyAdminCustomBadges=Object.assign({},m.journeyCustomBadges||{});_rc008OpenJourneyAdminEdit(uid);setTimeout(function(){journeyEnsureCustomBadgeLauncher();renderJourneyAdminTitleLibrary(m);},0);
 };
 window.openJourneyAdminEdit=openJourneyAdminEdit;
-saveJourneyAdminEdit=async function(){
- const uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;
- const base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0),delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta),newTitle=document.getElementById('ja-new-title').value.trim(),titles=Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles.slice():[];
- journeyAdminSelectedTitles.forEach(function(t){if(t&&!titles.includes(t))titles.push(t);});if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
- const customTitle=document.getElementById('ja-active-title-custom').value.trim(),active=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
- const badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges)),customDefs={};badges.forEach(function(id){if(String(id).startsWith('custom:')&&journeyAdminCustomBadges[id])customDefs[id]=journeyAdminCustomBadges[id];});
- const newlyGrantedTitles=Array.from(journeyAdminSelectedTitles),newCustomIds=badges.filter(function(id){return String(id).startsWith('custom:')&&!(m.journeyUnlockedBadges||[]).includes(id);});
- const msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked,data={journeyXp:total,journeyPath:document.getElementById('ja-path').value||'',journeySubclass:document.getElementById('ja-subclass').value||'',journeyActiveTitle:active,journeyBadgeOverride:'',journeyUnlockedBadges:badges,journeyCustomBadges:customDefs,journeyUnlockedTitles:titles,journeyUpdatedAt:new Date().toISOString()};
- if(celebrate&&(msg||delta||newlyGrantedTitles.length||newTitle||customTitle||newCustomIds.length)){const titleAwarded=newlyGrantedTitles[0]||newTitle||customTitle,customAward=newCustomIds[0]&&customDefs[newCustomIds[0]];data.pendingJourneyCelebration={title:titleAwarded?'New Title Unlocked':customAward?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',message:msg||(titleAwarded?titleAwarded+' has been added to your title collection.':customAward?customAward.name+' has been awarded to recognise your contribution.':delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.'),symbol:customAward?journeyCustomIconSvg(customAward.customIconKey):'✦',createdAt:new Date().toISOString()};}
- try{await db.collection('users').doc(uid).set(data,{merge:true});const diff=total-journeyXp(m);if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();toast('Member Journey updated','ok');}catch(e){toast(e.message||'Could not update Journey','err');}
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of saveJourneyAdminEdit */
 window.saveJourneyAdminEdit=saveJourneyAdminEdit;
 if(typeof recBadgeById==='function'){
  const _rc008RecBadgeById=recBadgeById;recBadgeById=function(id){const custom=journeyCustomBadgeDefinition(id,currentProfile||{});if(custom)return Object.assign({},custom,{icon:journeyCustomIconSvg(custom.customIconKey)});return _rc008RecBadgeById(id);};
@@ -9815,54 +10405,7 @@ openJourneyAdminEdit=function(uid){
 };
 window.openJourneyAdminEdit=openJourneyAdminEdit;
 
-saveJourneyAdminEdit=async function(){
- const uid=document.getElementById('ja-uid').value,m=(liveData.members||{})[uid];if(!uid||!m)return;
- const base=Math.max(0,Number(document.getElementById('ja-total-xp').value)||0);
- const delta=Number(document.getElementById('ja-xp-delta').value)||0,total=Math.max(0,base+delta);
- const previousTitles=new Set(Array.isArray(m.journeyUnlockedTitles)?m.journeyUnlockedTitles:[]);
- const titles=Array.from(journeyAdminSelectedTitles);
- const newTitle=document.getElementById('ja-new-title').value.trim();
- if(newTitle&&!titles.includes(newTitle))titles.push(newTitle);
- const customTitle=document.getElementById('ja-active-title-custom').value.trim();
- if(customTitle&&!titles.includes(customTitle))titles.push(customTitle);
- const requestedActive=customTitle||document.getElementById('ja-active-title-select').value||newTitle||'';
- const active=requestedActive&&titles.includes(requestedActive)?requestedActive:'';
- const badges=journeyNormalizeBadgeIds(Array.from(journeyAdminCollectedBadges)),customDefs={};
- badges.forEach(function(id){if(String(id).startsWith('custom:')&&journeyAdminCustomBadges[id])customDefs[id]=journeyAdminCustomBadges[id];});
- const newlyGrantedTitles=titles.filter(function(title){return !previousTitles.has(title);});
- const revokedTitles=Array.from(previousTitles).filter(function(title){return !titles.includes(title);});
- const newCustomIds=badges.filter(function(id){return String(id).startsWith('custom:')&&!(m.journeyUnlockedBadges||[]).includes(id);});
- const msg=document.getElementById('ja-celebration').value.trim(),celebrate=document.getElementById('ja-celebrate').checked;
- const data={
-  journeyXp:total,
-  journeyPath:document.getElementById('ja-path').value||'',
-  journeySubclass:document.getElementById('ja-subclass').value||'',
-  journeyActiveTitle:active,
-  journeyBadgeOverride:'',
-  journeyUnlockedBadges:badges,
-  journeyCustomBadges:customDefs,
-  journeyUnlockedTitles:titles,
-  journeyUpdatedAt:new Date().toISOString()
- };
- if(celebrate&&(msg||delta||newlyGrantedTitles.length||newTitle||customTitle||newCustomIds.length)){
-  const titleAwarded=newlyGrantedTitles[0]||newTitle||customTitle,customAward=newCustomIds[0]&&customDefs[newCustomIds[0]];
-  data.pendingJourneyCelebration={
-   title:titleAwarded?'New Title Unlocked':customAward?'New Badge Awarded':delta>0?'A Special Recognition':'Journey Updated',
-   message:msg||(titleAwarded?titleAwarded+' has been added to your title collection.':customAward?customAward.name+' has been awarded to recognise your contribution.':delta>0?'You have been awarded '+delta+' XP for an outstanding contribution.':'Your Journey has been updated by the Project Admin.'),
-   symbol:customAward?journeyCustomIconSvg(customAward.customIconKey):'✦',
-   createdAt:new Date().toISOString()
-  };
- }
- try{
-  await db.collection('users').doc(uid).set(data,{merge:true});
-  const diff=total-journeyXp(m);
-  if(diff)await db.collection('xp_events').add({userId:uid,amount:diff,type:'admin_adjustment',sourceId:'admin_'+Date.now(),label:'Admin adjustment',createdAt:new Date().toISOString(),awardedBy:currentUser.uid});
-  Object.assign(m,data);closeModal('m-journey-admin-edit');renderJourneyAdmin();
-  var note='Member Journey updated';
-  if(revokedTitles.length)note+=' · '+revokedTitles.length+' title'+(revokedTitles.length===1?'':'s')+' revoked';
-  toast(note,'ok');
- }catch(e){toast(e.message||'Could not update Journey','err');}
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of saveJourneyAdminEdit */
 window.saveJourneyAdminEdit=saveJourneyAdminEdit;
 
 
@@ -9902,7 +10445,8 @@ function mhDeptDefinitions(){
   return list.slice();
 }
 function mhMemberDepartments(member){
-  return normaliseDepts((member||{}).depts||[]);
+  member=member||{};
+  return normaliseDepts(member.depts||member.departments||[]);
 }
 function mhAlphaMembers(members){
   return (members||[]).slice().sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'});});
@@ -10064,31 +10608,14 @@ saveJourneyAdminEdit=async function(){
 window.saveJourneyAdminEdit=saveJourneyAdminEdit;
 
 // Task owner and contributor selectors: preferred task department first, alphabetical within groups.
-populateAssignSelect=function(dept){
-  var sel=document.getElementById('t-assign'),role=currentProfile?normaliseRole(currentProfile.role):'',canAssignAll=['admin','project_manager','lead','director'].includes(role);
-  if(!sel)return;
-  if(!canAssignAll){
-    sel.innerHTML='';var me=(liveData.members||{})[currentUser.uid]||{};var o=document.createElement('option');o.value=currentUser.uid;o.textContent=(me.name||'Me')+' (you)';sel.appendChild(o);return;
-  }
-  var previous=sel.value;mhPopulateGroupedSelect(sel,dept,previous,true);
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of populateAssignSelect */
 window.populateAssignSelect=populateAssignSelect;
 
-populateContributorSelect=function(dept,selected,owner){
-  var sel=document.getElementById('t-contributors');if(!sel)return;
-  mhPopulateGroupedSelect(sel,dept,'',false,owner,selected||[]);
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of populateContributorSelect */
 window.populateContributorSelect=populateContributorSelect;
 
 // Scheduler person picker grouped by department; members appear in every department they belong to.
-renderSchedulerFilters=function(){
-  var dbx=document.getElementById('sched-dept-filters'),pbx=document.getElementById('sched-person-filters');if(!dbx||!pbx)return;
-  dbx.innerHTML=getDeptList().map(function(d){return '<div class="sched-chip '+(schedulerSelectedDepts.has(d.id)?'active':'')+'" onclick="toggleSchedulerDept(\''+d.id+'\')">'+esc(d.label)+'</div>';}).join('');
-  var q=((document.getElementById('sched-person-search')||{}).value||'').toLowerCase();
-  var members=Object.values(liveData.members||{}).filter(function(m){return !q||String(m.name||'').toLowerCase().includes(q);});
-  pbx.classList.add('mh-grouped-chips');
-  pbx.innerHTML=mhGroupHtml(mhGroupedMembers(members,'',true),function(m){return '<div class="sched-chip '+(schedulerSelectedPeople.has(m.uid)?'active':'')+'" onclick="toggleSchedulerPerson(\''+m.uid+'\')">'+esc(m.name||'Team member')+'</div>';},'',!!q);
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of renderSchedulerFilters */
 window.renderSchedulerFilters=renderSchedulerFilters;
 
 // Meeting attendee list grouped by department.
@@ -10113,22 +10640,7 @@ toggleOtherAttendees=function(){
 window.toggleOtherAttendees=toggleOtherAttendees;
 
 // Members tab grouped by department and alphabetised. Multi-department members intentionally appear in each group.
-renderCrew=function(){
-  const el=document.getElementById('crew-roster');if(!el)return;
-  const actionsEl=document.getElementById('crew-actions');
-  if(actionsEl&&currentProfile.role==='admin')actionsEl.innerHTML="<button class='btn btn-gold' onclick='openModal(&quot;m-add-member&quot;);populateDeptChecks()'>+ Add Member</button>";
-  var q=String(crewFilter||'').toLowerCase();
-  var members=Object.values(liveData.members||{}).filter(function(m){return !q||String(m.name||'').toLowerCase().includes(q)||String(m.email||'').toLowerCase().includes(q);});
-  var groups=mhGroupedMembers(members,'',true);
-  if(!groups.length){el.innerHTML='<div class="no-data">No members</div>';return;}
-  el.classList.add('mh-grouped-roster');
-  function card(m){
-    const statusCls=STATUS_CLASS[getPresenceState(m)],localTime=getLocalTime(m.tz||'UTC');
-    var depts=mhMemberDepartments(m).map(function(d){var dc=DEPT_COLORS[d]||'#888';return '<span class="dept-tag" style="color:'+dc+';border-color:'+dc+'44;background:'+dc+'11;">'+esc(DEPT_NAMES[d]||d)+'</span>';}).join('');
-    return `<div class="roster-card"><div style="position:relative;"><div class="tz-av" style="background:linear-gradient(135deg,var(--crimson-dim),#1a0508);border:1px solid rgba(200,16,46,.3);font-size:11px;font-weight:700;">${initials(m.name)}</div><div class="status-dot ${statusCls}" style="position:absolute;bottom:0;right:0;width:10px;height:10px;border:2px solid var(--panel);"></div></div><div><div style="font-size:14px;font-weight:600;cursor:pointer;color:var(--white);" onclick="openMemberProfile('${m.uid}')" title="View profile">${esc(m.name)} <span style="font-size:10px;color:var(--grey-2);">↗</span></div><div style="font-size:11px;color:var(--grey);font-family:'Share Tech Mono',monospace;">${esc(m.email||'')}</div><div style="margin-top:4px;">${depts}</div></div><div style="text-align:right;"><div class="text-mono" style="font-size:13px;color:var(--gold);">${localTime}</div><div style="font-size:10px;color:var(--grey);margin-top:2px;">${getTzOffset(m.tz||'UTC')}</div></div><div><span class="u-role ${normaliseRole(m.role)}">${normaliseRole(m.role).toUpperCase()}</span></div><div style="display:flex;gap:4px;">${currentProfile.role==='admin'?`<button class="icon-btn" onclick="openEditMember('${m.uid}')" title="Edit">✎</button><button class="icon-btn danger" onclick="removeMember('${m.uid}')" title="Remove">✕</button>`:''}</div></div>`;
-  }
-  el.innerHTML=mhGroupHtml(groups,card,'',!!q);
-};
+/* MH-CLEAN-BUILD: retired earlier assignment replacement of renderCrew */
 window.renderCrew=renderCrew;
 
 // Department boards were already department-specific; ensure their member rows are alphabetical.
@@ -10159,9 +10671,7 @@ window.renderDeptBoard=renderDeptBoard;
   if(!document.getElementById(style.id))document.head.appendChild(style);
 })();
 
-function mhIsManagementMember(member){
-  return ['admin','director','project_manager','lead'].includes(normaliseRole((member||{}).role));
-}
+/* MH-CLEAN-BUILD: retired earlier declaration replacement of mhIsManagementMember */
 function mhRc012GroupedMembers(members,preferredDept,includeUnassigned){
   members=mhAlphaMembers(members||[]);
   var management={id:'management',label:'Management',members:[]};
@@ -10296,6 +10806,8 @@ renderOtherAttendees=function(){
   var groups=mhRc012GroupedMembers(members,preferred,true);
   box.innerHTML=groups.length?mhRc012GroupHtml(groups,function(m){return meetingAttendeeRow(m,false);},preferred,!!q,false):
     '<div class="meeting-list-empty">'+(q?'No matching team members.':'Search for a person to add them, or choose “Show team”.')+'</div>';
+  cvpRc022NormaliseAttendeeRows(box);
+  cvpRc022NormaliseAttendeeRows(document.getElementById('mt-auto-attendees'));
 };
 window.renderOtherAttendees=renderOtherAttendees;
 
@@ -10588,7 +11100,7 @@ async function cvpRc014AdvanceMeeting(meeting){
     optionalAttendees:meeting.seriesMembershipPolicy==='dynamic'?[]:(meeting.optionalAttendees||[]),
     rsvp:cvpRc014FreshRsvp(meeting,attendees),
     recurrenceCompleted:false,
-    calendarRevision:cvpGenerateCalendarRevision(),
+    calendarRevision:cvpRc024CalendarRevision(),
     updatedAt:new Date().toISOString()
   };
   await db.collection('meetings').doc(meeting.id).set(update,{merge:true});
@@ -10621,82 +11133,169 @@ async function cvpRc014RollRecurringMeetings(){
 }
 window.cvpRc014RollRecurringMeetings=cvpRc014RollRecurringMeetings;
 
+// Mission Hub v12 RC023 — staged meeting-creation diagnostics.
+// RC024 — scheduler-local calendar revision helper.
+// The legacy helper lives in another module and is not reliably available at runtime.
+// Use the same token format locally so meeting create/edit/cancel/recurrence no longer depend on it.
+function cvpRc024CalendarRevision(){
+  return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
+}
+window.cvpRc024CalendarRevision=cvpRc024CalendarRevision;
+
+function cvpRc023MeetingStageLabel(stage){
+  return ({
+    'start':'STARTING',
+    'validate-session':'VALIDATING SESSION',
+    'validate-form':'VALIDATING FORM',
+    'convert-time':'CONVERTING DATE/TIME',
+    'build-attendees':'BUILDING ATTENDEE LIST',
+    'build-recurrence':'BUILDING RECURRENCE',
+    'build-rsvp':'BUILDING RSVP',
+    'build-document':'BUILDING MEETING DOCUMENT',
+    'write-firestore':'WRITING TO FIRESTORE',
+    'notifications':'SENDING NOTIFICATIONS',
+    'complete':'COMPLETE'
+  })[stage]||String(stage||'UNKNOWN').toUpperCase();
+}
+function cvpRc023RequireElement(id){
+  var el=document.getElementById(id);
+  if(!el)throw new Error('Required meeting field #'+id+' was not found in the page.');
+  return el;
+}
+function cvpRc023ClearPipelineError(){
+  var old=document.getElementById('mt-pipeline-error');if(old)old.remove();
+}
+function cvpRc023ShowPipelineError(stage,error){
+  var label=cvpRc023MeetingStageLabel(stage);
+  var code=cvpRc022MeetingErrorCode(error);
+  var msg=String((error&&error.message)||error||'Unknown error');
+  window.__mhLastMeetingPipelineError={stage:stage,label:label,code:code,message:msg,at:new Date().toISOString(),uid:(currentUser&&currentUser.uid)||''};
+  console.error('[Mission Hub][RC023] Meeting creation failed at '+label,window.__mhLastMeetingPipelineError,error);
+  var host=document.querySelector('#m-meeting .modal-body');
+  if(host){
+    cvpRc023ClearPipelineError();
+    var box=document.createElement('div');box.id='mt-pipeline-error';
+    box.style.cssText='border:1px solid rgba(232,21,58,.55);border-left:3px solid var(--crimson-hi);background:rgba(200,16,46,.08);border-radius:6px;padding:11px 13px;font-size:12px;line-height:1.5;color:var(--grey);';
+    var title=(stage==='write-firestore'?'MEETING WRITE FAILED':'MEETING CREATION FAILED')+' · '+label;
+    var hint='The meeting stopped before it could be completed. The stage below tells us exactly which part failed.';
+    if(stage==='write-firestore'){
+      if(code.indexOf('permission-denied')!==-1)hint='The Hub reached Firestore, but the deployed rules denied creation of the meeting.';
+      else if(code.indexOf('unauthenticated')!==-1)hint='Firebase does not consider this session authenticated.';
+      else hint='The Hub reached Firestore, but the database write failed.';
+    }
+    box.innerHTML='<div style="font-weight:700;color:var(--crimson-hi);margin-bottom:4px;">'+esc(title)+'</div><div>'+esc(hint)+'</div><div style="margin-top:6px;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--gold);">ERROR CODE: '+esc(code)+'</div><div style="margin-top:4px;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--grey-2);word-break:break-word;">'+esc(msg)+'</div><button type="button" class="btn btn-ghost btn-xs" style="margin-top:8px" onclick="cvpRc023ClearPipelineError()">Dismiss</button>';
+    host.appendChild(box);
+  }
+  toast('Meeting creation failed · '+label,'err');
+}
+window.cvpRc023ClearPipelineError=cvpRc023ClearPipelineError;
+
 submitMeeting=async function(){
-  var name=document.getElementById('mt-name').value.trim();
-  if(!name){toast('Enter a meeting name','err');return;}
-  var dateStr=document.getElementById('mt-date').value,timeStr=document.getElementById('mt-time').value||'00:00';
-  if(!dateStr){toast('Choose a meeting date','err');return;}
-  var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
-  var duration=parseInt(document.getElementById('mt-duration').value)||60;
-  var required=[],optional=[];
-  Object.keys(liveData.members||{}).forEach(function(uid){
-    var role=getMeetingRole(uid);
-    if(role==='required')required.push(uid);
-    else if(role==='optional')optional.push(uid);
-  });
-  var ownerAttending=document.getElementById('mt-owner-attending').checked;
-  if(ownerAttending&&!required.includes(currentUser.uid)&&!optional.includes(currentUser.uid))required.push(currentUser.uid);
-  if(!ownerAttending){
-    required=required.filter(function(uid){return uid!==currentUser.uid;});
-    optional=optional.filter(function(uid){return uid!==currentUser.uid;});
-  }
-  var attendees=required.concat(optional.filter(function(uid){return !required.includes(uid);}));
-  if(!attendees.length){toast('Select at least one attendee','err');return;}
-
-  var recurrence=document.getElementById('mt-recurrence').value;
-  var until=(document.getElementById('mt-recur-until')||{}).value||'';
-  var requestedCount=Math.max(2,Math.min(52,parseInt((document.getElementById('mt-recur-count')||{}).value)||6));
-  var membership=(document.getElementById('mt-recur-membership')||{}).value||'fixed';
-  if(recurrence!=='none'&&!until&&!requestedCount){
-    toast('Choose when the recurring meeting should end','err');return;
-  }
-
-  var rsvp=cvpRc014FreshRsvp({ownerAttending:ownerAttending,ownerId:currentUser.uid},attendees);
-  var doc={
-    name:name,
-    dateUtc:dateUtc,
-    notes:document.getElementById('mt-notes').value.trim(),
-    duration:duration,
-    attendees:attendees,
-    requiredAttendees:required,
-    optionalAttendees:optional,
-    rsvp:rsvp,
-    ownerAttending:ownerAttending,
-    createdBy:currentUser.uid,
-    ownerId:currentUser.uid,
-    status:document.getElementById('mt-status').value,
-    provisional:document.getElementById('mt-status').value==='provisional',
-    recurrence:recurrence,
-    seriesId:recurrence==='none'?'':('series_'+currentUser.uid+'_'+Date.now().toString(36)),
-    seriesMode:recurrence==='none'?'single':'rolling',
-    seriesMembershipPolicy:membership,
-    recurrenceEndDate:recurrence==='none'?'':until,
-    recurrenceMaxOccurrences:recurrence==='none'?null:requestedCount,
-    occurrenceIndex:0,
-    seriesStartUtc:dateUtc,
-    departments:Array.from(schedulerSelectedDepts),
-    discordJoin:document.getElementById('mt-discord-join').checked,
-    createdAt:new Date().toISOString(),
-    updatedAt:new Date().toISOString(),
-    calendarRevision:cvpGenerateCalendarRevision()
-  };
-
+  var stage='start';
+  cvpRc022ClearMeetingWriteError();
+  cvpRc023ClearPipelineError();
   try{
+    stage='validate-session';
+    if(!currentUser||!currentUser.uid){toast('Your Firebase session is not signed in','err');return;}
+    if(!db||typeof db.collection!=='function'){toast('Firebase database is not ready','err');return;}
+
+    stage='validate-form';
+    var nameEl=cvpRc023RequireElement('mt-name');
+    var dateEl=cvpRc023RequireElement('mt-date');
+    var timeEl=cvpRc023RequireElement('mt-time');
+    var durationEl=cvpRc023RequireElement('mt-duration');
+    var ownerEl=cvpRc023RequireElement('mt-owner-attending');
+    var recurrenceEl=cvpRc023RequireElement('mt-recurrence');
+    var statusEl=cvpRc023RequireElement('mt-status');
+    var notesEl=cvpRc023RequireElement('mt-notes');
+    var discordEl=cvpRc023RequireElement('mt-discord-join');
+    var name=String(nameEl.value||'').trim();
+    if(!name){toast('Enter a meeting name','err');return;}
+    var dateStr=String(dateEl.value||''),timeStr=String(timeEl.value||'00:00');
+    if(!dateStr){toast('Choose a meeting date','err');return;}
+
+    stage='convert-time';
+    if(typeof localDateTimeToUtc!=='function')throw new Error('localDateTimeToUtc is not available.');
+    var dateUtc=localDateTimeToUtc(dateStr,timeStr,(currentProfile&&currentProfile.tz)||'UTC');
+    if(!dateUtc||isNaN(new Date(dateUtc).getTime()))throw new Error('The converted meeting date/time is invalid: '+String(dateUtc));
+    var duration=parseInt(durationEl.value,10)||60;
+
+    stage='build-attendees';
+    if(typeof getMeetingRole!=='function')throw new Error('getMeetingRole is not available.');
+    var required=[],optional=[];
+    Object.keys((liveData&&liveData.members)||{}).forEach(function(uid){
+      var role=getMeetingRole(uid);
+      if(role==='required')required.push(uid);
+      else if(role==='optional')optional.push(uid);
+    });
+    required=Array.from(new Set(required));
+    optional=Array.from(new Set(optional.filter(function(uid){return !required.includes(uid);}))); 
+    var ownerAttending=!!ownerEl.checked;
+    if(ownerAttending&&!required.includes(currentUser.uid)&&!optional.includes(currentUser.uid))required.push(currentUser.uid);
+    if(!ownerAttending){
+      required=required.filter(function(uid){return uid!==currentUser.uid;});
+      optional=optional.filter(function(uid){return uid!==currentUser.uid;});
+    }
+    var attendees=required.concat(optional.filter(function(uid){return !required.includes(uid);}));
+    if(!attendees.length){toast('Select at least one attendee','err');return;}
+
+    stage='build-recurrence';
+    var recurrence=String(recurrenceEl.value||'none');
+    var untilEl=document.getElementById('mt-recur-until');
+    var countEl=document.getElementById('mt-recur-count');
+    var membershipEl=document.getElementById('mt-recur-membership');
+    var until=untilEl?String(untilEl.value||''):'';
+    var requestedCount=Math.max(2,Math.min(52,parseInt(countEl&&countEl.value,10)||6));
+    var membership=membershipEl?String(membershipEl.value||'fixed'):'fixed';
+
+    stage='build-rsvp';
+    if(typeof cvpRc014FreshRsvp!=='function')throw new Error('cvpRc014FreshRsvp is not available.');
+    var rsvp=cvpRc014FreshRsvp({ownerAttending:ownerAttending,ownerId:currentUser.uid},attendees);
+
+    stage='build-document';
+    var selectedDepartments=[];
+    if(typeof schedulerSelectedDepts!=='undefined'&&schedulerSelectedDepts&&typeof schedulerSelectedDepts.forEach==='function')schedulerSelectedDepts.forEach(function(d){selectedDepartments.push(d);});
+    var status=String(statusEl.value||'confirmed');
+    var doc={
+      name:name,dateUtc:dateUtc,notes:String(notesEl.value||'').trim(),duration:duration,
+      attendees:attendees,requiredAttendees:required,optionalAttendees:optional,rsvp:rsvp,
+      ownerAttending:ownerAttending,createdBy:currentUser.uid,ownerId:currentUser.uid,
+      status:status,provisional:status==='provisional',
+      recurrence:recurrence,seriesId:recurrence==='none'?'':('series_'+currentUser.uid+'_'+Date.now().toString(36)),
+      seriesMode:recurrence==='none'?'single':'rolling',seriesMembershipPolicy:membership,
+      recurrenceEndDate:recurrence==='none'?'':until,recurrenceMaxOccurrences:recurrence==='none'?null:requestedCount,
+      occurrenceIndex:0,seriesStartUtc:dateUtc,departments:selectedDepartments,
+      discordJoin:!!discordEl.checked,
+      createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),calendarRevision:cvpRc024CalendarRevision()
+    };
+
+    stage='write-firestore';
     var ref=await db.collection('meetings').add(doc);
-    await Promise.all(attendees.map(function(uid){
-      var tz=(liveData.members[uid]&&liveData.members[uid].tz)||'UTC';
-      return createUserNotification(
-        uid,
-        'meeting_invite',
-        doc.provisional?'Provisional meeting proposed: '+name:(recurrence!=='none'?'Recurring meeting invitation: '+name:'Meeting invitation: '+name),
-        formatMeetingRangeForTz(dateUtc,duration,tz)+(recurrence!=='none'?' · '+cvpRc014SeriesLabel(doc):''),
-        ref.id
-      );
-    }));
+    if(!ref||!ref.id)throw new Error('Firestore returned no meeting document ID after add().');
+
+    stage='notifications';
+    // Notifications remain non-fatal: the meeting has already been created at this point.
+    try{
+      await Promise.all(attendees.map(function(uid){
+        var tz=((liveData&&liveData.members&&liveData.members[uid])&&liveData.members[uid].tz)||'UTC';
+        return createUserNotification(
+          uid,'meeting_invite',
+          doc.provisional?'Provisional meeting proposed: '+name:(recurrence!=='none'?'Recurring meeting invitation: '+name:'Meeting invitation: '+name),
+          formatMeetingRangeForTz(dateUtc,duration,tz)+(recurrence!=='none'?' · '+cvpRc014SeriesLabel(doc):''),ref.id
+        );
+      }));
+    }catch(notificationError){
+      console.warn('[Mission Hub][RC024] Meeting created, notification stage failed non-fatally',notificationError);
+    }
+
+    stage='complete';
     closeModal('m-meeting');
     resetMeetingPlanner();
     toast(recurrence!=='none'?'Recurring meeting series created':'Meeting scheduled!','ok');
-  }catch(e){toast(e.message||'Could not schedule meeting','err');}
+  }catch(e){
+    cvpRc023ShowPipelineError(stage,e);
+    return;
+  }
 };
 window.submitMeeting=submitMeeting;
 
@@ -10874,7 +11473,7 @@ saveEditMeeting=async function(){
   if(recurrenceChanged||timingChanged){
     update.occurrenceIndex=0;
     update.seriesStartUtc=dateUtc;
-    update.calendarRevision=cvpGenerateCalendarRevision();
+    update.calendarRevision=cvpRc024CalendarRevision();
     update.rsvp=cvpRc014FreshRsvp(old,attendees);
   }
 
@@ -10904,17 +11503,57 @@ saveEditMeeting=async function(){
 };
 window.saveEditMeeting=saveEditMeeting;
 
+// Mission Hub v12 RC022 — Scheduler recovery: UID state, duplicate-row-safe controls, Firebase diagnostics.
+function cvpRc022NormaliseAttendeeRows(root){
+  if(!root)return;
+  var counts={};
+  Array.from(root.querySelectorAll('.meeting-attendee-row[data-uid]')).forEach(function(row){
+    var uid=String(row.dataset.uid||'');if(!uid)return;
+    counts[uid]=(counts[uid]||0)+1;
+    var groupName='mt-role-'+uid+'-row-'+counts[uid]+'-'+(root.id||'list');
+    row.querySelectorAll('input[type="radio"][value]').forEach(function(input){
+      input.name=groupName;
+      input.dataset.meetingRoleUid=uid;
+      input.checked=input.value===getMeetingRole(uid);
+    });
+  });
+}
+function cvpRc022MeetingErrorCode(error){
+  var code=String((error&&error.code)||'unknown');
+  return code.replace(/^firestore\//i,'').replace(/^firebase\//i,'');
+}
+function cvpRc022ClearMeetingWriteError(){
+  var old=document.getElementById('mt-write-error');if(old)old.remove();
+}
+function cvpRc022ShowMeetingWriteError(error){
+  var code=cvpRc022MeetingErrorCode(error),msg=String((error&&error.message)||'Unknown Firebase error');
+  var hint='The Hub reached Firebase, but Firebase rejected or failed the meeting write.';
+  if(code.indexOf('permission-denied')!==-1)hint='Firestore denied creation of the meeting. The scheduler reached Firebase correctly; the deployed Firestore rules for the meetings collection need checking.';
+  else if(code.indexOf('unauthenticated')!==-1)hint='Firebase does not consider this session authenticated. Sign out and back in, then try again.';
+  else if(code.indexOf('unavailable')!==-1||code.indexOf('network')!==-1)hint='Firebase could not be reached. Check the connection and try again.';
+  window.__mhLastMeetingWriteError={code:code,message:msg,at:new Date().toISOString(),uid:(currentUser&&currentUser.uid)||''};
+  console.error('[Mission Hub][RC022] Meeting write failed',window.__mhLastMeetingWriteError,error);
+  var host=document.querySelector('#m-meeting .modal-body');
+  if(host){
+    cvpRc022ClearMeetingWriteError();
+    var box=document.createElement('div');box.id='mt-write-error';
+    box.style.cssText='border:1px solid rgba(232,21,58,.55);border-left:3px solid var(--crimson-hi);background:rgba(200,16,46,.08);border-radius:6px;padding:11px 13px;font-size:12px;line-height:1.5;color:var(--grey);';
+    box.innerHTML='<div style="font-weight:700;color:var(--crimson-hi);margin-bottom:4px;">MEETING WRITE FAILED · '+esc(code)+'</div><div>'+esc(hint)+'</div><div style="margin-top:5px;font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--grey-2);word-break:break-word;">'+esc(msg)+'</div><button type="button" class="btn btn-ghost btn-xs" style="margin-top:8px" onclick="cvpRc022ClearMeetingWriteError()">Dismiss</button>';
+    host.appendChild(box);
+  }
+  toast('Meeting could not be created · '+code,'err');
+}
+window.cvpRc022ClearMeetingWriteError=cvpRc022ClearMeetingWriteError;
+
 // Keep attendee list position and expanded departments stable while selecting roles.
 function cvpRc015UpdateAttendeeRow(uid,role){
-  document.querySelectorAll('input[name="mt-role-'+uid+'"]').forEach(function(input){
-    input.checked=input.value===role;
-  });
-  var row=document.querySelector('.meeting-attendee-row[data-uid="'+uid+'"]');
-  if(row){
+  Array.from(document.querySelectorAll('.meeting-attendee-row[data-uid]')).forEach(function(row){
+    if(String(row.dataset.uid||'')!==String(uid))return;
+    row.querySelectorAll('input[type="radio"][value]').forEach(function(input){input.checked=input.value===role;});
     row.classList.toggle('selected',role!=='none');
     var button=row.querySelector('button');
     if(button)button.textContent=role==='none'?'Not invited':'Remove from meeting';
-  }
+  });
 }
 setMeetingRole=function(uid,role){
   meetingRoleState[uid]=role;
